@@ -21,8 +21,8 @@ public class SanPhamService {
     }
 
     public SanPham update(SanPham sanPham) {
-        SanPham existing = sanPhamRepository.findById(sanPham.getMaSanPham())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm: " + sanPham.getMaSanPham()));
+        SanPham existing = sanPhamRepository.findById(sanPham.getId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm: " + sanPham.getId()));
 
         existing.setTenSanPham(sanPham.getTenSanPham());
         existing.setGiaVon(sanPham.getGiaVon());
@@ -32,12 +32,12 @@ public class SanPhamService {
         return sanPhamRepository.save(existing);
     }
 
-    public void delete(String maSanPham) {
-        sanPhamRepository.deleteById(maSanPham);
+    public void delete(long id) {
+        sanPhamRepository.deleteById(id);
     }
 
-    public SanPham findById(String maSanPham) {
-        return sanPhamRepository.findById(maSanPham).orElse(null);
+    public SanPham findById(long id) {
+        return sanPhamRepository.findById(id).orElse(null);
     }
 
     public List<SanPham> findAll() {

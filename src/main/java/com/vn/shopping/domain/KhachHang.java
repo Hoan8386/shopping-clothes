@@ -15,8 +15,8 @@ import lombok.*;
 public class KhachHang {
 
     @Id
-    @Column(name = "MaKhachHang", length = 50)
-    private String maKhachHang;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
     @Column(name = "TenKhachHang", length = 255)
     private String tenKhachHang;

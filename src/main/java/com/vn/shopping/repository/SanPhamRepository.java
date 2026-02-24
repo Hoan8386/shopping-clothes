@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 import com.vn.shopping.domain.SanPham;
 
 @Repository
-public interface SanPhamRepository extends JpaRepository<SanPham, String> {
+public interface SanPhamRepository extends JpaRepository<SanPham, Long> {
 }

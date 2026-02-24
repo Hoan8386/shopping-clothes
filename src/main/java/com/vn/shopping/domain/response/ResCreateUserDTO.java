@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ResCreateUserDTO {
-    private String maKhachHang;
+    private long id;
     private String tenKhachHang;
     private String email;
     private String sdt;

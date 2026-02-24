@@ -82,7 +82,7 @@ public class AuthController {
                 role.getName(); // Trigger lazy loading
             }
             ResLoginDTO.UserLogin userLogin = new ResLoginDTO.UserLogin(
-                    nhanVien.getMaNhanVien().hashCode(),
+                    nhanVien.getId(),
                     nhanVien.getEmail(),
                     nhanVien.getTenNhanVien(),
                     role);
@@ -97,7 +97,7 @@ public class AuthController {
                     role.getName(); // Trigger lazy loading
                 }
                 ResLoginDTO.UserLogin userLogin = new ResLoginDTO.UserLogin(
-                        currentUserDB.getMaKhachHang().hashCode(),
+                        currentUserDB.getId(),
                         currentUserDB.getEmail(),
                         currentUserDB.getTenKhachHang(),
                         role);
@@ -147,7 +147,7 @@ public class AuthController {
             if (role != null) {
                 role.getName(); // Trigger lazy loading
             }
-            userLogin.setId(nhanVienDB.getMaNhanVien().hashCode());
+            userLogin.setId(nhanVienDB.getId());
             userLogin.setEmail(nhanVienDB.getEmail());
             userLogin.setName(nhanVienDB.getTenNhanVien());
             userLogin.setRole(role);
@@ -160,7 +160,7 @@ public class AuthController {
                 if (role != null) {
                     role.getName(); // Trigger lazy loading
                 }
-                userLogin.setId(currentUserDB.getMaKhachHang().hashCode());
+                userLogin.setId(currentUserDB.getId());
                 userLogin.setEmail(currentUserDB.getEmail());
                 userLogin.setName(currentUserDB.getTenKhachHang());
                 userLogin.setRole(role);
@@ -196,7 +196,7 @@ public class AuthController {
                 role.getName(); // Trigger lazy loading
             }
             ResLoginDTO.UserLogin userLogin = new ResLoginDTO.UserLogin(
-                    nhanVien.getMaNhanVien().hashCode(),
+                    nhanVien.getId(),
                     nhanVien.getEmail(),
                     nhanVien.getTenNhanVien(),
                     role);
@@ -208,7 +208,7 @@ public class AuthController {
                 role.getName(); // Trigger lazy loading
             }
             ResLoginDTO.UserLogin userLogin = new ResLoginDTO.UserLogin(
-                    khachHang.getMaKhachHang().hashCode(),
+                    khachHang.getId(),
                     khachHang.getEmail(),
                     khachHang.getTenKhachHang(),
                     role);

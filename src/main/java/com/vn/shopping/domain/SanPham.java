@@ -14,8 +14,8 @@ import java.math.BigDecimal;
 public class SanPham {
 
     @Id
-    @Column(name = "MaSanPham", length = 50)
-    private String maSanPham;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
     @Column(name = "TenSanPham", length = 255, nullable = false)
     private String tenSanPham;

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.vn.shopping.domain.KhachHang;
 
 @Repository
-public interface KhachHangRepository extends JpaRepository<KhachHang, String> {
+public interface KhachHangRepository extends JpaRepository<KhachHang, Long> {
     Optional<KhachHang> findByEmail(String email);
 
     boolean existsByEmail(String email);

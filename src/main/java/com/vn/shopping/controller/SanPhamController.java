@@ -35,10 +35,10 @@ public class SanPhamController {
      */
     @GetMapping("/{id}")
     @ApiMessage("Get detail product")
-    public ResponseEntity<SanPham> getById(@PathVariable("id") String maSanPham) throws IdInvalidException {
-        SanPham sp = sanPhamService.findById(maSanPham);
+    public ResponseEntity<SanPham> getById(@PathVariable("id") long id) throws IdInvalidException {
+        SanPham sp = sanPhamService.findById(id);
         if (sp == null) {
-            throw new IdInvalidException("Không tìm thấy sản phẩm: " + maSanPham);
+            throw new IdInvalidException("Không tìm thấy sản phẩm: " + id);
         }
         return ResponseEntity.ok(sp);
     }
@@ -60,7 +60,7 @@ public class SanPhamController {
     @PutMapping
     @ApiMessage("Update product")
     public ResponseEntity<SanPham> update(@RequestBody SanPham sanPham) throws IdInvalidException {
-        if (sanPham.getMaSanPham() == null) {
+        if (sanPham.getId() == 0) {
             throw new IdInvalidException("Mã sản phẩm không được để trống");
         }
         SanPham updated = sanPhamService.update(sanPham);
@@ -72,12 +72,12 @@ public class SanPhamController {
      */
     @DeleteMapping("/{id}")
     @ApiMessage("Delete product ")
-    public ResponseEntity<Void> delete(@PathVariable("id") String maSanPham) throws IdInvalidException {
-        SanPham sp = sanPhamService.findById(maSanPham);
+    public ResponseEntity<Void> delete(@PathVariable("id") long id) throws IdInvalidException {
+        SanPham sp = sanPhamService.findById(id);
         if (sp == null) {
-            throw new IdInvalidException("Không tìm thấy sản phẩm: " + maSanPham);
+            throw new IdInvalidException("Không tìm thấy sản phẩm: " + id);
         }
-        sanPhamService.delete(maSanPham);
+        sanPhamService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

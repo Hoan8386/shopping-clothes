@@ -41,7 +41,7 @@ public class KhachHangService {
 
     public ResCreateUserDTO convertToResCreateUserDTO(KhachHang khachHang) {
         ResCreateUserDTO dto = new ResCreateUserDTO();
-        dto.setMaKhachHang(khachHang.getMaKhachHang());
+        dto.setId(khachHang.getId());
         dto.setTenKhachHang(khachHang.getTenKhachHang());
         dto.setEmail(khachHang.getEmail());
         dto.setSdt(khachHang.getSdt());
