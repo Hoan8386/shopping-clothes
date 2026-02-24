@@ -1,5 +1,6 @@
 package com.vn.shopping.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
@@ -10,6 +11,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+
 public class KhachHang {
 
     @Id
@@ -31,6 +33,10 @@ public class KhachHang {
     @Column(name = "DiemTichLuy")
     private Integer diemTichLuy;
 
+    @Column(name = "RefreshToken", columnDefinition = "MEDIUMTEXT")
+    private String refreshToken;
+
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
     @JsonIgnoreProperties(value = { "permissions" })

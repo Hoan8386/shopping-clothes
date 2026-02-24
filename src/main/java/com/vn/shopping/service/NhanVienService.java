@@ -17,4 +17,16 @@ public class NhanVienService {
     public NhanVien findByEmail(String email) {
         return nhanVienRepository.findByEmail(email).orElse(null);
     }
+
+    public void updateUserToken(String token, String email) {
+        NhanVien nhanVien = this.findByEmail(email);
+        if (nhanVien != null) {
+            nhanVien.setRefreshToken(token);
+            nhanVienRepository.save(nhanVien);
+        }
+    }
+
+    public NhanVien getUserByRefreshTokenAndEmail(String refreshToken, String email) {
+        return nhanVienRepository.findByRefreshTokenAndEmail(refreshToken, email).orElse(null);
+    }
 }

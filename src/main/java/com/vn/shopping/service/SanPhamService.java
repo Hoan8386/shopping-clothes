@@ -27,10 +27,6 @@ public class SanPhamService {
         existing.setTenSanPham(sanPham.getTenSanPham());
         existing.setGiaVon(sanPham.getGiaVon());
         existing.setGiaBan(sanPham.getGiaBan());
-        existing.setKieuSanPham(sanPham.getKieuSanPham());
-        existing.setNhaCungCap(sanPham.getNhaCungCap());
-        existing.setBoSuuTap(sanPham.getBoSuuTap());
-        existing.setThuongHieu(sanPham.getThuongHieu());
         existing.setTrangThai(sanPham.getTrangThai());
 
         return sanPhamRepository.save(existing);

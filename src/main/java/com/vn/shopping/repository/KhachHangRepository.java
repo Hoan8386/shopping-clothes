@@ -10,4 +10,8 @@ import com.vn.shopping.domain.KhachHang;
 @Repository
 public interface KhachHangRepository extends JpaRepository<KhachHang, String> {
     Optional<KhachHang> findByEmail(String email);
+
+    boolean existsByEmail(String email);
+
+    Optional<KhachHang> findByRefreshTokenAndEmail(String refreshToken, String email);
 }

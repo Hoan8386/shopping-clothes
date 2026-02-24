@@ -1,5 +1,6 @@
 package com.vn.shopping.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.vn.shopping.domain.enums.ChucVu;
 import jakarta.persistence.*;
@@ -11,6 +12,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+
 public class NhanVien {
 
     @Id
@@ -29,14 +31,14 @@ public class NhanVien {
     @Column(name = "Sdt", length = 20)
     private String sdt;
 
-    @ManyToOne
-    @JoinColumn(name = "MaCuaHang")
-    private CuaHang cuaHang;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "ChucVu", length = 50)
     private ChucVu chucVu;
 
+    @Column(name = "RefreshToken", columnDefinition = "MEDIUMTEXT")
+    private String refreshToken;
+
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
     @JsonIgnoreProperties(value = { "permissions" })

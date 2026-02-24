@@ -27,6 +27,7 @@ import lombok.Setter;
 @Table(name = "roles")
 @Getter
 @Setter
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

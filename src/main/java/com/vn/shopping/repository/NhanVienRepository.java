@@ -10,4 +10,6 @@ import com.vn.shopping.domain.NhanVien;
 @Repository
 public interface NhanVienRepository extends JpaRepository<NhanVien, String> {
     Optional<NhanVien> findByEmail(String email);
+
+    Optional<NhanVien> findByRefreshTokenAndEmail(String refreshToken, String email);
 }

@@ -26,22 +26,6 @@ public class SanPham {
     @Column(name = "GiaBan", precision = 18, scale = 2)
     private BigDecimal giaBan;
 
-    @ManyToOne
-    @JoinColumn(name = "MaKieuSanPham")
-    private KieuSanPham kieuSanPham;
-
-    @ManyToOne
-    @JoinColumn(name = "MaNhaCungCap")
-    private NhaCungCap nhaCungCap;
-
-    @ManyToOne
-    @JoinColumn(name = "MaSuuTap")
-    private BoSuuTap boSuuTap;
-
-    @ManyToOne
-    @JoinColumn(name = "MaThuongHieu")
-    private ThuongHieu thuongHieu;
-
     @Column(name = "TrangThai", length = 50)
     private String trangThai;
 }
