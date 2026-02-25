@@ -28,7 +28,7 @@ import lombok.*;
 public class Permission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @NotBlank(message = "name không được để trống")
     private String name;

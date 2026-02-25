@@ -29,27 +29,27 @@ INSERT INTO permissions (name, apiPath, method, module, createdAt) VALUES
     ('Xóa sản phẩm',            '/api/v1/san-pham/{id}',                'DELETE', 'SAN_PHAM',       NOW()),
     ('Xem sản phẩm',            '/api/v1/san-pham',                     'GET',    'SAN_PHAM',       NOW()),
     -- GioHang (5-7)
-    ('Thêm giỏ hàng',           '/api/v1/gio-hang',                     'POST',   'GIO_HANG',       NOW()),
-    ('Xem giỏ hàng',            '/api/v1/gio-hang',                     'GET',    'GIO_HANG',       NOW()),
-    ('Xóa giỏ hàng',            '/api/v1/gio-hang/{id}',                'DELETE', 'GIO_HANG',       NOW()),
+    ('Thêm SP vào giỏ hàng',    '/api/v1/gio-hang/them-san-pham',                                        'POST',   'GIO_HANG',       NOW()),
+    ('Xem giỏ hàng theo KH',    '/api/v1/gio-hang/khach-hang/{khachHangId}',                              'GET',    'GIO_HANG',       NOW()),
+    ('Xóa SP khỏi giỏ hàng',   '/api/v1/gio-hang/chi-tiet/{maChiTietGioHang}', 'DELETE', 'GIO_HANG',       NOW()),
     -- SanPham chi tiết (8)
     ('Xem chi tiết sản phẩm',   '/api/v1/san-pham/{id}',                'GET',    'SAN_PHAM',       NOW()),
-    -- MauSac (9-12)
+    -- MauSac (9-13)
     ('Xem màu sắc',             '/api/v1/mau-sac',                      'GET',    'MAU_SAC',        NOW()),
     ('Tạo màu sắc',             '/api/v1/mau-sac',                      'POST',   'MAU_SAC',        NOW()),
     ('Sửa màu sắc',             '/api/v1/mau-sac',                      'PUT',    'MAU_SAC',        NOW()),
     ('Xóa màu sắc',             '/api/v1/mau-sac/{id}',                 'DELETE', 'MAU_SAC',        NOW()),
     ('Xem chi tiết màu sắc',    '/api/v1/mau-sac/{id}',                 'GET',    'MAU_SAC',        NOW()),
-    -- KichThuoc (13-16, 24)
+    -- KichThuoc (14-18)
     ('Xem kích thước',          '/api/v1/kich-thuoc',                   'GET',    'KICH_THUOC',     NOW()),
     ('Tạo kích thước',          '/api/v1/kich-thuoc',                   'POST',   'KICH_THUOC',     NOW()),
     ('Sửa kích thước',          '/api/v1/kich-thuoc',                   'PUT',    'KICH_THUOC',     NOW()),
     ('Xóa kích thước',          '/api/v1/kich-thuoc/{id}',              'DELETE', 'KICH_THUOC',     NOW()),
     ('Xem chi tiết kích thước', '/api/v1/kich-thuoc/{id}',              'GET',    'KICH_THUOC',     NOW()),
-    -- ChiTietSanPham (17-22)
+    -- ChiTietSanPham (19-24)
     ('Xem chi tiết SP (all)',    '/api/v1/chi-tiet-san-pham',           'GET',    'CHI_TIET_SP',    NOW()),
     ('Xem chi tiết SP (id)',     '/api/v1/chi-tiet-san-pham/{id}',      'GET',    'CHI_TIET_SP',    NOW()),
-    ('Xem CTSP theo sản phẩm',  '/api/v1/chi-tiet-san-pham/san-pham/{id}','GET', 'CHI_TIET_SP',    NOW()),
+    ('Xem CTSP theo sản phẩm',  '/api/v1/chi-tiet-san-pham/san-pham/{sanPhamId}','GET', 'CHI_TIET_SP',    NOW()),
     ('Tạo chi tiết SP',         '/api/v1/chi-tiet-san-pham',           'POST',   'CHI_TIET_SP',    NOW()),
     ('Sửa chi tiết SP',         '/api/v1/chi-tiet-san-pham',           'PUT',    'CHI_TIET_SP',    NOW()),
     ('Xóa chi tiết SP',         '/api/v1/chi-tiet-san-pham/{id}',      'DELETE', 'CHI_TIET_SP',    NOW());
@@ -69,9 +69,9 @@ INSERT INTO permission_role (role_id, permission_id) VALUES
 -- NHAN_VIEN: chỉ xem
 INSERT INTO permission_role (role_id, permission_id) VALUES
     (3,4),(3,8),(3,9),(3,13),(3,14),(3,18),(3,19),(3,20),(3,21);
--- KHACH_HANG: xem sp, mau sac, kich thuoc, chi tiet sp
+-- KHACH_HANG: xem sp + giỏ hàng (thêm/xem/xóa) + mau sac + kich thuoc + chi tiet sp
 INSERT INTO permission_role (role_id, permission_id) VALUES
-    (4,4),(4,8),(4,9),(4,13),(4,14),(4,18),(4,19),(4,20),(4,21);
+    (4,4),(4,5),(4,6),(4,7),(4,8),(4,9),(4,13),(4,14),(4,18),(4,19),(4,20),(4,21);
 
 -- 4. NhanVien (NhanVien.java)
 -- password = BCrypt hash của '123456'

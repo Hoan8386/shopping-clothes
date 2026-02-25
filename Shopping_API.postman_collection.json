@@ -270,19 +270,19 @@
 			"description": "Đăng nhập bằng tài khoản khách hàng trước khi test (Login KH1)",
 			"item": [
 				{
-					"name": "Xem giỏ hàng",
+					"name": "Xem giỏ hàng theo khách hàng",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/v1/gio-hang",
+							"raw": "{{base_url}}/api/v1/gio-hang/khach-hang/1",
 							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "gio-hang"]
+							"path": ["api", "v1", "gio-hang", "khach-hang", "1"]
 						}
 					}
 				},
 				{
-					"name": "Thêm sản phẩm vào giỏ",
+					"name": "Thêm sản phẩm vào giỏ (KH1, CTSP1, SL=2)",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -293,17 +293,17 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"maChiTietSanPham\": 1,\n    \"soLuong\": 2\n}"
+							"raw": "{\n    \"maKhachHang\": 1,\n    \"maChiTietSanPham\": 1,\n    \"soLuong\": 2\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/v1/gio-hang",
+							"raw": "{{base_url}}/api/v1/gio-hang/them-san-pham",
 							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "gio-hang"]
+							"path": ["api", "v1", "gio-hang", "them-san-pham"]
 						}
 					}
 				},
 				{
-					"name": "Thêm sản phẩm khác vào giỏ",
+					"name": "Thêm sản phẩm khác vào giỏ (KH1, CTSP3, SL=1)",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -314,19 +314,19 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"maChiTietSanPham\": 3,\n    \"soLuong\": 1\n}"
+							"raw": "{\n    \"maKhachHang\": 1,\n    \"maChiTietSanPham\": 3,\n    \"soLuong\": 1\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/v1/gio-hang",
+							"raw": "{{base_url}}/api/v1/gio-hang/them-san-pham",
 							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "gio-hang"]
+							"path": ["api", "v1", "gio-hang", "them-san-pham"]
 						}
 					}
 				},
 				{
-					"name": "Cập nhật số lượng trong giỏ",
+					"name": "Thêm SP đã có trong giỏ (cộng dồn SL)",
 					"request": {
-						"method": "PUT",
+						"method": "POST",
 						"header": [
 							{
 								"key": "Content-Type",
@@ -335,24 +335,24 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"maChiTietSanPham\": 1,\n    \"soLuong\": 5\n}"
+							"raw": "{\n    \"maKhachHang\": 1,\n    \"maChiTietSanPham\": 1,\n    \"soLuong\": 3\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/v1/gio-hang",
+							"raw": "{{base_url}}/api/v1/gio-hang/them-san-pham",
 							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "gio-hang"]
+							"path": ["api", "v1", "gio-hang", "them-san-pham"]
 						}
 					}
 				},
 				{
-					"name": "Xóa sản phẩm khỏi giỏ",
+					"name": "Xóa chi tiết giỏ hàng (CTGH=1)",
 					"request": {
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/v1/gio-hang/3",
+							"raw": "{{base_url}}/api/v1/gio-hang/chi-tiet/1",
 							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "gio-hang", "3"]
+							"path": ["api", "v1", "gio-hang", "chi-tiet", "1"]
 						}
 					}
 				}
