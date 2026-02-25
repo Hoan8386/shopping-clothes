@@ -17,6 +17,7 @@ public class NhanVien {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "MaNhanVien")
     private long id;
 
     @Column(name = "TenNhanVien", length = 255)
