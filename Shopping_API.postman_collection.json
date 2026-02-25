@@ -1,4 +1,4 @@
-{
+﻿{
 	"info": {
 		"_postman_id": "shopping-api-collection",
 		"name": "Shopping API",
@@ -171,7 +171,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"maKhachHang\": \"KH99\",\n    \"tenKhachHang\": \"Nguyễn Test\",\n    \"sdt\": \"0999999999\",\n    \"email\": \"test@gmail.com\",\n    \"password\": \"123456\"\n}"
+							"raw": "{\n    \"tenKhachHang\": \"Nguyễn Test\",\n    \"sdt\": \"0999999999\",\n    \"email\": \"test@gmail.com\",\n    \"password\": \"123456\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/auth/register",
@@ -203,9 +203,9 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/v1/san-pham/SP1",
+							"raw": "{{base_url}}/api/v1/san-pham/1",
 							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "san-pham", "SP1"]
+							"path": ["api", "v1", "san-pham", "1"]
 						}
 					}
 				},
@@ -221,7 +221,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"maSanPham\": \"SP6\",\n    \"tenSanPham\": \"Áo Thun Basic\",\n    \"giaVon\": 80,\n    \"giaBan\": 180,\n    \"kieuSanPham\": {\n        \"maKieuSanPham\": \"KSP1\"\n    },\n    \"nhaCungCap\": {\n        \"maNhaCungCap\": \"NCC1\"\n    },\n    \"boSuuTap\": {\n        \"maSuuTap\": \"BST3\"\n    },\n    \"thuongHieu\": {\n        \"maThuongHieu\": \"TH1\"\n    },\n    \"trangThai\": \"Kinh doanh\"\n}"
+							"raw": "{\n    \"tenSanPham\": \"Áo Thun Basic\",\n    \"giaVon\": 80,\n    \"giaBan\": 180,\n    \"trangThai\": \"Kinh doanh\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/san-pham",
@@ -242,7 +242,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"maSanPham\": \"SP6\",\n    \"tenSanPham\": \"Áo Thun Basic V2\",\n    \"giaVon\": 90,\n    \"giaBan\": 200,\n    \"kieuSanPham\": {\n        \"maKieuSanPham\": \"KSP1\"\n    },\n    \"nhaCungCap\": {\n        \"maNhaCungCap\": \"NCC1\"\n    },\n    \"boSuuTap\": {\n        \"maSuuTap\": \"BST3\"\n    },\n    \"thuongHieu\": {\n        \"maThuongHieu\": \"TH1\"\n    },\n    \"trangThai\": \"Kinh doanh\"\n}"
+							"raw": "{\n    \"tenSanPham\": \"Áo Thun Basic V2\",\n    \"giaVon\": 90,\n    \"giaBan\": 200,\n    \"trangThai\": \"Kinh doanh\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/san-pham",
@@ -257,9 +257,9 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/v1/san-pham/SP6",
+							"raw": "{{base_url}}/api/v1/san-pham/6",
 							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "san-pham", "SP6"]
+							"path": ["api", "v1", "san-pham", "6"]
 						}
 					}
 				}
@@ -293,7 +293,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"maChiTietSanPham\": \"CT1\",\n    \"soLuong\": 2\n}"
+							"raw": "{\n    \"maChiTietSanPham\": 1,\n    \"soLuong\": 2\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/gio-hang",
@@ -314,7 +314,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"maChiTietSanPham\": \"CT3\",\n    \"soLuong\": 1\n}"
+							"raw": "{\n    \"maChiTietSanPham\": 3,\n    \"soLuong\": 1\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/gio-hang",
@@ -335,7 +335,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"maChiTietSanPham\": \"CT1\",\n    \"soLuong\": 5\n}"
+							"raw": "{\n    \"maChiTietSanPham\": 1,\n    \"soLuong\": 5\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/gio-hang",
@@ -350,9 +350,9 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/v1/gio-hang/CT3",
+							"raw": "{{base_url}}/api/v1/gio-hang/3",
 							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "gio-hang", "CT3"]
+							"path": ["api", "v1", "gio-hang", "3"]
 						}
 					}
 				}
@@ -425,12 +425,243 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"maSanPham\": \"SP99\",\n    \"tenSanPham\": \"Test bị chặn\",\n    \"giaVon\": 10,\n    \"giaBan\": 20,\n    \"trangThai\": \"Kinh doanh\"\n}"
+							"raw": "{\n    \"tenSanPham\": \"Test bị chặn\",\n    \"giaVon\": 10,\n    \"giaBan\": 20,\n    \"trangThai\": \"Kinh doanh\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/san-pham",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "san-pham"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Màu Sắc",
+			"item": [
+				{
+					"name": "Xem tất cả màu sắc",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/mau-sac",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "mau-sac"]
+						}
+					}
+				},
+				{
+					"name": "Xem chi tiết màu sắc",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/mau-sac/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "mau-sac", "1"]
+						}
+					}
+				},
+				{
+					"name": "Tạo màu sắc (ADMIN/QUAN_LY)",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tenMauSac\": \"Tím\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/mau-sac",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "mau-sac"]
+						}
+					}
+				},
+				{
+					"name": "Sửa màu sắc (ADMIN/QUAN_LY)",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"tenMauSac\": \"Trắng sữa\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/mau-sac",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "mau-sac"]
+						}
+					}
+				},
+				{
+					"name": "Xóa màu sắc (ADMIN/QUAN_LY)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/mau-sac/6",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "mau-sac", "6"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Kích Thước",
+			"item": [
+				{
+					"name": "Xem tất cả kích thước",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/kich-thuoc",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "kich-thuoc"]
+						}
+					}
+				},
+				{
+					"name": "Xem chi tiết kích thước",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/kich-thuoc/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "kich-thuoc", "1"]
+						}
+					}
+				},
+				{
+					"name": "Tạo kích thước (ADMIN/QUAN_LY)",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tenKichThuoc\": \"XXXL\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/kich-thuoc",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "kich-thuoc"]
+						}
+					}
+				},
+				{
+					"name": "Sửa kích thước (ADMIN/QUAN_LY)",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"tenKichThuoc\": \"Siêu nhỏ\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/kich-thuoc",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "kich-thuoc"]
+						}
+					}
+				},
+				{
+					"name": "Xóa kích thước (ADMIN/QUAN_LY)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/kich-thuoc/6",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "kich-thuoc", "6"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Chi Tiết Sản Phẩm",
+			"item": [
+				{
+					"name": "Xem tất cả chi tiết SP",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/chi-tiet-san-pham",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "chi-tiet-san-pham"]
+						}
+					}
+				},
+				{
+					"name": "Xem chi tiết SP theo id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/chi-tiet-san-pham/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "chi-tiet-san-pham", "1"]
+						}
+					}
+				},
+				{
+					"name": "Xem chi tiết SP theo sản phẩm",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/chi-tiet-san-pham/san-pham/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "chi-tiet-san-pham", "san-pham", "1"]
+						}
+					}
+				},
+				{
+					"name": "Tạo chi tiết SP (ADMIN/QUAN_LY)",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"sanPham\": { \"id\": 1 },\n    \"kichThuoc\": { \"id\": 4 },\n    \"mauSac\": { \"id\": 4 },\n    \"sku\": \"SKU-6\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/chi-tiet-san-pham",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "chi-tiet-san-pham"]
+						}
+					}
+				},
+				{
+					"name": "Sửa chi tiết SP (ADMIN/QUAN_LY)",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"sanPham\": { \"id\": 1 },\n    \"kichThuoc\": { \"id\": 2 },\n    \"mauSac\": { \"id\": 1 },\n    \"sku\": \"SKU-1-UPDATED\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/chi-tiet-san-pham",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "chi-tiet-san-pham"]
+						}
+					}
+				},
+				{
+					"name": "Xóa chi tiết SP (ADMIN/QUAN_LY)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/chi-tiet-san-pham/6",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "chi-tiet-san-pham", "6"]
 						}
 					}
 				}

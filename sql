@@ -23,24 +23,55 @@ INSERT INTO roles (name, description, active, createdAt) VALUES
 
 -- 2. permissions (Permission.java)
 INSERT INTO permissions (name, apiPath, method, module, createdAt) VALUES
-    ('Tạo sản phẩm', '/api/v1/san-pham',     'POST',   'SAN_PHAM', NOW()),
-    ('Sửa sản phẩm', '/api/v1/san-pham',     'PUT',    'SAN_PHAM', NOW()),
-    ('Xóa sản phẩm', '/api/v1/san-pham/{id}','DELETE', 'SAN_PHAM', NOW()),
-    ('Xem sản phẩm', '/api/v1/san-pham',     'GET',    'SAN_PHAM', NOW()),
-    ('Thêm giỏ hàng','/api/v1/gio-hang',     'POST',   'GIO_HANG', NOW()),
-    ('Xem giỏ hàng', '/api/v1/gio-hang',     'GET',    'GIO_HANG', NOW()),
-    ('Xóa giỏ hàng',          '/api/v1/gio-hang/{id}', 'DELETE', 'GIO_HANG', NOW()),
-    ('Xem chi tiết sản phẩm','/api/v1/san-pham/{id}',  'GET',    'SAN_PHAM', NOW());
+    -- SanPham (1-4, 8)
+    ('Tạo sản phẩm',            '/api/v1/san-pham',                     'POST',   'SAN_PHAM',       NOW()),
+    ('Sửa sản phẩm',            '/api/v1/san-pham',                     'PUT',    'SAN_PHAM',       NOW()),
+    ('Xóa sản phẩm',            '/api/v1/san-pham/{id}',                'DELETE', 'SAN_PHAM',       NOW()),
+    ('Xem sản phẩm',            '/api/v1/san-pham',                     'GET',    'SAN_PHAM',       NOW()),
+    -- GioHang (5-7)
+    ('Thêm giỏ hàng',           '/api/v1/gio-hang',                     'POST',   'GIO_HANG',       NOW()),
+    ('Xem giỏ hàng',            '/api/v1/gio-hang',                     'GET',    'GIO_HANG',       NOW()),
+    ('Xóa giỏ hàng',            '/api/v1/gio-hang/{id}',                'DELETE', 'GIO_HANG',       NOW()),
+    -- SanPham chi tiết (8)
+    ('Xem chi tiết sản phẩm',   '/api/v1/san-pham/{id}',                'GET',    'SAN_PHAM',       NOW()),
+    -- MauSac (9-12)
+    ('Xem màu sắc',             '/api/v1/mau-sac',                      'GET',    'MAU_SAC',        NOW()),
+    ('Tạo màu sắc',             '/api/v1/mau-sac',                      'POST',   'MAU_SAC',        NOW()),
+    ('Sửa màu sắc',             '/api/v1/mau-sac',                      'PUT',    'MAU_SAC',        NOW()),
+    ('Xóa màu sắc',             '/api/v1/mau-sac/{id}',                 'DELETE', 'MAU_SAC',        NOW()),
+    ('Xem chi tiết màu sắc',    '/api/v1/mau-sac/{id}',                 'GET',    'MAU_SAC',        NOW()),
+    -- KichThuoc (13-16, 24)
+    ('Xem kích thước',          '/api/v1/kich-thuoc',                   'GET',    'KICH_THUOC',     NOW()),
+    ('Tạo kích thước',          '/api/v1/kich-thuoc',                   'POST',   'KICH_THUOC',     NOW()),
+    ('Sửa kích thước',          '/api/v1/kich-thuoc',                   'PUT',    'KICH_THUOC',     NOW()),
+    ('Xóa kích thước',          '/api/v1/kich-thuoc/{id}',              'DELETE', 'KICH_THUOC',     NOW()),
+    ('Xem chi tiết kích thước', '/api/v1/kich-thuoc/{id}',              'GET',    'KICH_THUOC',     NOW()),
+    -- ChiTietSanPham (17-22)
+    ('Xem chi tiết SP (all)',    '/api/v1/chi-tiet-san-pham',           'GET',    'CHI_TIET_SP',    NOW()),
+    ('Xem chi tiết SP (id)',     '/api/v1/chi-tiet-san-pham/{id}',      'GET',    'CHI_TIET_SP',    NOW()),
+    ('Xem CTSP theo sản phẩm',  '/api/v1/chi-tiet-san-pham/san-pham/{id}','GET', 'CHI_TIET_SP',    NOW()),
+    ('Tạo chi tiết SP',         '/api/v1/chi-tiet-san-pham',           'POST',   'CHI_TIET_SP',    NOW()),
+    ('Sửa chi tiết SP',         '/api/v1/chi-tiet-san-pham',           'PUT',    'CHI_TIET_SP',    NOW()),
+    ('Xóa chi tiết SP',         '/api/v1/chi-tiet-san-pham/{id}',      'DELETE', 'CHI_TIET_SP',    NOW());
 
 -- 3. permission_role (join table Role ↔ Permission)
--- ADMIN: tất cả permissions
-INSERT INTO permission_role (role_id, permission_id) VALUES (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8);
--- QUAN_LY: CRUD sản phẩm
-INSERT INTO permission_role (role_id, permission_id) VALUES (2,1),(2,2),(2,3),(2,4);
--- NHAN_VIEN: xem sản phẩm
-INSERT INTO permission_role (role_id, permission_id) VALUES (3,4);
--- KHACH_HANG: xem sản phẩm + xem chi tiết sản phẩm
-INSERT INTO permission_role (role_id, permission_id) VALUES (4,4),(4,8);
+-- ADMIN: tất cả permissions (1-24)
+INSERT INTO permission_role (role_id, permission_id) VALUES
+    (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),
+    (1,9),(1,10),(1,11),(1,12),(1,13),(1,14),(1,15),(1,16),
+    (1,17),(1,18),(1,19),(1,20),(1,21),(1,22),(1,23),(1,24);
+-- QUAN_LY: CRUD sp + mau sac + kich thuoc + chi tiet sp
+INSERT INTO permission_role (role_id, permission_id) VALUES
+    (2,1),(2,2),(2,3),(2,4),(2,8),
+    (2,9),(2,10),(2,11),(2,12),(2,13),
+    (2,14),(2,15),(2,16),(2,17),(2,18),
+    (2,19),(2,20),(2,21),(2,22),(2,23),(2,24);
+-- NHAN_VIEN: chỉ xem
+INSERT INTO permission_role (role_id, permission_id) VALUES
+    (3,4),(3,8),(3,9),(3,13),(3,14),(3,18),(3,19),(3,20),(3,21);
+-- KHACH_HANG: xem sp, mau sac, kich thuoc, chi tiet sp
+INSERT INTO permission_role (role_id, permission_id) VALUES
+    (4,4),(4,8),(4,9),(4,13),(4,14),(4,18),(4,19),(4,20),(4,21);
 
 -- 4. NhanVien (NhanVien.java)
 -- password = BCrypt hash của '123456'
@@ -62,8 +93,33 @@ INSERT INTO KhachHang (TenKhachHang, Sdt, Email, Password, DiemTichLuy, role_id)
 
 -- 6. SanPham (SanPham.java)
 INSERT INTO SanPham (TenSanPham, GiaVon, GiaBan, TrangThai) VALUES
-    ('Áo Oxford', 100, 200, 'Kinh doanh'),
-    ('Quần Jean', 200, 400, 'Kinh doanh'),
-    ('Váy Hoa',   150, 300, 'Kinh doanh'),
-    ('Nịt Da',     50, 100, 'Kinh doanh'),
-    ('Áo Phao',   300, 600, 'Ngừng');
+    ('Áo Oxford', 100, 200, 'Kinh doanh'),  -- id = 1
+    ('Quần Jean', 200, 400, 'Kinh doanh'),  -- id = 2
+    ('Váy Hoa',   150, 300, 'Kinh doanh'),  -- id = 3
+    ('Nịt Da',     50, 100, 'Kinh doanh'),  -- id = 4
+    ('Áo Phao',   300, 600, 'Ngừng');       -- id = 5
+
+-- 7. KichThuoc (KichThuoc.java)
+INSERT INTO KichThuoc (TenKichThuoc) VALUES
+    ('Nhỏ'),        -- id = 1
+    ('Vừa'),        -- id = 2
+    ('Lớn'),        -- id = 3
+    ('Rất lớn'),    -- id = 4
+    ('Đặc biệt');   -- id = 5
+
+-- 8. MauSac (MauSac.java)
+INSERT INTO MauSac (TenMauSac) VALUES
+    ('Trắng'),  -- id = 1
+    ('Đen'),    -- id = 2
+    ('Đỏ'),     -- id = 3
+    ('Xanh'),   -- id = 4
+    ('Vàng');   -- id = 5
+
+-- 9. ChiTietSanPham (ChiTietSanPham.java)
+-- MaSanPham(FK long), MaKichThuoc(FK long), MaMauSac(FK long)
+INSERT INTO ChiTietSanPham (MaSanPham, MaKichThuoc, MaMauSac, SKU) VALUES
+    (1, 2, 1, 'SKU-1'),  -- id=1: Áo Oxford / Vừa / Trắng
+    (1, 3, 1, 'SKU-2'),  -- id=2: Áo Oxford / Lớn / Trắng
+    (2, 2, 2, 'SKU-3'),  -- id=3: Quần Jean / Vừa / Đen
+    (3, 1, 3, 'SKU-4'),  -- id=4: Váy Hoa   / Nhỏ / Đỏ
+    (4, 3, 2, 'SKU-5');  -- id=5: Nịt Da    / Lớn / Đen
