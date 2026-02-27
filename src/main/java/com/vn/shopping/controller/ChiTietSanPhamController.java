@@ -3,8 +3,10 @@ package com.vn.shopping.controller;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.vn.shopping.domain.ChiTietSanPham;
 import com.vn.shopping.domain.response.ResChiTietSanPhamDTO;
@@ -44,21 +46,54 @@ public class ChiTietSanPhamController {
         return ResponseEntity.ok(chiTietSanPhamService.findBySanPhamIdDTO(sanPhamId));
     }
 
-    @PostMapping
+    /**
+     * Tạo chi tiết sản phẩm + upload nhiều hình ảnh lên MinIO
+     * Gửi multipart/form-data: từng trường + "files" (nhiều ảnh, không bắt buộc)
+     */
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiMessage("Create product detail")
-    public ResponseEntity<ResChiTietSanPhamDTO> create(@RequestBody ChiTietSanPham chiTietSanPham) {
-        ChiTietSanPham created = chiTietSanPhamService.create(chiTietSanPham);
+    public ResponseEntity<ResChiTietSanPhamDTO> create(
+            @RequestParam(value = "sanPhamId", required = false) Long sanPhamId,
+            @RequestParam(value = "maPhieuNhap", required = false) Long maPhieuNhap,
+            @RequestParam(value = "mauSacId", required = false) Long mauSacId,
+            @RequestParam(value = "kichThuocId", required = false) Long kichThuocId,
+            @RequestParam(value = "maCuaHang", required = false) Long maCuaHang,
+            @RequestParam(value = "trangThai", required = false) Integer trangThai,
+            @RequestParam(value = "moTa", required = false) String moTa,
+            @RequestParam(value = "ghiTru", required = false) String ghiTru,
+            @RequestPart(value = "files", required = false) List<MultipartFile> files) throws Exception {
+
+        ChiTietSanPham created = chiTietSanPhamService.createChiTietSanPham(
+                sanPhamId, maPhieuNhap, mauSacId, kichThuocId,
+                maCuaHang, trangThai, moTa, ghiTru, files);
         return ResponseEntity.status(HttpStatus.CREATED).body(chiTietSanPhamService.convertToDTO(created));
     }
 
-    @PutMapping
+    /**
+     * Cập nhật chi tiết sản phẩm + upload thêm hình ảnh mới
+     * Gửi multipart/form-data: từng trường + "files" (ảnh mới, không bắt buộc)
+     */
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiMessage("Update product detail")
-    public ResponseEntity<ResChiTietSanPhamDTO> update(@RequestBody ChiTietSanPham chiTietSanPham)
-            throws IdInvalidException {
-        if (chiTietSanPham.getId() == 0) {
+    public ResponseEntity<ResChiTietSanPhamDTO> update(
+            @RequestParam("id") Long id,
+            @RequestParam(value = "sanPhamId", required = false) Long sanPhamId,
+            @RequestParam(value = "maPhieuNhap", required = false) Long maPhieuNhap,
+            @RequestParam(value = "mauSacId", required = false) Long mauSacId,
+            @RequestParam(value = "kichThuocId", required = false) Long kichThuocId,
+            @RequestParam(value = "maCuaHang", required = false) Long maCuaHang,
+            @RequestParam(value = "trangThai", required = false) Integer trangThai,
+            @RequestParam(value = "moTa", required = false) String moTa,
+            @RequestParam(value = "ghiTru", required = false) String ghiTru,
+            @RequestPart(value = "files", required = false) List<MultipartFile> files) throws Exception {
+
+        if (id == null || id == 0) {
             throw new IdInvalidException("Mã chi tiết sản phẩm không được để trống");
         }
-        ChiTietSanPham updated = chiTietSanPhamService.update(chiTietSanPham);
+
+        ChiTietSanPham updated = chiTietSanPhamService.updateChiTietSanPham(
+                id, sanPhamId, maPhieuNhap, mauSacId, kichThuocId,
+                maCuaHang, trangThai, moTa, ghiTru, files);
         return ResponseEntity.ok(chiTietSanPhamService.convertToDTO(updated));
     }
 

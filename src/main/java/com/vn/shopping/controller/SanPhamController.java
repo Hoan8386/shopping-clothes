@@ -1,11 +1,11 @@
 package com.vn.shopping.controller;
 
-import java.util.List;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.vn.shopping.domain.SanPham;
 import com.vn.shopping.domain.response.ResSanPhamDTO;
@@ -62,24 +62,52 @@ public class SanPhamController {
 
     /**
      * Tạo sản phẩm mới — chỉ ADMIN có permission mới gọi được
+     * Gửi multipart/form-data: từng trường + "file" (ảnh, không bắt buộc)
      */
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiMessage("Create a product")
-    public ResponseEntity<ResSanPhamDTO> create(@RequestBody SanPham sanPham) {
-        SanPham created = sanPhamService.create(sanPham);
+    public ResponseEntity<ResSanPhamDTO> create(
+            @RequestParam(value = "tenSanPham", required = false) String tenSanPham,
+            @RequestParam(value = "giaVon", required = false) Double giaVon,
+            @RequestParam(value = "giaBan", required = false) Double giaBan,
+            @RequestParam(value = "giaGiam", required = false) Integer giaGiam,
+            @RequestParam(value = "moTa", required = false) String moTa,
+            @RequestParam(value = "trangThai", required = false) Integer trangThai,
+            @RequestParam(value = "kieuSanPhamId", required = false) Long kieuSanPhamId,
+            @RequestParam(value = "boSuuTapId", required = false) Long boSuuTapId,
+            @RequestParam(value = "thuongHieuId", required = false) Long thuongHieuId,
+            @RequestPart(value = "file", required = false) MultipartFile file) throws Exception {
+
+        SanPham created = sanPhamService.createSanPham(tenSanPham, giaVon, giaBan, giaGiam,
+                moTa, trangThai, kieuSanPhamId, boSuuTapId, thuongHieuId, file);
         return ResponseEntity.status(HttpStatus.CREATED).body(sanPhamService.convertToDTO(created));
     }
 
     /**
      * Cập nhật sản phẩm — chỉ ADMIN có permission mới gọi được
+     * Gửi multipart/form-data: từng trường + "file" (ảnh mới, không bắt buộc)
      */
-    @PutMapping
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiMessage("Update product")
-    public ResponseEntity<ResSanPhamDTO> update(@RequestBody SanPham sanPham) throws IdInvalidException {
-        if (sanPham.getId() == 0) {
+    public ResponseEntity<ResSanPhamDTO> update(
+            @RequestParam("id") Long id,
+            @RequestParam(value = "tenSanPham", required = false) String tenSanPham,
+            @RequestParam(value = "giaVon", required = false) Double giaVon,
+            @RequestParam(value = "giaBan", required = false) Double giaBan,
+            @RequestParam(value = "giaGiam", required = false) Integer giaGiam,
+            @RequestParam(value = "moTa", required = false) String moTa,
+            @RequestParam(value = "trangThai", required = false) Integer trangThai,
+            @RequestParam(value = "kieuSanPhamId", required = false) Long kieuSanPhamId,
+            @RequestParam(value = "boSuuTapId", required = false) Long boSuuTapId,
+            @RequestParam(value = "thuongHieuId", required = false) Long thuongHieuId,
+            @RequestPart(value = "file", required = false) MultipartFile file) throws Exception {
+
+        if (id == null || id == 0) {
             throw new IdInvalidException("Mã sản phẩm không được để trống");
         }
-        SanPham updated = sanPhamService.update(sanPham);
+
+        SanPham updated = sanPhamService.updateSanPham(id, tenSanPham, giaVon, giaBan, giaGiam,
+                moTa, trangThai, kieuSanPhamId, boSuuTapId, thuongHieuId, file);
         return ResponseEntity.ok(sanPhamService.convertToDTO(updated));
     }
 
