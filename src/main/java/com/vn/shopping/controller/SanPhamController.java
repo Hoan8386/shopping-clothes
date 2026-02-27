@@ -2,12 +2,14 @@ package com.vn.shopping.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.vn.shopping.domain.SanPham;
 import com.vn.shopping.domain.response.ResSanPhamDTO;
+import com.vn.shopping.domain.response.ResultPaginationDTO;
 import com.vn.shopping.service.SanPhamService;
 import com.vn.shopping.util.anotation.ApiMessage;
 import com.vn.shopping.util.error.IdInvalidException;
@@ -23,12 +25,26 @@ public class SanPhamController {
     }
 
     /**
-     * Xem danh sách sản phẩm (tất cả đều xem được)
+     * Xem danh sách sản phẩm + lọc theo nhiều tiêu chí + phân trang
+     * Ví dụ: GET /api/v1/san-pham?tenSanPham=ao&kieuSanPhamId=1&thuongHieuId=2
+     * &trangThai=1&giaMin=100000&giaMax=500000&page=1&size=10&sort=giaBan,asc
+     * Nếu không truyền tham số nào => trả về tất cả sản phẩm (có phân trang)
      */
     @GetMapping
     @ApiMessage("Get all product")
-    public ResponseEntity<List<ResSanPhamDTO>> getAll() {
-        return ResponseEntity.ok(sanPhamService.findAllDTO());
+    public ResponseEntity<ResultPaginationDTO> getAll(
+            @RequestParam(required = false) String tenSanPham,
+            @RequestParam(required = false) Long kieuSanPhamId,
+            @RequestParam(required = false) Long boSuuTapId,
+            @RequestParam(required = false) Long thuongHieuId,
+            @RequestParam(required = false) Integer trangThai,
+            @RequestParam(required = false) Double giaMin,
+            @RequestParam(required = false) Double giaMax,
+            Pageable pageable) {
+
+        ResultPaginationDTO result = sanPhamService.filterSanPham(
+                tenSanPham, kieuSanPhamId, boSuuTapId, thuongHieuId, trangThai, giaMin, giaMax, pageable);
+        return ResponseEntity.ok(result);
     }
 
     /**

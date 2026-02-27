@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "shopping-api-collection",
 		"name": "Shopping API",
-		"description": "Collection đầy đủ tất cả API endpoints - Shopping App",
+		"description": "Collection đầy đủ tất cả API endpoints - Shopping App\n\n📌 GHI CHÚ PHÂN QUYỀN:\n- 🔓 Public: Không cần đăng nhập\n-  Khách hàng: Cần đăng nhập bằng tài khoản khách hàng\n-  Admin/Nhân viên: Cần đăng nhập bằng tài khoản có quyền (ADMIN, QUAN_LY, NHAN_VIEN)",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"auth": {
@@ -27,7 +27,8 @@
 	],
 	"item": [
 		{
-			"name": "Auth",
+			"name": "Auth (🔓 Public)",
+			"description": "Các API xác thực — Không cần đăng nhập (trừ Get Account, Logout)",
 			"item": [
 				{
 					"name": "Login (ADMIN - NV5 Hùng)",
@@ -59,7 +60,8 @@
 							"raw": "{{base_url}}/api/v1/auth/login",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "auth", "login"]
-						}
+						},
+						"description": "🔓 Public — Đăng nhập bằng tài khoản Admin/Nhân viên"
 					}
 				},
 				{
@@ -92,11 +94,12 @@
 							"raw": "{{base_url}}/api/v1/auth/login",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "auth", "login"]
-						}
+						},
+						"description": "🔓 Public — Đăng nhập bằng tài khoản khách hàng"
 					}
 				},
 				{
-					"name": "Get Account",
+					"name": "Get Account ( Đã đăng nhập)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -104,11 +107,12 @@
 							"raw": "{{base_url}}/api/v1/auth/account",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "auth", "account"]
-						}
+						},
+						"description": " Cần đăng nhập — Xem thông tin tài khoản hiện tại"
 					}
 				},
 				{
-					"name": "Refresh Token",
+					"name": "Refresh Token (🔓 Public)",
 					"event": [
 						{
 							"listen": "test",
@@ -133,11 +137,11 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "auth", "refresh"]
 						},
-						"description": "Sử dụng refresh_token từ cookie (được set tự động khi login)"
+						"description": "🔓 Public — Sử dụng refresh_token từ cookie (được set tự động khi login)"
 					}
 				},
 				{
-					"name": "Logout",
+					"name": "Logout ( Đã đăng nhập)",
 					"request": {
 						"method": "POST",
 						"header": [],
@@ -145,11 +149,12 @@
 							"raw": "{{base_url}}/api/v1/auth/logout",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "auth", "logout"]
-						}
+						},
+						"description": " Cần đăng nhập — Đăng xuất và xóa refresh token"
 					}
 				},
 				{
-					"name": "Register (Khách hàng mới)",
+					"name": "Register (🔓 Public)",
 					"request": {
 						"auth": { "type": "noauth" },
 						"method": "POST",
@@ -162,28 +167,43 @@
 							"raw": "{{base_url}}/api/v1/auth/register",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "auth", "register"]
-						}
+						},
+						"description": "🔓 Public — Đăng ký tài khoản khách hàng mới (tự động gán role_id=4)"
 					}
 				}
 			]
 		},
 		{
-			"name": "Sản Phẩm",
+			"name": "Sản Phẩm ( Xem /  CRUD)",
+			"description": "GET: Tất cả đều xem được (cần đăng nhập)\nPOST/PUT/DELETE: Chỉ Admin có permission mới được thao tác",
 			"item": [
 				{
-					"name": "Xem tất cả sản phẩm",
+					"name": "Xem tất cả SP + Filter + Phân trang ( Tất cả)",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/v1/san-pham",
+							"raw": "{{base_url}}/api/v1/san-pham?page=1&size=10",
 							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "san-pham"]
-						}
+							"path": ["api", "v1", "san-pham"],
+							"query": [
+								{ "key": "page", "value": "1", "description": "Trang (bắt đầu từ 1)" },
+								{ "key": "size", "value": "10", "description": "Số bản ghi mỗi trang" },
+								{ "key": "sort", "value": "giaBan,asc", "description": "Sắp xếp (field,direction). VD: giaBan,asc | ngayTao,desc", "disabled": true },
+								{ "key": "tenSanPham", "value": "ao", "description": "Tìm theo tên SP (LIKE, không phân biệt hoa thường)", "disabled": true },
+								{ "key": "kieuSanPhamId", "value": "1", "description": "Lọc theo mã kiểu sản phẩm", "disabled": true },
+								{ "key": "boSuuTapId", "value": "1", "description": "Lọc theo mã bộ sưu tập", "disabled": true },
+								{ "key": "thuongHieuId", "value": "1", "description": "Lọc theo mã thương hiệu", "disabled": true },
+								{ "key": "trangThai", "value": "1", "description": "Lọc theo trạng thái (1=hiện, 0=ẩn)", "disabled": true },
+								{ "key": "giaMin", "value": "100000", "description": "Giá bán tối thiểu", "disabled": true },
+								{ "key": "giaMax", "value": "500000", "description": "Giá bán tối đa", "disabled": true }
+							]
+						},
+						"description": " Tất cả người dùng đã đăng nhập\n\nHỗ trợ lọc theo nhiều tiêu chí + phân trang + sắp xếp.\nBật/tắt các query param (checkbox) để lọc.\nKhông truyền param nào → trả tất cả sản phẩm."
 					}
 				},
 				{
-					"name": "Xem chi tiết sản phẩm",
+					"name": "Xem chi tiết SP ( Tất cả)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -191,11 +211,12 @@
 							"raw": "{{base_url}}/api/v1/san-pham/1",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "san-pham", "1"]
-						}
+						},
+						"description": " Tất cả người dùng đã đăng nhập — Xem chi tiết 1 sản phẩm theo ID"
 					}
 				},
 				{
-					"name": "Tạo sản phẩm",
+					"name": "Tạo sản phẩm ( Admin)",
 					"request": {
 						"method": "POST",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -207,11 +228,12 @@
 							"raw": "{{base_url}}/api/v1/san-pham",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "san-pham"]
-						}
+						},
+						"description": " Chỉ Admin — Tạo sản phẩm mới. Khách hàng gọi → 403"
 					}
 				},
 				{
-					"name": "Cập nhật sản phẩm",
+					"name": "Cập nhật sản phẩm ( Admin)",
 					"request": {
 						"method": "PUT",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -223,11 +245,12 @@
 							"raw": "{{base_url}}/api/v1/san-pham",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "san-pham"]
-						}
+						},
+						"description": " Chỉ Admin — Cập nhật sản phẩm. Khách hàng gọi → 403"
 					}
 				},
 				{
-					"name": "Xóa sản phẩm",
+					"name": "Xóa sản phẩm ( Admin)",
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -235,162 +258,18 @@
 							"raw": "{{base_url}}/api/v1/san-pham/6",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "san-pham", "6"]
-						}
+						},
+						"description": " Chỉ Admin — Xóa sản phẩm. Khách hàng gọi → 403"
 					}
 				}
 			]
 		},
 		{
-			"name": "Màu Sắc",
+			"name": "Chi Tiết Sản Phẩm ( Xem /  CRUD)",
+			"description": "GET: Tất cả đều xem được (cần đăng nhập)\nPOST/PUT/DELETE: Chỉ Admin có permission mới được thao tác",
 			"item": [
 				{
-					"name": "Xem tất cả màu sắc",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/api/v1/mau-sac",
-							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "mau-sac"]
-						}
-					}
-				},
-				{
-					"name": "Xem chi tiết màu sắc",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/api/v1/mau-sac/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "mau-sac", "1"]
-						}
-					}
-				},
-				{
-					"name": "Tạo màu sắc",
-					"request": {
-						"method": "POST",
-						"header": [{ "key": "Content-Type", "value": "application/json" }],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"tenMauSac\": \"Tím\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/v1/mau-sac",
-							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "mau-sac"]
-						}
-					}
-				},
-				{
-					"name": "Cập nhật màu sắc",
-					"request": {
-						"method": "PUT",
-						"header": [{ "key": "Content-Type", "value": "application/json" }],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"id\": 1,\n    \"tenMauSac\": \"Trắng sữa\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/v1/mau-sac",
-							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "mau-sac"]
-						}
-					}
-				},
-				{
-					"name": "Xóa màu sắc",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/api/v1/mau-sac/6",
-							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "mau-sac", "6"]
-						}
-					}
-				}
-			]
-		},
-		{
-			"name": "Kích Thước",
-			"item": [
-				{
-					"name": "Xem tất cả kích thước",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/api/v1/kich-thuoc",
-							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "kich-thuoc"]
-						}
-					}
-				},
-				{
-					"name": "Xem chi tiết kích thước",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/api/v1/kich-thuoc/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "kich-thuoc", "1"]
-						}
-					}
-				},
-				{
-					"name": "Tạo kích thước",
-					"request": {
-						"method": "POST",
-						"header": [{ "key": "Content-Type", "value": "application/json" }],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"tenKichThuoc\": \"XXXL\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/v1/kich-thuoc",
-							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "kich-thuoc"]
-						}
-					}
-				},
-				{
-					"name": "Cập nhật kích thước",
-					"request": {
-						"method": "PUT",
-						"header": [{ "key": "Content-Type", "value": "application/json" }],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"id\": 1,\n    \"tenKichThuoc\": \"Siêu nhỏ\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/v1/kich-thuoc",
-							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "kich-thuoc"]
-						}
-					}
-				},
-				{
-					"name": "Xóa kích thước",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/api/v1/kich-thuoc/6",
-							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "kich-thuoc", "6"]
-						}
-					}
-				}
-			]
-		},
-		{
-			"name": "Chi Tiết Sản Phẩm",
-			"item": [
-				{
-					"name": "Xem tất cả chi tiết SP",
+					"name": "Xem tất cả chi tiết SP ( Tất cả)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -398,11 +277,12 @@
 							"raw": "{{base_url}}/api/v1/chi-tiet-san-pham",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "chi-tiet-san-pham"]
-						}
+						},
+						"description": " Tất cả người dùng đã đăng nhập"
 					}
 				},
 				{
-					"name": "Xem chi tiết SP theo id",
+					"name": "Xem chi tiết SP theo id ( Tất cả)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -410,11 +290,12 @@
 							"raw": "{{base_url}}/api/v1/chi-tiet-san-pham/1",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "chi-tiet-san-pham", "1"]
-						}
+						},
+						"description": " Tất cả người dùng đã đăng nhập"
 					}
 				},
 				{
-					"name": "Xem chi tiết SP theo sản phẩm",
+					"name": "Xem chi tiết SP theo sản phẩm ( Tất cả)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -422,11 +303,12 @@
 							"raw": "{{base_url}}/api/v1/chi-tiet-san-pham/san-pham/1",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "chi-tiet-san-pham", "san-pham", "1"]
-						}
+						},
+						"description": " Tất cả người dùng đã đăng nhập — Lấy danh sách CTSP theo mã sản phẩm"
 					}
 				},
 				{
-					"name": "Tạo chi tiết SP",
+					"name": "Tạo chi tiết SP ( Admin)",
 					"request": {
 						"method": "POST",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -438,11 +320,12 @@
 							"raw": "{{base_url}}/api/v1/chi-tiet-san-pham",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "chi-tiet-san-pham"]
-						}
+						},
+						"description": " Chỉ Admin — Tạo chi tiết sản phẩm. Khách hàng gọi → 403"
 					}
 				},
 				{
-					"name": "Cập nhật chi tiết SP",
+					"name": "Cập nhật chi tiết SP ( Admin)",
 					"request": {
 						"method": "PUT",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -454,11 +337,12 @@
 							"raw": "{{base_url}}/api/v1/chi-tiet-san-pham",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "chi-tiet-san-pham"]
-						}
+						},
+						"description": " Chỉ Admin — Cập nhật chi tiết SP. Khách hàng gọi → 403"
 					}
 				},
 				{
-					"name": "Xóa chi tiết SP",
+					"name": "Xóa chi tiết SP ( Admin)",
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -466,17 +350,18 @@
 							"raw": "{{base_url}}/api/v1/chi-tiet-san-pham/6",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "chi-tiet-san-pham", "6"]
-						}
+						},
+						"description": " Chỉ Admin — Xóa chi tiết SP. Khách hàng gọi → 403"
 					}
 				}
 			]
 		},
 		{
-			"name": "Giỏ Hàng",
-			"description": "Đăng nhập bằng tài khoản khách hàng trước khi test",
+			"name": "Giỏ Hàng ( Khách hàng)",
+			"description": "Dành cho khách hàng — Cần đăng nhập bằng tài khoản khách hàng trước khi test",
 			"item": [
 				{
-					"name": "Xem giỏ hàng theo khách hàng",
+					"name": "Xem giỏ hàng theo KH ( Khách hàng)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -484,11 +369,12 @@
 							"raw": "{{base_url}}/api/v1/gio-hang/khach-hang/1",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "gio-hang", "khach-hang", "1"]
-						}
+						},
+						"description": " Khách hàng — Xem giỏ hàng của khách hàng theo ID"
 					}
 				},
 				{
-					"name": "Thêm sản phẩm vào giỏ (KH1, CTSP1, SL=2)",
+					"name": "Thêm SP vào giỏ ( Khách hàng)",
 					"request": {
 						"method": "POST",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -500,11 +386,12 @@
 							"raw": "{{base_url}}/api/v1/gio-hang/them-san-pham",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "gio-hang", "them-san-pham"]
-						}
+						},
+						"description": " Khách hàng — Thêm sản phẩm vào giỏ hàng (KH1, CTSP1, SL=2)"
 					}
 				},
 				{
-					"name": "Thêm sản phẩm khác vào giỏ (KH1, CTSP3, SL=1)",
+					"name": "Thêm SP khác vào giỏ ( Khách hàng)",
 					"request": {
 						"method": "POST",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -516,11 +403,12 @@
 							"raw": "{{base_url}}/api/v1/gio-hang/them-san-pham",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "gio-hang", "them-san-pham"]
-						}
+						},
+						"description": " Khách hàng — Thêm sản phẩm khác vào giỏ (KH1, CTSP3, SL=1)"
 					}
 				},
 				{
-					"name": "Thêm SP đã có (cộng dồn SL)",
+					"name": "Thêm SP đã có — cộng dồn SL ( Khách hàng)",
 					"request": {
 						"method": "POST",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -532,11 +420,12 @@
 							"raw": "{{base_url}}/api/v1/gio-hang/them-san-pham",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "gio-hang", "them-san-pham"]
-						}
+						},
+						"description": " Khách hàng — Thêm SP đã tồn tại trong giỏ → số lượng được cộng dồn"
 					}
 				},
 				{
-					"name": "Xóa chi tiết giỏ hàng",
+					"name": "Xóa chi tiết giỏ hàng ( Khách hàng)",
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -544,16 +433,176 @@
 							"raw": "{{base_url}}/api/v1/gio-hang/chi-tiet/1",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "gio-hang", "chi-tiet", "1"]
-						}
+						},
+						"description": " Khách hàng — Xóa 1 sản phẩm khỏi giỏ hàng"
 					}
 				}
 			]
 		},
 		{
-			"name": "Kiểu Sản Phẩm",
+			"name": "Màu Sắc ( Admin)",
+			"description": "Quản lý màu sắc — Chỉ Admin có permission mới được thao tác",
 			"item": [
 				{
-					"name": "Xem tất cả kiểu sản phẩm",
+					"name": "Xem tất cả màu sắc ( Admin)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/mau-sac",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "mau-sac"]
+						},
+						"description": " Admin — Xem danh sách tất cả màu sắc"
+					}
+				},
+				{
+					"name": "Xem chi tiết màu sắc ( Admin)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/mau-sac/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "mau-sac", "1"]
+						},
+						"description": " Admin — Xem chi tiết 1 màu sắc"
+					}
+				},
+				{
+					"name": "Tạo màu sắc ( Admin)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tenMauSac\": \"Tím\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/mau-sac",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "mau-sac"]
+						},
+						"description": " Admin — Tạo màu sắc mới"
+					}
+				},
+				{
+					"name": "Cập nhật màu sắc ( Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"tenMauSac\": \"Trắng sữa\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/mau-sac",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "mau-sac"]
+						},
+						"description": " Admin — Cập nhật màu sắc"
+					}
+				},
+				{
+					"name": "Xóa màu sắc ( Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/mau-sac/6",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "mau-sac", "6"]
+						},
+						"description": " Admin — Xóa màu sắc"
+					}
+				}
+			]
+		},
+		{
+			"name": "Kích Thước ( Admin)",
+			"description": "Quản lý kích thước — Chỉ Admin có permission mới được thao tác",
+			"item": [
+				{
+					"name": "Xem tất cả kích thước ( Admin)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/kich-thuoc",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "kich-thuoc"]
+						},
+						"description": " Admin — Xem danh sách tất cả kích thước"
+					}
+				},
+				{
+					"name": "Xem chi tiết kích thước ( Admin)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/kich-thuoc/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "kich-thuoc", "1"]
+						},
+						"description": " Admin — Xem chi tiết 1 kích thước"
+					}
+				},
+				{
+					"name": "Tạo kích thước ( Admin)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tenKichThuoc\": \"XXXL\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/kich-thuoc",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "kich-thuoc"]
+						},
+						"description": " Admin — Tạo kích thước mới"
+					}
+				},
+				{
+					"name": "Cập nhật kích thước ( Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"tenKichThuoc\": \"Siêu nhỏ\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/kich-thuoc",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "kich-thuoc"]
+						},
+						"description": " Admin — Cập nhật kích thước"
+					}
+				},
+				{
+					"name": "Xóa kích thước ( Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/kich-thuoc/6",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "kich-thuoc", "6"]
+						},
+						"description": " Admin — Xóa kích thước"
+					}
+				}
+			]
+		},
+		{
+			"name": "Kiểu Sản Phẩm ( Admin)",
+			"description": "Quản lý kiểu sản phẩm — Chỉ Admin có permission mới được thao tác",
+			"item": [
+				{
+					"name": "Xem tất cả kiểu SP ( Admin)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -561,11 +610,12 @@
 							"raw": "{{base_url}}/api/v1/kieu-san-pham",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "kieu-san-pham"]
-						}
+						},
+						"description": " Admin — Xem danh sách tất cả kiểu sản phẩm"
 					}
 				},
 				{
-					"name": "Xem chi tiết kiểu sản phẩm",
+					"name": "Xem chi tiết kiểu SP ( Admin)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -573,11 +623,12 @@
 							"raw": "{{base_url}}/api/v1/kieu-san-pham/1",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "kieu-san-pham", "1"]
-						}
+						},
+						"description": " Admin — Xem chi tiết 1 kiểu sản phẩm"
 					}
 				},
 				{
-					"name": "Tạo kiểu sản phẩm",
+					"name": "Tạo kiểu SP ( Admin)",
 					"request": {
 						"method": "POST",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -589,11 +640,12 @@
 							"raw": "{{base_url}}/api/v1/kieu-san-pham",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "kieu-san-pham"]
-						}
+						},
+						"description": " Admin — Tạo kiểu sản phẩm mới"
 					}
 				},
 				{
-					"name": "Cập nhật kiểu sản phẩm",
+					"name": "Cập nhật kiểu SP ( Admin)",
 					"request": {
 						"method": "PUT",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -605,11 +657,12 @@
 							"raw": "{{base_url}}/api/v1/kieu-san-pham",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "kieu-san-pham"]
-						}
+						},
+						"description": " Admin — Cập nhật kiểu sản phẩm"
 					}
 				},
 				{
-					"name": "Xóa kiểu sản phẩm",
+					"name": "Xóa kiểu SP ( Admin)",
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -617,16 +670,18 @@
 							"raw": "{{base_url}}/api/v1/kieu-san-pham/5",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "kieu-san-pham", "5"]
-						}
+						},
+						"description": " Admin — Xóa kiểu sản phẩm"
 					}
 				}
 			]
 		},
 		{
-			"name": "Bộ Sưu Tập",
+			"name": "Bộ Sưu Tập ( Admin)",
+			"description": "Quản lý bộ sưu tập — Chỉ Admin có permission mới được thao tác",
 			"item": [
 				{
-					"name": "Xem tất cả bộ sưu tập",
+					"name": "Xem tất cả BST ( Admin)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -634,11 +689,12 @@
 							"raw": "{{base_url}}/api/v1/bo-suu-tap",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "bo-suu-tap"]
-						}
+						},
+						"description": " Admin — Xem danh sách tất cả bộ sưu tập"
 					}
 				},
 				{
-					"name": "Xem chi tiết bộ sưu tập",
+					"name": "Xem chi tiết BST ( Admin)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -646,11 +702,12 @@
 							"raw": "{{base_url}}/api/v1/bo-suu-tap/1",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "bo-suu-tap", "1"]
-						}
+						},
+						"description": " Admin — Xem chi tiết 1 bộ sưu tập"
 					}
 				},
 				{
-					"name": "Tạo bộ sưu tập",
+					"name": "Tạo BST ( Admin)",
 					"request": {
 						"method": "POST",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -662,11 +719,12 @@
 							"raw": "{{base_url}}/api/v1/bo-suu-tap",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "bo-suu-tap"]
-						}
+						},
+						"description": " Admin — Tạo bộ sưu tập mới"
 					}
 				},
 				{
-					"name": "Cập nhật bộ sưu tập",
+					"name": "Cập nhật BST ( Admin)",
 					"request": {
 						"method": "PUT",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -678,11 +736,12 @@
 							"raw": "{{base_url}}/api/v1/bo-suu-tap",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "bo-suu-tap"]
-						}
+						},
+						"description": " Admin — Cập nhật bộ sưu tập"
 					}
 				},
 				{
-					"name": "Xóa bộ sưu tập",
+					"name": "Xóa BST ( Admin)",
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -690,16 +749,18 @@
 							"raw": "{{base_url}}/api/v1/bo-suu-tap/4",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "bo-suu-tap", "4"]
-						}
+						},
+						"description": " Admin — Xóa bộ sưu tập"
 					}
 				}
 			]
 		},
 		{
-			"name": "Thương Hiệu",
+			"name": "Thương Hiệu ( Admin)",
+			"description": "Quản lý thương hiệu — Chỉ Admin có permission mới được thao tác",
 			"item": [
 				{
-					"name": "Xem tất cả thương hiệu",
+					"name": "Xem tất cả thương hiệu ( Admin)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -707,11 +768,12 @@
 							"raw": "{{base_url}}/api/v1/thuong-hieu",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "thuong-hieu"]
-						}
+						},
+						"description": " Admin — Xem danh sách tất cả thương hiệu"
 					}
 				},
 				{
-					"name": "Xem chi tiết thương hiệu",
+					"name": "Xem chi tiết thương hiệu ( Admin)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -719,11 +781,12 @@
 							"raw": "{{base_url}}/api/v1/thuong-hieu/1",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "thuong-hieu", "1"]
-						}
+						},
+						"description": " Admin — Xem chi tiết 1 thương hiệu"
 					}
 				},
 				{
-					"name": "Tạo thương hiệu",
+					"name": "Tạo thương hiệu ( Admin)",
 					"request": {
 						"method": "POST",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -735,11 +798,12 @@
 							"raw": "{{base_url}}/api/v1/thuong-hieu",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "thuong-hieu"]
-						}
+						},
+						"description": " Admin — Tạo thương hiệu mới"
 					}
 				},
 				{
-					"name": "Cập nhật thương hiệu",
+					"name": "Cập nhật thương hiệu ( Admin)",
 					"request": {
 						"method": "PUT",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -751,11 +815,12 @@
 							"raw": "{{base_url}}/api/v1/thuong-hieu",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "thuong-hieu"]
-						}
+						},
+						"description": " Admin — Cập nhật thương hiệu"
 					}
 				},
 				{
-					"name": "Xóa thương hiệu",
+					"name": "Xóa thương hiệu ( Admin)",
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -763,16 +828,18 @@
 							"raw": "{{base_url}}/api/v1/thuong-hieu/4",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "thuong-hieu", "4"]
-						}
+						},
+						"description": " Admin — Xóa thương hiệu"
 					}
 				}
 			]
 		},
 		{
-			"name": "Hình Ảnh",
+			"name": "Hình Ảnh ( Admin)",
+			"description": "Quản lý hình ảnh sản phẩm — Chỉ Admin có permission mới được thao tác",
 			"item": [
 				{
-					"name": "Xem tất cả hình ảnh",
+					"name": "Xem tất cả hình ảnh ( Admin)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -780,11 +847,12 @@
 							"raw": "{{base_url}}/api/v1/hinh-anh",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "hinh-anh"]
-						}
+						},
+						"description": " Admin — Xem danh sách tất cả hình ảnh"
 					}
 				},
 				{
-					"name": "Xem hình ảnh theo id",
+					"name": "Xem hình ảnh theo id ( Admin)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -792,11 +860,12 @@
 							"raw": "{{base_url}}/api/v1/hinh-anh/1",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "hinh-anh", "1"]
-						}
+						},
+						"description": " Admin — Xem chi tiết 1 hình ảnh"
 					}
 				},
 				{
-					"name": "Xem hình ảnh theo chi tiết SP",
+					"name": "Xem hình ảnh theo chi tiết SP ( Admin)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -804,11 +873,12 @@
 							"raw": "{{base_url}}/api/v1/hinh-anh/chi-tiet-san-pham/1",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "hinh-anh", "chi-tiet-san-pham", "1"]
-						}
+						},
+						"description": " Admin — Xem hình ảnh theo mã chi tiết sản phẩm"
 					}
 				},
 				{
-					"name": "Tạo hình ảnh",
+					"name": "Tạo hình ảnh ( Admin)",
 					"request": {
 						"method": "POST",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -820,11 +890,12 @@
 							"raw": "{{base_url}}/api/v1/hinh-anh",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "hinh-anh"]
-						}
+						},
+						"description": " Admin — Tạo hình ảnh mới"
 					}
 				},
 				{
-					"name": "Cập nhật hình ảnh",
+					"name": "Cập nhật hình ảnh ( Admin)",
 					"request": {
 						"method": "PUT",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -836,11 +907,12 @@
 							"raw": "{{base_url}}/api/v1/hinh-anh",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "hinh-anh"]
-						}
+						},
+						"description": " Admin — Cập nhật hình ảnh"
 					}
 				},
 				{
-					"name": "Xóa hình ảnh",
+					"name": "Xóa hình ảnh ( Admin)",
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -848,16 +920,18 @@
 							"raw": "{{base_url}}/api/v1/hinh-anh/6",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "hinh-anh", "6"]
-						}
+						},
+						"description": " Admin — Xóa hình ảnh"
 					}
 				}
 			]
 		},
 		{
-			"name": "Cửa Hàng",
+			"name": "Cửa Hàng ( Admin)",
+			"description": "Quản lý cửa hàng — Chỉ Admin có permission mới được thao tác",
 			"item": [
 				{
-					"name": "Xem tất cả cửa hàng",
+					"name": "Xem tất cả cửa hàng ( Admin)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -865,11 +939,12 @@
 							"raw": "{{base_url}}/api/v1/cua-hang",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "cua-hang"]
-						}
+						},
+						"description": " Admin — Xem danh sách tất cả cửa hàng"
 					}
 				},
 				{
-					"name": "Xem chi tiết cửa hàng",
+					"name": "Xem chi tiết cửa hàng ( Admin)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -877,11 +952,12 @@
 							"raw": "{{base_url}}/api/v1/cua-hang/1",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "cua-hang", "1"]
-						}
+						},
+						"description": " Admin — Xem chi tiết 1 cửa hàng"
 					}
 				},
 				{
-					"name": "Tạo cửa hàng",
+					"name": "Tạo cửa hàng ( Admin)",
 					"request": {
 						"method": "POST",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -893,11 +969,12 @@
 							"raw": "{{base_url}}/api/v1/cua-hang",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "cua-hang"]
-						}
+						},
+						"description": " Admin — Tạo cửa hàng mới. Khách hàng gọi → 403"
 					}
 				},
 				{
-					"name": "Cập nhật cửa hàng",
+					"name": "Cập nhật cửa hàng ( Admin)",
 					"request": {
 						"method": "PUT",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -909,11 +986,12 @@
 							"raw": "{{base_url}}/api/v1/cua-hang",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "cua-hang"]
-						}
+						},
+						"description": " Admin — Cập nhật cửa hàng"
 					}
 				},
 				{
-					"name": "Xóa cửa hàng",
+					"name": "Xóa cửa hàng ( Admin)",
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -921,16 +999,18 @@
 							"raw": "{{base_url}}/api/v1/cua-hang/4",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "cua-hang", "4"]
-						}
+						},
+						"description": " Admin — Xóa cửa hàng. Khách hàng gọi → 403"
 					}
 				}
 			]
 		},
 		{
-			"name": "Roles (Vai trò)",
+			"name": "Roles — Vai trò ( Admin)",
+			"description": "Quản lý vai trò — Chỉ Admin có permission mới được thao tác",
 			"item": [
 				{
-					"name": "Xem tất cả vai trò",
+					"name": "Xem tất cả vai trò ( Admin)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -938,11 +1018,12 @@
 							"raw": "{{base_url}}/api/v1/roles",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "roles"]
-						}
+						},
+						"description": " Admin — Xem danh sách tất cả vai trò"
 					}
 				},
 				{
-					"name": "Xem chi tiết vai trò",
+					"name": "Xem chi tiết vai trò ( Admin)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -950,11 +1031,12 @@
 							"raw": "{{base_url}}/api/v1/roles/1",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "roles", "1"]
-						}
+						},
+						"description": " Admin — Xem chi tiết 1 vai trò"
 					}
 				},
 				{
-					"name": "Tạo vai trò",
+					"name": "Tạo vai trò ( Admin)",
 					"request": {
 						"method": "POST",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -966,11 +1048,12 @@
 							"raw": "{{base_url}}/api/v1/roles",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "roles"]
-						}
+						},
+						"description": " Admin — Tạo vai trò mới"
 					}
 				},
 				{
-					"name": "Cập nhật vai trò",
+					"name": "Cập nhật vai trò ( Admin)",
 					"request": {
 						"method": "PUT",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -982,11 +1065,12 @@
 							"raw": "{{base_url}}/api/v1/roles",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "roles"]
-						}
+						},
+						"description": " Admin — Cập nhật vai trò"
 					}
 				},
 				{
-					"name": "Xóa vai trò",
+					"name": "Xóa vai trò ( Admin)",
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -994,16 +1078,18 @@
 							"raw": "{{base_url}}/api/v1/roles/5",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "roles", "5"]
-						}
+						},
+						"description": " Admin — Xóa vai trò. Khách hàng gọi → 403"
 					}
 				}
 			]
 		},
 		{
-			"name": "Permissions (Quyền)",
+			"name": "Permissions — Quyền ( Admin)",
+			"description": "Quản lý quyền — Chỉ Admin có permission mới được thao tác",
 			"item": [
 				{
-					"name": "Xem tất cả quyền",
+					"name": "Xem tất cả quyền ( Admin)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -1011,11 +1097,12 @@
 							"raw": "{{base_url}}/api/v1/permissions",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "permissions"]
-						}
+						},
+						"description": " Admin — Xem danh sách tất cả quyền"
 					}
 				},
 				{
-					"name": "Xem chi tiết quyền",
+					"name": "Xem chi tiết quyền ( Admin)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -1023,11 +1110,12 @@
 							"raw": "{{base_url}}/api/v1/permissions/1",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "permissions", "1"]
-						}
+						},
+						"description": " Admin — Xem chi tiết 1 quyền"
 					}
 				},
 				{
-					"name": "Tạo quyền",
+					"name": "Tạo quyền ( Admin)",
 					"request": {
 						"method": "POST",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -1039,11 +1127,12 @@
 							"raw": "{{base_url}}/api/v1/permissions",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "permissions"]
-						}
+						},
+						"description": " Admin — Tạo quyền mới"
 					}
 				},
 				{
-					"name": "Cập nhật quyền",
+					"name": "Cập nhật quyền ( Admin)",
 					"request": {
 						"method": "PUT",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -1055,11 +1144,12 @@
 							"raw": "{{base_url}}/api/v1/permissions",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "permissions"]
-						}
+						},
+						"description": " Admin — Cập nhật quyền"
 					}
 				},
 				{
-					"name": "Xóa quyền",
+					"name": "Xóa quyền ( Admin)",
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -1067,14 +1157,15 @@
 							"raw": "{{base_url}}/api/v1/permissions/61",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "permissions", "61"]
-						}
+						},
+						"description": " Admin — Xóa quyền"
 					}
 				}
 			]
 		},
 		{
-			"name": "Test phân quyền",
-			"description": "Login khách hàng rồi thử truy cập API admin → phải bị 403",
+			"name": "Test phân quyền (KH gọi API Admin → 403)",
+			"description": "Login bằng tài khoản khách hàng rồi thử truy cập API admin → phải bị từ chối 403",
 			"item": [
 				{
 					"name": "1. Login KH trước",
@@ -1106,7 +1197,8 @@
 							"raw": "{{base_url}}/api/v1/auth/login",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "auth", "login"]
-						}
+						},
+						"description": "Đăng nhập bằng tài khoản khách hàng để lấy token"
 					}
 				},
 				{
@@ -1135,7 +1227,8 @@
 							"raw": "{{base_url}}/api/v1/san-pham",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "san-pham"]
-						}
+						},
+						"description": "Khách hàng tạo sản phẩm → Phải bị 403 Forbidden"
 					}
 				},
 				{
@@ -1164,7 +1257,8 @@
 							"raw": "{{base_url}}/api/v1/cua-hang",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "cua-hang"]
-						}
+						},
+						"description": "Khách hàng tạo cửa hàng → Phải bị 403 Forbidden"
 					}
 				},
 				{
@@ -1189,7 +1283,8 @@
 							"raw": "{{base_url}}/api/v1/roles",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "roles"]
-						}
+						},
+						"description": "Khách hàng xem roles → Phải bị 403 Forbidden"
 					}
 				}
 			]

@@ -3,11 +3,15 @@ package com.vn.shopping.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vn.shopping.domain.SanPham;
 import com.vn.shopping.domain.response.ResSanPhamDTO;
+import com.vn.shopping.domain.response.ResultPaginationDTO;
 import com.vn.shopping.repository.SanPhamRepository;
 
 import jakarta.persistence.EntityManager;
@@ -104,5 +108,43 @@ public class SanPhamService {
     @Transactional(readOnly = true)
     public List<ResSanPhamDTO> findAllDTO() {
         return convertToListDTO(sanPhamRepository.findAll());
+    }
+
+    /**
+     * Lọc sản phẩm theo nhiều tiêu chí + phân trang
+     */
+    @Transactional(readOnly = true)
+    public ResultPaginationDTO filterSanPham(
+            String tenSanPham,
+            Long kieuSanPhamId,
+            Long boSuuTapId,
+            Long thuongHieuId,
+            Integer trangThai,
+            Double giaMin,
+            Double giaMax,
+            Pageable pageable) {
+
+        Specification<SanPham> spec = SanPhamSpecification.filter(
+                tenSanPham, kieuSanPhamId, boSuuTapId, thuongHieuId, trangThai, giaMin, giaMax);
+
+        Page<SanPham> page = sanPhamRepository.findAll(spec, pageable);
+
+        // Convert sang DTO
+        List<ResSanPhamDTO> dtoList = page.getContent().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+
+        // Build meta phân trang
+        ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
+        meta.setPage(pageable.getPageNumber() + 1); // 1-indexed cho client
+        meta.setPageSize(pageable.getPageSize());
+        meta.setPages(page.getTotalPages());
+        meta.setTotal(page.getTotalElements());
+
+        ResultPaginationDTO result = new ResultPaginationDTO();
+        result.setMeta(meta);
+        result.setResult(dtoList);
+
+        return result;
     }
 }
