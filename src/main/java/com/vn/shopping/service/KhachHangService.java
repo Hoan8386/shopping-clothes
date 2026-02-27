@@ -3,16 +3,20 @@ package com.vn.shopping.service;
 import org.springframework.stereotype.Service;
 
 import com.vn.shopping.domain.KhachHang;
+import com.vn.shopping.domain.Role;
 import com.vn.shopping.domain.response.ResCreateUserDTO;
 import com.vn.shopping.repository.KhachHangRepository;
+import com.vn.shopping.repository.RoleRepository;
 
 @Service
 public class KhachHangService {
 
     private final KhachHangRepository khachHangRepository;
+    private final RoleRepository roleRepository;
 
-    public KhachHangService(KhachHangRepository khachHangRepository) {
+    public KhachHangService(KhachHangRepository khachHangRepository, RoleRepository roleRepository) {
         this.khachHangRepository = khachHangRepository;
+        this.roleRepository = roleRepository;
     }
 
     public KhachHang findByEmail(String email) {
@@ -23,7 +27,16 @@ public class KhachHangService {
         return khachHangRepository.existsByEmail(email);
     }
 
+    public boolean isSdtExist(String sdt) {
+        return khachHangRepository.existsBySdt(sdt);
+    }
+
     public KhachHang handleCreateUser(KhachHang khachHang) {
+        // Tự động gán role KHACH_HANG (id=4) nếu chưa có role
+        if (khachHang.getRole() == null) {
+            Role khachHangRole = roleRepository.findById(4L).orElse(null);
+            khachHang.setRole(khachHangRole);
+        }
         return khachHangRepository.save(khachHang);
     }
 

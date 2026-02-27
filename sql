@@ -1,125 +1,451 @@
 -- =============================================================
 -- DATABASE: QUẢN LÝ SHOP QUẦN ÁO ĐA CHI NHÁNH
--- CHỈ INSERT DỮ LIỆU MẪU
--- Hibernate (ddl-auto=update) sẽ tự tạo bảng từ domain entities
+-- FILE NÀY CHỈ CHỨA CẤU TRÚC BẢNG (CREATE TABLE)
+-- Dữ liệu mẫu nằm trong file insert_data.sql
 -- =============================================================
-
--- Bước 1: Tạo database (nếu chưa có) rồi chạy app để Hibernate tạo bảng
--- Bước 2: Chạy file này để INSERT dữ liệu mẫu
 
 CREATE DATABASE IF NOT EXISTS shopping DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE shopping;
 
--- ---------------------------------------------------------
--- INSERT DỮ LIỆU MẪU (chỉ các bảng có domain entity)
--- ---------------------------------------------------------
+-- ==============================================
+-- 1. HỆ THỐNG PHÂN QUYỀN (SYSTEM SECURITY)
+-- ==============================================
 
--- 1. roles (Role.java)
-INSERT INTO roles (name, description, active, createdAt) VALUES
-    ('ADMIN',      'Quản trị viên toàn quyền', TRUE, NOW()),
-    ('QUAN_LY',    'Quản lý cửa hàng',         TRUE, NOW()),
-    ('NHAN_VIEN',  'Nhân viên bán hàng',        TRUE, NOW()),
-    ('KHACH_HANG', 'Khách hàng mua sắm',        TRUE, NOW());
+CREATE TABLE permissions (
+    id BIGINT PRIMARY KEY,
+    name VARCHAR(255),
+    api_path VARCHAR(255),
+    method VARCHAR(255),
+    module VARCHAR(255),
+    created_at DATETIME,
+    updated_at DATETIME,
+    created_by VARCHAR(255),
+    updated_by VARCHAR(255)
+);
 
--- 2. permissions (Permission.java)
-INSERT INTO permissions (name, apiPath, method, module, createdAt) VALUES
-    -- SanPham (1-4, 8)
-    ('Tạo sản phẩm',            '/api/v1/san-pham',                     'POST',   'SAN_PHAM',       NOW()),
-    ('Sửa sản phẩm',            '/api/v1/san-pham',                     'PUT',    'SAN_PHAM',       NOW()),
-    ('Xóa sản phẩm',            '/api/v1/san-pham/{id}',                'DELETE', 'SAN_PHAM',       NOW()),
-    ('Xem sản phẩm',            '/api/v1/san-pham',                     'GET',    'SAN_PHAM',       NOW()),
-    -- GioHang (5-7)
-    ('Thêm SP vào giỏ hàng',    '/api/v1/gio-hang/them-san-pham',                                        'POST',   'GIO_HANG',       NOW()),
-    ('Xem giỏ hàng theo KH',    '/api/v1/gio-hang/khach-hang/{khachHangId}',                              'GET',    'GIO_HANG',       NOW()),
-    ('Xóa SP khỏi giỏ hàng',   '/api/v1/gio-hang/chi-tiet/{maChiTietGioHang}', 'DELETE', 'GIO_HANG',       NOW()),
-    -- SanPham chi tiết (8)
-    ('Xem chi tiết sản phẩm',   '/api/v1/san-pham/{id}',                'GET',    'SAN_PHAM',       NOW()),
-    -- MauSac (9-13)
-    ('Xem màu sắc',             '/api/v1/mau-sac',                      'GET',    'MAU_SAC',        NOW()),
-    ('Tạo màu sắc',             '/api/v1/mau-sac',                      'POST',   'MAU_SAC',        NOW()),
-    ('Sửa màu sắc',             '/api/v1/mau-sac',                      'PUT',    'MAU_SAC',        NOW()),
-    ('Xóa màu sắc',             '/api/v1/mau-sac/{id}',                 'DELETE', 'MAU_SAC',        NOW()),
-    ('Xem chi tiết màu sắc',    '/api/v1/mau-sac/{id}',                 'GET',    'MAU_SAC',        NOW()),
-    -- KichThuoc (14-18)
-    ('Xem kích thước',          '/api/v1/kich-thuoc',                   'GET',    'KICH_THUOC',     NOW()),
-    ('Tạo kích thước',          '/api/v1/kich-thuoc',                   'POST',   'KICH_THUOC',     NOW()),
-    ('Sửa kích thước',          '/api/v1/kich-thuoc',                   'PUT',    'KICH_THUOC',     NOW()),
-    ('Xóa kích thước',          '/api/v1/kich-thuoc/{id}',              'DELETE', 'KICH_THUOC',     NOW()),
-    ('Xem chi tiết kích thước', '/api/v1/kich-thuoc/{id}',              'GET',    'KICH_THUOC',     NOW()),
-    -- ChiTietSanPham (19-24)
-    ('Xem chi tiết SP (all)',    '/api/v1/chi-tiet-san-pham',           'GET',    'CHI_TIET_SP',    NOW()),
-    ('Xem chi tiết SP (id)',     '/api/v1/chi-tiet-san-pham/{id}',      'GET',    'CHI_TIET_SP',    NOW()),
-    ('Xem CTSP theo sản phẩm',  '/api/v1/chi-tiet-san-pham/san-pham/{sanPhamId}','GET', 'CHI_TIET_SP',    NOW()),
-    ('Tạo chi tiết SP',         '/api/v1/chi-tiet-san-pham',           'POST',   'CHI_TIET_SP',    NOW()),
-    ('Sửa chi tiết SP',         '/api/v1/chi-tiet-san-pham',           'PUT',    'CHI_TIET_SP',    NOW()),
-    ('Xóa chi tiết SP',         '/api/v1/chi-tiet-san-pham/{id}',      'DELETE', 'CHI_TIET_SP',    NOW());
+CREATE TABLE roles (
+    id BIGINT PRIMARY KEY,
+    name VARCHAR(255),
+    description VARCHAR(255),
+    active INT, 
+    created_at DATETIME,
+    updated_at DATETIME,
+    created_by VARCHAR(255),
+    updated_by VARCHAR(255)
+);
 
--- 3. permission_role (join table Role ↔ Permission)
--- ADMIN: tất cả permissions (1-24)
-INSERT INTO permission_role (role_id, permission_id) VALUES
-    (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),
-    (1,9),(1,10),(1,11),(1,12),(1,13),(1,14),(1,15),(1,16),
-    (1,17),(1,18),(1,19),(1,20),(1,21),(1,22),(1,23),(1,24);
--- QUAN_LY: CRUD sp + mau sac + kich thuoc + chi tiet sp
-INSERT INTO permission_role (role_id, permission_id) VALUES
-    (2,1),(2,2),(2,3),(2,4),(2,8),
-    (2,9),(2,10),(2,11),(2,12),(2,13),
-    (2,14),(2,15),(2,16),(2,17),(2,18),
-    (2,19),(2,20),(2,21),(2,22),(2,23),(2,24);
--- NHAN_VIEN: chỉ xem
-INSERT INTO permission_role (role_id, permission_id) VALUES
-    (3,4),(3,8),(3,9),(3,13),(3,14),(3,18),(3,19),(3,20),(3,21);
--- KHACH_HANG: xem sp + giỏ hàng (thêm/xem/xóa) + mau sac + kich thuoc + chi tiet sp
-INSERT INTO permission_role (role_id, permission_id) VALUES
-    (4,4),(4,5),(4,6),(4,7),(4,8),(4,9),(4,13),(4,14),(4,18),(4,19),(4,20),(4,21);
+CREATE TABLE permission_role (
+    role_id BIGINT,
+    permission_id BIGINT,
+    PRIMARY KEY (role_id, permission_id)
+);
 
--- 4. NhanVien (NhanVien.java)
--- password = BCrypt hash của '123456'
--- ChucVu khớp enum: NHAN_VIEN, QUAN_LY, CHU_CUA_HANG, ADMIN
-INSERT INTO NhanVien (TenNhanVien, Email, Password, Sdt, ChucVu, role_id) VALUES
-    ('An',   'an@s.com','$2a$10$dXJ3SW6G7P50lGEheIjLOOvTnLJpv0r4a6Oq5a7n5g5z5z5z5z5z5','01','QUAN_LY', 2),
-    ('Bình', 'b@s.com', '$2a$10$dXJ3SW6G7P50lGEheIjLOOvTnLJpv0r4a6Oq5a7n5g5z5z5z5z5z5','02','NHAN_VIEN',3),
-    ('Chi',  'c@s.com', '$2a$10$dXJ3SW6G7P50lGEheIjLOOvTnLJpv0r4a6Oq5a7n5g5z5z5z5z5z5','03','NHAN_VIEN',3),
-    ('Danh', 'd@s.com', '$2a$10$dXJ3SW6G7P50lGEheIjLOOvTnLJpv0r4a6Oq5a7n5g5z5z5z5z5z5','04','QUAN_LY', 2),
-    ('Hùng', 'h@s.com', '$2a$10$dXJ3SW6G7P50lGEheIjLOOvTnLJpv0r4a6Oq5a7n5g5z5z5z5z5z5','05','ADMIN',   1);
+-- ==============================================
+-- 2. QUẢN LÝ SẢN PHẨM & DANH MỤC
+-- ==============================================
 
--- 5. KhachHang (KhachHang.java)
-INSERT INTO KhachHang (TenKhachHang, Sdt, Email, Password, DiemTichLuy, role_id) VALUES
-    ('Lan',  '0911','lan@g.com','$2a$10$dXJ3SW6G7P50lGEheIjLOOvTnLJpv0r4a6Oq5a7n5g5z5z5z5z5z5', 10,4),
-    ('Minh', '0922','m@g.com',  '$2a$10$dXJ3SW6G7P50lGEheIjLOOvTnLJpv0r4a6Oq5a7n5g5z5z5z5z5z5',  0,4),
-    ('Hoa',  '0933','h@g.com',  '$2a$10$dXJ3SW6G7P50lGEheIjLOOvTnLJpv0r4a6Oq5a7n5g5z5z5z5z5z5',100,4),
-    ('Tuấn', '0944','t@g.com',  '$2a$10$dXJ3SW6G7P50lGEheIjLOOvTnLJpv0r4a6Oq5a7n5g5z5z5z5z5z5',  5,4),
-    ('Yến',  '0955','y@g.com',  '$2a$10$dXJ3SW6G7P50lGEheIjLOOvTnLJpv0r4a6Oq5a7n5g5z5z5z5z5z5', 50,4);
+CREATE TABLE KieuSanPham (
+    MaKieuSanPham BIGINT PRIMARY KEY,
+    TenKieuSanPham VARCHAR(255),
+    NgayTao DATETIME,
+    NgayCapNhat DATETIME
+);
 
--- 6. SanPham (SanPham.java)
-INSERT INTO SanPham (TenSanPham, GiaVon, GiaBan, TrangThai) VALUES
-    ('Áo Oxford', 100, 200, 'Kinh doanh'),  -- id = 1
-    ('Quần Jean', 200, 400, 'Kinh doanh'),  -- id = 2
-    ('Váy Hoa',   150, 300, 'Kinh doanh'),  -- id = 3
-    ('Nịt Da',     50, 100, 'Kinh doanh'),  -- id = 4
-    ('Áo Phao',   300, 600, 'Ngừng');       -- id = 5
+CREATE TABLE BoSuuTap (
+    MaSuuTap BIGINT PRIMARY KEY,
+    TenSuuTap VARCHAR(255),
+    MoTa VARCHAR(255),
+    NgayTao DATETIME,
+    NgayCapNhat DATETIME
+);
 
--- 7. KichThuoc (KichThuoc.java)
-INSERT INTO KichThuoc (TenKichThuoc) VALUES
-    ('Nhỏ'),        -- id = 1
-    ('Vừa'),        -- id = 2
-    ('Lớn'),        -- id = 3
-    ('Rất lớn'),    -- id = 4
-    ('Đặc biệt');   -- id = 5
+CREATE TABLE ThuongHieu (
+    MaThuongHieu BIGINT PRIMARY KEY,
+    TenThuongHieu VARCHAR(255),
+    TrangThaiHoatDong INT,
+    TrangThaiHienThi INT,
+    NgayTao DATETIME,
+    NgayCapNhat DATETIME
+);
 
--- 8. MauSac (MauSac.java)
-INSERT INTO MauSac (TenMauSac) VALUES
-    ('Trắng'),  -- id = 1
-    ('Đen'),    -- id = 2
-    ('Đỏ'),     -- id = 3
-    ('Xanh'),   -- id = 4
-    ('Vàng');   -- id = 5
+CREATE TABLE MauSac (
+    MaMauSac BIGINT PRIMARY KEY,
+    TenMau VARCHAR(255),
+    NgayTao DATETIME,
+    NgayCapNhat DATETIME
+);
 
--- 9. ChiTietSanPham (ChiTietSanPham.java)
--- MaSanPham(FK long), MaKichThuoc(FK long), MaMauSac(FK long)
-INSERT INTO ChiTietSanPham (MaSanPham, MaKichThuoc, MaMauSac, SKU) VALUES
-    (1, 2, 1, 'SKU-1'),  -- id=1: Áo Oxford / Vừa / Trắng
-    (1, 3, 1, 'SKU-2'),  -- id=2: Áo Oxford / Lớn / Trắng
-    (2, 2, 2, 'SKU-3'),  -- id=3: Quần Jean / Vừa / Đen
-    (3, 1, 3, 'SKU-4'),  -- id=4: Váy Hoa   / Nhỏ / Đỏ
-    (4, 3, 2, 'SKU-5');  -- id=5: Nịt Da    / Lớn / Đen
+CREATE TABLE KichThuoc (
+    MaKichThuoc BIGINT PRIMARY KEY,
+    TenKichThuoc VARCHAR(255),
+    NgayTao DATETIME,
+    NgayCapNhat DATETIME
+);
+
+CREATE TABLE SanPham (
+    MaSanPham BIGINT PRIMARY KEY,
+    MaKieuSanPham BIGINT,
+    MaSuuTap BIGINT,
+    MaThuongHieu BIGINT,
+    TenSanPham VARCHAR(255),
+    GiaVon DOUBLE,
+    GiaBan DOUBLE,
+    GiaGiam INT,
+    HinhAnhChinh VARCHAR(255),
+    MoTa VARCHAR(255),
+    TrangThai INT,
+    NgayTao DATETIME,
+    NgayCapNhat DATETIME
+);
+
+CREATE TABLE ChiTietSanPham (
+    MaChiTietSanPham BIGINT PRIMARY KEY,
+    MaSanPham BIGINT,
+    MaPhieuNhap BIGINT,
+    MaMauSac BIGINT,
+    MaKichThuoc BIGINT,
+    MaCuaHang BIGINT,
+    TrangThai INT,
+    MoTa VARCHAR(255),
+    GhiTru VARCHAR(255),
+    NgayTao DATETIME,
+    NgayCapNhat DATETIME
+);
+
+CREATE TABLE HinhAnh (
+    MaHinhAnh BIGINT PRIMARY KEY,
+    MaChiTietSanPham BIGINT,
+    TenHinhAnh VARCHAR(255),
+    NgayTao DATETIME,
+    NgayCapNhat DATETIME
+);
+
+-- ==============================================
+-- 3. QUẢN LÝ NHÂN SỰ & CỬA HÀNG
+-- ==============================================
+
+CREATE TABLE CuaHang (
+    MaCuaHang BIGINT PRIMARY KEY,
+    TenCuaHang VARCHAR(255),
+    DiaChi VARCHAR(255),
+    ViTri VARCHAR(255),
+    SoDienThoai VARCHAR(255),
+    Email VARCHAR(255),
+    TrangThai INT
+);
+
+-- ĐÃ BỎ BẢNG ChucVu Ở ĐÂY
+
+CREATE TABLE NhanVien (
+    MaNhanVien BIGINT PRIMARY KEY,
+    MaCuaHang BIGINT,
+    role_id BIGINT,  -- Sử dụng role_id thay cho MaChucVu
+    TenNhanVien VARCHAR(255),
+    Email VARCHAR(255),
+    SoDienThoai VARCHAR(255),
+    MatKhau VARCHAR(255),
+    NgayBatDauLam DATETIME,
+    NgayKetThucLam DATETIME,
+    TrangThai INT
+);
+
+-- ==============================================
+-- 4. QUẢN LÝ KHÁCH HÀNG, ĐÁNH GIÁ & GIỎ HÀNG
+-- ==============================================
+
+CREATE TABLE KhachHang (
+    MaKhachHang BIGINT PRIMARY KEY,
+    role_id BIGINT,  -- Cột phân quyền
+    TenKhachHang VARCHAR(255),
+    Email VARCHAR(255),
+    SoDienThoai VARCHAR(255),
+    DiemTichLuy INT,
+    MatKhau VARCHAR(255)
+);
+
+CREATE TABLE DanhGiaSanPham (
+    MaDanhGia BIGINT PRIMARY KEY,
+    MaKhachHang BIGINT,
+    MaSanPham BIGINT,
+    MaDon BIGINT,
+    SoSao INT,
+    GhiTru VARCHAR(255),
+    HinhAnh VARCHAR(255),
+    NgayTao DATETIME,
+    NgayCapNhat DATETIME
+);
+
+CREATE TABLE GioHang (
+    MaGioHang BIGINT PRIMARY KEY,
+    MaKhachHang BIGINT,
+    NgayTao DATETIME,
+    NgayCapNhat DATETIME
+);
+
+CREATE TABLE ChiTietGioHang (
+    MaGioHang BIGINT,
+    MaChiTietSanPham BIGINT,
+    SoLuong INT,
+    NgayTao DATETIME,
+    NgayCapNhat DATETIME,
+    PRIMARY KEY (MaGioHang, MaChiTietSanPham)
+);
+
+-- ==============================================
+-- 5. QUẢN LÝ ĐƠN HÀNG & KHUYẾN MÃI
+-- ==============================================
+
+CREATE TABLE KhuyenMaiTheoHoaDon (
+    MaKhuyenMaiHoaDon BIGINT PRIMARY KEY,
+    TenKhuyenMai VARCHAR(255),
+    GiamToiDa INT,
+    HoaDonToiDa INT,
+    PhanTramGiam DOUBLE,
+    HinhThuc INT,
+    ThoiGianBatDau DATETIME,
+    ThoiGianKetThuc DATETIME,
+    SoLuong INT,
+    TrangThai INT,
+    NgayTao DATETIME,
+    NgayCapNhat DATETIME
+);
+
+CREATE TABLE KhuyenMaiTheoDiem (
+    MaKhuyenMaiDiem BIGINT PRIMARY KEY,
+    TenKhuyenMai VARCHAR(255),
+    GiamToiDa INT,
+    HoaDonToiDa INT,
+    PhanTramGiam DOUBLE,
+    HinhThuc INT,
+    ThoiGianBatDau DATETIME,
+    ThoiGianKetThuc DATETIME,
+    SoLuong INT,
+    TrangThai INT,
+    NgayTao DATETIME,
+    NgayCapNhat DATETIME
+);
+
+CREATE TABLE DonHang (
+    MaDon BIGINT PRIMARY KEY,
+    MaCuaHang BIGINT,
+    MaKhachHang BIGINT,
+    MaNhanVien BIGINT,
+    MaKhuyenMaiHoaDon BIGINT,
+    MaKhuyenMaiDiem BIGINT,
+    DiaChi VARCHAR(255),
+    TongTien INT,
+    TienGiam INT,
+    TongTienGiam INT,
+    TongTienTra INT,
+    TrangThai INT,
+    TrangThaiThanhToan INT,
+    HinhThucDonHang INT,
+    NgayTao DATETIME,
+    NgayCapNhat DATETIME
+);
+
+CREATE TABLE ChiTietDonHang (
+    MaDon BIGINT,
+    MaChiTietSanPham BIGINT,
+    GiaSanPham DOUBLE,
+    GiamGia DOUBLE,
+    GiaGiam DOUBLE,
+    SoLuong INT,
+    ThanhTien DOUBLE,
+    NgayTao DATETIME,
+    NgayCapNhat DATETIME,
+    PRIMARY KEY (MaDon, MaChiTietSanPham)
+);
+
+CREATE TABLE DoiHang (
+    MaDoiHang BIGINT PRIMARY KEY,
+    MaDonHang BIGINT,
+    GhiTru VARCHAR(255),
+    TrangThai INT,
+    NgayTao DATETIME,
+    NgayCapNhat DATETIME
+);
+
+CREATE TABLE ChiTietDoiHang (
+    MaDoiHang BIGINT,
+    MaSanPhamTra BIGINT,
+    MaSanPhamDoi BIGINT,
+    GhiTru VARCHAR(255),
+    TrangThai INT,
+    NgayTao DATETIME,
+    NgayCapNhat DATETIME,
+    PRIMARY KEY (MaDoiHang, MaSanPhamTra)
+);
+
+-- ==============================================
+-- 6. QUẢN LÝ KHO & LUÂN CHUYỂN
+-- ==============================================
+
+CREATE TABLE NhaCungCap (
+    MaNhaCungCap BIGINT PRIMARY KEY,
+    TenNhaCungCap VARCHAR(255),
+    SoDienThoai VARCHAR(255),
+    Email VARCHAR(255),
+    DiaChi VARCHAR(255),
+    GhiTru VARCHAR(255),
+    TrangThai INT,
+    NgayTao DATETIME,
+    NgayCapNhat DATETIME
+);
+
+CREATE TABLE PhieuNhap (
+    MaPhieuNhap BIGINT PRIMARY KEY,
+    MaCuaHang BIGINT,
+    MaNhaCungCap BIGINT,
+    TenPhieuNhap VARCHAR(255),
+    TrangThai INT,
+    NgayGiaoHang DATETIME,
+    NgayNhanHang DATETIME,
+    NgayTao DATETIME,
+    NgayCapNhat DATETIME
+);
+
+CREATE TABLE ChiTietPhieuNhap (
+    MaPhieuNhap BIGINT,
+    MaChiTietSanPham BIGINT,
+    SoLuong INT,
+    GhiTru VARCHAR(255),
+    GhiTruKiemHang VARCHAR(255),
+    TrangThai INT,
+    NgayTao DATETIME,
+    NgayCapNhat DATETIME,
+    PRIMARY KEY (MaPhieuNhap, MaChiTietSanPham)
+);
+
+CREATE TABLE LoaiKiemKe (
+    MaLoaiKiemKe BIGINT PRIMARY KEY,
+    TenLoai VARCHAR(255),
+    NgayTao DATETIME,
+    NgayCapNhat DATETIME,
+    TrangThai INT
+);
+
+CREATE TABLE KiemKeHangHoa (
+    MaKiemKe BIGINT PRIMARY KEY,
+    MaCuaHang BIGINT,
+    MaLoaiKiemKe BIGINT,
+    TenKiemKe VARCHAR(255),
+    TrangThai INT,
+    NgayBatDau DATETIME,
+    NgayKetThuc DATETIME,
+    NgayTao DATETIME,
+    NgayCapNhat DATETIME
+);
+
+CREATE TABLE ChiTietKiemKe (
+    MaKiemKe BIGINT,
+    MaChiTietSanPham BIGINT,
+    SoLuongThuc INT,
+    GhiTru VARCHAR(255),
+    TrangThai INT,
+    NgayTao DATETIME,
+    NgayCapNhat DATETIME,
+    PRIMARY KEY (MaKiemKe, MaChiTietSanPham)
+);
+
+CREATE TABLE LoaiDonLuanChuyen (
+    MaLoaiDonLuanChuyen BIGINT PRIMARY KEY,
+    TenLoai VARCHAR(255),
+    MoTa VARCHAR(255),
+    NgayTao DATETIME,
+    NgayCapNhat DATETIME
+);
+
+CREATE TABLE DonLuanChuyen (
+    MaDonLuanChuyen BIGINT PRIMARY KEY,
+    CuaHangDat BIGINT,
+    CuaHangGui BIGINT,
+    MaLoaiDonLuanChuyen BIGINT,
+    TenDon VARCHAR(255),
+    ThoiGianGiao DATETIME,
+    ThoiGianNhan DATETIME,
+    GhiTru VARCHAR(255),
+    TrangThai INT,
+    NgayTao DATETIME,
+    NgayCapNhat DATETIME
+);
+
+CREATE TABLE ChiTietDonLuanChuyen (
+    MaDonLuanChuyen BIGINT,
+    MaChiTietSanPham BIGINT,
+    HinhAnh VARCHAR(255),
+    SoLuong INT,
+    TrangThai INT,
+    GhiTru VARCHAR(255),
+    GhiTruKiemHang VARCHAR(255),
+    PRIMARY KEY (MaDonLuanChuyen, MaChiTietSanPham)
+);
+
+-- ==============================================
+-- 7. QUẢN LÝ LỊCH LÀM VIỆC & LƯƠNG
+-- ==============================================
+
+CREATE TABLE CaLamViec (
+    MaCaLam BIGINT PRIMARY KEY,
+    TenCaLam VARCHAR(255),
+    GioBatDau TIME,
+    GioKetThuc TIME,
+    NgayTao DATETIME,
+    NgayCapNhat DATETIME
+);
+
+CREATE TABLE LichLamViec (
+    MaLichLam BIGINT PRIMARY KEY,
+    MaNhanVien BIGINT,
+    NgayLamViec DATE,
+    TrangThai INT,
+    NgayTao DATETIME,
+    NgayCapNhat DATETIME
+);
+
+CREATE TABLE ChiTietLichLam (
+    MaLichLam BIGINT,
+    MaCaLamViec BIGINT,
+    TrangThai INT,
+    NgayTao DATETIME,
+    NgayCapNhat DATETIME,
+    PRIMARY KEY (MaLichLam, MaCaLamViec)
+);
+
+CREATE TABLE DoiCa (
+    MaDoiCa BIGINT PRIMARY KEY,
+    MaLichLam BIGINT,
+    MaCaLamViec BIGINT,
+    NhanVienNhanCa BIGINT,
+    TrangThai INT,
+    NgayTao DATETIME,
+    NgayCapNhat DATETIME
+);
+
+CREATE TABLE LoiPhatSinh (
+    MaLoiPhatSinh BIGINT PRIMARY KEY,
+    MaLichLam BIGINT,
+    MaCaLamViec BIGINT,
+    TenLoiPhatSinh VARCHAR(255),
+    SoTienTru INT,
+    TrangThai INT,
+    NgayTao DATETIME,
+    NgayCapNhat DATETIME
+);
+
+CREATE TABLE LuongCoBan (
+    MaLuongCoBan BIGINT PRIMARY KEY,
+    MaNhanVien BIGINT,
+    LuongCoBan INT,
+    NgayApDung DATETIME,
+    TrangThai INT
+);
+
+CREATE TABLE LuongThuong (
+    MaLuongThuong BIGINT PRIMARY KEY,
+    MaNhanVien BIGINT,
+    TienThuong INT,
+    NgayBatDau DATETIME,
+    NgayKetThuc DATETIME,
+    TrangThai INT
+);

@@ -14,7 +14,6 @@ import com.vn.shopping.repository.GioHangRepository;
 import com.vn.shopping.repository.KhachHangRepository;
 import com.vn.shopping.util.error.IdInvalidException;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -98,7 +97,7 @@ public class GioHangService {
 
         List<ResGioHangDTO.ChiTietGioHangDTO> chiTietList = new ArrayList<>();
         int tongSoLuong = 0;
-        BigDecimal tongTien = BigDecimal.ZERO;
+        Double tongTien = 0.0;
 
         if (gioHang.getChiTietGioHangs() != null) {
             for (ChiTietGioHang ct : gioHang.getChiTietGioHangs()) {
@@ -109,7 +108,6 @@ public class GioHangService {
                 ChiTietSanPham ctsp = ct.getChiTietSanPham();
                 if (ctsp != null) {
                     item.setMaChiTietSanPham(ctsp.getId());
-                    item.setSku(ctsp.getSku());
                     if (ctsp.getKichThuoc() != null) {
                         item.setKichThuoc(ctsp.getKichThuoc().getTenKichThuoc());
                     }
@@ -120,10 +118,9 @@ public class GioHangService {
                         item.setTenSanPham(ctsp.getSanPham().getTenSanPham());
                         item.setGiaBan(ctsp.getSanPham().getGiaBan());
 
-                        BigDecimal thanhTien = ctsp.getSanPham().getGiaBan()
-                                .multiply(BigDecimal.valueOf(ct.getSoLuong()));
+                        Double thanhTien = ctsp.getSanPham().getGiaBan() * ct.getSoLuong();
                         item.setThanhTien(thanhTien);
-                        tongTien = tongTien.add(thanhTien);
+                        tongTien += thanhTien;
                     }
                 }
 

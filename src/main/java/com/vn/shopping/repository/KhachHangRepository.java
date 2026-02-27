@@ -13,5 +13,7 @@ public interface KhachHangRepository extends JpaRepository<KhachHang, Long> {
 
     boolean existsByEmail(String email);
 
+    boolean existsBySdt(String sdt);
+
     Optional<KhachHang> findByRefreshTokenAndEmail(String refreshToken, String email);
 }

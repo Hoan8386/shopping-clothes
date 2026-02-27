@@ -31,7 +31,7 @@ public class UserDetailsCustom implements UserDetailsService {
         if (nhanVien != null) {
             return new User(
                     nhanVien.getEmail(),
-                    nhanVien.getPassword(),
+                    nhanVien.getMatKhau(),
                     Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
         }
         KhachHang khachHang = khachHangService.findByEmail(username);

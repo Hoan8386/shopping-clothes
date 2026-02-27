@@ -2,9 +2,10 @@ package com.vn.shopping.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.vn.shopping.domain.enums.ChucVu;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "NhanVien")
@@ -12,7 +13,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class NhanVien {
 
     @Id
@@ -20,21 +21,30 @@ public class NhanVien {
     @Column(name = "MaNhanVien")
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "MaCuaHang")
+    private CuaHang cuaHang;
+
     @Column(name = "TenNhanVien", length = 255)
     private String tenNhanVien;
 
-    @Column(name = "Email", length = 100)
+    @Column(name = "Email", length = 255)
     private String email;
 
-    @Column(name = "Password")
-    private String password;
+    @Column(name = "SoDienThoai", length = 255)
+    private String soDienThoai;
 
-    @Column(name = "Sdt", length = 20)
-    private String sdt;
+    @Column(name = "MatKhau", length = 255)
+    private String matKhau;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "ChucVu", length = 50)
-    private ChucVu chucVu;
+    @Column(name = "NgayBatDauLam")
+    private LocalDateTime ngayBatDauLam;
+
+    @Column(name = "NgayKetThucLam")
+    private LocalDateTime ngayKetThucLam;
+
+    @Column(name = "TrangThai")
+    private Integer trangThai;
 
     @Column(name = "RefreshToken", columnDefinition = "MEDIUMTEXT")
     private String refreshToken;

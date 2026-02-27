@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.vn.shopping.domain.SanPham;
+import com.vn.shopping.domain.response.ResSanPhamDTO;
 import com.vn.shopping.service.SanPhamService;
 import com.vn.shopping.util.anotation.ApiMessage;
 import com.vn.shopping.util.error.IdInvalidException;
@@ -26,8 +27,8 @@ public class SanPhamController {
      */
     @GetMapping
     @ApiMessage("Get all product")
-    public ResponseEntity<List<SanPham>> getAll() {
-        return ResponseEntity.ok(sanPhamService.findAll());
+    public ResponseEntity<List<ResSanPhamDTO>> getAll() {
+        return ResponseEntity.ok(sanPhamService.findAllDTO());
     }
 
     /**
@@ -35,23 +36,22 @@ public class SanPhamController {
      */
     @GetMapping("/{id}")
     @ApiMessage("Get detail product")
-    public ResponseEntity<SanPham> getById(@PathVariable("id") long id) throws IdInvalidException {
-        SanPham sp = sanPhamService.findById(id);
-        if (sp == null) {
+    public ResponseEntity<ResSanPhamDTO> getById(@PathVariable("id") long id) throws IdInvalidException {
+        ResSanPhamDTO dto = sanPhamService.findByIdDTO(id);
+        if (dto == null) {
             throw new IdInvalidException("Không tìm thấy sản phẩm: " + id);
         }
-        return ResponseEntity.ok(sp);
+        return ResponseEntity.ok(dto);
     }
 
     /**
      * Tạo sản phẩm mới — chỉ ADMIN có permission mới gọi được
-     * (kiểm tra qua PermissionInterceptor: POST /api/v1/san-pham)
      */
     @PostMapping
     @ApiMessage("Create a product")
-    public ResponseEntity<SanPham> create(@RequestBody SanPham sanPham) {
+    public ResponseEntity<ResSanPhamDTO> create(@RequestBody SanPham sanPham) {
         SanPham created = sanPhamService.create(sanPham);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        return ResponseEntity.status(HttpStatus.CREATED).body(sanPhamService.convertToDTO(created));
     }
 
     /**
@@ -59,12 +59,12 @@ public class SanPhamController {
      */
     @PutMapping
     @ApiMessage("Update product")
-    public ResponseEntity<SanPham> update(@RequestBody SanPham sanPham) throws IdInvalidException {
+    public ResponseEntity<ResSanPhamDTO> update(@RequestBody SanPham sanPham) throws IdInvalidException {
         if (sanPham.getId() == 0) {
             throw new IdInvalidException("Mã sản phẩm không được để trống");
         }
         SanPham updated = sanPhamService.update(sanPham);
-        return ResponseEntity.ok(updated);
+        return ResponseEntity.ok(sanPhamService.convertToDTO(updated));
     }
 
     /**

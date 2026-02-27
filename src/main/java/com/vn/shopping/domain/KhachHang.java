@@ -11,7 +11,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class KhachHang {
 
     @Id

@@ -7,21 +7,27 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "KichThuoc")
+@Table(name = "ThuongHieu")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
-public class KichThuoc {
+public class ThuongHieu {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "MaKichThuoc")
+    @Column(name = "MaThuongHieu")
     private Long id;
 
-    @Column(name = "TenKichThuoc", length = 255)
-    private String tenKichThuoc;
+    @Column(name = "TenThuongHieu", length = 255)
+    private String tenThuongHieu;
+
+    @Column(name = "TrangThaiHoatDong")
+    private Integer trangThaiHoatDong;
+
+    @Column(name = "TrangThaiHienThi")
+    private Integer trangThaiHienThi;
 
     @Column(name = "NgayTao")
     private LocalDateTime ngayTao;

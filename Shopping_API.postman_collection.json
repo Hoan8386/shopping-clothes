@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "shopping-api-collection",
 		"name": "Shopping API",
-		"description": "Collection cho SanPham và GioHang controller",
+		"description": "Collection đầy đủ tất cả API endpoints - Shopping App",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"auth": {
@@ -30,14 +30,16 @@
 			"name": "Auth",
 			"item": [
 				{
-					"name": "Login (ADMIN - NV5)",
+					"name": "Login (ADMIN - NV5 Hùng)",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
 									"var jsonData = pm.response.json();",
-									"if (jsonData.access_token) {",
+									"if (jsonData.data && jsonData.data.access_token) {",
+									"    pm.collectionVariables.set('access_token', jsonData.data.access_token);",
+									"} else if (jsonData.access_token) {",
 									"    pm.collectionVariables.set('access_token', jsonData.access_token);",
 									"}"
 								],
@@ -46,16 +48,9 @@
 						}
 					],
 					"request": {
-						"auth": {
-							"type": "noauth"
-						},
+						"auth": { "type": "noauth" },
 						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"username\": \"h@s.com\",\n    \"password\": \"123456\"\n}"
@@ -68,14 +63,16 @@
 					}
 				},
 				{
-					"name": "Login (Khách hàng - KH1)",
+					"name": "Login (Khách hàng - KH1 Lan)",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
 									"var jsonData = pm.response.json();",
-									"if (jsonData.access_token) {",
+									"if (jsonData.data && jsonData.data.access_token) {",
+									"    pm.collectionVariables.set('access_token', jsonData.data.access_token);",
+									"} else if (jsonData.access_token) {",
 									"    pm.collectionVariables.set('access_token', jsonData.access_token);",
 									"}"
 								],
@@ -84,16 +81,9 @@
 						}
 					],
 					"request": {
-						"auth": {
-							"type": "noauth"
-						},
+						"auth": { "type": "noauth" },
 						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"username\": \"lan@g.com\",\n    \"password\": \"123456\"\n}"
@@ -125,7 +115,9 @@
 							"script": {
 								"exec": [
 									"var jsonData = pm.response.json();",
-									"if (jsonData.access_token) {",
+									"if (jsonData.data && jsonData.data.access_token) {",
+									"    pm.collectionVariables.set('access_token', jsonData.data.access_token);",
+									"} else if (jsonData.access_token) {",
 									"    pm.collectionVariables.set('access_token', jsonData.access_token);",
 									"}"
 								],
@@ -159,16 +151,9 @@
 				{
 					"name": "Register (Khách hàng mới)",
 					"request": {
-						"auth": {
-							"type": "noauth"
-						},
+						"auth": { "type": "noauth" },
 						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"tenKhachHang\": \"Nguyễn Test\",\n    \"sdt\": \"0999999999\",\n    \"email\": \"test@gmail.com\",\n    \"password\": \"123456\"\n}"
@@ -210,18 +195,13 @@
 					}
 				},
 				{
-					"name": "Tạo sản phẩm (ADMIN only)",
+					"name": "Tạo sản phẩm",
 					"request": {
 						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"tenSanPham\": \"Áo Thun Basic\",\n    \"giaVon\": 80,\n    \"giaBan\": 180,\n    \"trangThai\": \"Kinh doanh\"\n}"
+							"raw": "{\n    \"kieuSanPham\": { \"id\": 1 },\n    \"boSuuTap\": { \"id\": 3 },\n    \"thuongHieu\": { \"id\": 1 },\n    \"tenSanPham\": \"Áo Thun Basic\",\n    \"giaVon\": 80,\n    \"giaBan\": 180,\n    \"giaGiam\": 0,\n    \"trangThai\": 1\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/san-pham",
@@ -231,18 +211,13 @@
 					}
 				},
 				{
-					"name": "Cập nhật sản phẩm (ADMIN only)",
+					"name": "Cập nhật sản phẩm",
 					"request": {
 						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"tenSanPham\": \"Áo Thun Basic V2\",\n    \"giaVon\": 90,\n    \"giaBan\": 200,\n    \"trangThai\": \"Kinh doanh\"\n}"
+							"raw": "{\n    \"id\": 1,\n    \"kieuSanPham\": { \"id\": 1 },\n    \"boSuuTap\": { \"id\": 3 },\n    \"thuongHieu\": { \"id\": 1 },\n    \"tenSanPham\": \"Áo Oxford V2\",\n    \"giaVon\": 120,\n    \"giaBan\": 250,\n    \"giaGiam\": 5,\n    \"trangThai\": 1\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/san-pham",
@@ -252,7 +227,7 @@
 					}
 				},
 				{
-					"name": "Xóa sản phẩm (ADMIN only)",
+					"name": "Xóa sản phẩm",
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -260,177 +235,6 @@
 							"raw": "{{base_url}}/api/v1/san-pham/6",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "san-pham", "6"]
-						}
-					}
-				}
-			]
-		},
-		{
-			"name": "Giỏ Hàng",
-			"description": "Đăng nhập bằng tài khoản khách hàng trước khi test (Login KH1)",
-			"item": [
-				{
-					"name": "Xem giỏ hàng theo khách hàng",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/api/v1/gio-hang/khach-hang/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "gio-hang", "khach-hang", "1"]
-						}
-					}
-				},
-				{
-					"name": "Thêm sản phẩm vào giỏ (KH1, CTSP1, SL=2)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"maKhachHang\": 1,\n    \"maChiTietSanPham\": 1,\n    \"soLuong\": 2\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/v1/gio-hang/them-san-pham",
-							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "gio-hang", "them-san-pham"]
-						}
-					}
-				},
-				{
-					"name": "Thêm sản phẩm khác vào giỏ (KH1, CTSP3, SL=1)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"maKhachHang\": 1,\n    \"maChiTietSanPham\": 3,\n    \"soLuong\": 1\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/v1/gio-hang/them-san-pham",
-							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "gio-hang", "them-san-pham"]
-						}
-					}
-				},
-				{
-					"name": "Thêm SP đã có trong giỏ (cộng dồn SL)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"maKhachHang\": 1,\n    \"maChiTietSanPham\": 1,\n    \"soLuong\": 3\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/v1/gio-hang/them-san-pham",
-							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "gio-hang", "them-san-pham"]
-						}
-					}
-				},
-				{
-					"name": "Xóa chi tiết giỏ hàng (CTGH=1)",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/api/v1/gio-hang/chi-tiet/1",
-							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "gio-hang", "chi-tiet", "1"]
-						}
-					}
-				}
-			]
-		},
-		{
-			"name": "Test phân quyền",
-			"description": "Login khách hàng rồi thử tạo sản phẩm → phải bị 403",
-			"item": [
-				{
-					"name": "1. Login KH trước",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"var jsonData = pm.response.json();",
-									"if (jsonData.access_token) {",
-									"    pm.collectionVariables.set('access_token', jsonData.access_token);",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"username\": \"lan@g.com\",\n    \"password\": \"123456\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/v1/auth/login",
-							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "auth", "login"]
-						}
-					}
-				},
-				{
-					"name": "2. Tạo SP bằng KH → Bị từ chối",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test('Khách hàng không được tạo SP', function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([403, 400]);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"tenSanPham\": \"Test bị chặn\",\n    \"giaVon\": 10,\n    \"giaBan\": 20,\n    \"trangThai\": \"Kinh doanh\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/v1/san-pham",
-							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "san-pham"]
 						}
 					}
 				}
@@ -464,10 +268,10 @@
 					}
 				},
 				{
-					"name": "Tạo màu sắc (ADMIN/QUAN_LY)",
+					"name": "Tạo màu sắc",
 					"request": {
 						"method": "POST",
-						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"tenMauSac\": \"Tím\"\n}"
@@ -480,10 +284,10 @@
 					}
 				},
 				{
-					"name": "Sửa màu sắc (ADMIN/QUAN_LY)",
+					"name": "Cập nhật màu sắc",
 					"request": {
 						"method": "PUT",
-						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"id\": 1,\n    \"tenMauSac\": \"Trắng sữa\"\n}"
@@ -496,7 +300,7 @@
 					}
 				},
 				{
-					"name": "Xóa màu sắc (ADMIN/QUAN_LY)",
+					"name": "Xóa màu sắc",
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -537,10 +341,10 @@
 					}
 				},
 				{
-					"name": "Tạo kích thước (ADMIN/QUAN_LY)",
+					"name": "Tạo kích thước",
 					"request": {
 						"method": "POST",
-						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"tenKichThuoc\": \"XXXL\"\n}"
@@ -553,10 +357,10 @@
 					}
 				},
 				{
-					"name": "Sửa kích thước (ADMIN/QUAN_LY)",
+					"name": "Cập nhật kích thước",
 					"request": {
 						"method": "PUT",
-						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"id\": 1,\n    \"tenKichThuoc\": \"Siêu nhỏ\"\n}"
@@ -569,7 +373,7 @@
 					}
 				},
 				{
-					"name": "Xóa kích thước (ADMIN/QUAN_LY)",
+					"name": "Xóa kích thước",
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -622,13 +426,13 @@
 					}
 				},
 				{
-					"name": "Tạo chi tiết SP (ADMIN/QUAN_LY)",
+					"name": "Tạo chi tiết SP",
 					"request": {
 						"method": "POST",
-						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"sanPham\": { \"id\": 1 },\n    \"kichThuoc\": { \"id\": 4 },\n    \"mauSac\": { \"id\": 4 },\n    \"sku\": \"SKU-6\"\n}"
+							"raw": "{\n    \"sanPham\": { \"id\": 1 },\n    \"kichThuoc\": { \"id\": 4 },\n    \"mauSac\": { \"id\": 4 },\n    \"trangThai\": 1,\n    \"moTa\": \"Màu xanh size XL\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/chi-tiet-san-pham",
@@ -638,13 +442,13 @@
 					}
 				},
 				{
-					"name": "Sửa chi tiết SP (ADMIN/QUAN_LY)",
+					"name": "Cập nhật chi tiết SP",
 					"request": {
 						"method": "PUT",
-						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"id\": 1,\n    \"sanPham\": { \"id\": 1 },\n    \"kichThuoc\": { \"id\": 2 },\n    \"mauSac\": { \"id\": 1 },\n    \"sku\": \"SKU-1-UPDATED\"\n}"
+							"raw": "{\n    \"id\": 1,\n    \"sanPham\": { \"id\": 1 },\n    \"kichThuoc\": { \"id\": 2 },\n    \"mauSac\": { \"id\": 1 },\n    \"trangThai\": 1,\n    \"moTa\": \"Cập nhật mô tả\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/chi-tiet-san-pham",
@@ -654,7 +458,7 @@
 					}
 				},
 				{
-					"name": "Xóa chi tiết SP (ADMIN/QUAN_LY)",
+					"name": "Xóa chi tiết SP",
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -662,6 +466,729 @@
 							"raw": "{{base_url}}/api/v1/chi-tiet-san-pham/6",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "chi-tiet-san-pham", "6"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Giỏ Hàng",
+			"description": "Đăng nhập bằng tài khoản khách hàng trước khi test",
+			"item": [
+				{
+					"name": "Xem giỏ hàng theo khách hàng",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/gio-hang/khach-hang/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "gio-hang", "khach-hang", "1"]
+						}
+					}
+				},
+				{
+					"name": "Thêm sản phẩm vào giỏ (KH1, CTSP1, SL=2)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"maKhachHang\": 1,\n    \"maChiTietSanPham\": 1,\n    \"soLuong\": 2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/gio-hang/them-san-pham",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "gio-hang", "them-san-pham"]
+						}
+					}
+				},
+				{
+					"name": "Thêm sản phẩm khác vào giỏ (KH1, CTSP3, SL=1)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"maKhachHang\": 1,\n    \"maChiTietSanPham\": 3,\n    \"soLuong\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/gio-hang/them-san-pham",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "gio-hang", "them-san-pham"]
+						}
+					}
+				},
+				{
+					"name": "Thêm SP đã có (cộng dồn SL)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"maKhachHang\": 1,\n    \"maChiTietSanPham\": 1,\n    \"soLuong\": 3\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/gio-hang/them-san-pham",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "gio-hang", "them-san-pham"]
+						}
+					}
+				},
+				{
+					"name": "Xóa chi tiết giỏ hàng",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/gio-hang/chi-tiet/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "gio-hang", "chi-tiet", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Kiểu Sản Phẩm",
+			"item": [
+				{
+					"name": "Xem tất cả kiểu sản phẩm",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/kieu-san-pham",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "kieu-san-pham"]
+						}
+					}
+				},
+				{
+					"name": "Xem chi tiết kiểu sản phẩm",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/kieu-san-pham/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "kieu-san-pham", "1"]
+						}
+					}
+				},
+				{
+					"name": "Tạo kiểu sản phẩm",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tenKieuSanPham\": \"Giày dép\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/kieu-san-pham",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "kieu-san-pham"]
+						}
+					}
+				},
+				{
+					"name": "Cập nhật kiểu sản phẩm",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"tenKieuSanPham\": \"Áo sơ mi\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/kieu-san-pham",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "kieu-san-pham"]
+						}
+					}
+				},
+				{
+					"name": "Xóa kiểu sản phẩm",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/kieu-san-pham/5",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "kieu-san-pham", "5"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Bộ Sưu Tập",
+			"item": [
+				{
+					"name": "Xem tất cả bộ sưu tập",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/bo-suu-tap",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "bo-suu-tap"]
+						}
+					}
+				},
+				{
+					"name": "Xem chi tiết bộ sưu tập",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/bo-suu-tap/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "bo-suu-tap", "1"]
+						}
+					}
+				},
+				{
+					"name": "Tạo bộ sưu tập",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tenSuuTap\": \"Lễ hội 2026\",\n    \"moTa\": \"Bộ sưu tập dành cho lễ hội\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/bo-suu-tap",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "bo-suu-tap"]
+						}
+					}
+				},
+				{
+					"name": "Cập nhật bộ sưu tập",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"tenSuuTap\": \"Xuân Hè 2026 (Updated)\",\n    \"moTa\": \"Mô tả cập nhật\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/bo-suu-tap",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "bo-suu-tap"]
+						}
+					}
+				},
+				{
+					"name": "Xóa bộ sưu tập",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/bo-suu-tap/4",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "bo-suu-tap", "4"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Thương Hiệu",
+			"item": [
+				{
+					"name": "Xem tất cả thương hiệu",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/thuong-hieu",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "thuong-hieu"]
+						}
+					}
+				},
+				{
+					"name": "Xem chi tiết thương hiệu",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/thuong-hieu/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "thuong-hieu", "1"]
+						}
+					}
+				},
+				{
+					"name": "Tạo thương hiệu",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tenThuongHieu\": \"Fashion Plus\",\n    \"trangThaiHoatDong\": 1,\n    \"trangThaiHienThi\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/thuong-hieu",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "thuong-hieu"]
+						}
+					}
+				},
+				{
+					"name": "Cập nhật thương hiệu",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"tenThuongHieu\": \"Shop House Premium\",\n    \"trangThaiHoatDong\": 1,\n    \"trangThaiHienThi\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/thuong-hieu",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "thuong-hieu"]
+						}
+					}
+				},
+				{
+					"name": "Xóa thương hiệu",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/thuong-hieu/4",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "thuong-hieu", "4"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Hình Ảnh",
+			"item": [
+				{
+					"name": "Xem tất cả hình ảnh",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/hinh-anh",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "hinh-anh"]
+						}
+					}
+				},
+				{
+					"name": "Xem hình ảnh theo id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/hinh-anh/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "hinh-anh", "1"]
+						}
+					}
+				},
+				{
+					"name": "Xem hình ảnh theo chi tiết SP",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/hinh-anh/chi-tiet-san-pham/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "hinh-anh", "chi-tiet-san-pham", "1"]
+						}
+					}
+				},
+				{
+					"name": "Tạo hình ảnh",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"chiTietSanPham\": { \"id\": 1 },\n    \"tenHinhAnh\": \"hinh-moi-1.jpg\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/hinh-anh",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "hinh-anh"]
+						}
+					}
+				},
+				{
+					"name": "Cập nhật hình ảnh",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"chiTietSanPham\": { \"id\": 1 },\n    \"tenHinhAnh\": \"hinh-cap-nhat.jpg\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/hinh-anh",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "hinh-anh"]
+						}
+					}
+				},
+				{
+					"name": "Xóa hình ảnh",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/hinh-anh/6",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "hinh-anh", "6"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Cửa Hàng",
+			"item": [
+				{
+					"name": "Xem tất cả cửa hàng",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/cua-hang",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "cua-hang"]
+						}
+					}
+				},
+				{
+					"name": "Xem chi tiết cửa hàng",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/cua-hang/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "cua-hang", "1"]
+						}
+					}
+				},
+				{
+					"name": "Tạo cửa hàng",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tenCuaHang\": \"Chi nhánh Thủ Đức\",\n    \"diaChi\": \"321 Võ Văn Ngân, Thủ Đức, HCM\",\n    \"viTri\": \"10.8500,106.7719\",\n    \"soDienThoai\": \"02812345681\",\n    \"email\": \"td@shop.com\",\n    \"trangThai\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/cua-hang",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "cua-hang"]
+						}
+					}
+				},
+				{
+					"name": "Cập nhật cửa hàng",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"tenCuaHang\": \"Chi nhánh Quận 1 (Updated)\",\n    \"diaChi\": \"123 Nguyễn Huệ, Q.1, TP.HCM\",\n    \"viTri\": \"10.7769,106.7009\",\n    \"soDienThoai\": \"02812345678\",\n    \"email\": \"q1@shop.com\",\n    \"trangThai\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/cua-hang",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "cua-hang"]
+						}
+					}
+				},
+				{
+					"name": "Xóa cửa hàng",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/cua-hang/4",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "cua-hang", "4"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Roles (Vai trò)",
+			"item": [
+				{
+					"name": "Xem tất cả vai trò",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/roles",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "roles"]
+						}
+					}
+				},
+				{
+					"name": "Xem chi tiết vai trò",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/roles/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "roles", "1"]
+						}
+					}
+				},
+				{
+					"name": "Tạo vai trò",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"THU_NGAN\",\n    \"description\": \"Nhân viên thu ngân\",\n    \"active\": true,\n    \"permissions\": [\n        { \"id\": 1 },\n        { \"id\": 4 },\n        { \"id\": 6 }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/roles",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "roles"]
+						}
+					}
+				},
+				{
+					"name": "Cập nhật vai trò",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 2,\n    \"name\": \"QUAN_LY\",\n    \"description\": \"Quản lý cửa hàng (Updated)\",\n    \"active\": true,\n    \"permissions\": [\n        { \"id\": 1 },\n        { \"id\": 2 },\n        { \"id\": 3 },\n        { \"id\": 4 },\n        { \"id\": 5 }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/roles",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "roles"]
+						}
+					}
+				},
+				{
+					"name": "Xóa vai trò",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/roles/5",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "roles", "5"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Permissions (Quyền)",
+			"item": [
+				{
+					"name": "Xem tất cả quyền",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/permissions",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "permissions"]
+						}
+					}
+				},
+				{
+					"name": "Xem chi tiết quyền",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/permissions/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "permissions", "1"]
+						}
+					}
+				},
+				{
+					"name": "Tạo quyền",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Xem báo cáo\",\n    \"apiPath\": \"/api/v1/bao-cao\",\n    \"method\": \"GET\",\n    \"module\": \"BAO_CAO\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/permissions",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "permissions"]
+						}
+					}
+				},
+				{
+					"name": "Cập nhật quyền",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"name\": \"Xem tất cả sản phẩm (Updated)\",\n    \"apiPath\": \"/api/v1/san-pham\",\n    \"method\": \"GET\",\n    \"module\": \"SAN_PHAM\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/permissions",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "permissions"]
+						}
+					}
+				},
+				{
+					"name": "Xóa quyền",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/permissions/61",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "permissions", "61"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Test phân quyền",
+			"description": "Login khách hàng rồi thử truy cập API admin → phải bị 403",
+			"item": [
+				{
+					"name": "1. Login KH trước",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.data && jsonData.data.access_token) {",
+									"    pm.collectionVariables.set('access_token', jsonData.data.access_token);",
+									"} else if (jsonData.access_token) {",
+									"    pm.collectionVariables.set('access_token', jsonData.access_token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"lan@g.com\",\n    \"password\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "2. Tạo SP bằng KH → Bị 403",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Khách hàng không được tạo SP', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([403, 400]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tenSanPham\": \"Test bị chặn\",\n    \"giaVon\": 10,\n    \"giaBan\": 20,\n    \"trangThai\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/san-pham",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "san-pham"]
+						}
+					}
+				},
+				{
+					"name": "3. Tạo cửa hàng bằng KH → Bị 403",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Khách hàng không được tạo cửa hàng', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([403, 400]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tenCuaHang\": \"Test bị chặn\",\n    \"diaChi\": \"Test\",\n    \"trangThai\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/cua-hang",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "cua-hang"]
+						}
+					}
+				},
+				{
+					"name": "4. Xem roles bằng KH → Bị 403",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Khách hàng không được xem roles', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([403, 400]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/roles",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "roles"]
 						}
 					}
 				}

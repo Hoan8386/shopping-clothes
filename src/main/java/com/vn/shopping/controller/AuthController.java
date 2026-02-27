@@ -273,6 +273,11 @@ public class AuthController {
             throw new IdInvalidException(
                     "Email " + postManUser.getEmail() + " đã tồn tại, vui lòng sử dụng email khác.");
         }
+        boolean isSdtExist = this.khachHangService.isSdtExist(postManUser.getSdt());
+        if (isSdtExist) {
+            throw new IdInvalidException(
+                    "Số điện thoại " + postManUser.getSdt() + " đã tồn tại, vui lòng sử dụng số khác.");
+        }
         String hashPassword = this.passwordEncoder.encode(postManUser.getPassword());
         postManUser.setPassword(hashPassword);
         KhachHang savedUser = this.khachHangService.handleCreateUser(postManUser);
