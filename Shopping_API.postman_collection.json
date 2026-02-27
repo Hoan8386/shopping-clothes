@@ -216,37 +216,167 @@
 					}
 				},
 				{
-					"name": "Tạo sản phẩm ( Admin)",
+					"name": "Tạo sản phẩm + Upload ảnh ( Admin)",
 					"request": {
 						"method": "POST",
-						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"kieuSanPham\": { \"id\": 1 },\n    \"boSuuTap\": { \"id\": 3 },\n    \"thuongHieu\": { \"id\": 1 },\n    \"tenSanPham\": \"Áo Thun Basic\",\n    \"giaVon\": 80,\n    \"giaBan\": 180,\n    \"giaGiam\": 0,\n    \"trangThai\": 1\n}"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "tenSanPham",
+									"value": "Áo Thun Basic",
+									"type": "text",
+									"description": "Tên sản phẩm"
+								},
+								{
+									"key": "giaVon",
+									"value": "80",
+									"type": "text",
+									"description": "Giá vốn"
+								},
+								{
+									"key": "giaBan",
+									"value": "180",
+									"type": "text",
+									"description": "Giá bán"
+								},
+								{
+									"key": "giaGiam",
+									"value": "0",
+									"type": "text",
+									"description": "Giá giảm (%)"
+								},
+								{
+									"key": "moTa",
+									"value": "",
+									"type": "text",
+									"description": "Mô tả sản phẩm (không bắt buộc)",
+									"disabled": true
+								},
+								{
+									"key": "trangThai",
+									"value": "1",
+									"type": "text",
+									"description": "Trạng thái (1=hiện, 0=ẩn)"
+								},
+								{
+									"key": "kieuSanPhamId",
+									"value": "1",
+									"type": "text",
+									"description": "Mã kiểu sản phẩm"
+								},
+								{
+									"key": "boSuuTapId",
+									"value": "3",
+									"type": "text",
+									"description": "Mã bộ sưu tập"
+								},
+								{
+									"key": "thuongHieuId",
+									"value": "1",
+									"type": "text",
+									"description": "Mã thương hiệu"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": "",
+									"description": "Hình ảnh chính (1 ảnh, không bắt buộc). Upload lên MinIO, URL lưu vào HinhAnhChinh"
+								}
+							]
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/san-pham",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "san-pham"]
 						},
-						"description": " Chỉ Admin — Tạo sản phẩm mới. Khách hàng gọi → 403"
+						"description": " Chỉ Admin — Tạo sản phẩm mới (truyền từng trường) + upload 1 ảnh chính lên MinIO. Gửi multipart/form-data. Khách hàng gọi → 403"
 					}
 				},
 				{
-					"name": "Cập nhật sản phẩm ( Admin)",
+					"name": "Cập nhật sản phẩm + Upload ảnh mới ( Admin)",
 					"request": {
 						"method": "PUT",
-						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"id\": 1,\n    \"kieuSanPham\": { \"id\": 1 },\n    \"boSuuTap\": { \"id\": 3 },\n    \"thuongHieu\": { \"id\": 1 },\n    \"tenSanPham\": \"Áo Oxford V2\",\n    \"giaVon\": 120,\n    \"giaBan\": 250,\n    \"giaGiam\": 5,\n    \"trangThai\": 1\n}"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "id",
+									"value": "1",
+									"type": "text",
+									"description": "Mã sản phẩm (bắt buộc)"
+								},
+								{
+									"key": "tenSanPham",
+									"value": "Áo Oxford V2",
+									"type": "text",
+									"description": "Tên sản phẩm"
+								},
+								{
+									"key": "giaVon",
+									"value": "120",
+									"type": "text",
+									"description": "Giá vốn"
+								},
+								{
+									"key": "giaBan",
+									"value": "250",
+									"type": "text",
+									"description": "Giá bán"
+								},
+								{
+									"key": "giaGiam",
+									"value": "5",
+									"type": "text",
+									"description": "Giá giảm (%)"
+								},
+								{
+									"key": "moTa",
+									"value": "",
+									"type": "text",
+									"description": "Mô tả sản phẩm (không bắt buộc)",
+									"disabled": true
+								},
+								{
+									"key": "trangThai",
+									"value": "1",
+									"type": "text",
+									"description": "Trạng thái (1=hiện, 0=ẩn)"
+								},
+								{
+									"key": "kieuSanPhamId",
+									"value": "1",
+									"type": "text",
+									"description": "Mã kiểu sản phẩm"
+								},
+								{
+									"key": "boSuuTapId",
+									"value": "3",
+									"type": "text",
+									"description": "Mã bộ sưu tập"
+								},
+								{
+									"key": "thuongHieuId",
+									"value": "1",
+									"type": "text",
+									"description": "Mã thương hiệu"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": "",
+									"description": "Ảnh mới thay thế ảnh chính (không bắt buộc). Nếu không gửi → giữ ảnh cũ"
+								}
+							]
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/san-pham",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "san-pham"]
 						},
-						"description": " Chỉ Admin — Cập nhật sản phẩm. Khách hàng gọi → 403"
+						"description": " Chỉ Admin — Cập nhật sản phẩm (truyền từng trường) + thay đổi ảnh chính lên MinIO. Gửi multipart/form-data. Khách hàng gọi → 403"
 					}
 				},
 				{
@@ -308,37 +438,159 @@
 					}
 				},
 				{
-					"name": "Tạo chi tiết SP ( Admin)",
+					"name": "Tạo chi tiết SP + Upload nhiều ảnh ( Admin)",
 					"request": {
 						"method": "POST",
-						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"sanPham\": { \"id\": 1 },\n    \"kichThuoc\": { \"id\": 4 },\n    \"mauSac\": { \"id\": 4 },\n    \"trangThai\": 1,\n    \"moTa\": \"Màu xanh size XL\"\n}"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "sanPhamId",
+									"value": "1",
+									"type": "text",
+									"description": "Mã sản phẩm"
+								},
+								{
+									"key": "maPhieuNhap",
+									"value": "",
+									"type": "text",
+									"description": "Mã phiếu nhập (không bắt buộc)",
+									"disabled": true
+								},
+								{
+									"key": "mauSacId",
+									"value": "4",
+									"type": "text",
+									"description": "Mã màu sắc"
+								},
+								{
+									"key": "kichThuocId",
+									"value": "4",
+									"type": "text",
+									"description": "Mã kích thước"
+								},
+								{
+									"key": "maCuaHang",
+									"value": "",
+									"type": "text",
+									"description": "Mã cửa hàng (không bắt buộc)",
+									"disabled": true
+								},
+								{
+									"key": "trangThai",
+									"value": "1",
+									"type": "text",
+									"description": "Trạng thái (1=hiện, 0=ẩn)"
+								},
+								{
+									"key": "moTa",
+									"value": "Màu xanh size XL",
+									"type": "text",
+									"description": "Mô tả (không bắt buộc)"
+								},
+								{
+									"key": "ghiTru",
+									"value": "",
+									"type": "text",
+									"description": "Ghi trừ (không bắt buộc)",
+									"disabled": true
+								},
+								{
+									"key": "files",
+									"type": "file",
+									"src": [],
+									"description": "Nhiều hình ảnh cho CTSP (không bắt buộc). Upload lên MinIO, lưu vào bảng HinhAnh"
+								}
+							]
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/chi-tiet-san-pham",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "chi-tiet-san-pham"]
 						},
-						"description": " Chỉ Admin — Tạo chi tiết sản phẩm. Khách hàng gọi → 403"
+						"description": " Chỉ Admin — Tạo chi tiết sản phẩm (truyền từng trường) + upload nhiều ảnh lên MinIO. Gửi multipart/form-data. Khách hàng gọi → 403"
 					}
 				},
 				{
-					"name": "Cập nhật chi tiết SP ( Admin)",
+					"name": "Cập nhật chi tiết SP + Upload ảnh mới ( Admin)",
 					"request": {
 						"method": "PUT",
-						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"id\": 1,\n    \"sanPham\": { \"id\": 1 },\n    \"kichThuoc\": { \"id\": 2 },\n    \"mauSac\": { \"id\": 1 },\n    \"trangThai\": 1,\n    \"moTa\": \"Cập nhật mô tả\"\n}"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "id",
+									"value": "1",
+									"type": "text",
+									"description": "Mã chi tiết sản phẩm (bắt buộc)"
+								},
+								{
+									"key": "sanPhamId",
+									"value": "1",
+									"type": "text",
+									"description": "Mã sản phẩm"
+								},
+								{
+									"key": "maPhieuNhap",
+									"value": "",
+									"type": "text",
+									"description": "Mã phiếu nhập (không bắt buộc)",
+									"disabled": true
+								},
+								{
+									"key": "mauSacId",
+									"value": "1",
+									"type": "text",
+									"description": "Mã màu sắc"
+								},
+								{
+									"key": "kichThuocId",
+									"value": "2",
+									"type": "text",
+									"description": "Mã kích thước"
+								},
+								{
+									"key": "maCuaHang",
+									"value": "",
+									"type": "text",
+									"description": "Mã cửa hàng (không bắt buộc)",
+									"disabled": true
+								},
+								{
+									"key": "trangThai",
+									"value": "1",
+									"type": "text",
+									"description": "Trạng thái (1=hiện, 0=ẩn)"
+								},
+								{
+									"key": "moTa",
+									"value": "Cập nhật mô tả",
+									"type": "text",
+									"description": "Mô tả (không bắt buộc)"
+								},
+								{
+									"key": "ghiTru",
+									"value": "",
+									"type": "text",
+									"description": "Ghi trừ (không bắt buộc)",
+									"disabled": true
+								},
+								{
+									"key": "files",
+									"type": "file",
+									"src": [],
+									"description": "Ảnh mới bổ sung (không bắt buộc). Upload lên MinIO, thêm vào bảng HinhAnh"
+								}
+							]
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/chi-tiet-san-pham",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "chi-tiet-san-pham"]
 						},
-						"description": " Chỉ Admin — Cập nhật chi tiết SP. Khách hàng gọi → 403"
+						"description": " Chỉ Admin — Cập nhật chi tiết SP (truyền từng trường) + upload thêm ảnh mới lên MinIO. Gửi multipart/form-data. Khách hàng gọi → 403"
 					}
 				},
 				{
@@ -878,20 +1130,44 @@
 					}
 				},
 				{
-					"name": "Tạo hình ảnh ( Admin)",
+					"name": "Upload nhiều ảnh cho CTSP ( Admin)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "files",
+									"type": "file",
+									"src": [],
+									"description": "Chọn nhiều hình ảnh để upload lên MinIO"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/hinh-anh/upload/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "hinh-anh", "upload", "1"]
+						},
+						"description": " Admin — Upload nhiều ảnh cho 1 chi tiết sản phẩm (ID=1). Ảnh upload lên MinIO, URL lưu vào bảng HinhAnh"
+					}
+				},
+				{
+					"name": "Tạo hình ảnh (JSON) ( Admin)",
 					"request": {
 						"method": "POST",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"chiTietSanPham\": { \"id\": 1 },\n    \"tenHinhAnh\": \"hinh-moi-1.jpg\"\n}"
+							"raw": "{\n    \"chiTietSanPham\": { \"id\": 1 },\n    \"tenHinhAnh\": \"http://localhost:9000/restaurant/hinh-moi-1.jpg\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/hinh-anh",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "hinh-anh"]
 						},
-						"description": " Admin — Tạo hình ảnh mới"
+						"description": " Admin — Tạo hình ảnh bằng JSON (truyền URL trực tiếp, không upload file)"
 					}
 				},
 				{
@@ -1218,10 +1494,21 @@
 					],
 					"request": {
 						"method": "POST",
-						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"tenSanPham\": \"Test bị chặn\",\n    \"giaVon\": 10,\n    \"giaBan\": 20,\n    \"trangThai\": 1\n}"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "tenSanPham",
+									"value": "Test bị chặn",
+									"type": "text"
+								},
+								{
+									"key": "giaBan",
+									"value": "20",
+									"type": "text"
+								}
+							]
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/san-pham",
