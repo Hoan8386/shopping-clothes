@@ -51,7 +51,7 @@ INSERT INTO permissions (name, apiPath, method, module, createdAt) VALUES
 
     -- === GIO_HANG (22-24) ===
     ('Thêm SP vào giỏ hàng',       '/api/v1/gio-hang/them-san-pham',                     'POST',   'GIO_HANG',    NOW()),
-    ('Xem giỏ hàng theo KH',       '/api/v1/gio-hang/khach-hang/{khachHangId}',          'GET',    'GIO_HANG',    NOW()),
+    ('Xem giỏ hàng của tôi',       '/api/v1/gio-hang/cua-toi',                           'GET',    'GIO_HANG',    NOW()),
     ('Xóa SP khỏi giỏ hàng',      '/api/v1/gio-hang/chi-tiet/{maChiTietGioHang}',       'DELETE', 'GIO_HANG',    NOW()),
 
     -- === KIEU_SAN_PHAM (25-29) ===

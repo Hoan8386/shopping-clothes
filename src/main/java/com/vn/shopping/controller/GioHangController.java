@@ -27,13 +27,12 @@ public class GioHangController {
         return ResponseEntity.status(HttpStatus.CREATED).body(gioHangService.themSanPhamVaoGioHang(req));
     }
 
-    @GetMapping("/khach-hang/{khachHangId}")
-    @ApiMessage("Lấy giỏ hàng theo mã khách hàng")
-    public ResponseEntity<ResGioHangDTO> getByKhachHangId(@PathVariable("khachHangId") Long khachHangId)
-            throws IdInvalidException {
-        ResGioHangDTO gioHang = gioHangService.findByKhachHangId(khachHangId);
+    @GetMapping("/cua-toi")
+    @ApiMessage("Lấy giỏ hàng của tôi")
+    public ResponseEntity<ResGioHangDTO> getGioHangCuaToi() throws IdInvalidException {
+        ResGioHangDTO gioHang = gioHangService.getGioHangCuaToi();
         if (gioHang == null) {
-            throw new IdInvalidException("Không tìm thấy giỏ hàng của khách hàng: " + khachHangId);
+            throw new IdInvalidException("Không tìm thấy giỏ hàng");
         }
         return ResponseEntity.ok(gioHang);
     }
