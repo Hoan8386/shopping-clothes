@@ -19,6 +19,7 @@ public class ResSanPhamDTO {
     private Integer giaGiam;
     private String hinhAnhChinh;
     private String moTa;
+    private Integer soLuong;
     private Integer trangThai;
     private String tenKieuSanPham;
     private String tenBoSuuTap;

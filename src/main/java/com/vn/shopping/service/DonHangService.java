@@ -28,16 +28,21 @@ public class DonHangService {
     private final NhanVienRepository nhanVienRepository;
     private final GioHangRepository gioHangRepository;
     private final ChiTietDonHangRepository chiTietDonHangRepository;
+    private final ChiTietSanPhamRepository chiTietSanPhamRepository;
+    private final SanPhamRepository sanPhamRepository;
 
     public DonHangService(DonHangRepository donHangRepository, EntityManager entityManager,
             KhachHangRepository khachHangRepository, NhanVienRepository nhanVienRepository,
-            GioHangRepository gioHangRepository, ChiTietDonHangRepository chiTietDonHangRepository) {
+            GioHangRepository gioHangRepository, ChiTietDonHangRepository chiTietDonHangRepository,
+            ChiTietSanPhamRepository chiTietSanPhamRepository, SanPhamRepository sanPhamRepository) {
         this.donHangRepository = donHangRepository;
         this.entityManager = entityManager;
         this.khachHangRepository = khachHangRepository;
         this.nhanVienRepository = nhanVienRepository;
         this.gioHangRepository = gioHangRepository;
         this.chiTietDonHangRepository = chiTietDonHangRepository;
+        this.chiTietSanPhamRepository = chiTietSanPhamRepository;
+        this.sanPhamRepository = sanPhamRepository;
     }
 
     @Transactional
@@ -125,7 +130,10 @@ public class DonHangService {
         savedDonHang.setTongTienTra(tongTien);
         donHangRepository.save(savedDonHang);
 
-        // 6. Xóa giỏ hàng sau khi tạo đơn thành công
+        // 6. Trừ số lượng sản phẩm
+        truSoLuongSanPham(chiTietDonHangs);
+
+        // 7. Xóa giỏ hàng sau khi tạo đơn thành công
         gioHang.getChiTietGioHangs().clear();
         gioHangRepository.save(gioHang);
 
@@ -155,7 +163,14 @@ public class DonHangService {
             donHang.setCuaHang(nhanVien.getCuaHang());
         }
 
-        return save(donHang);
+        DonHang saved = save(donHang);
+
+        // Trừ số lượng sản phẩm từ chi tiết đơn hàng
+        if (saved.getChiTietDonHangs() != null && !saved.getChiTietDonHangs().isEmpty()) {
+            truSoLuongSanPham(saved.getChiTietDonHangs());
+        }
+
+        return saved;
     }
 
     @Transactional
@@ -193,6 +208,54 @@ public class DonHangService {
 
     public List<DonHang> findAll() {
         return donHangRepository.findAll();
+    }
+
+    /**
+     * Trừ số lượng ChiTietSanPham và tính lại tổng SanPham khi đặt hàng.
+     * - Trừ soLuong từ ChiTietDonHang khỏi ChiTietSanPham tương ứng
+     * - Tính lại tổng soLuong trên SanPham = tổng soLuong của tất cả ChiTietSanPham
+     */
+    private void truSoLuongSanPham(List<ChiTietDonHang> chiTietDonHangs) {
+        for (ChiTietDonHang ctdh : chiTietDonHangs) {
+            if (ctdh.getChiTietSanPham() == null || ctdh.getSoLuong() == null || ctdh.getSoLuong() <= 0) {
+                continue;
+            }
+
+            ChiTietSanPham ctsp = chiTietSanPhamRepository.findById(ctdh.getChiTietSanPham().getId())
+                    .orElse(null);
+            if (ctsp == null) {
+                continue;
+            }
+
+            // Trừ số lượng chi tiết sản phẩm
+            int soLuongHienTai = ctsp.getSoLuong() != null ? ctsp.getSoLuong() : 0;
+            int soLuongMoi = soLuongHienTai - ctdh.getSoLuong();
+            ctsp.setSoLuong(Math.max(soLuongMoi, 0));
+            chiTietSanPhamRepository.save(ctsp);
+
+            // Tính lại tổng số lượng sản phẩm
+            if (ctsp.getSanPham() != null) {
+                capNhatTongSoLuongSanPham(ctsp.getSanPham().getId());
+            }
+        }
+    }
+
+    /**
+     * Tính lại tổng số lượng sản phẩm = tổng soLuong của tất cả ChiTietSanPham
+     */
+    private void capNhatTongSoLuongSanPham(Long sanPhamId) {
+        SanPham sanPham = sanPhamRepository.findById(sanPhamId).orElse(null);
+        if (sanPham == null) {
+            return;
+        }
+
+        List<ChiTietSanPham> danhSachChiTiet = chiTietSanPhamRepository.findBySanPhamId(sanPhamId);
+        int tongSoLuong = danhSachChiTiet.stream()
+                .mapToInt(ct -> ct.getSoLuong() != null ? ct.getSoLuong() : 0)
+                .sum();
+
+        sanPham.setSoLuong(tongSoLuong);
+        sanPhamRepository.save(sanPham);
     }
 
     /**

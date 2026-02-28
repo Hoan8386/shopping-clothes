@@ -15,7 +15,8 @@ import lombok.Setter;
 public class ResChiTietSanPhamDTO {
     private Long id;
     private Long maPhieuNhap;
-    private Long maCuaHang;
+    private String tenCuaHang;
+    private Integer soLuong;
     private Integer trangThai;
     private String moTa;
     private String ghiTru;

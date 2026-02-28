@@ -50,6 +50,9 @@ public class SanPham {
     @Column(name = "MoTa", length = 255)
     private String moTa;
 
+    @Column(name = "SoLuong")
+    private Integer soLuong;
+
     @Column(name = "TrangThai")
     private Integer trangThai;
 

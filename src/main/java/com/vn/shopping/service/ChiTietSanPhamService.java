@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.vn.shopping.domain.ChiTietSanPham;
+import com.vn.shopping.domain.CuaHang;
 import com.vn.shopping.domain.HinhAnh;
 import com.vn.shopping.domain.KichThuoc;
 import com.vn.shopping.domain.MauSac;
@@ -24,15 +25,18 @@ public class ChiTietSanPhamService {
     private final EntityManager entityManager;
     private final MinioStorageService minioStorageService;
     private final HinhAnhService hinhAnhService;
+    private final CuaHangService cuaHangService;
 
     public ChiTietSanPhamService(ChiTietSanPhamRepository chiTietSanPhamRepository,
             EntityManager entityManager,
             MinioStorageService minioStorageService,
-            HinhAnhService hinhAnhService) {
+            HinhAnhService hinhAnhService,
+            CuaHangService cuaHangService) {
         this.chiTietSanPhamRepository = chiTietSanPhamRepository;
         this.entityManager = entityManager;
         this.minioStorageService = minioStorageService;
         this.hinhAnhService = hinhAnhService;
+        this.cuaHangService = cuaHangService;
     }
 
     @Transactional
@@ -49,12 +53,13 @@ public class ChiTietSanPhamService {
     @Transactional
     public ChiTietSanPham createChiTietSanPham(
             Long sanPhamId, Long maPhieuNhap, Long mauSacId, Long kichThuocId,
-            Long maCuaHang, Integer trangThai, String moTa, String ghiTru,
+            Long maCuaHang, Integer soLuong, Integer trangThai, String moTa, String ghiTru,
             List<MultipartFile> files) throws Exception {
 
         ChiTietSanPham ct = new ChiTietSanPham();
         ct.setMaPhieuNhap(maPhieuNhap);
         ct.setMaCuaHang(maCuaHang);
+        ct.setSoLuong(soLuong);
         ct.setTrangThai(trangThai);
         ct.setMoTa(moTa);
         ct.setGhiTru(ghiTru);
@@ -97,13 +102,14 @@ public class ChiTietSanPhamService {
     @Transactional
     public ChiTietSanPham updateChiTietSanPham(
             Long id, Long sanPhamId, Long maPhieuNhap, Long mauSacId, Long kichThuocId,
-            Long maCuaHang, Integer trangThai, String moTa, String ghiTru,
+            Long maCuaHang, Integer soLuong, Integer trangThai, String moTa, String ghiTru,
             List<MultipartFile> files) throws Exception {
 
         ChiTietSanPham ct = new ChiTietSanPham();
         ct.setId(id);
         ct.setMaPhieuNhap(maPhieuNhap);
         ct.setMaCuaHang(maCuaHang);
+        ct.setSoLuong(soLuong);
         ct.setTrangThai(trangThai);
         ct.setMoTa(moTa);
         ct.setGhiTru(ghiTru);
@@ -147,6 +153,7 @@ public class ChiTietSanPhamService {
         existing.setSanPham(chiTietSanPham.getSanPham());
         existing.setKichThuoc(chiTietSanPham.getKichThuoc());
         existing.setMauSac(chiTietSanPham.getMauSac());
+        existing.setSoLuong(chiTietSanPham.getSoLuong());
         existing.setTrangThai(chiTietSanPham.getTrangThai());
         existing.setMoTa(chiTietSanPham.getMoTa());
         existing.setGhiTru(chiTietSanPham.getGhiTru());
@@ -182,10 +189,18 @@ public class ChiTietSanPhamService {
         ResChiTietSanPhamDTO dto = new ResChiTietSanPhamDTO();
         dto.setId(ct.getId());
         dto.setMaPhieuNhap(ct.getMaPhieuNhap());
-        dto.setMaCuaHang(ct.getMaCuaHang());
+        dto.setSoLuong(ct.getSoLuong());
         dto.setTrangThai(ct.getTrangThai());
         dto.setMoTa(ct.getMoTa());
         dto.setGhiTru(ct.getGhiTru());
+
+        // Lấy tên cửa hàng từ mã cửa hàng
+        if (ct.getMaCuaHang() != null) {
+            CuaHang cuaHang = cuaHangService.findById(ct.getMaCuaHang());
+            if (cuaHang != null) {
+                dto.setTenCuaHang(cuaHang.getTenCuaHang());
+            }
+        }
 
         if (ct.getSanPham() != null) {
             dto.setTenSanPham(ct.getSanPham().getTenSanPham());

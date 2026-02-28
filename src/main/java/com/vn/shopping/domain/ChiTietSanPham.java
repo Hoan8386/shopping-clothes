@@ -38,6 +38,9 @@ public class ChiTietSanPham {
     @Column(name = "MaCuaHang")
     private Long maCuaHang;
 
+    @Column(name = "SoLuong")
+    private Integer soLuong;
+
     @Column(name = "TrangThai")
     private Integer trangThai;
 

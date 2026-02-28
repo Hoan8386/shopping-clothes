@@ -72,6 +72,7 @@ public class SanPhamController {
             @RequestParam(value = "giaBan", required = false) Double giaBan,
             @RequestParam(value = "giaGiam", required = false) Integer giaGiam,
             @RequestParam(value = "moTa", required = false) String moTa,
+            @RequestParam(value = "soLuong", required = false) Integer soLuong,
             @RequestParam(value = "trangThai", required = false) Integer trangThai,
             @RequestParam(value = "kieuSanPhamId", required = false) Long kieuSanPhamId,
             @RequestParam(value = "boSuuTapId", required = false) Long boSuuTapId,
@@ -79,7 +80,7 @@ public class SanPhamController {
             @RequestPart(value = "file", required = false) MultipartFile file) throws Exception {
 
         SanPham created = sanPhamService.createSanPham(tenSanPham, giaVon, giaBan, giaGiam,
-                moTa, trangThai, kieuSanPhamId, boSuuTapId, thuongHieuId, file);
+                moTa, soLuong, trangThai, kieuSanPhamId, boSuuTapId, thuongHieuId, file);
         return ResponseEntity.status(HttpStatus.CREATED).body(sanPhamService.convertToDTO(created));
     }
 
@@ -96,6 +97,7 @@ public class SanPhamController {
             @RequestParam(value = "giaBan", required = false) Double giaBan,
             @RequestParam(value = "giaGiam", required = false) Integer giaGiam,
             @RequestParam(value = "moTa", required = false) String moTa,
+            @RequestParam(value = "soLuong", required = false) Integer soLuong,
             @RequestParam(value = "trangThai", required = false) Integer trangThai,
             @RequestParam(value = "kieuSanPhamId", required = false) Long kieuSanPhamId,
             @RequestParam(value = "boSuuTapId", required = false) Long boSuuTapId,
@@ -107,7 +109,7 @@ public class SanPhamController {
         }
 
         SanPham updated = sanPhamService.updateSanPham(id, tenSanPham, giaVon, giaBan, giaGiam,
-                moTa, trangThai, kieuSanPhamId, boSuuTapId, thuongHieuId, file);
+                moTa, soLuong, trangThai, kieuSanPhamId, boSuuTapId, thuongHieuId, file);
         return ResponseEntity.ok(sanPhamService.convertToDTO(updated));
     }
 

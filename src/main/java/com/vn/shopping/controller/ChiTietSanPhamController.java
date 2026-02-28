@@ -58,6 +58,7 @@ public class ChiTietSanPhamController {
             @RequestParam(value = "mauSacId", required = false) Long mauSacId,
             @RequestParam(value = "kichThuocId", required = false) Long kichThuocId,
             @RequestParam(value = "maCuaHang", required = false) Long maCuaHang,
+            @RequestParam(value = "soLuong", required = false) Integer soLuong,
             @RequestParam(value = "trangThai", required = false) Integer trangThai,
             @RequestParam(value = "moTa", required = false) String moTa,
             @RequestParam(value = "ghiTru", required = false) String ghiTru,
@@ -65,7 +66,7 @@ public class ChiTietSanPhamController {
 
         ChiTietSanPham created = chiTietSanPhamService.createChiTietSanPham(
                 sanPhamId, maPhieuNhap, mauSacId, kichThuocId,
-                maCuaHang, trangThai, moTa, ghiTru, files);
+                maCuaHang, soLuong, trangThai, moTa, ghiTru, files);
         return ResponseEntity.status(HttpStatus.CREATED).body(chiTietSanPhamService.convertToDTO(created));
     }
 
@@ -82,6 +83,7 @@ public class ChiTietSanPhamController {
             @RequestParam(value = "mauSacId", required = false) Long mauSacId,
             @RequestParam(value = "kichThuocId", required = false) Long kichThuocId,
             @RequestParam(value = "maCuaHang", required = false) Long maCuaHang,
+            @RequestParam(value = "soLuong", required = false) Integer soLuong,
             @RequestParam(value = "trangThai", required = false) Integer trangThai,
             @RequestParam(value = "moTa", required = false) String moTa,
             @RequestParam(value = "ghiTru", required = false) String ghiTru,
@@ -93,7 +95,7 @@ public class ChiTietSanPhamController {
 
         ChiTietSanPham updated = chiTietSanPhamService.updateChiTietSanPham(
                 id, sanPhamId, maPhieuNhap, mauSacId, kichThuocId,
-                maCuaHang, trangThai, moTa, ghiTru, files);
+                maCuaHang, soLuong, trangThai, moTa, ghiTru, files);
         return ResponseEntity.ok(chiTietSanPhamService.convertToDTO(updated));
     }
 

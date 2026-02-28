@@ -48,7 +48,7 @@ public class SanPhamService {
      */
     @Transactional
     public SanPham createSanPham(String tenSanPham, Double giaVon, Double giaBan, Integer giaGiam,
-            String moTa, Integer trangThai, Long kieuSanPhamId, Long boSuuTapId,
+            String moTa, Integer soLuong, Integer trangThai, Long kieuSanPhamId, Long boSuuTapId,
             Long thuongHieuId, MultipartFile file) {
 
         SanPham sanPham = new SanPham();
@@ -57,6 +57,7 @@ public class SanPhamService {
         sanPham.setGiaBan(giaBan);
         sanPham.setGiaGiam(giaGiam);
         sanPham.setMoTa(moTa);
+        sanPham.setSoLuong(soLuong);
         sanPham.setTrangThai(trangThai);
 
         if (kieuSanPhamId != null) {
@@ -94,6 +95,7 @@ public class SanPhamService {
         existing.setGiaBan(sanPham.getGiaBan());
         existing.setGiaGiam(sanPham.getGiaGiam());
         existing.setMoTa(sanPham.getMoTa());
+        existing.setSoLuong(sanPham.getSoLuong());
         existing.setTrangThai(sanPham.getTrangThai());
 
         if (sanPham.getKieuSanPham() != null) {
@@ -122,7 +124,7 @@ public class SanPhamService {
      */
     @Transactional
     public SanPham updateSanPham(Long id, String tenSanPham, Double giaVon, Double giaBan, Integer giaGiam,
-            String moTa, Integer trangThai, Long kieuSanPhamId, Long boSuuTapId,
+            String moTa, Integer soLuong, Integer trangThai, Long kieuSanPhamId, Long boSuuTapId,
             Long thuongHieuId, MultipartFile file) {
 
         SanPham sanPham = new SanPham();
@@ -132,6 +134,7 @@ public class SanPhamService {
         sanPham.setGiaBan(giaBan);
         sanPham.setGiaGiam(giaGiam);
         sanPham.setMoTa(moTa);
+        sanPham.setSoLuong(soLuong);
         sanPham.setTrangThai(trangThai);
 
         if (kieuSanPhamId != null) {
@@ -186,6 +189,7 @@ public class SanPhamService {
         dto.setGiaGiam(sp.getGiaGiam());
         dto.setHinhAnhChinh(sp.getHinhAnhChinh());
         dto.setMoTa(sp.getMoTa());
+        dto.setSoLuong(sp.getSoLuong());
         dto.setTrangThai(sp.getTrangThai());
 
         if (sp.getKieuSanPham() != null) {
