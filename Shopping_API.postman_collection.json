@@ -613,16 +613,16 @@
 			"description": "Dành cho khách hàng — Cần đăng nhập bằng tài khoản khách hàng trước khi test",
 			"item": [
 				{
-					"name": "Xem giỏ hàng theo KH ( Khách hàng)",
+					"name": "Xem giỏ hàng của tôi ( Khách hàng)",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/v1/gio-hang/khach-hang/1",
+							"raw": "{{base_url}}/api/v1/gio-hang/cua-toi",
 							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "gio-hang", "khach-hang", "1"]
+							"path": ["api", "v1", "gio-hang", "cua-toi"]
 						},
-						"description": " Khách hàng — Xem giỏ hàng của khách hàng theo ID"
+						"description": " Khách hàng — Xem giỏ hàng của tôi (tự lấy từ token đăng nhập)"
 					}
 				},
 				{
@@ -632,14 +632,14 @@
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"maKhachHang\": 1,\n    \"maChiTietSanPham\": 1,\n    \"soLuong\": 2\n}"
+							"raw": "{\n    \"maChiTietSanPham\": 1,\n    \"soLuong\": 2\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/gio-hang/them-san-pham",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "gio-hang", "them-san-pham"]
 						},
-						"description": " Khách hàng — Thêm sản phẩm vào giỏ hàng (KH1, CTSP1, SL=2)"
+						"description": " Khách hàng — Thêm sản phẩm vào giỏ hàng (CTSP1, SL=2, KH tự lấy từ token)"
 					}
 				},
 				{
@@ -649,14 +649,14 @@
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"maKhachHang\": 1,\n    \"maChiTietSanPham\": 3,\n    \"soLuong\": 1\n}"
+							"raw": "{\n    \"maChiTietSanPham\": 3,\n    \"soLuong\": 1\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/gio-hang/them-san-pham",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "gio-hang", "them-san-pham"]
 						},
-						"description": " Khách hàng — Thêm sản phẩm khác vào giỏ (KH1, CTSP3, SL=1)"
+						"description": " Khách hàng — Thêm sản phẩm khác vào giỏ (CTSP3, SL=1, KH tự lấy từ token)"
 					}
 				},
 				{
@@ -666,7 +666,7 @@
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"maKhachHang\": 1,\n    \"maChiTietSanPham\": 1,\n    \"soLuong\": 3\n}"
+							"raw": "{\n    \"maChiTietSanPham\": 1,\n    \"soLuong\": 3\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/gio-hang/them-san-pham",

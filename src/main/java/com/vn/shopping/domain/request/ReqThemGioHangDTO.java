@@ -7,8 +7,6 @@ import lombok.Setter;
 @Setter
 public class ReqThemGioHangDTO {
 
-    private Long maKhachHang;
-
     private Long maChiTietSanPham;
 
     private Integer soLuong;

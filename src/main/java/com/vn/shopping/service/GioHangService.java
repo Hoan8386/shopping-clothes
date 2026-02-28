@@ -1,5 +1,6 @@
 package com.vn.shopping.service;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.vn.shopping.domain.ChiTietGioHang;
@@ -36,15 +37,20 @@ public class GioHangService {
         this.chiTietSanPhamRepository = chiTietSanPhamRepository;
     }
 
+    private KhachHang getCurrentKhachHang() throws IdInvalidException {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return khachHangRepository.findByEmail(email)
+                .orElseThrow(() -> new IdInvalidException("Không tìm thấy khách hàng với email: " + email));
+    }
+
     public ChiTietGioHang themSanPhamVaoGioHang(ReqThemGioHangDTO req) throws IdInvalidException {
         // Kiểm tra số lượng tối thiểu
         if (req.getSoLuong() == null || req.getSoLuong() < 1) {
             throw new IdInvalidException("Số lượng phải lớn hơn hoặc bằng 1");
         }
 
-        // Tìm khách hàng
-        KhachHang khachHang = khachHangRepository.findById(req.getMaKhachHang())
-                .orElseThrow(() -> new IdInvalidException("Không tìm thấy khách hàng: " + req.getMaKhachHang()));
+        // Lấy khách hàng từ token đang đăng nhập
+        KhachHang khachHang = getCurrentKhachHang();
 
         // Tìm chi tiết sản phẩm
         ChiTietSanPham chiTietSanPham = chiTietSanPhamRepository.findById(req.getMaChiTietSanPham())
@@ -86,8 +92,9 @@ public class GioHangService {
         chiTietGioHangRepository.delete(item);
     }
 
-    public ResGioHangDTO findByKhachHangId(Long khachHangId) {
-        GioHang gioHang = gioHangRepository.findByKhachHangId(khachHangId).orElse(null);
+    public ResGioHangDTO getGioHangCuaToi() throws IdInvalidException {
+        KhachHang khachHang = getCurrentKhachHang();
+        GioHang gioHang = gioHangRepository.findByKhachHangId(khachHang.getId()).orElse(null);
         if (gioHang == null) {
             return null;
         }
