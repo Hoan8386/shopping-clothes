@@ -197,6 +197,13 @@ public class ChiTietSanPhamService {
             dto.setTenKichThuoc(ct.getKichThuoc().getTenKichThuoc());
         }
 
+        // Lấy danh sách URL hình ảnh
+        List<HinhAnh> hinhAnhs = hinhAnhService.findByChiTietSanPhamId(ct.getId());
+        List<String> hinhAnhUrls = hinhAnhs.stream()
+                .map(HinhAnh::getTenHinhAnh)
+                .collect(Collectors.toList());
+        dto.setHinhAnhUrls(hinhAnhUrls);
+
         return dto;
     }
 

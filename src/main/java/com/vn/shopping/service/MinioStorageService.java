@@ -75,8 +75,9 @@ public class MinioStorageService implements StorageService {
                             .contentType(file.getContentType())
                             .build());
 
-            // Trả về đường dẫn công khai
-            return minioUrl + "/" + defaultBucket + "/" + uniqueFileName;
+            // Trả về URL qua backend proxy endpoint /storage/{fileName}
+            // để UI có thể truy cập trực tiếp mà không cần kết nối MinIO
+            return "/storage/" + uniqueFileName;
         } catch (Exception e) {
             throw new RuntimeException("Lỗi khi upload file lên MinIO: " + e.getMessage(), e);
         }

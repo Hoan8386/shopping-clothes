@@ -1,6 +1,7 @@
 package com.vn.shopping.domain.response;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,4 +22,5 @@ public class ResChiTietSanPhamDTO {
     private String tenSanPham;
     private String tenMauSac;
     private String tenKichThuoc;
+    private List<String> hinhAnhUrls;
 }

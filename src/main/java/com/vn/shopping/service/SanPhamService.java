@@ -80,7 +80,7 @@ public class SanPhamService {
             String imageUrl = minioStorageService.uploadSingleFile(file);
             sanPham.setHinhAnhChinh(imageUrl);
         }
-
+        System.out.println(file.getName());
         return create(sanPham);
     }
 
