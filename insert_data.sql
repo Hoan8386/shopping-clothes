@@ -102,13 +102,35 @@ INSERT INTO permissions (name, apiPath, method, module, createdAt) VALUES
     ('Xem chi tiết quyền',         '/api/v1/permissions/{id}',     'GET',    'PERMISSIONS',   NOW()),
     ('Tạo quyền',                  '/api/v1/permissions',          'POST',   'PERMISSIONS',   NOW()),
     ('Cập nhật quyền',             '/api/v1/permissions',          'PUT',    'PERMISSIONS',   NOW()),
-    ('Xóa quyền',                  '/api/v1/permissions/{id}',     'DELETE', 'PERMISSIONS',   NOW());
+    ('Xóa quyền',                  '/api/v1/permissions/{id}',     'DELETE', 'PERMISSIONS',   NOW()),
+
+    -- === NHA_CUNG_CAP (61-65) ===
+    ('Xem tất cả nhà cung cấp',    '/api/v1/nha-cung-cap',         'GET',    'NHA_CUNG_CAP',  NOW()),
+    ('Xem chi tiết nhà cung cấp',  '/api/v1/nha-cung-cap/{id}',    'GET',    'NHA_CUNG_CAP',  NOW()),
+    ('Tạo nhà cung cấp',           '/api/v1/nha-cung-cap',         'POST',   'NHA_CUNG_CAP',  NOW()),
+    ('Cập nhật nhà cung cấp',      '/api/v1/nha-cung-cap',         'PUT',    'NHA_CUNG_CAP',  NOW()),
+    ('Xóa nhà cung cấp',           '/api/v1/nha-cung-cap/{id}',    'DELETE', 'NHA_CUNG_CAP',  NOW()),
+
+    -- === PHIEU_NHAP (66-70) ===
+    ('Xem tất cả phiếu nhập',      '/api/v1/phieu-nhap',           'GET',    'PHIEU_NHAP',    NOW()),
+    ('Xem chi tiết phiếu nhập',    '/api/v1/phieu-nhap/{id}',      'GET',    'PHIEU_NHAP',    NOW()),
+    ('Tạo phiếu nhập',             '/api/v1/phieu-nhap',           'POST',   'PHIEU_NHAP',    NOW()),
+    ('Cập nhật phiếu nhập',        '/api/v1/phieu-nhap',           'PUT',    'PHIEU_NHAP',    NOW()),
+    ('Xóa phiếu nhập',             '/api/v1/phieu-nhap/{id}',      'DELETE', 'PHIEU_NHAP',    NOW()),
+
+    -- === CHI_TIET_PHIEU_NHAP (71-76) ===
+    ('Xem tất cả CTPN',            '/api/v1/chi-tiet-phieu-nhap',                              'GET',    'CHI_TIET_PHIEU_NHAP', NOW()),
+    ('Xem CTPN theo id',           '/api/v1/chi-tiet-phieu-nhap/{id}',                         'GET',    'CHI_TIET_PHIEU_NHAP', NOW()),
+    ('Xem CTPN theo phiếu nhập',   '/api/v1/chi-tiet-phieu-nhap/phieu-nhap/{phieuNhapId}',     'GET',    'CHI_TIET_PHIEU_NHAP', NOW()),
+    ('Tạo CTPN',                   '/api/v1/chi-tiet-phieu-nhap',                              'POST',   'CHI_TIET_PHIEU_NHAP', NOW()),
+    ('Cập nhật CTPN',              '/api/v1/chi-tiet-phieu-nhap',                              'PUT',    'CHI_TIET_PHIEU_NHAP', NOW()),
+    ('Xóa CTPN',                   '/api/v1/chi-tiet-phieu-nhap/{id}',                         'DELETE', 'CHI_TIET_PHIEU_NHAP', NOW());
 
 -- ---------------------------------------------------------
 -- 3. PERMISSION_ROLE
 -- ---------------------------------------------------------
 
--- ADMIN (role_id=1): TẤT CẢ QUYỀN (1-60)
+-- ADMIN (role_id=1): TẤT CẢ QUYỀN (1-76)
 INSERT INTO permission_role (role_id, permission_id) VALUES
     (1,1),(1,2),(1,3),(1,4),(1,5),
     (1,6),(1,7),(1,8),(1,9),(1,10),
@@ -121,7 +143,10 @@ INSERT INTO permission_role (role_id, permission_id) VALUES
     (1,41),(1,42),(1,43),(1,44),(1,45),
     (1,46),(1,47),(1,48),(1,49),(1,50),
     (1,51),(1,52),(1,53),(1,54),(1,55),
-    (1,56),(1,57),(1,58),(1,59),(1,60);
+    (1,56),(1,57),(1,58),(1,59),(1,60),
+    (1,61),(1,62),(1,63),(1,64),(1,65),
+    (1,66),(1,67),(1,68),(1,69),(1,70),
+    (1,71),(1,72),(1,73),(1,74),(1,75),(1,76);
 
 -- NHAN_VIEN (role_id=3): Xem tất cả danh mục, SP, CTSP, hình ảnh, cửa hàng (chỉ GET)
 INSERT INTO permission_role (role_id, permission_id) VALUES
@@ -250,3 +275,29 @@ INSERT INTO KhachHang (role_id, TenKhachHang, Email, Sdt, Password, DiemTichLuy)
     (4, 'Hoa',  'h@g.com',   '0933000003', '$2a$10$dXJ3SW6G7P50lGEheIjLOOvTnLJpv0r4a6Oq5a7n5g5z5z5z5z5z5', 100),
     (4, 'Tuấn', 't@g.com',   '0944000004', '$2a$10$dXJ3SW6G7P50lGEheIjLOOvTnLJpv0r4a6Oq5a7n5g5z5z5z5z5z5',   5),
     (4, 'Yến',  'y@g.com',   '0955000005', '$2a$10$dXJ3SW6G7P50lGEheIjLOOvTnLJpv0r4a6Oq5a7n5g5z5z5z5z5z5',  50);
+
+-- ---------------------------------------------------------
+-- 15. NHÀ CUNG CẤP
+-- ---------------------------------------------------------
+INSERT INTO NhaCungCap (TenNhaCungCap, SoDienThoai, Email, DiaChi, TrangThai, NgayTao) VALUES
+    ('Công ty TNHH Vải Việt',   '02838001001', 'vaiviet@ncc.com',   '100 Lý Thường Kiệt, Q.10, HCM', 1, NOW()),
+    ('Công ty CP May Sài Gòn',  '02838002002', 'maysaigon@ncc.com', '200 Cách Mạng Tháng 8, Q.3, HCM', 1, NOW()),
+    ('Xưởng may Hà Nội',        '02438003003', 'mayhanoi@ncc.com',  '50 Hàng Bông, Hoàn Kiếm, HN', 1, NOW());
+
+-- ---------------------------------------------------------
+-- 16. PHIẾU NHẬP
+-- ---------------------------------------------------------
+INSERT INTO PhieuNhap (MaCuaHang, MaNhaCungCap, TenPhieuNhap, TrangThai, NgayTao) VALUES
+    (1, 1, 'Nhập hàng đợt 1 - CN Q.1',  1, NOW()),   -- id=1
+    (2, 2, 'Nhập hàng đợt 1 - CN Q.3',  1, NOW()),   -- id=2
+    (1, 3, 'Nhập bổ sung áo phao',       0, NOW());   -- id=3
+
+-- ---------------------------------------------------------
+-- 17. CHI TIẾT PHIẾU NHẬP
+-- ---------------------------------------------------------
+INSERT INTO ChiTietPhieuNhap (MaPhieuNhap, MaChiTietSanPham, SoLuong, TrangThai, NgayTao) VALUES
+    (1, 1, 50, 1, NOW()),   -- Phiếu 1: Áo Oxford M Trắng x50
+    (1, 2, 30, 1, NOW()),   -- Phiếu 1: Áo Oxford L Trắng x30
+    (1, 3, 40, 1, NOW()),   -- Phiếu 1: Quần Jean M Đen x40
+    (2, 4, 25, 1, NOW()),   -- Phiếu 2: Váy Hoa S Đỏ x25
+    (2, 5, 20, 1, NOW());   -- Phiếu 2: Nịt Da L Đen x20

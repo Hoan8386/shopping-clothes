@@ -1440,6 +1440,295 @@
 			]
 		},
 		{
+			"name": "Nhà Cung Cấp ( Admin)",
+			"description": "Quản lý nhà cung cấp — Chỉ Admin có permission mới được thao tác",
+			"item": [
+				{
+					"name": "Xem tất cả nhà cung cấp ( Admin)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/nha-cung-cap",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "nha-cung-cap"]
+						},
+						"description": " Admin — Xem danh sách tất cả nhà cung cấp"
+					}
+				},
+				{
+					"name": "Xem chi tiết nhà cung cấp ( Admin)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/nha-cung-cap/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "nha-cung-cap", "1"]
+						},
+						"description": " Admin — Xem chi tiết 1 nhà cung cấp"
+					}
+				},
+				{
+					"name": "Tạo nhà cung cấp ( Admin)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tenNhaCungCap\": \"Công ty Vải Đà Nẵng\",\n    \"soDienThoai\": \"02368004004\",\n    \"email\": \"vaidanang@ncc.com\",\n    \"diaChi\": \"30 Bạch Đằng, Hải Châu, Đà Nẵng\",\n    \"trangThai\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/nha-cung-cap",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "nha-cung-cap"]
+						},
+						"description": " Admin — Tạo nhà cung cấp mới"
+					}
+				},
+				{
+					"name": "Cập nhật nhà cung cấp ( Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"tenNhaCungCap\": \"Công ty TNHH Vải Việt (Updated)\",\n    \"soDienThoai\": \"02838001001\",\n    \"email\": \"vaiviet@ncc.com\",\n    \"diaChi\": \"100 Lý Thường Kiệt, Q.10, HCM\",\n    \"trangThai\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/nha-cung-cap",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "nha-cung-cap"]
+						},
+						"description": " Admin — Cập nhật nhà cung cấp"
+					}
+				},
+				{
+					"name": "Xóa nhà cung cấp ( Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/nha-cung-cap/4",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "nha-cung-cap", "4"]
+						},
+						"description": " Admin — Xóa nhà cung cấp"
+					}
+				}
+			]
+		},
+		{
+			"name": "Phiếu Nhập ( Admin)",
+			"description": "Quản lý phiếu nhập hàng — Chỉ Admin có permission mới được thao tác",
+			"item": [
+				{
+					"name": "Xem tất cả phiếu nhập ( Admin)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/phieu-nhap",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "phieu-nhap"]
+						},
+						"description": " Admin — Xem danh sách tất cả phiếu nhập"
+					}
+				},
+				{
+					"name": "Xem chi tiết phiếu nhập ( Admin)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/phieu-nhap/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "phieu-nhap", "1"]
+						},
+						"description": " Admin — Xem chi tiết 1 phiếu nhập"
+					}
+				},
+				{
+					"name": "Tạo phiếu nhập ( Admin)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tenPhieuNhap\": \"Nhập hàng đợt 2 - CN Q.1\",\n    \"cuaHang\": { \"id\": 1 },\n    \"nhaCungCap\": { \"id\": 2 },\n    \"trangThai\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/phieu-nhap",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "phieu-nhap"]
+						},
+						"description": " Admin — Tạo phiếu nhập mới"
+					}
+				},
+				{
+					"name": "Cập nhật phiếu nhập ( Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"tenPhieuNhap\": \"Nhập hàng đợt 1 - CN Q.1 (Updated)\",\n    \"cuaHang\": { \"id\": 1 },\n    \"nhaCungCap\": { \"id\": 1 },\n    \"trangThai\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/phieu-nhap",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "phieu-nhap"]
+						},
+						"description": " Admin — Cập nhật phiếu nhập"
+					}
+				},
+				{
+					"name": "Xóa phiếu nhập ( Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/phieu-nhap/4",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "phieu-nhap", "4"]
+						},
+						"description": " Admin — Xóa phiếu nhập"
+					}
+				}
+			]
+		},
+		{
+			"name": "Chi Tiết Phiếu Nhập ( Admin)",
+			"description": "Quản lý chi tiết phiếu nhập — Chỉ Admin có permission mới được thao tác",
+			"item": [
+				{
+					"name": "Xem tất cả chi tiết phiếu nhập ( Admin)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/chi-tiet-phieu-nhap",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "chi-tiet-phieu-nhap"]
+						},
+						"description": " Admin — Xem danh sách tất cả chi tiết phiếu nhập"
+					}
+				},
+				{
+					"name": "Xem CTPN theo id ( Admin)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/chi-tiet-phieu-nhap/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "chi-tiet-phieu-nhap", "1"]
+						},
+						"description": " Admin — Xem chi tiết phiếu nhập theo id"
+					}
+				},
+				{
+					"name": "Xem CTPN theo phiếu nhập ( Admin)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/chi-tiet-phieu-nhap/phieu-nhap/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "chi-tiet-phieu-nhap", "phieu-nhap", "1"]
+						},
+						"description": " Admin — Xem chi tiết phiếu nhập theo mã phiếu nhập"
+					}
+				},
+				{
+					"name": "Tạo chi tiết phiếu nhập ( Admin)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "phieuNhapId",
+									"value": "1",
+									"type": "text",
+									"description": "Mã phiếu nhập"
+								},
+								{
+									"key": "chiTietSanPhamId",
+									"value": "1",
+									"type": "text",
+									"description": "Mã chi tiết sản phẩm"
+								},
+								{
+									"key": "soLuong",
+									"value": "100",
+									"type": "text",
+									"description": "Số lượng nhập"
+								},
+								{
+									"key": "ghiTru",
+									"value": "",
+									"type": "text",
+									"description": "Ghi trừ (không bắt buộc)",
+									"disabled": true
+								},
+								{
+									"key": "ghiTruKiemHang",
+									"value": "",
+									"type": "text",
+									"description": "Ghi trừ kiểm hàng (không bắt buộc)",
+									"disabled": true
+								},
+								{
+									"key": "trangThai",
+									"value": "1",
+									"type": "text",
+									"description": "Trạng thái"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/chi-tiet-phieu-nhap",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "chi-tiet-phieu-nhap"]
+						},
+						"description": " Admin — Tạo chi tiết phiếu nhập (truyền từng trường qua form-urlencoded)"
+					}
+				},
+				{
+					"name": "Cập nhật chi tiết phiếu nhập ( Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"phieuNhap\": { \"id\": 1 },\n    \"chiTietSanPham\": { \"id\": 1 },\n    \"soLuong\": 60,\n    \"trangThai\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/chi-tiet-phieu-nhap",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "chi-tiet-phieu-nhap"]
+						},
+						"description": " Admin — Cập nhật chi tiết phiếu nhập"
+					}
+				},
+				{
+					"name": "Xóa chi tiết phiếu nhập ( Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/chi-tiet-phieu-nhap/6",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "chi-tiet-phieu-nhap", "6"]
+						},
+						"description": " Admin — Xóa chi tiết phiếu nhập"
+					}
+				}
+			]
+		},
+		{
 			"name": "Test phân quyền (KH gọi API Admin → 403)",
 			"description": "Login bằng tài khoản khách hàng rồi thử truy cập API admin → phải bị từ chối 403",
 			"item": [
