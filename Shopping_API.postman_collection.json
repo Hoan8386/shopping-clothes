@@ -1729,6 +1729,204 @@
 			]
 		},
 		{
+			"name": "Đơn Hàng (🛒)",
+			"description": "Quản lý đơn hàng — Admin/NV xem tất cả, KH chỉ xem đơn của mình",
+			"item": [
+				{
+					"name": "Xem tất cả đơn hàng + Lọc + Phân trang (🔒)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/don-hang?page=0&size=10&sort=id,desc",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "don-hang"],
+							"query": [
+								{ "key": "page", "value": "0" },
+								{ "key": "size", "value": "10" },
+								{ "key": "sort", "value": "id,desc" },
+								{ "key": "cuaHangId", "value": "1", "disabled": true },
+								{ "key": "nhanVienId", "value": "1", "disabled": true },
+								{ "key": "trangThai", "value": "0", "disabled": true },
+								{ "key": "trangThaiThanhToan", "value": "0", "disabled": true },
+								{ "key": "hinhThucDonHang", "value": "1", "disabled": true }
+							]
+						},
+						"description": "🔒 Admin/NV: xem tất cả đơn hàng (có lọc + phân trang). KH: chỉ xem đơn hàng của chính mình.\nFilter params (tùy chọn): cuaHangId, nhanVienId, trangThai, trangThaiThanhToan, hinhThucDonHang (0=tại quầy, 1=online)"
+					}
+				},
+				{
+					"name": "Xem chi tiết đơn hàng (🔒)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/don-hang/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "don-hang", "1"]
+						},
+						"description": "🔒 Admin/NV: xem bất kỳ đơn hàng. KH: chỉ xem đơn hàng của chính mình, nếu không phải đơn của mình sẽ bị từ chối."
+					}
+				},
+				{
+					"name": "Khách hàng đặt hàng online (🔒 Khách hàng)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"diaChi\": \"123 Nguyễn Trãi, Q.1, TP.HCM\",\n    \"cuaHangId\": null,\n    \"maKhuyenMaiHoaDon\": null,\n    \"maKhuyenMaiDiem\": null,\n    \"khachHangId\": null\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/don-hang/online",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "don-hang", "online"]
+						},
+						"description": "🔒 Khách hàng — Tạo đơn hàng online từ giỏ hàng. Thông tin KH lấy từ token, hàng lấy từ giỏ hàng, sau khi tạo đơn sẽ xóa giỏ hàng."
+					}
+				},
+				{
+					"name": "Nhân viên tạo đơn tại quầy (🔒 Nhân viên)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"khachHang\": { \"id\": 1 },\n    \"maKhuyenMaiHoaDon\": null,\n    \"maKhuyenMaiDiem\": null,\n    \"diaChi\": null,\n    \"tongTien\": 500000,\n    \"tienGiam\": 50000,\n    \"tongTienGiam\": 50000,\n    \"tongTienTra\": 450000,\n    \"trangThai\": 1,\n    \"trangThaiThanhToan\": 0\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/don-hang/tai-quay",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "don-hang", "tai-quay"]
+						},
+						"description": "🔒 Nhân viên — Tạo đơn hàng tại quầy. Thông tin NV + cửa hàng tự lấy từ token. hinhThucDonHang = 0 (tại quầy)."
+					}
+				},
+				{
+					"name": "Cập nhật đơn hàng (🔒 Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"cuaHang\": { \"id\": 1 },\n    \"khachHang\": { \"id\": 1 },\n    \"nhanVien\": { \"id\": 1 },\n    \"diaChi\": \"456 Lê Lợi, Q.3, TP.HCM\",\n    \"tongTien\": 600000,\n    \"tienGiam\": 60000,\n    \"tongTienGiam\": 60000,\n    \"tongTienTra\": 540000,\n    \"trangThai\": 2,\n    \"trangThaiThanhToan\": 1,\n    \"hinhThucDonHang\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/don-hang",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "don-hang"]
+						},
+						"description": "🔒 Admin — Cập nhật đơn hàng"
+					}
+				},
+				{
+					"name": "Xóa đơn hàng (🔒 Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/don-hang/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "don-hang", "1"]
+						},
+						"description": "🔒 Admin — Xóa đơn hàng"
+					}
+				}
+			]
+		},
+		{
+			"name": "Chi Tiết Đơn Hàng (🔒 Admin)",
+			"description": "Quản lý chi tiết đơn hàng — Chỉ Admin có permission mới được thao tác",
+			"item": [
+				{
+					"name": "Xem tất cả chi tiết đơn hàng (🔒 Admin)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/chi-tiet-don-hang",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "chi-tiet-don-hang"]
+						},
+						"description": "🔒 Admin — Xem danh sách tất cả chi tiết đơn hàng"
+					}
+				},
+				{
+					"name": "Xem CTDH theo mã đơn hàng (🔒 Admin)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/chi-tiet-don-hang/don-hang/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "chi-tiet-don-hang", "don-hang", "1"]
+						},
+						"description": "🔒 Admin — Lấy danh sách chi tiết đơn hàng theo mã đơn"
+					}
+				},
+				{
+					"name": "Xem CTDH theo id (🔒 Admin)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/chi-tiet-don-hang/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "chi-tiet-don-hang", "1"]
+						},
+						"description": "🔒 Admin — Xem chi tiết 1 dòng chi tiết đơn hàng"
+					}
+				},
+				{
+					"name": "Tạo chi tiết đơn hàng (🔒 Admin)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"donHang\": { \"id\": 1 },\n    \"chiTietSanPham\": { \"id\": 1 },\n    \"giaSanPham\": 250000,\n    \"giamGia\": 10,\n    \"giaGiam\": 25000,\n    \"soLuong\": 2,\n    \"thanhTien\": 450000\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/chi-tiet-don-hang",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "chi-tiet-don-hang"]
+						},
+						"description": "🔒 Admin — Tạo chi tiết đơn hàng mới"
+					}
+				},
+				{
+					"name": "Cập nhật chi tiết đơn hàng (🔒 Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"donHang\": { \"id\": 1 },\n    \"chiTietSanPham\": { \"id\": 2 },\n    \"giaSanPham\": 300000,\n    \"giamGia\": 15,\n    \"giaGiam\": 45000,\n    \"soLuong\": 3,\n    \"thanhTien\": 765000\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/chi-tiet-don-hang",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "chi-tiet-don-hang"]
+						},
+						"description": "🔒 Admin — Cập nhật chi tiết đơn hàng"
+					}
+				},
+				{
+					"name": "Xóa chi tiết đơn hàng (🔒 Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/chi-tiet-don-hang/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "chi-tiet-don-hang", "1"]
+						},
+						"description": "🔒 Admin — Xóa chi tiết đơn hàng"
+					}
+				}
+			]
+		},
+		{
 			"name": "Test phân quyền (KH gọi API Admin → 403)",
 			"description": "Login bằng tài khoản khách hàng rồi thử truy cập API admin → phải bị từ chối 403",
 			"item": [

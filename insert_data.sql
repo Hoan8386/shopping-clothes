@@ -124,13 +124,29 @@ INSERT INTO permissions (name, apiPath, method, module, createdAt) VALUES
     ('Xem CTPN theo phiếu nhập',   '/api/v1/chi-tiet-phieu-nhap/phieu-nhap/{phieuNhapId}',     'GET',    'CHI_TIET_PHIEU_NHAP', NOW()),
     ('Tạo CTPN',                   '/api/v1/chi-tiet-phieu-nhap',                              'POST',   'CHI_TIET_PHIEU_NHAP', NOW()),
     ('Cập nhật CTPN',              '/api/v1/chi-tiet-phieu-nhap',                              'PUT',    'CHI_TIET_PHIEU_NHAP', NOW()),
-    ('Xóa CTPN',                   '/api/v1/chi-tiet-phieu-nhap/{id}',                         'DELETE', 'CHI_TIET_PHIEU_NHAP', NOW());
+    ('Xóa CTPN',                   '/api/v1/chi-tiet-phieu-nhap/{id}',                         'DELETE', 'CHI_TIET_PHIEU_NHAP', NOW()),
+
+    -- === DON_HANG (77-82) ===
+    ('Xem tất cả đơn hàng',        '/api/v1/don-hang',                                         'GET',    'DON_HANG',            NOW()),
+    ('Xem chi tiết đơn hàng',      '/api/v1/don-hang/{id}',                                    'GET',    'DON_HANG',            NOW()),
+    ('Tạo đơn hàng online',        '/api/v1/don-hang/online',                                  'POST',   'DON_HANG',            NOW()),
+    ('Tạo đơn hàng tại quầy',      '/api/v1/don-hang/tai-quay',                                'POST',   'DON_HANG',            NOW()),
+    ('Cập nhật đơn hàng',          '/api/v1/don-hang',                                         'PUT',    'DON_HANG',            NOW()),
+    ('Xóa đơn hàng',               '/api/v1/don-hang/{id}',                                    'DELETE', 'DON_HANG',            NOW()),
+
+    -- === CHI_TIET_DON_HANG (83-88) ===
+    ('Xem tất cả CTDH',            '/api/v1/chi-tiet-don-hang',                                'GET',    'CHI_TIET_DON_HANG',   NOW()),
+    ('Xem CTDH theo mã đơn',       '/api/v1/chi-tiet-don-hang/don-hang/{donHangId}',           'GET',    'CHI_TIET_DON_HANG',   NOW()),
+    ('Xem CTDH theo id',           '/api/v1/chi-tiet-don-hang/{id}',                           'GET',    'CHI_TIET_DON_HANG',   NOW()),
+    ('Tạo CTDH',                   '/api/v1/chi-tiet-don-hang',                                'POST',   'CHI_TIET_DON_HANG',   NOW()),
+    ('Cập nhật CTDH',              '/api/v1/chi-tiet-don-hang',                                'PUT',    'CHI_TIET_DON_HANG',   NOW()),
+    ('Xóa CTDH',                   '/api/v1/chi-tiet-don-hang/{id}',                           'DELETE', 'CHI_TIET_DON_HANG',   NOW());
 
 -- ---------------------------------------------------------
 -- 3. PERMISSION_ROLE
 -- ---------------------------------------------------------
 
--- ADMIN (role_id=1): TẤT CẢ QUYỀN (1-76)
+-- ADMIN (role_id=1): TẤT CẢ QUYỀN (1-88)
 INSERT INTO permission_role (role_id, permission_id) VALUES
     (1,1),(1,2),(1,3),(1,4),(1,5),
     (1,6),(1,7),(1,8),(1,9),(1,10),
@@ -146,7 +162,9 @@ INSERT INTO permission_role (role_id, permission_id) VALUES
     (1,56),(1,57),(1,58),(1,59),(1,60),
     (1,61),(1,62),(1,63),(1,64),(1,65),
     (1,66),(1,67),(1,68),(1,69),(1,70),
-    (1,71),(1,72),(1,73),(1,74),(1,75),(1,76);
+    (1,71),(1,72),(1,73),(1,74),(1,75),(1,76),
+    (1,77),(1,78),(1,79),(1,80),(1,81),(1,82),
+    (1,83),(1,84),(1,85),(1,86),(1,87),(1,88);
 
 -- NHAN_VIEN (role_id=3): Xem tất cả danh mục, SP, CTSP, hình ảnh, cửa hàng (chỉ GET)
 INSERT INTO permission_role (role_id, permission_id) VALUES
@@ -158,7 +176,9 @@ INSERT INTO permission_role (role_id, permission_id) VALUES
     (3,30),(3,31),         -- BO_SUU_TAP: xem all, xem id
     (3,35),(3,36),         -- THUONG_HIEU: xem all, xem id
     (3,40),(3,41),(3,42),  -- HINH_ANH: xem all, xem id, xem theo CTSP
-    (3,46),(3,47);         -- CUA_HANG: xem all, xem id
+    (3,46),(3,47),         -- CUA_HANG: xem all, xem id
+    (3,77),(3,78),(3,80),  -- DON_HANG: xem all, xem id, tạo tại quầy
+    (3,83),(3,84),(3,85);  -- CHI_TIET_DON_HANG: xem all, xem theo đơn, xem id
 
 -- KHACH_HANG (role_id=4): Xem SP/danh mục + giỏ hàng (thêm/xem/xóa)
 INSERT INTO permission_role (role_id, permission_id) VALUES
@@ -171,7 +191,9 @@ INSERT INTO permission_role (role_id, permission_id) VALUES
     (4,30),(4,31),         -- BO_SUU_TAP: xem all, xem id
     (4,35),(4,36),         -- THUONG_HIEU: xem all, xem id
     (4,40),(4,41),(4,42),  -- HINH_ANH: xem all, xem id, xem theo CTSP
-    (4,46),(4,47);         -- CUA_HANG: xem all, xem id
+    (4,46),(4,47),         -- CUA_HANG: xem all, xem id
+    (4,77),(4,78),(4,79),  -- DON_HANG: xem all, xem id, tạo online
+    (4,83),(4,84),(4,85);  -- CHI_TIET_DON_HANG: xem all, xem theo đơn, xem id
 
 -- ---------------------------------------------------------
 -- 4. CỬA HÀNG
@@ -301,3 +323,25 @@ INSERT INTO ChiTietPhieuNhap (MaPhieuNhap, MaChiTietSanPham, SoLuong, TrangThai,
     (1, 3, 40, 1, NOW()),   -- Phiếu 1: Quần Jean M Đen x40
     (2, 4, 25, 1, NOW()),   -- Phiếu 2: Váy Hoa S Đỏ x25
     (2, 5, 20, 1, NOW());   -- Phiếu 2: Nịt Da L Đen x20
+
+-- ---------------------------------------------------------
+-- 18. ĐƠN HÀNG
+-- ---------------------------------------------------------
+INSERT INTO DonHang (MaCuaHang, MaKhachHang, MaNhanVien, MaKhuyenMaiHoaDon, MaKhuyenMaiDiem, DiaChi, TongTien, TienGiam, TongTienGiam, TongTienTra, TrangThai, TrangThaiThanhToan, HinhThucDonHang, NgayTao) VALUES
+    (1, 1, 5, NULL, NULL, '123 Nguyễn Trãi, Q.1, TP.HCM',     600, 0,   0,   600, 1, 1, 1, NOW()),   -- id=1: KH Lan, NV Hùng, CN Q.1, online
+    (1, 2, 2, NULL, NULL, '456 Lê Lợi, Q.3, TP.HCM',           400, 40,  40,  360, 2, 1, 1, NOW()),   -- id=2: KH Minh, NV Bình, CN Q.1, online
+    (2, 3, 3, NULL, NULL, 'Mua tại cửa hàng',                   300, 15,  15,  285, 3, 1, 0, NOW()),   -- id=3: KH Hoa, NV Chi, CN Q.3, tại quầy
+    (1, 4, 5, NULL, NULL, '789 Trần Hưng Đạo, Q.5, TP.HCM',    200, 0,   0,   200, 0, 0, 1, NOW()),   -- id=4: KH Tuấn, NV Hùng, chờ xác nhận
+    (2, 5, 4, NULL, NULL, 'Mua tại cửa hàng',                  1000, 100, 100, 900, 3, 1, 0, NOW());   -- id=5: KH Yến, NV Danh, CN Q.3, tại quầy
+
+-- ---------------------------------------------------------
+-- 19. CHI TIẾT ĐƠN HÀNG
+-- ---------------------------------------------------------
+INSERT INTO ChiTietDonHang (MaDon, MaChiTietSanPham, GiaSanPham, GiamGia, GiaGiam, SoLuong, ThanhTien, NgayTao) VALUES
+    (1, 1, 200, 0,  0,  2, 400, NOW()),   -- Đơn 1: Áo Oxford M Trắng x2 = 400
+    (1, 3, 400, 10, 40, 1, 360, NOW()),   -- Đơn 1: Quần Jean M Đen x1 (giảm 10%) = 360 → Tổng đơn ≈ 600 (đã làm tròn)
+    (2, 2, 200, 0,  0,  2, 400, NOW()),   -- Đơn 2: Áo Oxford L Trắng x2 = 400
+    (3, 4, 300, 5,  15, 1, 285, NOW()),   -- Đơn 3: Váy Hoa S Đỏ x1 (giảm 5%) = 285
+    (4, 5, 100, 0,  0,  2, 200, NOW()),   -- Đơn 4: Nịt Da L Đen x2 = 200
+    (5, 1, 200, 0,  0,  3, 600, NOW()),   -- Đơn 5: Áo Oxford M Trắng x3 = 600
+    (5, 3, 400, 0,  0,  1, 400, NOW());   -- Đơn 5: Quần Jean M Đen x1 = 400 → Tổng đơn = 1000

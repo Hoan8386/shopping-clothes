@@ -226,7 +226,7 @@ CREATE TABLE KhuyenMaiTheoDiem (
 );
 
 CREATE TABLE DonHang (
-    MaDon BIGINT PRIMARY KEY,
+    MaDon BIGINT AUTO_INCREMENT PRIMARY KEY,
     MaCuaHang BIGINT,
     MaKhachHang BIGINT,
     MaNhanVien BIGINT,
@@ -241,10 +241,16 @@ CREATE TABLE DonHang (
     TrangThaiThanhToan INT,
     HinhThucDonHang INT,
     NgayTao DATETIME,
-    NgayCapNhat DATETIME
+    NgayCapNhat DATETIME,
+    FOREIGN KEY (MaCuaHang) REFERENCES CuaHang(MaCuaHang),
+    FOREIGN KEY (MaKhachHang) REFERENCES KhachHang(MaKhachHang),
+    FOREIGN KEY (MaNhanVien) REFERENCES NhanVien(MaNhanVien),
+    FOREIGN KEY (MaKhuyenMaiHoaDon) REFERENCES KhuyenMaiTheoHoaDon(MaKhuyenMaiHoaDon),
+    FOREIGN KEY (MaKhuyenMaiDiem) REFERENCES KhuyenMaiTheoDiem(MaKhuyenMaiDiem)
 );
 
 CREATE TABLE ChiTietDonHang (
+    MaChiTietDonHang BIGINT AUTO_INCREMENT PRIMARY KEY,
     MaDon BIGINT,
     MaChiTietSanPham BIGINT,
     GiaSanPham DOUBLE,
@@ -254,7 +260,8 @@ CREATE TABLE ChiTietDonHang (
     ThanhTien DOUBLE,
     NgayTao DATETIME,
     NgayCapNhat DATETIME,
-    PRIMARY KEY (MaDon, MaChiTietSanPham)
+    FOREIGN KEY (MaDon) REFERENCES DonHang(MaDon),
+    FOREIGN KEY (MaChiTietSanPham) REFERENCES ChiTietSanPham(MaChiTietSanPham)
 );
 
 CREATE TABLE DoiHang (
