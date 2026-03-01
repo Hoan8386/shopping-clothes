@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "shopping-api-collection",
 		"name": "Shopping API",
-		"description": "Collection đầy đủ tất cả API endpoints - Shopping App\n\n📌 GHI CHÚ PHÂN QUYỀN:\n- 🔓 Public: Không cần đăng nhập\n-  Khách hàng: Cần đăng nhập bằng tài khoản khách hàng\n-  Admin/Nhân viên: Cần đăng nhập bằng tài khoản có quyền (ADMIN, QUAN_LY, NHAN_VIEN)",
+		"description": "Collection đầy đủ tất cả API endpoints - Shopping App\n\n📌 GHI CHÚ PHÂN QUYỀN:\n-  Public: Không cần đăng nhập\n-  Khách hàng: Cần đăng nhập bằng tài khoản khách hàng\n-  Admin/Nhân viên: Cần đăng nhập bằng tài khoản có quyền (ADMIN, QUAN_LY, NHAN_VIEN)",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"auth": {
@@ -27,7 +27,7 @@
 	],
 	"item": [
 		{
-			"name": "Auth (🔓 Public)",
+			"name": "Auth ( Public)",
 			"description": "Các API xác thực — Không cần đăng nhập (trừ Get Account, Logout)",
 			"item": [
 				{
@@ -61,7 +61,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "auth", "login"]
 						},
-						"description": "🔓 Public — Đăng nhập bằng tài khoản Admin/Nhân viên"
+						"description": " Public — Đăng nhập bằng tài khoản Admin/Nhân viên"
 					}
 				},
 				{
@@ -95,7 +95,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "auth", "login"]
 						},
-						"description": "🔓 Public — Đăng nhập bằng tài khoản khách hàng"
+						"description": " Public — Đăng nhập bằng tài khoản khách hàng"
 					}
 				},
 				{
@@ -112,7 +112,7 @@
 					}
 				},
 				{
-					"name": "Refresh Token (🔓 Public)",
+					"name": "Refresh Token ( Public)",
 					"event": [
 						{
 							"listen": "test",
@@ -137,7 +137,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "auth", "refresh"]
 						},
-						"description": "🔓 Public — Sử dụng refresh_token từ cookie (được set tự động khi login)"
+						"description": " Public — Sử dụng refresh_token từ cookie (được set tự động khi login)"
 					}
 				},
 				{
@@ -154,7 +154,7 @@
 					}
 				},
 				{
-					"name": "Register (🔓 Public)",
+					"name": "Register ( Public)",
 					"request": {
 						"auth": { "type": "noauth" },
 						"method": "POST",
@@ -168,7 +168,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "auth", "register"]
 						},
-						"description": "🔓 Public — Đăng ký tài khoản khách hàng mới (tự động gán role_id=4)"
+						"description": " Public — Đăng ký tài khoản khách hàng mới (tự động gán role_id=4)"
 					}
 				}
 			]
@@ -1733,7 +1733,7 @@
 			"description": "Quản lý đơn hàng — Admin/NV xem tất cả, KH chỉ xem đơn của mình",
 			"item": [
 				{
-					"name": "Xem tất cả đơn hàng + Lọc + Phân trang (🔒)",
+					"name": "Xem tất cả đơn hàng + Lọc + Phân trang ()",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -1752,11 +1752,11 @@
 								{ "key": "hinhThucDonHang", "value": "1", "disabled": true }
 							]
 						},
-						"description": "🔒 Admin/NV: xem tất cả đơn hàng (có lọc + phân trang). KH: chỉ xem đơn hàng của chính mình.\nFilter params (tùy chọn): cuaHangId, nhanVienId, trangThai, trangThaiThanhToan, hinhThucDonHang (0=tại quầy, 1=online)"
+						"description": " Admin/NV: xem tất cả đơn hàng (có lọc + phân trang). KH: chỉ xem đơn hàng của chính mình.\nFilter params (tùy chọn): cuaHangId, nhanVienId, trangThai, trangThaiThanhToan, hinhThucDonHang (0=tại quầy, 1=online)"
 					}
 				},
 				{
-					"name": "Xem chi tiết đơn hàng (🔒)",
+					"name": "Xem chi tiết đơn hàng ()",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -1765,11 +1765,11 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "don-hang", "1"]
 						},
-						"description": "🔒 Admin/NV: xem bất kỳ đơn hàng. KH: chỉ xem đơn hàng của chính mình, nếu không phải đơn của mình sẽ bị từ chối."
+						"description": " Admin/NV: xem bất kỳ đơn hàng. KH: chỉ xem đơn hàng của chính mình, nếu không phải đơn của mình sẽ bị từ chối."
 					}
 				},
 				{
-					"name": "Khách hàng đặt hàng online (🔒 Khách hàng)",
+					"name": "Khách hàng đặt hàng online ( Khách hàng)",
 					"request": {
 						"method": "POST",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -1782,11 +1782,11 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "don-hang", "online"]
 						},
-						"description": "🔒 Khách hàng — Tạo đơn hàng online từ giỏ hàng. Thông tin KH lấy từ token, hàng lấy từ giỏ hàng, sau khi tạo đơn sẽ xóa giỏ hàng."
+						"description": " Khách hàng — Tạo đơn hàng online từ giỏ hàng. Thông tin KH lấy từ token, hàng lấy từ giỏ hàng, sau khi tạo đơn sẽ xóa giỏ hàng."
 					}
 				},
 				{
-					"name": "Nhân viên tạo đơn tại quầy (🔒 Nhân viên)",
+					"name": "Nhân viên tạo đơn tại quầy ( Nhân viên)",
 					"request": {
 						"method": "POST",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -1799,11 +1799,11 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "don-hang", "tai-quay"]
 						},
-						"description": "🔒 Nhân viên — Tạo đơn hàng tại quầy. Thông tin NV + cửa hàng tự lấy từ token. hinhThucDonHang = 0 (tại quầy)."
+						"description": " Nhân viên — Tạo đơn hàng tại quầy. Thông tin NV + cửa hàng tự lấy từ token. hinhThucDonHang = 0 (tại quầy)."
 					}
 				},
 				{
-					"name": "Cập nhật đơn hàng (🔒 Admin)",
+					"name": "Cập nhật đơn hàng ( Admin)",
 					"request": {
 						"method": "PUT",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -1816,11 +1816,11 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "don-hang"]
 						},
-						"description": "🔒 Admin — Cập nhật đơn hàng"
+						"description": " Admin — Cập nhật đơn hàng"
 					}
 				},
 				{
-					"name": "Xóa đơn hàng (🔒 Admin)",
+					"name": "Xóa đơn hàng ( Admin)",
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -1829,17 +1829,17 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "don-hang", "1"]
 						},
-						"description": "🔒 Admin — Xóa đơn hàng"
+						"description": " Admin — Xóa đơn hàng"
 					}
 				}
 			]
 		},
 		{
-			"name": "Chi Tiết Đơn Hàng (🔒 Admin)",
+			"name": "Chi Tiết Đơn Hàng ( Admin)",
 			"description": "Quản lý chi tiết đơn hàng — Chỉ Admin có permission mới được thao tác",
 			"item": [
 				{
-					"name": "Xem tất cả chi tiết đơn hàng (🔒 Admin)",
+					"name": "Xem tất cả chi tiết đơn hàng ( Admin)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -1848,11 +1848,11 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "chi-tiet-don-hang"]
 						},
-						"description": "🔒 Admin — Xem danh sách tất cả chi tiết đơn hàng"
+						"description": " Admin — Xem danh sách tất cả chi tiết đơn hàng"
 					}
 				},
 				{
-					"name": "Xem CTDH theo mã đơn hàng (🔒 Admin)",
+					"name": "Xem CTDH theo mã đơn hàng ( Admin)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -1861,11 +1861,11 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "chi-tiet-don-hang", "don-hang", "1"]
 						},
-						"description": "🔒 Admin — Lấy danh sách chi tiết đơn hàng theo mã đơn"
+						"description": " Admin — Lấy danh sách chi tiết đơn hàng theo mã đơn"
 					}
 				},
 				{
-					"name": "Xem CTDH theo id (🔒 Admin)",
+					"name": "Xem CTDH theo id ( Admin)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -1874,11 +1874,11 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "chi-tiet-don-hang", "1"]
 						},
-						"description": "🔒 Admin — Xem chi tiết 1 dòng chi tiết đơn hàng"
+						"description": " Admin — Xem chi tiết 1 dòng chi tiết đơn hàng"
 					}
 				},
 				{
-					"name": "Tạo chi tiết đơn hàng (🔒 Admin)",
+					"name": "Tạo chi tiết đơn hàng ( Admin)",
 					"request": {
 						"method": "POST",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -1891,11 +1891,11 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "chi-tiet-don-hang"]
 						},
-						"description": "🔒 Admin — Tạo chi tiết đơn hàng mới"
+						"description": " Admin — Tạo chi tiết đơn hàng mới"
 					}
 				},
 				{
-					"name": "Cập nhật chi tiết đơn hàng (🔒 Admin)",
+					"name": "Cập nhật chi tiết đơn hàng ( Admin)",
 					"request": {
 						"method": "PUT",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -1908,11 +1908,11 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "chi-tiet-don-hang"]
 						},
-						"description": "🔒 Admin — Cập nhật chi tiết đơn hàng"
+						"description": " Admin — Cập nhật chi tiết đơn hàng"
 					}
 				},
 				{
-					"name": "Xóa chi tiết đơn hàng (🔒 Admin)",
+					"name": "Xóa chi tiết đơn hàng ( Admin)",
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -1921,17 +1921,17 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "chi-tiet-don-hang", "1"]
 						},
-						"description": "🔒 Admin — Xóa chi tiết đơn hàng"
+						"description": " Admin — Xóa chi tiết đơn hàng"
 					}
 				}
 			]
 		},
 		{
-			"name": "Khuyến Mãi Theo Hóa Đơn (🔒 Admin)",
+			"name": "Khuyến Mãi Theo Hóa Đơn ( Admin)",
 			"description": "Quản lý khuyến mãi theo hóa đơn — Admin CRUD, NV/KH chỉ xem",
 			"item": [
 				{
-					"name": "Xem tất cả KMHD (🔒 Tất cả)",
+					"name": "Xem tất cả KMHD ( Tất cả)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -1940,11 +1940,11 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "khuyen-mai-theo-hoa-don"]
 						},
-						"description": "🔒 Tất cả người dùng đã đăng nhập — Xem danh sách khuyến mãi theo hóa đơn"
+						"description": " Tất cả người dùng đã đăng nhập — Xem danh sách khuyến mãi theo hóa đơn"
 					}
 				},
 				{
-					"name": "Xem KMHD theo id (🔒 Tất cả)",
+					"name": "Xem KMHD theo id ( Tất cả)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -1953,11 +1953,11 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "khuyen-mai-theo-hoa-don", "1"]
 						},
-						"description": "🔒 Tất cả người dùng đã đăng nhập — Xem chi tiết khuyến mãi theo hóa đơn"
+						"description": " Tất cả người dùng đã đăng nhập — Xem chi tiết khuyến mãi theo hóa đơn"
 					}
 				},
 				{
-					"name": "Tạo KMHD (🔒 Admin)",
+					"name": "Tạo KMHD ( Admin)",
 					"request": {
 						"method": "POST",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -1970,11 +1970,11 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "khuyen-mai-theo-hoa-don"]
 						},
-						"description": "🔒 Admin — Tạo khuyến mãi theo hóa đơn mới"
+						"description": " Admin — Tạo khuyến mãi theo hóa đơn mới"
 					}
 				},
 				{
-					"name": "Cập nhật KMHD (🔒 Admin)",
+					"name": "Cập nhật KMHD ( Admin)",
 					"request": {
 						"method": "PUT",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -1987,11 +1987,11 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "khuyen-mai-theo-hoa-don"]
 						},
-						"description": "🔒 Admin — Cập nhật khuyến mãi theo hóa đơn"
+						"description": " Admin — Cập nhật khuyến mãi theo hóa đơn"
 					}
 				},
 				{
-					"name": "Xóa KMHD (🔒 Admin)",
+					"name": "Xóa KMHD ( Admin)",
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -2000,17 +2000,17 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "khuyen-mai-theo-hoa-don", "1"]
 						},
-						"description": "🔒 Admin — Xóa khuyến mãi theo hóa đơn"
+						"description": " Admin — Xóa khuyến mãi theo hóa đơn"
 					}
 				}
 			]
 		},
 		{
-			"name": "Khuyến Mãi Theo Điểm (🔒 Admin)",
+			"name": "Khuyến Mãi Theo Điểm ( Admin)",
 			"description": "Quản lý khuyến mãi theo điểm tích lũy — Admin CRUD, NV/KH chỉ xem",
 			"item": [
 				{
-					"name": "Xem tất cả KMD (🔒 Tất cả)",
+					"name": "Xem tất cả KMD ( Tất cả)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -2019,11 +2019,11 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "khuyen-mai-theo-diem"]
 						},
-						"description": "🔒 Tất cả người dùng đã đăng nhập — Xem danh sách khuyến mãi theo điểm"
+						"description": " Tất cả người dùng đã đăng nhập — Xem danh sách khuyến mãi theo điểm"
 					}
 				},
 				{
-					"name": "Xem KMD theo id (🔒 Tất cả)",
+					"name": "Xem KMD theo id ( Tất cả)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -2032,11 +2032,11 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "khuyen-mai-theo-diem", "1"]
 						},
-						"description": "🔒 Tất cả người dùng đã đăng nhập — Xem chi tiết khuyến mãi theo điểm"
+						"description": " Tất cả người dùng đã đăng nhập — Xem chi tiết khuyến mãi theo điểm"
 					}
 				},
 				{
-					"name": "Tạo KMD (🔒 Admin)",
+					"name": "Tạo KMD ( Admin)",
 					"request": {
 						"method": "POST",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -2049,11 +2049,11 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "khuyen-mai-theo-diem"]
 						},
-						"description": "🔒 Admin — Tạo khuyến mãi theo điểm mới"
+						"description": " Admin — Tạo khuyến mãi theo điểm mới"
 					}
 				},
 				{
-					"name": "Cập nhật KMD (🔒 Admin)",
+					"name": "Cập nhật KMD ( Admin)",
 					"request": {
 						"method": "PUT",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -2066,11 +2066,11 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "khuyen-mai-theo-diem"]
 						},
-						"description": "🔒 Admin — Cập nhật khuyến mãi theo điểm"
+						"description": " Admin — Cập nhật khuyến mãi theo điểm"
 					}
 				},
 				{
-					"name": "Xóa KMD (🔒 Admin)",
+					"name": "Xóa KMD ( Admin)",
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -2079,7 +2079,127 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "khuyen-mai-theo-diem", "1"]
 						},
-						"description": "🔒 Admin — Xóa khuyến mãi theo điểm"
+						"description": " Admin — Xóa khuyến mãi theo điểm"
+					}
+				}
+			]
+		},
+		{
+			"name": "Đánh Giá Sản Phẩm (⭐ KH đánh giá /  Admin xem)",
+			"description": "Quản lý đánh giá sản phẩm — KH chỉ đánh giá được khi đơn hàng đã giao thành công (trạng thái = 3)",
+			"item": [
+				{
+					"name": "Xem tất cả đánh giá (👤 Tất cả)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/danh-gia-san-pham",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "danh-gia-san-pham"]
+						},
+						"description": "👤 Tất cả — Xem danh sách tất cả đánh giá sản phẩm"
+					}
+				},
+				{
+					"name": "Xem đánh giá theo id (👤 Tất cả)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/danh-gia-san-pham/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "danh-gia-san-pham", "1"]
+						},
+						"description": "👤 Tất cả — Xem chi tiết 1 đánh giá theo mã"
+					}
+				},
+				{
+					"name": "Xem đánh giá theo sản phẩm + phân trang (👤 Tất cả)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/danh-gia-san-pham/san-pham/3?page=1&size=10",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "danh-gia-san-pham", "san-pham", "3"],
+							"query": [
+								{ "key": "page", "value": "1" },
+								{ "key": "size", "value": "10" }
+							]
+						},
+						"description": "👤 Tất cả — Xem đánh giá của sản phẩm id=3 (Váy Hoa), có phân trang"
+					}
+				},
+				{
+					"name": "Xem đánh giá của tôi (🛒 Khách hàng)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/danh-gia-san-pham/cua-toi",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "danh-gia-san-pham", "cua-toi"]
+						},
+						"description": "🛒 Khách hàng — Xem tất cả đánh giá của tôi (lấy KH từ token)"
+					}
+				},
+				{
+					"name": "Tạo đánh giá + Upload ảnh (🛒 Khách hàng)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "sanPhamId", "value": "3", "type": "text" },
+								{ "key": "donHangId", "value": "3", "type": "text" },
+								{ "key": "soSao", "value": "5", "type": "text" },
+								{ "key": "ghiChu", "value": "Sản phẩm rất đẹp, chất lượng tốt!", "type": "text" },
+								{ "key": "file", "type": "file", "src": "" }
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/danh-gia-san-pham",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "danh-gia-san-pham"]
+						},
+						"description": "🛒 Khách hàng — Tạo đánh giá sản phẩm.\n\n⚠️ Điều kiện:\n- Phải đăng nhập bằng TK khách hàng\n- Đơn hàng phải thuộc về khách hàng\n- Đơn hàng phải có trạng thái = 3 (Thành công)\n- Sản phẩm phải có trong đơn hàng\n- Chưa đánh giá SP này trong đơn này\n\n📌 Login bằng KH Hoa (h@g.com) → đánh giá SP Váy Hoa trong đơn 3 (đã thành công)"
+					}
+				},
+				{
+					"name": "Cập nhật đánh giá + Upload ảnh mới (🛒 Khách hàng)",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "id", "value": "1", "type": "text" },
+								{ "key": "soSao", "value": "4", "type": "text" },
+								{ "key": "ghiChu", "value": "Cập nhật: vẫn rất ưng ý!", "type": "text" },
+								{ "key": "file", "type": "file", "src": "" }
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/danh-gia-san-pham",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "danh-gia-san-pham"]
+						},
+						"description": "🛒 Khách hàng — Cập nhật đánh giá (chỉ chủ đánh giá mới được sửa). Có thể upload ảnh mới."
+					}
+				},
+				{
+					"name": "Xóa đánh giá (🛒 KH /  Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/danh-gia-san-pham/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "danh-gia-san-pham", "1"]
+						},
+						"description": "🛒 Khách hàng xóa đánh giá của mình, hoặc  Admin xóa bất kỳ đánh giá nào"
 					}
 				}
 			]

@@ -154,7 +154,15 @@ INSERT INTO permissions (name, apiPath, method, module, createdAt) VALUES
     ('Xem KMD theo id',            '/api/v1/khuyen-mai-theo-diem/{id}',                        'GET',    'KHUYEN_MAI_DIEM',     NOW()),
     ('Tạo KMD',                    '/api/v1/khuyen-mai-theo-diem',                             'POST',   'KHUYEN_MAI_DIEM',     NOW()),
     ('Cập nhật KMD',               '/api/v1/khuyen-mai-theo-diem',                             'PUT',    'KHUYEN_MAI_DIEM',     NOW()),
-    ('Xóa KMD',                    '/api/v1/khuyen-mai-theo-diem/{id}',                        'DELETE', 'KHUYEN_MAI_DIEM',     NOW());
+    ('Xóa KMD',                    '/api/v1/khuyen-mai-theo-diem/{id}',                        'DELETE', 'KHUYEN_MAI_DIEM',     NOW()),
+
+    -- === DANH_GIA_SAN_PHAM (99-104) ===
+    ('Xem tất cả đánh giá SP',     '/api/v1/danh-gia-san-pham',                                'GET',    'DANH_GIA_SP',         NOW()),
+    ('Xem đánh giá SP theo id',     '/api/v1/danh-gia-san-pham/{id}',                           'GET',    'DANH_GIA_SP',         NOW()),
+    ('Xem đánh giá theo sản phẩm',  '/api/v1/danh-gia-san-pham/san-pham/{sanPhamId}',           'GET',    'DANH_GIA_SP',         NOW()),
+    ('Xem đánh giá của tôi',        '/api/v1/danh-gia-san-pham/cua-toi',                        'GET',    'DANH_GIA_SP',         NOW()),
+    ('Tạo đánh giá SP',             '/api/v1/danh-gia-san-pham',                                'POST',   'DANH_GIA_SP',         NOW()),
+    ('Xóa đánh giá SP',             '/api/v1/danh-gia-san-pham/{id}',                           'DELETE', 'DANH_GIA_SP',         NOW());
 
 -- ---------------------------------------------------------
 -- 3. PERMISSION_ROLE
@@ -180,7 +188,8 @@ INSERT INTO permission_role (role_id, permission_id) VALUES
     (1,77),(1,78),(1,79),(1,80),(1,81),(1,82),
     (1,83),(1,84),(1,85),(1,86),(1,87),(1,88),
     (1,89),(1,90),(1,91),(1,92),(1,93),
-    (1,94),(1,95),(1,96),(1,97),(1,98);
+    (1,94),(1,95),(1,96),(1,97),(1,98),
+    (1,99),(1,100),(1,101),(1,102),(1,103),(1,104);
 
 -- NHAN_VIEN (role_id=3): Xem tất cả danh mục, SP, CTSP, hình ảnh, cửa hàng (chỉ GET)
 INSERT INTO permission_role (role_id, permission_id) VALUES
@@ -196,7 +205,8 @@ INSERT INTO permission_role (role_id, permission_id) VALUES
     (3,77),(3,78),(3,80),  -- DON_HANG: xem all, xem id, tạo tại quầy
     (3,83),(3,84),(3,85),  -- CHI_TIET_DON_HANG: xem all, xem theo đơn, xem id
     (3,89),(3,90),         -- KHUYEN_MAI_HOA_DON: xem all, xem id
-    (3,94),(3,95);         -- KHUYEN_MAI_DIEM: xem all, xem id
+    (3,94),(3,95),         -- KHUYEN_MAI_DIEM: xem all, xem id
+    (3,99),(3,100),(3,101); -- DANH_GIA_SP: xem all, xem id, xem theo SP
 
 -- KHACH_HANG (role_id=4): Xem SP/danh mục + giỏ hàng (thêm/xem/xóa)
 INSERT INTO permission_role (role_id, permission_id) VALUES
@@ -213,7 +223,8 @@ INSERT INTO permission_role (role_id, permission_id) VALUES
     (4,77),(4,78),(4,79),  -- DON_HANG: xem all, xem id, tạo online
     (4,83),(4,84),(4,85),  -- CHI_TIET_DON_HANG: xem all, xem theo đơn, xem id
     (4,89),(4,90),         -- KHUYEN_MAI_HOA_DON: xem all, xem id
-    (4,94),(4,95);         -- KHUYEN_MAI_DIEM: xem all, xem id
+    (4,94),(4,95),         -- KHUYEN_MAI_DIEM: xem all, xem id
+    (4,99),(4,100),(4,101),(4,102),(4,103),(4,104); -- DANH_GIA_SP: xem all, xem id, xem theo SP, xem của tôi, tạo, xóa
 
 -- ---------------------------------------------------------
 -- 4. CỬA HÀNG
@@ -381,3 +392,11 @@ INSERT INTO ChiTietDonHang (MaDon, MaChiTietSanPham, GiaSanPham, GiamGia, GiaGia
     (4, 5, 100, 0,  0,  2, 200, NOW()),   -- Đơn 4: Nịt Da L Đen x2 = 200
     (5, 1, 200, 0,  0,  3, 600, NOW()),   -- Đơn 5: Áo Oxford M Trắng x3 = 600
     (5, 3, 400, 0,  0,  1, 400, NOW());   -- Đơn 5: Quần Jean M Đen x1 = 400 → Tổng đơn = 1000
+
+-- ---------------------------------------------------------
+-- 22. ĐÁNH GIÁ SẢN PHẨM
+-- ---------------------------------------------------------
+INSERT INTO DanhGiaSanPham (MaKhachHang, MaSanPham, MaDon, SoSao, GhiTru, HinhAnh, NgayTao) VALUES
+    (3, 3, 3, 5, 'Váy rất đẹp, đúng size, vải mát', NULL, NOW()),      -- id=1: KH Hoa, đơn 3 (thành công), SP Váy Hoa
+    (5, 1, 5, 4, 'Áo Oxford chất lượng tốt', NULL, NOW()),              -- id=2: KH Yến, đơn 5 (thành công), SP Áo Oxford
+    (5, 2, 5, 3, 'Quần Jean hơi chật một chút', NULL, NOW());           -- id=3: KH Yến, đơn 5 (thành công), SP Quần Jean
