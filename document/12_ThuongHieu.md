@@ -2,7 +2,20 @@
 
 > **Base Path:** `/api/v1/thuong-hieu`  
 > **File:** `ThuongHieuController.java`  
-> Quản lý thương hiệu sản phẩm.
+> Quản lý thương hiệu sản phẩm (ví dụ: Nike, Adidas, Uniqlo, ...).
+
+---
+
+## Cấu trúc dữ liệu `ThuongHieu`
+
+| Trường              | Kiểu          | Mô tả                               |
+| ------------------- | ------------- | ----------------------------------- |
+| `id`                | Long          | Mã thương hiệu (auto-increment)     |
+| `tenThuongHieu`     | String(255)   | Tên thương hiệu                     |
+| `trangThaiHoatDong` | Integer       | TT hoạt động (0: ngừng, 1: đang HĐ) |
+| `trangThaiHienThi`  | Integer       | TT hiển thị (0: ẩn, 1: hiển thị)    |
+| `ngayTao`           | LocalDateTime | Ngày tạo (tự động)                  |
+| `ngayCapNhat`       | LocalDateTime | Ngày cập nhật (tự động)             |
 
 ---
 
@@ -11,74 +24,63 @@
 | Thuộc tính   | Chi tiết                  |
 | ------------ | ------------------------- |
 | **URL**      | `GET /api/v1/thuong-hieu` |
+| **Method**   | `GET`                     |
 | **Xác thực** | Bearer Token (JWT)        |
 
-**Response:** `200 OK` — Trả về `List<ThuongHieu>`
+**Response:** `200 OK`
+
+```json
+[
+  {
+    "id": 1,
+    "tenThuongHieu": "Nike",
+    "trangThaiHoatDong": 1,
+    "trangThaiHienThi": 1
+  },
+  {
+    "id": 2,
+    "tenThuongHieu": "Adidas",
+    "trangThaiHoatDong": 1,
+    "trangThaiHienThi": 1
+  }
+]
+```
 
 ---
 
-## 2. Lấy thương hiệu theo ID
+## 2-5. CRUD tiêu chuẩn
 
-| Thuộc tính   | Chi tiết                       |
-| ------------ | ------------------------------ |
-| **URL**      | `GET /api/v1/thuong-hieu/{id}` |
-| **Xác thực** | Bearer Token (JWT)             |
+| Endpoint                          | Method   | Mô tả                   |
+| --------------------------------- | -------- | ----------------------- |
+| `GET /api/v1/thuong-hieu/{id}`    | `GET`    | Lấy thương hiệu theo ID |
+| `POST /api/v1/thuong-hieu`        | `POST`   | Tạo thương hiệu mới     |
+| `PUT /api/v1/thuong-hieu`         | `PUT`    | Cập nhật thương hiệu    |
+| `DELETE /api/v1/thuong-hieu/{id}` | `DELETE` | Xóa thương hiệu         |
 
-**Path Parameters:**
+**Request Body (POST/PUT):**
 
-| Tham số | Kiểu | Mô tả          |
-| ------- | ---- | -------------- |
-| `id`    | Long | Mã thương hiệu |
-
-**Response:** `200 OK` — Trả về `ThuongHieu`
+```json
+{
+  "id": 1,
+  "tenThuongHieu": "Nike Vietnam",
+  "trangThaiHoatDong": 1,
+  "trangThaiHienThi": 1
+}
+```
 
 **Lỗi:**
 
-- `400` — Không tìm thấy thương hiệu
+| HTTP Status | Mô tả                              |
+| ----------- | ---------------------------------- |
+| `400`       | Không tìm thấy thương hiệu         |
+| `400`       | Mã thương hiệu không được để trống |
 
 ---
 
-## 3. Tạo thương hiệu
+## Phân quyền
 
-| Thuộc tính       | Chi tiết                   |
-| ---------------- | -------------------------- |
-| **URL**          | `POST /api/v1/thuong-hieu` |
-| **Content-Type** | `application/json`         |
-| **Xác thực**     | Bearer Token (JWT)         |
-
-**Request Body:** `ThuongHieu`
-
-**Response:** `201 Created` — Trả về `ThuongHieu`
-
----
-
-## 4. Cập nhật thương hiệu
-
-| Thuộc tính       | Chi tiết                  |
-| ---------------- | ------------------------- |
-| **URL**          | `PUT /api/v1/thuong-hieu` |
-| **Content-Type** | `application/json`        |
-| **Xác thực**     | Bearer Token (JWT)        |
-
-**Request Body:** `ThuongHieu` (phải có `id`)
-
-**Response:** `200 OK` — Trả về `ThuongHieu`
-
-**Lỗi:**
-
-- `400` — Mã thương hiệu không được để trống
-
----
-
-## 5. Xóa thương hiệu
-
-| Thuộc tính   | Chi tiết                          |
-| ------------ | --------------------------------- |
-| **URL**      | `DELETE /api/v1/thuong-hieu/{id}` |
-| **Xác thực** | Bearer Token (JWT)                |
-
-**Response:** `204 No Content`
-
-**Lỗi:**
-
-- `400` — Không tìm thấy thương hiệu
+| Vai trò    | GET | POST | PUT | DELETE |
+| ---------- | --- | ---- | --- | ------ |
+| ADMIN      | ✅  | ✅   | ✅  | ✅     |
+| NHAN_VIEN  | ✅  | ❌   | ❌  | ❌     |
+| KHACH_HANG | ✅  | ❌   | ❌  | ❌     |

@@ -2,7 +2,18 @@
 
 > **Base Path:** `/api/v1/kieu-san-pham`  
 > **File:** `KieuSanPhamController.java`  
-> Quản lý kiểu/loại sản phẩm.
+> Quản lý kiểu/loại sản phẩm (ví dụ: Áo, Quần, Giày, Phụ kiện, ...).
+
+---
+
+## Cấu trúc dữ liệu `KieuSanPham`
+
+| Trường           | Kiểu          | Mô tả                             |
+| ---------------- | ------------- | --------------------------------- |
+| `id`             | Long          | Mã kiểu sản phẩm (auto-increment) |
+| `tenKieuSanPham` | String(255)   | Tên kiểu sản phẩm                 |
+| `ngayTao`        | LocalDateTime | Ngày tạo (tự động)                |
+| `ngayCapNhat`    | LocalDateTime | Ngày cập nhật (tự động)           |
 
 ---
 
@@ -11,74 +22,48 @@
 | Thuộc tính   | Chi tiết                    |
 | ------------ | --------------------------- |
 | **URL**      | `GET /api/v1/kieu-san-pham` |
+| **Method**   | `GET`                       |
 | **Xác thực** | Bearer Token (JWT)          |
 
-**Response:** `200 OK` — Trả về `List<KieuSanPham>`
+**Response:** `200 OK`
+
+```json
+[
+  { "id": 1, "tenKieuSanPham": "Áo", "ngayTao": "2026-01-01T00:00:00" },
+  { "id": 2, "tenKieuSanPham": "Quần", "ngayTao": "2026-01-01T00:00:00" }
+]
+```
 
 ---
 
-## 2. Lấy kiểu sản phẩm theo ID
+## 2-5. CRUD tiêu chuẩn
 
-| Thuộc tính   | Chi tiết                         |
-| ------------ | -------------------------------- |
-| **URL**      | `GET /api/v1/kieu-san-pham/{id}` |
-| **Xác thực** | Bearer Token (JWT)               |
+| Endpoint                            | Method   | Mô tả               |
+| ----------------------------------- | -------- | ------------------- |
+| `GET /api/v1/kieu-san-pham/{id}`    | `GET`    | Lấy kiểu SP theo ID |
+| `POST /api/v1/kieu-san-pham`        | `POST`   | Tạo kiểu SP mới     |
+| `PUT /api/v1/kieu-san-pham`         | `PUT`    | Cập nhật kiểu SP    |
+| `DELETE /api/v1/kieu-san-pham/{id}` | `DELETE` | Xóa kiểu SP         |
 
-**Path Parameters:**
+**Request Body (POST/PUT):**
 
-| Tham số | Kiểu | Mô tả            |
-| ------- | ---- | ---------------- |
-| `id`    | Long | Mã kiểu sản phẩm |
-
-**Response:** `200 OK` — Trả về `KieuSanPham`
+```json
+{ "id": 1, "tenKieuSanPham": "Áo khoác" }
+```
 
 **Lỗi:**
 
-- `400` — Không tìm thấy kiểu sản phẩm
+| HTTP Status | Mô tả                                |
+| ----------- | ------------------------------------ |
+| `400`       | Không tìm thấy kiểu sản phẩm         |
+| `400`       | Mã kiểu sản phẩm không được để trống |
 
 ---
 
-## 3. Tạo kiểu sản phẩm
+## Phân quyền
 
-| Thuộc tính       | Chi tiết                     |
-| ---------------- | ---------------------------- |
-| **URL**          | `POST /api/v1/kieu-san-pham` |
-| **Content-Type** | `application/json`           |
-| **Xác thực**     | Bearer Token (JWT)           |
-
-**Request Body:** `KieuSanPham`
-
-**Response:** `201 Created` — Trả về `KieuSanPham`
-
----
-
-## 4. Cập nhật kiểu sản phẩm
-
-| Thuộc tính       | Chi tiết                    |
-| ---------------- | --------------------------- |
-| **URL**          | `PUT /api/v1/kieu-san-pham` |
-| **Content-Type** | `application/json`          |
-| **Xác thực**     | Bearer Token (JWT)          |
-
-**Request Body:** `KieuSanPham` (phải có `id`)
-
-**Response:** `200 OK` — Trả về `KieuSanPham`
-
-**Lỗi:**
-
-- `400` — Mã kiểu sản phẩm không được để trống
-
----
-
-## 5. Xóa kiểu sản phẩm
-
-| Thuộc tính   | Chi tiết                            |
-| ------------ | ----------------------------------- |
-| **URL**      | `DELETE /api/v1/kieu-san-pham/{id}` |
-| **Xác thực** | Bearer Token (JWT)                  |
-
-**Response:** `204 No Content`
-
-**Lỗi:**
-
-- `400` — Không tìm thấy kiểu sản phẩm
+| Vai trò    | GET | POST | PUT | DELETE |
+| ---------- | --- | ---- | --- | ------ |
+| ADMIN      | ✅  | ✅   | ✅  | ✅     |
+| NHAN_VIEN  | ✅  | ❌   | ❌  | ❌     |
+| KHACH_HANG | ✅  | ❌   | ❌  | ❌     |

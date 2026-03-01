@@ -6,14 +6,42 @@
 
 ---
 
+## Tổng quan
+
+### Cấu trúc dữ liệu `HinhAnh`
+
+| Trường           | Kiểu           | Mô tả                           |
+| ---------------- | -------------- | ------------------------------- |
+| `id`             | Long           | Mã hình ảnh (auto-increment)    |
+| `chiTietSanPham` | ChiTietSanPham | Chi tiết sản phẩm liên kết (FK) |
+| `tenHinhAnh`     | String(255)    | Tên file ảnh (trên MinIO)       |
+| `ngayTao`        | LocalDateTime  | Ngày tạo (tự động)              |
+| `ngayCapNhat`    | LocalDateTime  | Ngày cập nhật (tự động)         |
+
+> **Xem ảnh:** Truy cập `GET /storage/{tenHinhAnh}` để lấy file ảnh (không cần xác thực).
+
+---
+
 ## 1. Lấy danh sách hình ảnh
 
 | Thuộc tính   | Chi tiết               |
 | ------------ | ---------------------- |
 | **URL**      | `GET /api/v1/hinh-anh` |
+| **Method**   | `GET`                  |
 | **Xác thực** | Bearer Token (JWT)     |
 
 **Response:** `200 OK` — Trả về `List<HinhAnh>`
+
+```json
+[
+  {
+    "id": 1,
+    "chiTietSanPham": { "id": 1 },
+    "tenHinhAnh": "polo-den-m-1.jpg",
+    "ngayTao": "2026-03-01T10:00:00"
+  }
+]
+```
 
 ---
 
@@ -22,19 +50,16 @@
 | Thuộc tính   | Chi tiết                    |
 | ------------ | --------------------------- |
 | **URL**      | `GET /api/v1/hinh-anh/{id}` |
+| **Method**   | `GET`                       |
 | **Xác thực** | Bearer Token (JWT)          |
-
-**Path Parameters:**
-
-| Tham số | Kiểu | Mô tả       |
-| ------- | ---- | ----------- |
-| `id`    | Long | Mã hình ảnh |
 
 **Response:** `200 OK` — Trả về `HinhAnh`
 
 **Lỗi:**
 
-- `400` — Không tìm thấy hình ảnh
+| HTTP Status | Mô tả                   |
+| ----------- | ----------------------- |
+| `400`       | Không tìm thấy hình ảnh |
 
 ---
 
@@ -43,6 +68,7 @@
 | Thuộc tính   | Chi tiết                                                    |
 | ------------ | ----------------------------------------------------------- |
 | **URL**      | `GET /api/v1/hinh-anh/chi-tiet-san-pham/{chiTietSanPhamId}` |
+| **Method**   | `GET`                                                       |
 | **Xác thực** | Bearer Token (JWT)                                          |
 
 **Path Parameters:**
@@ -60,6 +86,7 @@
 | Thuộc tính       | Chi tiết                                          |
 | ---------------- | ------------------------------------------------- |
 | **URL**          | `POST /api/v1/hinh-anh/upload/{chiTietSanPhamId}` |
+| **Method**       | `POST`                                            |
 | **Content-Type** | `multipart/form-data`                             |
 | **Xác thực**     | Bearer Token (JWT)                                |
 
@@ -77,11 +104,13 @@
 
 **Response:** `201 Created` — Trả về `List<HinhAnh>`
 
-> **Lưu ý:** Ảnh được upload lên MinIO storage và URL được lưu vào database.
+> **Lưu ý:** Ảnh được upload lên MinIO storage. URL truy cập: `GET /storage/{tenHinhAnh}`.
 
 **Lỗi:**
 
-- `400` — Không tìm thấy chi tiết sản phẩm
+| HTTP Status | Mô tả                            |
+| ----------- | -------------------------------- |
+| `400`       | Không tìm thấy chi tiết sản phẩm |
 
 ---
 
@@ -90,10 +119,18 @@
 | Thuộc tính       | Chi tiết                |
 | ---------------- | ----------------------- |
 | **URL**          | `POST /api/v1/hinh-anh` |
+| **Method**       | `POST`                  |
 | **Content-Type** | `application/json`      |
 | **Xác thực**     | Bearer Token (JWT)      |
 
-**Request Body:** `HinhAnh`
+**Request Body:**
+
+```json
+{
+  "chiTietSanPham": { "id": 1 },
+  "tenHinhAnh": "custom-image.jpg"
+}
+```
 
 **Response:** `201 Created` — Trả về `HinhAnh`
 
@@ -104,16 +141,26 @@
 | Thuộc tính       | Chi tiết               |
 | ---------------- | ---------------------- |
 | **URL**          | `PUT /api/v1/hinh-anh` |
+| **Method**       | `PUT`                  |
 | **Content-Type** | `application/json`     |
 | **Xác thực**     | Bearer Token (JWT)     |
 
-**Request Body:** `HinhAnh` (phải có `id`)
+**Request Body:** (phải có `id`)
+
+```json
+{
+  "id": 1,
+  "tenHinhAnh": "updated-image.jpg"
+}
+```
 
 **Response:** `200 OK` — Trả về `HinhAnh`
 
 **Lỗi:**
 
-- `400` — Mã hình ảnh không được để trống
+| HTTP Status | Mô tả                           |
+| ----------- | ------------------------------- |
+| `400`       | Mã hình ảnh không được để trống |
 
 ---
 
@@ -122,10 +169,23 @@
 | Thuộc tính   | Chi tiết                       |
 | ------------ | ------------------------------ |
 | **URL**      | `DELETE /api/v1/hinh-anh/{id}` |
+| **Method**   | `DELETE`                       |
 | **Xác thực** | Bearer Token (JWT)             |
 
 **Response:** `204 No Content`
 
 **Lỗi:**
 
-- `400` — Không tìm thấy hình ảnh
+| HTTP Status | Mô tả                   |
+| ----------- | ----------------------- |
+| `400`       | Không tìm thấy hình ảnh |
+
+---
+
+## Phân quyền
+
+| Vai trò    | GET (Xem) | POST/Upload | PUT (Sửa) | DELETE (Xóa) |
+| ---------- | --------- | ----------- | --------- | ------------ |
+| ADMIN      | ✅        | ✅          | ✅        | ✅           |
+| NHAN_VIEN  | ✅        | ✅          | ✅        | ❌           |
+| KHACH_HANG | ✅        | ❌          | ❌        | ❌           |

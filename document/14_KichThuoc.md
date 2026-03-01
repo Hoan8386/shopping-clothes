@@ -2,7 +2,18 @@
 
 > **Base Path:** `/api/v1/kich-thuoc`  
 > **File:** `KichThuocController.java`  
-> Quản lý danh sách kích thước sản phẩm.
+> Quản lý danh sách kích thước sản phẩm (ví dụ: S, M, L, XL, XXL, ...).
+
+---
+
+## Cấu trúc dữ liệu `KichThuoc`
+
+| Trường         | Kiểu          | Mô tả                          |
+| -------------- | ------------- | ------------------------------ |
+| `id`           | Long          | Mã kích thước (auto-increment) |
+| `tenKichThuoc` | String(255)   | Tên kích thước                 |
+| `ngayTao`      | LocalDateTime | Ngày tạo (tự động)             |
+| `ngayCapNhat`  | LocalDateTime | Ngày cập nhật (tự động)        |
 
 ---
 
@@ -11,74 +22,49 @@
 | Thuộc tính   | Chi tiết                 |
 | ------------ | ------------------------ |
 | **URL**      | `GET /api/v1/kich-thuoc` |
+| **Method**   | `GET`                    |
 | **Xác thực** | Bearer Token (JWT)       |
 
-**Response:** `200 OK` — Trả về `List<KichThuoc>`
+**Response:** `200 OK`
+
+```json
+[
+  { "id": 1, "tenKichThuoc": "S", "ngayTao": "2026-01-01T00:00:00" },
+  { "id": 2, "tenKichThuoc": "M", "ngayTao": "2026-01-01T00:00:00" },
+  { "id": 3, "tenKichThuoc": "L", "ngayTao": "2026-01-01T00:00:00" }
+]
+```
 
 ---
 
-## 2. Lấy kích thước theo ID
+## 2-5. CRUD tiêu chuẩn
 
-| Thuộc tính   | Chi tiết                      |
-| ------------ | ----------------------------- |
-| **URL**      | `GET /api/v1/kich-thuoc/{id}` |
-| **Xác thực** | Bearer Token (JWT)            |
+| Endpoint                         | Method   | Mô tả                  |
+| -------------------------------- | -------- | ---------------------- |
+| `GET /api/v1/kich-thuoc/{id}`    | `GET`    | Lấy kích thước theo ID |
+| `POST /api/v1/kich-thuoc`        | `POST`   | Tạo kích thước mới     |
+| `PUT /api/v1/kich-thuoc`         | `PUT`    | Cập nhật kích thước    |
+| `DELETE /api/v1/kich-thuoc/{id}` | `DELETE` | Xóa kích thước         |
 
-**Path Parameters:**
+**Request Body (POST/PUT):**
 
-| Tham số | Kiểu | Mô tả         |
-| ------- | ---- | ------------- |
-| `id`    | Long | Mã kích thước |
-
-**Response:** `200 OK` — Trả về `KichThuoc`
+```json
+{ "id": 1, "tenKichThuoc": "XS" }
+```
 
 **Lỗi:**
 
-- `400` — Không tìm thấy kích thước
+| HTTP Status | Mô tả                             |
+| ----------- | --------------------------------- |
+| `400`       | Không tìm thấy kích thước         |
+| `400`       | Mã kích thước không được để trống |
 
 ---
 
-## 3. Tạo kích thước
+## Phân quyền
 
-| Thuộc tính       | Chi tiết                  |
-| ---------------- | ------------------------- |
-| **URL**          | `POST /api/v1/kich-thuoc` |
-| **Content-Type** | `application/json`        |
-| **Xác thực**     | Bearer Token (JWT)        |
-
-**Request Body:** `KichThuoc`
-
-**Response:** `201 Created` — Trả về `KichThuoc`
-
----
-
-## 4. Cập nhật kích thước
-
-| Thuộc tính       | Chi tiết                 |
-| ---------------- | ------------------------ |
-| **URL**          | `PUT /api/v1/kich-thuoc` |
-| **Content-Type** | `application/json`       |
-| **Xác thực**     | Bearer Token (JWT)       |
-
-**Request Body:** `KichThuoc` (phải có `id`)
-
-**Response:** `200 OK` — Trả về `KichThuoc`
-
-**Lỗi:**
-
-- `400` — Mã kích thước không được để trống
-
----
-
-## 5. Xóa kích thước
-
-| Thuộc tính   | Chi tiết                         |
-| ------------ | -------------------------------- |
-| **URL**      | `DELETE /api/v1/kich-thuoc/{id}` |
-| **Xác thực** | Bearer Token (JWT)               |
-
-**Response:** `204 No Content`
-
-**Lỗi:**
-
-- `400` — Không tìm thấy kích thước
+| Vai trò    | GET | POST | PUT | DELETE |
+| ---------- | --- | ---- | --- | ------ |
+| ADMIN      | ✅  | ✅   | ✅  | ✅     |
+| NHAN_VIEN  | ✅  | ❌   | ❌  | ❌     |
+| KHACH_HANG | ✅  | ❌   | ❌  | ❌     |

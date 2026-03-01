@@ -2,7 +2,18 @@
 
 > **Base Path:** `/api/v1/mau-sac`  
 > **File:** `MauSacController.java`  
-> Quản lý danh sách màu sắc sản phẩm.
+> Quản lý danh sách màu sắc sản phẩm (ví dụ: Đen, Trắng, Đỏ, Xanh, ...).
+
+---
+
+## Cấu trúc dữ liệu `MauSac`
+
+| Trường        | Kiểu          | Mô tả                       |
+| ------------- | ------------- | --------------------------- |
+| `id`          | Long          | Mã màu sắc (auto-increment) |
+| `tenMauSac`   | String(255)   | Tên màu sắc                 |
+| `ngayTao`     | LocalDateTime | Ngày tạo (tự động)          |
+| `ngayCapNhat` | LocalDateTime | Ngày cập nhật (tự động)     |
 
 ---
 
@@ -11,74 +22,49 @@
 | Thuộc tính   | Chi tiết              |
 | ------------ | --------------------- |
 | **URL**      | `GET /api/v1/mau-sac` |
+| **Method**   | `GET`                 |
 | **Xác thực** | Bearer Token (JWT)    |
 
-**Response:** `200 OK` — Trả về `List<MauSac>`
+**Response:** `200 OK`
+
+```json
+[
+  { "id": 1, "tenMauSac": "Đen", "ngayTao": "2026-01-01T00:00:00" },
+  { "id": 2, "tenMauSac": "Trắng", "ngayTao": "2026-01-01T00:00:00" },
+  { "id": 3, "tenMauSac": "Đỏ", "ngayTao": "2026-01-01T00:00:00" }
+]
+```
 
 ---
 
-## 2. Lấy màu sắc theo ID
+## 2-5. CRUD tiêu chuẩn
 
-| Thuộc tính   | Chi tiết                   |
-| ------------ | -------------------------- |
-| **URL**      | `GET /api/v1/mau-sac/{id}` |
-| **Xác thực** | Bearer Token (JWT)         |
+| Endpoint                      | Method   | Mô tả               |
+| ----------------------------- | -------- | ------------------- |
+| `GET /api/v1/mau-sac/{id}`    | `GET`    | Lấy màu sắc theo ID |
+| `POST /api/v1/mau-sac`        | `POST`   | Tạo màu sắc mới     |
+| `PUT /api/v1/mau-sac`         | `PUT`    | Cập nhật màu sắc    |
+| `DELETE /api/v1/mau-sac/{id}` | `DELETE` | Xóa màu sắc         |
 
-**Path Parameters:**
+**Request Body (POST/PUT):**
 
-| Tham số | Kiểu | Mô tả      |
-| ------- | ---- | ---------- |
-| `id`    | Long | Mã màu sắc |
-
-**Response:** `200 OK` — Trả về `MauSac`
+```json
+{ "id": 1, "tenMauSac": "Đen nhám" }
+```
 
 **Lỗi:**
 
-- `400` — Không tìm thấy màu sắc
+| HTTP Status | Mô tả                          |
+| ----------- | ------------------------------ |
+| `400`       | Không tìm thấy màu sắc         |
+| `400`       | Mã màu sắc không được để trống |
 
 ---
 
-## 3. Tạo màu sắc
+## Phân quyền
 
-| Thuộc tính       | Chi tiết               |
-| ---------------- | ---------------------- |
-| **URL**          | `POST /api/v1/mau-sac` |
-| **Content-Type** | `application/json`     |
-| **Xác thực**     | Bearer Token (JWT)     |
-
-**Request Body:** `MauSac`
-
-**Response:** `201 Created` — Trả về `MauSac`
-
----
-
-## 4. Cập nhật màu sắc
-
-| Thuộc tính       | Chi tiết              |
-| ---------------- | --------------------- |
-| **URL**          | `PUT /api/v1/mau-sac` |
-| **Content-Type** | `application/json`    |
-| **Xác thực**     | Bearer Token (JWT)    |
-
-**Request Body:** `MauSac` (phải có `id`)
-
-**Response:** `200 OK` — Trả về `MauSac`
-
-**Lỗi:**
-
-- `400` — Mã màu sắc không được để trống
-
----
-
-## 5. Xóa màu sắc
-
-| Thuộc tính   | Chi tiết                      |
-| ------------ | ----------------------------- |
-| **URL**      | `DELETE /api/v1/mau-sac/{id}` |
-| **Xác thực** | Bearer Token (JWT)            |
-
-**Response:** `204 No Content`
-
-**Lỗi:**
-
-- `400` — Không tìm thấy màu sắc
+| Vai trò    | GET | POST | PUT | DELETE |
+| ---------- | --- | ---- | --- | ------ |
+| ADMIN      | ✅  | ✅   | ✅  | ✅     |
+| NHAN_VIEN  | ✅  | ❌   | ❌  | ❌     |
+| KHACH_HANG | ✅  | ❌   | ❌  | ❌     |

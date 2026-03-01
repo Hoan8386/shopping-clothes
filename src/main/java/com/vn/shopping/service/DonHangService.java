@@ -178,6 +178,9 @@ public class DonHangService {
         DonHang existing = donHangRepository.findById(donHang.getId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng: " + donHang.getId()));
 
+        // Lưu trạng thái cũ để kiểm tra chuyển trạng thái
+        Integer trangThaiCu = existing.getTrangThai();
+
         existing.setCuaHang(donHang.getCuaHang());
         existing.setKhachHang(donHang.getKhachHang());
         existing.setNhanVien(donHang.getNhanVien());
@@ -192,6 +195,13 @@ public class DonHangService {
         existing.setTrangThaiThanhToan(donHang.getTrangThaiThanhToan());
         existing.setHinhThucDonHang(donHang.getHinhThucDonHang());
 
+        // Cộng điểm tích lũy khi trạng thái đơn hàng chuyển sang "Thành công" (3)
+        // Mỗi 100.000 VND = 10 điểm
+        if (donHang.getTrangThai() != null && donHang.getTrangThai() == 3
+                && (trangThaiCu == null || trangThaiCu != 3)) {
+            congDiemTichLuy(existing);
+        }
+
         DonHang saved = donHangRepository.save(existing);
         entityManager.flush();
         entityManager.clear();
@@ -200,6 +210,33 @@ public class DonHangService {
 
     public void delete(long id) {
         donHangRepository.deleteById(id);
+    }
+
+    /**
+     * Cộng điểm tích lũy cho khách hàng khi đơn hàng thành công.
+     * Mỗi 100.000 VND = 10 điểm
+     */
+    private void congDiemTichLuy(DonHang donHang) {
+        if (donHang.getKhachHang() == null || donHang.getKhachHang().getId() == null) {
+            return;
+        }
+
+        KhachHang khachHang = khachHangRepository.findById(donHang.getKhachHang().getId()).orElse(null);
+        if (khachHang == null) {
+            return;
+        }
+
+        // Lấy tổng tiền trả (sau giảm giá)
+        Integer tongTienTra = donHang.getTongTienTra() != null ? donHang.getTongTienTra() : 0;
+
+        // Tính điểm: mỗi 100.000 VND = 10 điểm
+        int diemCong = (tongTienTra / 100000) * 10;
+
+        if (diemCong > 0) {
+            int diemHienTai = khachHang.getDiemTichLuy() != null ? khachHang.getDiemTichLuy() : 0;
+            khachHang.setDiemTichLuy(diemHienTai + diemCong);
+            khachHangRepository.save(khachHang);
+        }
     }
 
     public DonHang findById(long id) {

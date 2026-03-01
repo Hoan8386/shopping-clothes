@@ -2,7 +2,21 @@
 
 > **Base Path:** `/api/v1/cua-hang`  
 > **File:** `CuaHangController.java`  
-> Quản lý danh sách cửa hàng.
+> Quản lý danh sách cửa hàng / chi nhánh.
+
+---
+
+## Cấu trúc dữ liệu `CuaHang`
+
+| Trường        | Kiểu        | Mô tả                        |
+| ------------- | ----------- | ---------------------------- |
+| `id`          | Long        | Mã cửa hàng (auto-increment) |
+| `tenCuaHang`  | String(255) | Tên cửa hàng / chi nhánh     |
+| `diaChi`      | String(255) | Địa chỉ                      |
+| `viTri`       | String(255) | Vị trí (tọa độ / khu vực)    |
+| `soDienThoai` | String(255) | Số điện thoại liên hệ        |
+| `email`       | String(255) | Email liên hệ                |
+| `trangThai`   | Integer     | Trạng thái (0: đóng, 1: mở)  |
 
 ---
 
@@ -11,74 +25,61 @@
 | Thuộc tính   | Chi tiết               |
 | ------------ | ---------------------- |
 | **URL**      | `GET /api/v1/cua-hang` |
+| **Method**   | `GET`                  |
 | **Xác thực** | Bearer Token (JWT)     |
 
-**Response:** `200 OK` — Trả về `List<CuaHang>`
+**Response:** `200 OK`
+
+```json
+[
+  {
+    "id": 1,
+    "tenCuaHang": "Chi nhánh Quận 1",
+    "diaChi": "123 Nguyễn Trãi, Q.1, TP.HCM",
+    "soDienThoai": "028-1234-5678",
+    "email": "q1@shop.vn",
+    "trangThai": 1
+  }
+]
+```
 
 ---
 
-## 2. Lấy cửa hàng theo ID
+## 2-5. CRUD tiêu chuẩn
 
-| Thuộc tính   | Chi tiết                    |
-| ------------ | --------------------------- |
-| **URL**      | `GET /api/v1/cua-hang/{id}` |
-| **Xác thực** | Bearer Token (JWT)          |
+| Endpoint                       | Method   | Mô tả                |
+| ------------------------------ | -------- | -------------------- |
+| `GET /api/v1/cua-hang/{id}`    | `GET`    | Lấy cửa hàng theo ID |
+| `POST /api/v1/cua-hang`        | `POST`   | Tạo cửa hàng mới     |
+| `PUT /api/v1/cua-hang`         | `PUT`    | Cập nhật cửa hàng    |
+| `DELETE /api/v1/cua-hang/{id}` | `DELETE` | Xóa cửa hàng         |
 
-**Path Parameters:**
+**Request Body (POST/PUT):**
 
-| Tham số | Kiểu | Mô tả       |
-| ------- | ---- | ----------- |
-| `id`    | Long | Mã cửa hàng |
-
-**Response:** `200 OK` — Trả về `CuaHang`
+```json
+{
+  "id": 1,
+  "tenCuaHang": "Chi nhánh Quận 1",
+  "diaChi": "123 Nguyễn Trãi, Q.1, TP.HCM",
+  "soDienThoai": "028-1234-5678",
+  "email": "q1@shop.vn",
+  "trangThai": 1
+}
+```
 
 **Lỗi:**
 
-- `400` — Không tìm thấy cửa hàng
+| HTTP Status | Mô tả                           |
+| ----------- | ------------------------------- |
+| `400`       | Không tìm thấy cửa hàng         |
+| `400`       | Mã cửa hàng không được để trống |
 
 ---
 
-## 3. Tạo cửa hàng
+## Phân quyền
 
-| Thuộc tính       | Chi tiết                |
-| ---------------- | ----------------------- |
-| **URL**          | `POST /api/v1/cua-hang` |
-| **Content-Type** | `application/json`      |
-| **Xác thực**     | Bearer Token (JWT)      |
-
-**Request Body:** `CuaHang`
-
-**Response:** `201 Created` — Trả về `CuaHang`
-
----
-
-## 4. Cập nhật cửa hàng
-
-| Thuộc tính       | Chi tiết               |
-| ---------------- | ---------------------- |
-| **URL**          | `PUT /api/v1/cua-hang` |
-| **Content-Type** | `application/json`     |
-| **Xác thực**     | Bearer Token (JWT)     |
-
-**Request Body:** `CuaHang` (phải có `id`)
-
-**Response:** `200 OK` — Trả về `CuaHang`
-
-**Lỗi:**
-
-- `400` — Mã cửa hàng không được để trống
-
----
-
-## 5. Xóa cửa hàng
-
-| Thuộc tính   | Chi tiết                       |
-| ------------ | ------------------------------ |
-| **URL**      | `DELETE /api/v1/cua-hang/{id}` |
-| **Xác thực** | Bearer Token (JWT)             |
-
-**Response:** `204 No Content`
-
-**Lỗi:**
-
-- `400` — Không tìm thấy cửa hàng
+| Vai trò    | GET | POST | PUT | DELETE |
+| ---------- | --- | ---- | --- | ------ |
+| ADMIN      | ✅  | ✅   | ✅  | ✅     |
+| NHAN_VIEN  | ✅  | ❌   | ❌  | ❌     |
+| KHACH_HANG | ✅  | ❌   | ❌  | ❌     |

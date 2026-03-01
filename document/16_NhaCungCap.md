@@ -2,7 +2,23 @@
 
 > **Base Path:** `/api/v1/nha-cung-cap`  
 > **File:** `NhaCungCapController.java`  
-> Quản lý danh sách nhà cung cấp.
+> Quản lý danh sách nhà cung cấp hàng hóa.
+
+---
+
+## Cấu trúc dữ liệu `NhaCungCap`
+
+| Trường          | Kiểu          | Mô tả                            |
+| --------------- | ------------- | -------------------------------- |
+| `id`            | Long          | Mã nhà cung cấp (auto-increment) |
+| `tenNhaCungCap` | String(255)   | Tên nhà cung cấp                 |
+| `soDienThoai`   | String(255)   | Số điện thoại                    |
+| `email`         | String(255)   | Email liên hệ                    |
+| `diaChi`        | String(255)   | Địa chỉ                          |
+| `ghiTru`        | String(255)   | Ghi chú                          |
+| `trangThai`     | Integer       | Trạng thái (0: ngừng, 1: HĐ)     |
+| `ngayTao`       | LocalDateTime | Ngày tạo (tự động)               |
+| `ngayCapNhat`   | LocalDateTime | Ngày cập nhật (tự động)          |
 
 ---
 
@@ -11,74 +27,62 @@
 | Thuộc tính   | Chi tiết                   |
 | ------------ | -------------------------- |
 | **URL**      | `GET /api/v1/nha-cung-cap` |
+| **Method**   | `GET`                      |
 | **Xác thực** | Bearer Token (JWT)         |
 
-**Response:** `200 OK` — Trả về `List<NhaCungCap>`
+**Response:** `200 OK`
+
+```json
+[
+  {
+    "id": 1,
+    "tenNhaCungCap": "Công ty TNHH ABC",
+    "soDienThoai": "028-9876-5432",
+    "email": "abc@supplier.vn",
+    "diaChi": "456 Lê Lợi, Q.1, TP.HCM",
+    "trangThai": 1
+  }
+]
+```
 
 ---
 
-## 2. Lấy nhà cung cấp theo ID
+## 2-5. CRUD tiêu chuẩn
 
-| Thuộc tính   | Chi tiết                        |
-| ------------ | ------------------------------- |
-| **URL**      | `GET /api/v1/nha-cung-cap/{id}` |
-| **Xác thực** | Bearer Token (JWT)              |
+| Endpoint                           | Method   | Mô tả           |
+| ---------------------------------- | -------- | --------------- |
+| `GET /api/v1/nha-cung-cap/{id}`    | `GET`    | Lấy NCC theo ID |
+| `POST /api/v1/nha-cung-cap`        | `POST`   | Tạo NCC mới     |
+| `PUT /api/v1/nha-cung-cap`         | `PUT`    | Cập nhật NCC    |
+| `DELETE /api/v1/nha-cung-cap/{id}` | `DELETE` | Xóa NCC         |
 
-**Path Parameters:**
+**Request Body (POST/PUT):**
 
-| Tham số | Kiểu | Mô tả           |
-| ------- | ---- | --------------- |
-| `id`    | Long | Mã nhà cung cấp |
-
-**Response:** `200 OK` — Trả về `NhaCungCap`
+```json
+{
+  "id": 1,
+  "tenNhaCungCap": "Công ty TNHH ABC",
+  "soDienThoai": "028-9876-5432",
+  "email": "abc@supplier.vn",
+  "diaChi": "456 Lê Lợi, Q.1, TP.HCM",
+  "ghiTru": "NCC uy tín",
+  "trangThai": 1
+}
+```
 
 **Lỗi:**
 
-- `400` — Không tìm thấy nhà cung cấp
+| HTTP Status | Mô tả                               |
+| ----------- | ----------------------------------- |
+| `400`       | Không tìm thấy nhà cung cấp         |
+| `400`       | Mã nhà cung cấp không được để trống |
 
 ---
 
-## 3. Tạo nhà cung cấp
+## Phân quyền
 
-| Thuộc tính       | Chi tiết                    |
-| ---------------- | --------------------------- |
-| **URL**          | `POST /api/v1/nha-cung-cap` |
-| **Content-Type** | `application/json`          |
-| **Xác thực**     | Bearer Token (JWT)          |
-
-**Request Body:** `NhaCungCap`
-
-**Response:** `201 Created` — Trả về `NhaCungCap`
-
----
-
-## 4. Cập nhật nhà cung cấp
-
-| Thuộc tính       | Chi tiết                   |
-| ---------------- | -------------------------- |
-| **URL**          | `PUT /api/v1/nha-cung-cap` |
-| **Content-Type** | `application/json`         |
-| **Xác thực**     | Bearer Token (JWT)         |
-
-**Request Body:** `NhaCungCap` (phải có `id`)
-
-**Response:** `200 OK` — Trả về `NhaCungCap`
-
-**Lỗi:**
-
-- `400` — Mã nhà cung cấp không được để trống
-
----
-
-## 5. Xóa nhà cung cấp
-
-| Thuộc tính   | Chi tiết                           |
-| ------------ | ---------------------------------- |
-| **URL**      | `DELETE /api/v1/nha-cung-cap/{id}` |
-| **Xác thực** | Bearer Token (JWT)                 |
-
-**Response:** `204 No Content`
-
-**Lỗi:**
-
-- `400` — Không tìm thấy nhà cung cấp
+| Vai trò    | GET | POST | PUT | DELETE |
+| ---------- | --- | ---- | --- | ------ |
+| ADMIN      | ✅  | ✅   | ✅  | ✅     |
+| NHAN_VIEN  | ✅  | ❌   | ❌  | ❌     |
+| KHACH_HANG | ❌  | ❌   | ❌  | ❌     |

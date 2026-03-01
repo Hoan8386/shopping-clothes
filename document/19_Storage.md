@@ -2,58 +2,83 @@
 
 > **Base Path:** `/storage`  
 > **File:** `StorageController.java`  
-> Phục vụ file/hình ảnh từ MinIO storage. **Không yêu cầu xác thực.**
+> Endpoint public để truy cập file hình ảnh từ MinIO storage.
 
 ---
 
-## 1. Lấy file/hình ảnh
+## Tổng quan
 
-| Thuộc tính   | Chi tiết                                                     |
-| ------------ | ------------------------------------------------------------ |
-| **URL**      | `GET /storage/{fileName}`                                    |
-| **Xác thực** | **Không yêu cầu** (đã whitelist trong SecurityConfiguration) |
+Hệ thống sử dụng **MinIO** làm object storage để lưu trữ hình ảnh sản phẩm. Endpoint `/storage/{fileName}` cho phép tải ảnh mà **không cần xác thực** (public).
+
+### Đặc điểm
+
+- **Không cần Bearer Token** — endpoint hoàn toàn public
+- **Tự động xác định Content-Type** dựa trên phần mở rộng file
+- **Cache** — response được cache 1 ngày (`Cache-Control: max-age=86400`)
+- **Inline display** — header `Content-Disposition: inline` cho phép hiển thị trực tiếp trong trình duyệt
+
+---
+
+## 1. Lấy file từ storage
+
+| Thuộc tính   | Chi tiết                  |
+| ------------ | ------------------------- |
+| **URL**      | `GET /storage/{fileName}` |
+| **Method**   | `GET`                     |
+| **Xác thực** | Không                     |
 
 **Path Parameters:**
 
-| Tham số    | Kiểu   | Mô tả                                |
-| ---------- | ------ | ------------------------------------ |
-| `fileName` | String | Tên file cần lấy (vd: `abc-123.jpg`) |
+| Tham số    | Kiểu   | Mô tả                             |
+| ---------- | ------ | --------------------------------- |
+| `fileName` | String | Tên file (vd: `polo-den-m-1.jpg`) |
 
-**Response:** `200 OK`
-
-- Body: Binary file content
-- Content-Type: Tự động nhận diện từ tên file (image/jpeg, image/png, ...)
-- Nếu không xác định được → `application/octet-stream`
+**Response:** `200 OK` — Trả về file binary (ảnh/file)
 
 **Response Headers:**
 
-| Header                | Giá trị                         | Mô tả                            |
-| --------------------- | ------------------------------- | -------------------------------- |
-| `Content-Disposition` | `inline; filename="<fileName>"` | Hiển thị inline trên trình duyệt |
-| `Cache-Control`       | `max-age=86400`                 | Cache 1 ngày                     |
+| Header                | Giá trị                               |
+| --------------------- | ------------------------------------- |
+| `Content-Type`        | Tự động (vd: `image/jpeg`)            |
+| `Cache-Control`       | `max-age=86400`                       |
+| `Content-Disposition` | `inline; filename="polo-den-m-1.jpg"` |
 
-**Ví dụ request:**
+**Ví dụ sử dụng:**
+
+```html
+<!-- Trong HTML/Frontend -->
+<img src="http://localhost:8080/storage/polo-den-m-1.jpg" alt="Sản phẩm" />
+```
 
 ```
-GET /storage/abc-123.jpg
+# Trực tiếp trên trình duyệt
+http://localhost:8080/storage/polo-den-m-1.jpg
 ```
 
 **Lỗi:**
 
-- `404 Not Found` — File không tồn tại trên MinIO
+| HTTP Status | Mô tả                     |
+| ----------- | ------------------------- |
+| `500`       | Lỗi khi tải file từ MinIO |
 
 ---
 
-## Cách sử dụng
+## Cấu hình MinIO
 
-URL hình ảnh trả về từ các API sản phẩm có thể truy cập trực tiếp:
+Cấu hình trong `application.properties`:
 
-```html
-<img src="http://localhost:8080/storage/ten-file.jpg" />
+```properties
+minio.endpoint=http://localhost:9000
+minio.access-key=minioadmin
+minio.secret-key=minioadmin
+minio.bucket-name=shopping
 ```
 
-Hoặc trong frontend:
+---
 
-```javascript
-const imageUrl = `${BASE_URL}/storage/${product.hinhAnh}`;
-```
+## Liên kết với các entity
+
+| Entity    | Trường ảnh     | Cách sử dụng                                   |
+| --------- | -------------- | ---------------------------------------------- |
+| `SanPham` | `hinhAnhChinh` | `/storage/{hinhAnhChinh}` — ảnh chính sản phẩm |
+| `HinhAnh` | `tenHinhAnh`   | `/storage/{tenHinhAnh}` — ảnh chi tiết SP      |

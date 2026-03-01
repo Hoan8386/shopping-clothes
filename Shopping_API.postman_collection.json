@@ -1927,6 +1927,164 @@
 			]
 		},
 		{
+			"name": "Khuyến Mãi Theo Hóa Đơn (🔒 Admin)",
+			"description": "Quản lý khuyến mãi theo hóa đơn — Admin CRUD, NV/KH chỉ xem",
+			"item": [
+				{
+					"name": "Xem tất cả KMHD (🔒 Tất cả)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/khuyen-mai-theo-hoa-don",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "khuyen-mai-theo-hoa-don"]
+						},
+						"description": "🔒 Tất cả người dùng đã đăng nhập — Xem danh sách khuyến mãi theo hóa đơn"
+					}
+				},
+				{
+					"name": "Xem KMHD theo id (🔒 Tất cả)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/khuyen-mai-theo-hoa-don/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "khuyen-mai-theo-hoa-don", "1"]
+						},
+						"description": "🔒 Tất cả người dùng đã đăng nhập — Xem chi tiết khuyến mãi theo hóa đơn"
+					}
+				},
+				{
+					"name": "Tạo KMHD (🔒 Admin)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tenKhuyenMai\": \"Giảm 10% đơn từ 300K\",\n    \"giamToiDa\": 50000,\n    \"hoaDonToiDa\": 300000,\n    \"phanTramGiam\": 10.0,\n    \"hinhThuc\": 1,\n    \"thoiGianBatDau\": \"2026-03-01T00:00:00\",\n    \"thoiGianKetThuc\": \"2026-06-30T23:59:59\",\n    \"soLuong\": 100,\n    \"trangThai\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/khuyen-mai-theo-hoa-don",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "khuyen-mai-theo-hoa-don"]
+						},
+						"description": "🔒 Admin — Tạo khuyến mãi theo hóa đơn mới"
+					}
+				},
+				{
+					"name": "Cập nhật KMHD (🔒 Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"tenKhuyenMai\": \"Giảm 15% đơn từ 500K (cập nhật)\",\n    \"giamToiDa\": 150000,\n    \"hoaDonToiDa\": 500000,\n    \"phanTramGiam\": 15.0,\n    \"hinhThuc\": 1,\n    \"thoiGianBatDau\": \"2026-03-01T00:00:00\",\n    \"thoiGianKetThuc\": \"2026-12-31T23:59:59\",\n    \"soLuong\": 200,\n    \"trangThai\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/khuyen-mai-theo-hoa-don",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "khuyen-mai-theo-hoa-don"]
+						},
+						"description": "🔒 Admin — Cập nhật khuyến mãi theo hóa đơn"
+					}
+				},
+				{
+					"name": "Xóa KMHD (🔒 Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/khuyen-mai-theo-hoa-don/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "khuyen-mai-theo-hoa-don", "1"]
+						},
+						"description": "🔒 Admin — Xóa khuyến mãi theo hóa đơn"
+					}
+				}
+			]
+		},
+		{
+			"name": "Khuyến Mãi Theo Điểm (🔒 Admin)",
+			"description": "Quản lý khuyến mãi theo điểm tích lũy — Admin CRUD, NV/KH chỉ xem",
+			"item": [
+				{
+					"name": "Xem tất cả KMD (🔒 Tất cả)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/khuyen-mai-theo-diem",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "khuyen-mai-theo-diem"]
+						},
+						"description": "🔒 Tất cả người dùng đã đăng nhập — Xem danh sách khuyến mãi theo điểm"
+					}
+				},
+				{
+					"name": "Xem KMD theo id (🔒 Tất cả)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/khuyen-mai-theo-diem/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "khuyen-mai-theo-diem", "1"]
+						},
+						"description": "🔒 Tất cả người dùng đã đăng nhập — Xem chi tiết khuyến mãi theo điểm"
+					}
+				},
+				{
+					"name": "Tạo KMD (🔒 Admin)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tenKhuyenMai\": \"Đổi 30 điểm giảm 10%\",\n    \"giamToiDa\": 100000,\n    \"hoaDonToiDa\": 500000,\n    \"phanTramGiam\": 10.0,\n    \"hinhThuc\": 1,\n    \"thoiGianBatDau\": \"2026-03-01T00:00:00\",\n    \"thoiGianKetThuc\": \"2026-12-31T23:59:59\",\n    \"soLuong\": 100,\n    \"trangThai\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/khuyen-mai-theo-diem",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "khuyen-mai-theo-diem"]
+						},
+						"description": "🔒 Admin — Tạo khuyến mãi theo điểm mới"
+					}
+				},
+				{
+					"name": "Cập nhật KMD (🔒 Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"tenKhuyenMai\": \"Đổi 50 điểm giảm 20% (cập nhật)\",\n    \"giamToiDa\": 300000,\n    \"hoaDonToiDa\": 1000000,\n    \"phanTramGiam\": 20.0,\n    \"hinhThuc\": 1,\n    \"thoiGianBatDau\": \"2026-03-01T00:00:00\",\n    \"thoiGianKetThuc\": \"2026-12-31T23:59:59\",\n    \"soLuong\": 150,\n    \"trangThai\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/khuyen-mai-theo-diem",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "khuyen-mai-theo-diem"]
+						},
+						"description": "🔒 Admin — Cập nhật khuyến mãi theo điểm"
+					}
+				},
+				{
+					"name": "Xóa KMD (🔒 Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/khuyen-mai-theo-diem/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "khuyen-mai-theo-diem", "1"]
+						},
+						"description": "🔒 Admin — Xóa khuyến mãi theo điểm"
+					}
+				}
+			]
+		},
+		{
 			"name": "Test phân quyền (KH gọi API Admin → 403)",
 			"description": "Login bằng tài khoản khách hàng rồi thử truy cập API admin → phải bị từ chối 403",
 			"item": [

@@ -6,14 +6,54 @@
 
 ---
 
+## Tổng quan
+
+### Cấu trúc dữ liệu `ChiTietDonHang`
+
+| Trường           | Kiểu           | Mô tả                                     |
+| ---------------- | -------------- | ----------------------------------------- |
+| `id`             | Long           | Mã chi tiết đơn hàng (auto-increment)     |
+| `donHang`        | DonHang        | Đơn hàng cha (FK, ẩn trong JSON response) |
+| `chiTietSanPham` | ChiTietSanPham | Biến thể sản phẩm (FK)                    |
+| `giaSanPham`     | Double         | Giá sản phẩm tại thời điểm mua (VND)      |
+| `giamGia`        | Double         | Phần trăm giảm giá (%)                    |
+| `giaGiam`        | Double         | Số tiền giảm (VND)                        |
+| `soLuong`        | Integer        | Số lượng mua                              |
+| `thanhTien`      | Double         | Thành tiền (VND)                          |
+| `ngayTao`        | LocalDateTime  | Ngày tạo (tự động)                        |
+| `ngayCapNhat`    | LocalDateTime  | Ngày cập nhật (tự động)                   |
+
+---
+
 ## 1. Lấy tất cả chi tiết đơn hàng
 
 | Thuộc tính   | Chi tiết                        |
 | ------------ | ------------------------------- |
 | **URL**      | `GET /api/v1/chi-tiet-don-hang` |
+| **Method**   | `GET`                           |
 | **Xác thực** | Bearer Token (JWT)              |
 
 **Response:** `200 OK` — Trả về `List<ChiTietDonHang>`
+
+```json
+[
+  {
+    "id": 1,
+    "chiTietSanPham": {
+      "id": 1,
+      "soLuong": 15,
+      "mauSac": { "tenMauSac": "Đen" },
+      "kichThuoc": { "tenKichThuoc": "M" }
+    },
+    "giaSanPham": 250000,
+    "giamGia": 10,
+    "giaGiam": 25000,
+    "soLuong": 2,
+    "thanhTien": 450000,
+    "ngayTao": "2026-03-01T10:00:00"
+  }
+]
+```
 
 ---
 
@@ -22,6 +62,7 @@
 | Thuộc tính   | Chi tiết                                             |
 | ------------ | ---------------------------------------------------- |
 | **URL**      | `GET /api/v1/chi-tiet-don-hang/don-hang/{donHangId}` |
+| **Method**   | `GET`                                                |
 | **Xác thực** | Bearer Token (JWT)                                   |
 
 **Path Parameters:**
@@ -39,6 +80,7 @@
 | Thuộc tính   | Chi tiết                             |
 | ------------ | ------------------------------------ |
 | **URL**      | `GET /api/v1/chi-tiet-don-hang/{id}` |
+| **Method**   | `GET`                                |
 | **Xác thực** | Bearer Token (JWT)                   |
 
 **Path Parameters:**
@@ -51,7 +93,9 @@
 
 **Lỗi:**
 
-- `400` — Không tìm thấy chi tiết đơn hàng
+| HTTP Status | Mô tả                            |
+| ----------- | -------------------------------- |
+| `400`       | Không tìm thấy chi tiết đơn hàng |
 
 ---
 
@@ -60,10 +104,23 @@
 | Thuộc tính       | Chi tiết                         |
 | ---------------- | -------------------------------- |
 | **URL**          | `POST /api/v1/chi-tiet-don-hang` |
+| **Method**       | `POST`                           |
 | **Content-Type** | `application/json`               |
 | **Xác thực**     | Bearer Token (JWT)               |
 
-**Request Body:** `ChiTietDonHang`
+**Request Body:**
+
+```json
+{
+  "donHang": { "id": 1 },
+  "chiTietSanPham": { "id": 1 },
+  "giaSanPham": 250000,
+  "giamGia": 10,
+  "giaGiam": 25000,
+  "soLuong": 2,
+  "thanhTien": 450000
+}
+```
 
 **Response:** `201 Created` — Trả về `ChiTietDonHang`
 
@@ -74,16 +131,27 @@
 | Thuộc tính       | Chi tiết                        |
 | ---------------- | ------------------------------- |
 | **URL**          | `PUT /api/v1/chi-tiet-don-hang` |
+| **Method**       | `PUT`                           |
 | **Content-Type** | `application/json`              |
 | **Xác thực**     | Bearer Token (JWT)              |
 
-**Request Body:** `ChiTietDonHang` (phải có `id`)
+**Request Body:** (phải có `id`)
+
+```json
+{
+  "id": 1,
+  "soLuong": 3,
+  "thanhTien": 675000
+}
+```
 
 **Response:** `200 OK` — Trả về `ChiTietDonHang`
 
 **Lỗi:**
 
-- `400` — Mã chi tiết đơn hàng không được để trống
+| HTTP Status | Mô tả                                    |
+| ----------- | ---------------------------------------- |
+| `400`       | Mã chi tiết đơn hàng không được để trống |
 
 ---
 
@@ -92,10 +160,23 @@
 | Thuộc tính   | Chi tiết                                |
 | ------------ | --------------------------------------- |
 | **URL**      | `DELETE /api/v1/chi-tiet-don-hang/{id}` |
+| **Method**   | `DELETE`                                |
 | **Xác thực** | Bearer Token (JWT)                      |
 
 **Response:** `204 No Content`
 
 **Lỗi:**
 
-- `400` — Không tìm thấy chi tiết đơn hàng
+| HTTP Status | Mô tả                            |
+| ----------- | -------------------------------- |
+| `400`       | Không tìm thấy chi tiết đơn hàng |
+
+---
+
+## Phân quyền
+
+| Vai trò    | GET (Xem) | POST (Tạo) | PUT (Sửa) | DELETE (Xóa) |
+| ---------- | --------- | ---------- | --------- | ------------ |
+| ADMIN      | ✅        | ✅         | ✅        | ✅           |
+| NHAN_VIEN  | ✅        | ✅         | ❌        | ❌           |
+| KHACH_HANG | ✅        | ❌         | ❌        | ❌           |

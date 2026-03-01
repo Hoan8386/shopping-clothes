@@ -85,7 +85,8 @@ public class AuthController {
                     nhanVien.getId(),
                     nhanVien.getEmail(),
                     nhanVien.getTenNhanVien(),
-                    role);
+                    role,
+                    null);
             res.setUser(userLogin);
         } else {
             // Kiểm tra KhachHang
@@ -100,7 +101,8 @@ public class AuthController {
                         currentUserDB.getId(),
                         currentUserDB.getEmail(),
                         currentUserDB.getTenKhachHang(),
-                        role);
+                        role,
+                        currentUserDB.getDiemTichLuy());
                 res.setUser(userLogin);
             }
         }
@@ -151,6 +153,7 @@ public class AuthController {
             userLogin.setEmail(nhanVienDB.getEmail());
             userLogin.setName(nhanVienDB.getTenNhanVien());
             userLogin.setRole(role);
+            userLogin.setDiemTichLuy(null);
             userGetAccount.setUser(userLogin);
         } else {
             KhachHang currentUserDB = this.khachHangService.findByEmail(email);
@@ -164,6 +167,7 @@ public class AuthController {
                 userLogin.setEmail(currentUserDB.getEmail());
                 userLogin.setName(currentUserDB.getTenKhachHang());
                 userLogin.setRole(role);
+                userLogin.setDiemTichLuy(currentUserDB.getDiemTichLuy());
                 userGetAccount.setUser(userLogin);
             }
         }
@@ -199,7 +203,8 @@ public class AuthController {
                     nhanVien.getId(),
                     nhanVien.getEmail(),
                     nhanVien.getTenNhanVien(),
-                    role);
+                    role,
+                    null);
             res.setUser(userLogin);
         } else {
             // Trigger lazy loading để tránh proxy issues
@@ -211,7 +216,8 @@ public class AuthController {
                     khachHang.getId(),
                     khachHang.getEmail(),
                     khachHang.getTenKhachHang(),
-                    role);
+                    role,
+                    khachHang.getDiemTichLuy());
             res.setUser(userLogin);
         }
 
