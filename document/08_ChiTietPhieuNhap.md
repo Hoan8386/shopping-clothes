@@ -116,6 +116,17 @@
 }
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "soLuong": "Integer",
+  "ghiTruKiemHang": "String",
+  "trangThai": "Integer"
+}
+```
+
 **Response:** `200 OK` — Trả về `ChiTietPhieuNhap`
 
 **Lỗi:**

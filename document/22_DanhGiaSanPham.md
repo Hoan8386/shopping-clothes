@@ -73,6 +73,24 @@
 ]
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "khachHangId": "Long",
+  "tenKhachHang": "String",
+  "sanPhamId": "Long",
+  "tenSanPham": "String",
+  "donHangId": "Long",
+  "soSao": "Integer",
+  "ghiChu": "String",
+  "hinhAnh": "String | null",
+  "ngayTao": "LocalDateTime",
+  "ngayCapNhat": "LocalDateTime | null"
+}
+```
+
 ---
 
 ## 2. Xem đánh giá theo ID
@@ -104,6 +122,24 @@
   "hinhAnh": null,
   "ngayTao": "2026-03-01T10:00:00",
   "ngayCapNhat": null
+}
+```
+
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "khachHangId": "Long",
+  "tenKhachHang": "String",
+  "sanPhamId": "Long",
+  "tenSanPham": "String",
+  "donHangId": "Long",
+  "soSao": "Integer",
+  "ghiChu": "String",
+  "hinhAnh": "String | null",
+  "ngayTao": "LocalDateTime",
+  "ngayCapNhat": "LocalDateTime | null"
 }
 ```
 
@@ -163,6 +199,33 @@
 }
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "meta": {
+    "page": "Integer",
+    "pageSize": "Integer",
+    "pages": "Integer",
+    "total": "Long"
+  },
+  "result": [
+    {
+      "id": "Long",
+      "khachHangId": "Long",
+      "tenKhachHang": "String",
+      "sanPhamId": "Long",
+      "tenSanPham": "String",
+      "donHangId": "Long",
+      "soSao": "Integer",
+      "ghiChu": "String",
+      "hinhAnh": "String | null",
+      "ngayTao": "LocalDateTime"
+    }
+  ]
+}
+```
+
 ---
 
 ## 4. Xem đánh giá của tôi
@@ -190,6 +253,23 @@
     "ngayTao": "2026-03-01T10:00:00"
   }
 ]
+```
+
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "khachHangId": "Long",
+  "tenKhachHang": "String",
+  "sanPhamId": "Long",
+  "tenSanPham": "String",
+  "donHangId": "Long",
+  "soSao": "Integer",
+  "ghiChu": "String",
+  "hinhAnh": "String | null",
+  "ngayTao": "LocalDateTime"
+}
 ```
 
 ---
@@ -227,6 +307,23 @@
   "ghiChu": "Sản phẩm rất đẹp, chất lượng tốt!",
   "hinhAnh": "/storage/abc123-uuid.jpg",
   "ngayTao": "2026-03-01T15:30:00"
+}
+```
+
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "khachHangId": "Long",
+  "tenKhachHang": "String",
+  "sanPhamId": "Long",
+  "tenSanPham": "String",
+  "donHangId": "Long",
+  "soSao": "Integer",
+  "ghiChu": "String",
+  "hinhAnh": "String | null",
+  "ngayTao": "LocalDateTime"
 }
 ```
 

@@ -35,6 +35,16 @@
 ]
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "tenMauSac": "String",
+  "ngayTao": "LocalDateTime"
+}
+```
+
 ---
 
 ## 2-5. CRUD tiêu chuẩn
@@ -50,6 +60,15 @@
 
 ```json
 { "id": 1, "tenMauSac": "Đen nhám" }
+```
+
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "tenMauSac": "String"
+}
 ```
 
 **Lỗi:**

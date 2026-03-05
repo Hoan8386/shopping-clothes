@@ -39,6 +39,15 @@ Mỗi khách hàng có **1 giỏ hàng duy nhất** (quan hệ 1-1 với `KhachH
 }
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "chiTietSanPhamId": "Long",
+  "soLuong": "Integer"
+}
+```
+
 | Trường             | Kiểu    | Bắt buộc | Mô tả                |
 | ------------------ | ------- | -------- | -------------------- |
 | `chiTietSanPhamId` | Long    | **Có**   | Mã biến thể sản phẩm |
@@ -73,6 +82,33 @@ Mỗi khách hàng có **1 giỏ hàng duy nhất** (quan hệ 1-1 với `KhachH
         "kichThuoc": { "tenKichThuoc": "M" }
       },
       "soLuong": 2
+    }
+  ]
+}
+```
+
+**Kiểu dữ liệu:**
+
+```json
+{
+  "maGioHang": "Long",
+  "chiTietGioHangs": [
+    {
+      "maChiTietGioHang": "Long",
+      "chiTietSanPham": {
+        "id": "Long",
+        "sanPham": {
+          "tenSanPham": "String",
+          "giaBan": "Double"
+        },
+        "mauSac": {
+          "tenMauSac": "String"
+        },
+        "kichThuoc": {
+          "tenKichThuoc": "String"
+        }
+      },
+      "soLuong": "Integer"
     }
   ]
 }

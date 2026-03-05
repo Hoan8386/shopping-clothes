@@ -45,6 +45,17 @@
 ]
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "tenSuuTap": "String",
+  "moTa": "String",
+  "ngayTao": "LocalDateTime"
+}
+```
+
 ---
 
 ## 2. Lấy bộ sưu tập theo ID
@@ -78,6 +89,15 @@
 { "tenSuuTap": "Xuân Hè 2026", "moTa": "Bộ sưu tập mới" }
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "tenSuuTap": "String",
+  "moTa": "String"
+}
+```
+
 **Response:** `201 Created`
 
 ---
@@ -95,6 +115,16 @@
 
 ```json
 { "id": 1, "tenSuuTap": "Xuân Hè 2025 - Updated", "moTa": "Mô tả mới" }
+```
+
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "tenSuuTap": "String",
+  "moTa": "String"
+}
 ```
 
 **Lỗi:**

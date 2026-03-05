@@ -51,6 +51,28 @@
 ]
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "cuaHang": {
+    "id": "Long",
+    "tenCuaHang": "String"
+  },
+  "nhaCungCap": {
+    "id": "Long",
+    "tenNhaCungCap": "String"
+  },
+  "tenPhieuNhap": "String",
+  "trangThai": "Integer",
+  "ngayGiaoHang": "LocalDateTime",
+  "ngayNhanHang": "LocalDateTime",
+  "chiTietPhieuNhaps": "List",
+  "ngayTao": "LocalDateTime"
+}
+```
+
 ---
 
 ## 2. Lấy phiếu nhập theo ID
@@ -92,6 +114,22 @@
 }
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "cuaHang": {
+    "id": "Long"
+  },
+  "nhaCungCap": {
+    "id": "Long"
+  },
+  "tenPhieuNhap": "String",
+  "trangThai": "Integer",
+  "ngayGiaoHang": "LocalDateTime"
+}
+```
+
 **Response:** `201 Created` — Trả về `PhieuNhap`
 
 ---
@@ -112,6 +150,16 @@
   "id": 1,
   "trangThai": 1,
   "ngayNhanHang": "2026-03-03T10:00:00"
+}
+```
+
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "trangThai": "Integer",
+  "ngayNhanHang": "LocalDateTime"
 }
 ```
 

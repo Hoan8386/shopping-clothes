@@ -230,13 +230,16 @@ public class SanPhamService {
             Long kieuSanPhamId,
             Long boSuuTapId,
             Long thuongHieuId,
+            Long kichThuocId,
+            Long mauSacId,
             Integer trangThai,
             Double giaMin,
             Double giaMax,
             Pageable pageable) {
 
         Specification<SanPham> spec = SanPhamSpecification.filter(
-                tenSanPham, kieuSanPhamId, boSuuTapId, thuongHieuId, trangThai, giaMin, giaMax);
+                tenSanPham, kieuSanPhamId, boSuuTapId, thuongHieuId, kichThuocId, mauSacId,
+                trangThai, giaMin, giaMax);
 
         Page<SanPham> page = sanPhamRepository.findAll(spec, pageable);
 

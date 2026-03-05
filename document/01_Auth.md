@@ -40,6 +40,15 @@ Hệ thống sử dụng **JWT (JSON Web Token)** để xác thực. Hỗ trợ 
 }
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "username": "String",
+  "password": "String"
+}
+```
+
 | Trường     | Kiểu   | Bắt buộc | Mô tả                 |
 | ---------- | ------ | -------- | --------------------- |
 | `username` | String | **Có**   | Email đăng nhập       |
@@ -62,6 +71,27 @@ Hệ thống sử dụng **JWT (JSON Web Token)** để xác thực. Hỗ trợ 
       "permissions": [...]
     },
     "diemTichLuy": 10
+  }
+}
+```
+
+**Kiểu dữ liệu:**
+
+```json
+{
+  "access_token": "String",
+  "user": {
+    "id": "Long",
+    "email": "String",
+    "name": "String",
+    "role": {
+      "id": "Long",
+      "name": "String",
+      "description": "String",
+      "active": "Integer",
+      "permissions": "List"
+    },
+    "diemTichLuy": "Integer"
   }
 }
 ```
@@ -111,6 +141,26 @@ Hệ thống sử dụng **JWT (JSON Web Token)** để xác thực. Hỗ trợ 
 }
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "user": {
+    "id": "Long",
+    "email": "String",
+    "name": "String",
+    "role": {
+      "id": "Long",
+      "name": "String",
+      "description": "String",
+      "active": "Integer",
+      "permissions": "List"
+    },
+    "diemTichLuy": "Integer"
+  }
+}
+```
+
 > **Lưu ý:** Trường `diemTichLuy` chỉ có giá trị với tài khoản KhachHang, NhanVien trả `null`.
 
 ---
@@ -137,6 +187,24 @@ Hệ thống sử dụng **JWT (JSON Web Token)** để xác thực. Hỗ trợ 
       "name": "KHACH_HANG"
     },
     "diemTichLuy": 10
+  }
+}
+```
+
+**Kiểu dữ liệu:**
+
+```json
+{
+  "access_token": "String",
+  "user": {
+    "id": "Long",
+    "email": "String",
+    "name": "String",
+    "role": {
+      "id": "Long",
+      "name": "String"
+    },
+    "diemTichLuy": "Integer"
   }
 }
 ```
@@ -198,6 +266,17 @@ Hệ thống sử dụng **JWT (JSON Web Token)** để xác thực. Hỗ trợ 
 }
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "tenKhachHang": "String",
+  "sdt": "String",
+  "email": "String",
+  "password": "String"
+}
+```
+
 | Trường         | Kiểu   | Bắt buộc | Mô tả                     |
 | -------------- | ------ | -------- | ------------------------- |
 | `tenKhachHang` | String | **Có**   | Tên khách hàng            |
@@ -213,6 +292,17 @@ Hệ thống sử dụng **JWT (JSON Web Token)** để xác thực. Hỗ trợ 
   "tenKhachHang": "Nguyễn Test",
   "email": "test@gmail.com",
   "sdt": "0999999999"
+}
+```
+
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "tenKhachHang": "String",
+  "email": "String",
+  "sdt": "String"
 }
 ```
 

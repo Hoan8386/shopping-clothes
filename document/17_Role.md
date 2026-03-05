@@ -79,6 +79,38 @@ Hệ thống sử dụng **RBAC** (Role-Based Access Control). Mỗi vai trò g�
 }
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "meta": {
+    "page": "Integer",
+    "pageSize": "Integer",
+    "pages": "Integer",
+    "total": "Long"
+  },
+  "result": [
+    {
+      "id": "Long",
+      "name": "String",
+      "description": "String",
+      "active": "boolean",
+      "permissions": [
+        {
+          "id": "Long",
+          "name": "String",
+          "apiPath": "String",
+          "method": "String",
+          "module": "String"
+        }
+      ],
+      "createdAt": "Instant",
+      "createdBy": "String"
+    }
+  ]
+}
+```
+
 ---
 
 ## 2. Lấy vai trò theo ID
@@ -119,6 +151,21 @@ Hệ thống sử dụng **RBAC** (Role-Based Access Control). Mỗi vai trò g�
 }
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "name": "String",
+  "description": "String",
+  "active": "boolean",
+  "permissions": [
+    {
+      "id": "Long"
+    }
+  ]
+}
+```
+
 | Trường        | Bắt buộc | Mô tả                   |
 | ------------- | -------- | ----------------------- |
 | `name`        | **Có**   | Tên vai trò (unique)    |
@@ -154,6 +201,22 @@ Hệ thống sử dụng **RBAC** (Role-Based Access Control). Mỗi vai trò g�
   "description": "Giám sát viên — cập nhật",
   "active": true,
   "permissions": [{ "id": 1 }, { "id": 2 }]
+}
+```
+
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "name": "String",
+  "description": "String",
+  "active": "boolean",
+  "permissions": [
+    {
+      "id": "Long"
+    }
+  ]
 }
 ```
 

@@ -5,9 +5,12 @@ import java.util.List;
 
 import org.springframework.data.jpa.domain.Specification;
 
+import com.vn.shopping.domain.ChiTietSanPham;
 import com.vn.shopping.domain.SanPham;
 
 import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 
 public class SanPhamSpecification {
 
@@ -20,12 +23,16 @@ public class SanPhamSpecification {
      * - trangThai: lọc theo trạng thái
      * - giaMin: giá bán tối thiểu
      * - giaMax: giá bán tối đa
+     * - kichThuocId: lọc theo kích thước (qua chi tiết sản phẩm)
+     * - mauSacId: lọc theo màu sắc (qua chi tiết sản phẩm)
      */
     public static Specification<SanPham> filter(
             String tenSanPham,
             Long kieuSanPhamId,
             Long boSuuTapId,
             Long thuongHieuId,
+            Long kichThuocId,
+            Long mauSacId,
             Integer trangThai,
             Double giaMin,
             Double giaMax) {
@@ -68,6 +75,24 @@ public class SanPhamSpecification {
             // Lọc theo giá bán tối đa
             if (giaMax != null) {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("giaBan"), giaMax));
+            }
+
+            // Lọc theo kích thước (subquery qua ChiTietSanPham)
+            if (kichThuocId != null) {
+                Subquery<Long> subquery = query.subquery(Long.class);
+                Root<ChiTietSanPham> ctsp = subquery.from(ChiTietSanPham.class);
+                subquery.select(ctsp.get("sanPham").get("id"))
+                        .where(criteriaBuilder.equal(ctsp.get("kichThuoc").get("id"), kichThuocId));
+                predicates.add(root.get("id").in(subquery));
+            }
+
+            // Lọc theo màu sắc (subquery qua ChiTietSanPham)
+            if (mauSacId != null) {
+                Subquery<Long> subquery = query.subquery(Long.class);
+                Root<ChiTietSanPham> ctsp = subquery.from(ChiTietSanPham.class);
+                subquery.select(ctsp.get("sanPham").get("id"))
+                        .where(criteriaBuilder.equal(ctsp.get("mauSac").get("id"), mauSacId));
+                predicates.add(root.get("id").in(subquery));
             }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

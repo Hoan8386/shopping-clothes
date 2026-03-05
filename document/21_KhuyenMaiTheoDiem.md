@@ -64,6 +64,25 @@ Khuyến mãi theo điểm cho phép khách hàng sử dụng điểm tích lũy
 ]
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "tenKhuyenMai": "String",
+  "giamToiDa": "Integer",
+  "hoaDonToiDa": "Integer",
+  "phanTramGiam": "Double",
+  "hinhThuc": "Integer",
+  "thoiGianBatDau": "LocalDateTime",
+  "thoiGianKetThuc": "LocalDateTime",
+  "soLuong": "Integer",
+  "trangThai": "Integer",
+  "ngayTao": "LocalDateTime",
+  "ngayCapNhat": "LocalDateTime | null"
+}
+```
+
 ---
 
 ## 2. Lấy khuyến mãi theo điểm theo ID
@@ -96,6 +115,25 @@ Khuyến mãi theo điểm cho phép khách hàng sử dụng điểm tích lũy
   "trangThai": 1,
   "ngayTao": "2026-03-01T10:00:00",
   "ngayCapNhat": null
+}
+```
+
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "tenKhuyenMai": "String",
+  "giamToiDa": "Integer",
+  "hoaDonToiDa": "Integer",
+  "phanTramGiam": "Double",
+  "hinhThuc": "Integer",
+  "thoiGianBatDau": "LocalDateTime",
+  "thoiGianKetThuc": "LocalDateTime",
+  "soLuong": "Integer",
+  "trangThai": "Integer",
+  "ngayTao": "LocalDateTime",
+  "ngayCapNhat": "LocalDateTime | null"
 }
 ```
 
@@ -132,6 +170,22 @@ Khuyến mãi theo điểm cho phép khách hàng sử dụng điểm tích lũy
 }
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "tenKhuyenMai": "String",
+  "giamToiDa": "Integer",
+  "hoaDonToiDa": "Integer",
+  "phanTramGiam": "Double",
+  "hinhThuc": "Integer",
+  "thoiGianBatDau": "LocalDateTime",
+  "thoiGianKetThuc": "LocalDateTime",
+  "soLuong": "Integer",
+  "trangThai": "Integer"
+}
+```
+
 **Response:** `201 Created` — Trả về `KhuyenMaiTheoDiem`
 
 > **Lưu ý:** Trường `ngayTao` được tự động gán khi tạo mới.
@@ -161,6 +215,23 @@ Khuyến mãi theo điểm cho phép khách hàng sử dụng điểm tích lũy
   "thoiGianKetThuc": "2026-12-31T23:59:59",
   "soLuong": 150,
   "trangThai": 1
+}
+```
+
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "tenKhuyenMai": "String",
+  "giamToiDa": "Integer",
+  "hoaDonToiDa": "Integer",
+  "phanTramGiam": "Double",
+  "hinhThuc": "Integer",
+  "thoiGianBatDau": "LocalDateTime",
+  "thoiGianKetThuc": "LocalDateTime",
+  "soLuong": "Integer",
+  "trangThai": "Integer"
 }
 ```
 

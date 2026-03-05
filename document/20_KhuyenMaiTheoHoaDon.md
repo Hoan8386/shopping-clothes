@@ -58,6 +58,25 @@ Khuyến mãi theo hóa đơn cho phép giảm giá trực tiếp trên tổng g
 ]
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "tenKhuyenMai": "String",
+  "giamToiDa": "Integer",
+  "hoaDonToiDa": "Integer",
+  "phanTramGiam": "Double",
+  "hinhThuc": "Integer",
+  "thoiGianBatDau": "LocalDateTime",
+  "thoiGianKetThuc": "LocalDateTime",
+  "soLuong": "Integer",
+  "trangThai": "Integer",
+  "ngayTao": "LocalDateTime",
+  "ngayCapNhat": "LocalDateTime | null"
+}
+```
+
 ---
 
 ## 2. Lấy khuyến mãi theo hóa đơn theo ID
@@ -90,6 +109,25 @@ Khuyến mãi theo hóa đơn cho phép giảm giá trực tiếp trên tổng g
   "trangThai": 1,
   "ngayTao": "2026-03-01T10:00:00",
   "ngayCapNhat": null
+}
+```
+
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "tenKhuyenMai": "String",
+  "giamToiDa": "Integer",
+  "hoaDonToiDa": "Integer",
+  "phanTramGiam": "Double",
+  "hinhThuc": "Integer",
+  "thoiGianBatDau": "LocalDateTime",
+  "thoiGianKetThuc": "LocalDateTime",
+  "soLuong": "Integer",
+  "trangThai": "Integer",
+  "ngayTao": "LocalDateTime",
+  "ngayCapNhat": "LocalDateTime | null"
 }
 ```
 
@@ -126,6 +164,22 @@ Khuyến mãi theo hóa đơn cho phép giảm giá trực tiếp trên tổng g
 }
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "tenKhuyenMai": "String",
+  "giamToiDa": "Integer",
+  "hoaDonToiDa": "Integer",
+  "phanTramGiam": "Double",
+  "hinhThuc": "Integer",
+  "thoiGianBatDau": "LocalDateTime",
+  "thoiGianKetThuc": "LocalDateTime",
+  "soLuong": "Integer",
+  "trangThai": "Integer"
+}
+```
+
 **Response:** `201 Created` — Trả về `KhuyenMaiTheoHoaDon`
 
 > **Lưu ý:** Trường `ngayTao` được tự động gán khi tạo mới.
@@ -155,6 +209,23 @@ Khuyến mãi theo hóa đơn cho phép giảm giá trực tiếp trên tổng g
   "thoiGianKetThuc": "2026-12-31T23:59:59",
   "soLuong": 200,
   "trangThai": 1
+}
+```
+
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "tenKhuyenMai": "String",
+  "giamToiDa": "Integer",
+  "hoaDonToiDa": "Integer",
+  "phanTramGiam": "Double",
+  "hinhThuc": "Integer",
+  "thoiGianBatDau": "LocalDateTime",
+  "thoiGianKetThuc": "LocalDateTime",
+  "soLuong": "Integer",
+  "trangThai": "Integer"
 }
 ```
 

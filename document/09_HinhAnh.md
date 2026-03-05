@@ -43,6 +43,19 @@
 ]
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "chiTietSanPham": {
+    "id": "Long"
+  },
+  "tenHinhAnh": "String",
+  "ngayTao": "LocalDateTime"
+}
+```
+
 ---
 
 ## 2. Lấy hình ảnh theo ID
@@ -132,6 +145,17 @@
 }
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "chiTietSanPham": {
+    "id": "Long"
+  },
+  "tenHinhAnh": "String"
+}
+```
+
 **Response:** `201 Created` — Trả về `HinhAnh`
 
 ---
@@ -151,6 +175,15 @@
 {
   "id": 1,
   "tenHinhAnh": "updated-image.jpg"
+}
+```
+
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "tenHinhAnh": "String"
 }
 ```
 

@@ -83,6 +83,29 @@ Mỗi **Permission** đại diện cho 1 quyền truy cập vào 1 API endpoint 
 }
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "meta": {
+    "page": "Integer",
+    "pageSize": "Integer",
+    "pages": "Integer",
+    "total": "Long"
+  },
+  "result": [
+    {
+      "id": "Long",
+      "name": "String",
+      "apiPath": "String",
+      "method": "String",
+      "module": "String",
+      "createdAt": "Instant"
+    }
+  ]
+}
+```
+
 ---
 
 ## 2. Lấy quyền theo ID
@@ -123,6 +146,17 @@ Mỗi **Permission** đại diện cho 1 quyền truy cập vào 1 API endpoint 
 }
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "name": "String",
+  "apiPath": "String",
+  "method": "String",
+  "module": "String"
+}
+```
+
 | Trường    | Bắt buộc | Mô tả         |
 | --------- | -------- | ------------- |
 | `name`    | **Có**   | Tên quyền     |
@@ -158,6 +192,18 @@ Mỗi **Permission** đại diện cho 1 quyền truy cập vào 1 API endpoint 
   "apiPath": "/api/v1/bao-cao",
   "method": "GET",
   "module": "BAO_CAO"
+}
+```
+
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "name": "String",
+  "apiPath": "String",
+  "method": "String",
+  "module": "String"
 }
 ```
 

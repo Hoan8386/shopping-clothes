@@ -43,6 +43,19 @@
 ]
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "tenCuaHang": "String",
+  "diaChi": "String",
+  "soDienThoai": "String",
+  "email": "String",
+  "trangThai": "Integer"
+}
+```
+
 ---
 
 ## 2-5. CRUD tiêu chuẩn
@@ -64,6 +77,19 @@
   "soDienThoai": "028-1234-5678",
   "email": "q1@shop.vn",
   "trangThai": 1
+}
+```
+
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "tenCuaHang": "String",
+  "diaChi": "String",
+  "soDienThoai": "String",
+  "email": "String",
+  "trangThai": "Integer"
 }
 ```
 

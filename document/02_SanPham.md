@@ -87,6 +87,44 @@ GET /api/v1/san-pham?tenSanPham=ao&kieuSanPhamId=1&thuongHieuId=2&trangThai=1&gi
 }
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "meta": {
+    "page": "Integer",
+    "pageSize": "Integer",
+    "pages": "Integer",
+    "total": "Long"
+  },
+  "result": [
+    {
+      "id": "Long",
+      "tenSanPham": "String",
+      "giaVon": "Double",
+      "giaBan": "Double",
+      "giaGiam": "Integer",
+      "moTa": "String",
+      "soLuong": "Integer",
+      "trangThai": "Integer",
+      "hinhAnh": "String",
+      "kieuSanPham": {
+        "id": "Long",
+        "tenKieuSanPham": "String"
+      },
+      "thuongHieu": {
+        "id": "Long",
+        "tenThuongHieu": "String"
+      },
+      "boSuuTap": {
+        "id": "Long",
+        "tenSuuTap": "String"
+      }
+    }
+  ]
+}
+```
+
 > **Lưu ý:** Nếu không truyền bất kỳ tham số lọc nào → trả về tất cả sản phẩm (có phân trang).
 
 ---
@@ -121,6 +159,34 @@ GET /api/v1/san-pham?tenSanPham=ao&kieuSanPhamId=1&thuongHieuId=2&trangThai=1&gi
   "kieuSanPham": { "id": 1, "tenKieuSanPham": "Áo" },
   "thuongHieu": { "id": 2, "tenThuongHieu": "Nike" },
   "boSuuTap": { "id": 1, "tenSuuTap": "Xuân Hè 2025" }
+}
+```
+
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "tenSanPham": "String",
+  "giaVon": "Double",
+  "giaBan": "Double",
+  "giaGiam": "Integer",
+  "moTa": "String",
+  "soLuong": "Integer",
+  "trangThai": "Integer",
+  "hinhAnh": "String",
+  "kieuSanPham": {
+    "id": "Long",
+    "tenKieuSanPham": "String"
+  },
+  "thuongHieu": {
+    "id": "Long",
+    "tenThuongHieu": "String"
+  },
+  "boSuuTap": {
+    "id": "Long",
+    "tenSuuTap": "String"
+  }
 }
 ```
 

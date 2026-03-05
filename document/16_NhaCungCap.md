@@ -45,6 +45,19 @@
 ]
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "tenNhaCungCap": "String",
+  "soDienThoai": "String",
+  "email": "String",
+  "diaChi": "String",
+  "trangThai": "Integer"
+}
+```
+
 ---
 
 ## 2-5. CRUD tiêu chuẩn
@@ -67,6 +80,20 @@
   "diaChi": "456 Lê Lợi, Q.1, TP.HCM",
   "ghiTru": "NCC uy tín",
   "trangThai": 1
+}
+```
+
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "tenNhaCungCap": "String",
+  "soDienThoai": "String",
+  "email": "String",
+  "diaChi": "String",
+  "ghiTru": "String",
+  "trangThai": "Integer"
 }
 ```
 

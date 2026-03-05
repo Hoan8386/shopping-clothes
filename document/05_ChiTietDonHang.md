@@ -55,6 +55,30 @@
 ]
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "chiTietSanPham": {
+    "id": "Long",
+    "soLuong": "Integer",
+    "mauSac": {
+      "tenMauSac": "String"
+    },
+    "kichThuoc": {
+      "tenKichThuoc": "String"
+    }
+  },
+  "giaSanPham": "Double",
+  "giamGia": "Double",
+  "giaGiam": "Double",
+  "soLuong": "Integer",
+  "thanhTien": "Double",
+  "ngayTao": "LocalDateTime"
+}
+```
+
 ---
 
 ## 2. Lấy chi tiết đơn hàng theo mã đơn
@@ -122,6 +146,24 @@
 }
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "donHang": {
+    "id": "Long"
+  },
+  "chiTietSanPham": {
+    "id": "Long"
+  },
+  "giaSanPham": "Double",
+  "giamGia": "Double",
+  "giaGiam": "Double",
+  "soLuong": "Integer",
+  "thanhTien": "Double"
+}
+```
+
 **Response:** `201 Created` — Trả về `ChiTietDonHang`
 
 ---
@@ -142,6 +184,16 @@
   "id": 1,
   "soLuong": 3,
   "thanhTien": 675000
+}
+```
+
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "soLuong": "Integer",
+  "thanhTien": "Double"
 }
 ```
 

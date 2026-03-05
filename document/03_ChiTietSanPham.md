@@ -55,6 +55,36 @@ Mỗi sản phẩm (`SanPham`) có thể có nhiều biến thể (`ChiTietSanPh
 ]
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "sanPham": {
+    "id": "Long",
+    "tenSanPham": "String"
+  },
+  "mauSac": {
+    "id": "Long",
+    "tenMauSac": "String"
+  },
+  "kichThuoc": {
+    "id": "Long",
+    "tenKichThuoc": "String"
+  },
+  "maCuaHang": "Long",
+  "soLuong": "Integer",
+  "trangThai": "Integer",
+  "moTa": "String",
+  "hinhAnhs": [
+    {
+      "id": "Long",
+      "tenHinhAnh": "String"
+    }
+  ]
+}
+```
+
 ---
 
 ## 2. Lấy chi tiết sản phẩm theo ID

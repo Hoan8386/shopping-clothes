@@ -126,6 +126,50 @@ GET /api/v1/don-hang?trangThai=1&hinhThucDonHang=1&page=0&size=10&sort=ngayTao,d
 }
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "meta": {
+    "page": "Integer",
+    "pageSize": "Integer",
+    "pages": "Integer",
+    "total": "Long"
+  },
+  "result": [
+    {
+      "id": "Long",
+      "cuaHang": {
+        "id": "Long",
+        "tenCuaHang": "String"
+      },
+      "khachHang": {
+        "id": "Long",
+        "tenKhachHang": "String",
+        "diemTichLuy": "Integer"
+      },
+      "nhanVien": {
+        "id": "Long",
+        "tenNhanVien": "String"
+      },
+      "maKhuyenMaiHoaDon": "Long | null",
+      "maKhuyenMaiDiem": "Long | null",
+      "diaChi": "String",
+      "tongTien": "Integer",
+      "tienGiam": "Integer",
+      "tongTienGiam": "Integer",
+      "tongTienTra": "Integer",
+      "trangThai": "Integer",
+      "trangThaiThanhToan": "Integer",
+      "hinhThucDonHang": "Integer",
+      "chiTietDonHangs": "List",
+      "ngayTao": "LocalDateTime",
+      "ngayCapNhat": "LocalDateTime | null"
+    }
+  ]
+}
+```
+
 > **Lưu ý phân quyền:**
 >
 > - **Khách hàng:** Chỉ xem được đơn hàng của mình (hệ thống tự lọc theo `khachHangId`).
@@ -175,6 +219,17 @@ GET /api/v1/don-hang?trangThai=1&hinhThucDonHang=1&page=0&size=10&sort=ngayTao,d
   "cuaHangId": 1,
   "maKhuyenMaiHoaDon": null,
   "maKhuyenMaiDiem": null
+}
+```
+
+**Kiểu dữ liệu:**
+
+```json
+{
+  "diaChi": "String",
+  "cuaHangId": "Long",
+  "maKhuyenMaiHoaDon": "Long | null",
+  "maKhuyenMaiDiem": "Long | null"
 }
 ```
 
@@ -239,6 +294,35 @@ GET /api/v1/don-hang?trangThai=1&hinhThucDonHang=1&page=0&size=10&sort=ngayTao,d
 }
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "khachHang": {
+    "id": "Long"
+  },
+  "diaChi": "String",
+  "tongTien": "Integer",
+  "tienGiam": "Integer",
+  "tongTienGiam": "Integer",
+  "tongTienTra": "Integer",
+  "trangThai": "Integer",
+  "trangThaiThanhToan": "Integer",
+  "chiTietDonHangs": [
+    {
+      "chiTietSanPham": {
+        "id": "Long"
+      },
+      "giaSanPham": "Double",
+      "giamGia": "Double",
+      "giaGiam": "Double",
+      "soLuong": "Integer",
+      "thanhTien": "Double"
+    }
+  ]
+}
+```
+
 **Response:** `201 Created`
 
 **Lỗi:**
@@ -269,6 +353,24 @@ GET /api/v1/don-hang?trangThai=1&hinhThucDonHang=1&page=0&size=10&sort=ngayTao,d
   "trangThaiThanhToan": 1,
   "tongTien": 200,
   "tongTienTra": 200
+}
+```
+
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "cuaHang": {
+    "id": "Long"
+  },
+  "khachHang": {
+    "id": "Long"
+  },
+  "trangThai": "Integer",
+  "trangThaiThanhToan": "Integer",
+  "tongTien": "Integer",
+  "tongTienTra": "Integer"
 }
 ```
 

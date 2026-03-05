@@ -313,21 +313,21 @@ INSERT INTO HinhAnh (MaChiTietSanPham, TenHinhAnh, NgayTao) VALUES
 -- 13. NHÂN VIÊN (MatKhau = BCrypt '123456')
 -- ---------------------------------------------------------
 INSERT INTO NhanVien (MaCuaHang, role_id, TenNhanVien, Email, SoDienThoai, MatKhau, TrangThai) VALUES
-    (1, 2, 'An',   'an@s.com', '0901000001', '$2a$10$dXJ3SW6G7P50lGEheIjLOOvTnLJpv0r4a6Oq5a7n5g5z5z5z5z5z5', 1),
-    (1, 3, 'Bình', 'b@s.com',  '0901000002', '$2a$10$dXJ3SW6G7P50lGEheIjLOOvTnLJpv0r4a6Oq5a7n5g5z5z5z5z5z5', 1),
-    (2, 3, 'Chi',  'c@s.com',  '0901000003', '$2a$10$dXJ3SW6G7P50lGEheIjLOOvTnLJpv0r4a6Oq5a7n5g5z5z5z5z5z5', 1),
-    (2, 2, 'Danh', 'd@s.com',  '0901000004', '$2a$10$dXJ3SW6G7P50lGEheIjLOOvTnLJpv0r4a6Oq5a7n5g5z5z5z5z5z5', 1),
-    (1, 1, 'Hùng', 'h@s.com',  '0901000005', '$2a$10$dXJ3SW6G7P50lGEheIjLOOvTnLJpv0r4a6Oq5a7n5g5z5z5z5z5z5', 1);
+    (1, 2, 'An',   'an@s.com', '0901000001', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG', 1),
+    (1, 3, 'Bình', 'b@s.com',  '0901000002', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG', 1),
+    (2, 3, 'Chi',  'c@s.com',  '0901000003', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG', 1),
+    (2, 2, 'Danh', 'd@s.com',  '0901000004', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG', 1),
+    (1, 1, 'Hùng', 'h@s.com',  '0901000005', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG', 1);
 
 -- ---------------------------------------------------------
 -- 14. KHÁCH HÀNG (Password = BCrypt '123456')
 -- ---------------------------------------------------------
 INSERT INTO KhachHang (role_id, TenKhachHang, Email, Sdt, Password, DiemTichLuy) VALUES
-    (4, 'Lan',  'lan@g.com', '0911000001', '$2a$10$dXJ3SW6G7P50lGEheIjLOOvTnLJpv0r4a6Oq5a7n5g5z5z5z5z5z5',  10),
-    (4, 'Minh', 'm@g.com',   '0922000002', '$2a$10$dXJ3SW6G7P50lGEheIjLOOvTnLJpv0r4a6Oq5a7n5g5z5z5z5z5z5',   0),
-    (4, 'Hoa',  'h@g.com',   '0933000003', '$2a$10$dXJ3SW6G7P50lGEheIjLOOvTnLJpv0r4a6Oq5a7n5g5z5z5z5z5z5', 100),
-    (4, 'Tuấn', 't@g.com',   '0944000004', '$2a$10$dXJ3SW6G7P50lGEheIjLOOvTnLJpv0r4a6Oq5a7n5g5z5z5z5z5z5',   5),
-    (4, 'Yến',  'y@g.com',   '0955000005', '$2a$10$dXJ3SW6G7P50lGEheIjLOOvTnLJpv0r4a6Oq5a7n5g5z5z5z5z5z5',  50);
+    (4, 'Lan',  'lan@g.com', '0911000001', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG',  10),
+    (4, 'Minh', 'm@g.com',   '0922000002', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG',   0),
+    (4, 'Hoa',  'h@g.com',   '0933000003', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG', 100),
+    (4, 'Tuấn', 't@g.com',   '0944000004', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG',   5),
+    (4, 'Yến',  'y@g.com',   '0955000005', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG',  50);
 
 -- ---------------------------------------------------------
 -- 15. NHÀ CUNG CẤP

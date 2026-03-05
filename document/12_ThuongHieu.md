@@ -46,6 +46,17 @@
 ]
 ```
 
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "tenThuongHieu": "String",
+  "trangThaiHoatDong": "Integer",
+  "trangThaiHienThi": "Integer"
+}
+```
+
 ---
 
 ## 2-5. CRUD tiêu chuẩn
@@ -65,6 +76,17 @@
   "tenThuongHieu": "Nike Vietnam",
   "trangThaiHoatDong": 1,
   "trangThaiHienThi": 1
+}
+```
+
+**Kiểu dữ liệu:**
+
+```json
+{
+  "id": "Long",
+  "tenThuongHieu": "String",
+  "trangThaiHoatDong": "Integer",
+  "trangThaiHienThi": "Integer"
 }
 ```
 

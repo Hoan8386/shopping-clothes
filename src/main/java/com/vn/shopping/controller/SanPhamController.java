@@ -37,13 +37,16 @@ public class SanPhamController {
             @RequestParam(required = false) Long kieuSanPhamId,
             @RequestParam(required = false) Long boSuuTapId,
             @RequestParam(required = false) Long thuongHieuId,
+            @RequestParam(required = false) Long kichThuocId,
+            @RequestParam(required = false) Long mauSacId,
             @RequestParam(required = false) Integer trangThai,
             @RequestParam(required = false) Double giaMin,
             @RequestParam(required = false) Double giaMax,
             Pageable pageable) {
 
         ResultPaginationDTO result = sanPhamService.filterSanPham(
-                tenSanPham, kieuSanPhamId, boSuuTapId, thuongHieuId, trangThai, giaMin, giaMax, pageable);
+                tenSanPham, kieuSanPhamId, boSuuTapId, thuongHieuId, kichThuocId, mauSacId,
+                trangThai, giaMin, giaMax, pageable);
         return ResponseEntity.ok(result);
     }
 
