@@ -578,13 +578,45 @@ public class DonHangService {
         dto.setTienGiam(donHang.getTienGiam());
         dto.setTongTienGiam(donHang.getTongTienGiam());
         dto.setTongTienTra(donHang.getTongTienTra());
-        dto.setTrangThai(donHang.getTrangThai());
-        dto.setTrangThaiThanhToan(donHang.getTrangThaiThanhToan());
-        dto.setHinhThucDonHang(donHang.getHinhThucDonHang());
-        dto.setMaKhuyenMaiHoaDon(donHang.getMaKhuyenMaiHoaDon());
-        dto.setMaKhuyenMaiDiem(donHang.getMaKhuyenMaiDiem());
+        dto.setTrangThai(mapTrangThai(donHang.getTrangThai()));
+        dto.setTrangThaiThanhToan(mapTrangThaiThanhToan(donHang.getTrangThaiThanhToan()));
+        dto.setHinhThucDonHang(mapHinhThucDonHang(donHang.getHinhThucDonHang()));
         dto.setNgayTao(donHang.getNgayTao());
         dto.setNgayCapNhat(donHang.getNgayCapNhat());
+
+        // Map khuyến mãi theo hóa đơn
+        if (donHang.getMaKhuyenMaiHoaDon() != null) {
+            int tongTien = donHang.getTongTien() != null ? donHang.getTongTien() : 0;
+            khuyenMaiTheoHoaDonRepository.findById(donHang.getMaKhuyenMaiHoaDon()).ifPresent(km -> {
+                int tienDaGiam = 0;
+                if (km.getPhanTramGiam() != null && km.getPhanTramGiam() > 0) {
+                    tienDaGiam = (int) (tongTien * km.getPhanTramGiam() / 100);
+                    if (km.getGiamToiDa() != null && km.getGiamToiDa() > 0 && tienDaGiam > km.getGiamToiDa()) {
+                        tienDaGiam = km.getGiamToiDa();
+                    }
+                }
+                dto.setKhuyenMaiHoaDon(new ResDonHangDTO.KhuyenMaiHoaDonDTO(
+                        km.getId(), km.getTenKhuyenMai(), km.getPhanTramGiam(),
+                        km.getGiamToiDa(), km.getHoaDonToiDa(), tienDaGiam));
+            });
+        }
+
+        // Map khuyến mãi theo điểm
+        if (donHang.getMaKhuyenMaiDiem() != null) {
+            int tongTien = donHang.getTongTien() != null ? donHang.getTongTien() : 0;
+            khuyenMaiTheoDiemRepository.findById(donHang.getMaKhuyenMaiDiem()).ifPresent(km -> {
+                int tienDaGiam = 0;
+                if (km.getPhanTramGiam() != null && km.getPhanTramGiam() > 0) {
+                    tienDaGiam = (int) (tongTien * km.getPhanTramGiam() / 100);
+                    if (km.getGiamToiDa() != null && km.getGiamToiDa() > 0 && tienDaGiam > km.getGiamToiDa()) {
+                        tienDaGiam = km.getGiamToiDa();
+                    }
+                }
+                dto.setKhuyenMaiDiem(new ResDonHangDTO.KhuyenMaiDiemDTO(
+                        km.getId(), km.getTenKhuyenMai(), km.getPhanTramGiam(),
+                        km.getGiamToiDa(), km.getHoaDonToiDa(), km.getDiemToiThieu(), tienDaGiam));
+            });
+        }
 
         if (donHang.getCuaHang() != null) {
             CuaHang ch = donHang.getCuaHang();
@@ -634,5 +666,39 @@ public class DonHangService {
         }
 
         return dto;
+    }
+
+    private String mapTrangThai(Integer trangThai) {
+        if (trangThai == null)
+            return null;
+        return switch (trangThai) {
+            case 0 -> "Chờ xác nhận";
+            case 1 -> "Đã xác nhận";
+            case 2 -> "Đang đóng gói";
+            case 3 -> "Đang giao hàng";
+            case 4 -> "Đã hủy";
+            case 5 -> "Đã nhận hàng";
+            default -> "Không xác định";
+        };
+    }
+
+    private String mapTrangThaiThanhToan(Integer trangThai) {
+        if (trangThai == null)
+            return null;
+        return switch (trangThai) {
+            case 0 -> "Chưa thanh toán";
+            case 1 -> "Đã thanh toán";
+            default -> "Không xác định";
+        };
+    }
+
+    private String mapHinhThucDonHang(Integer hinhThuc) {
+        if (hinhThuc == null)
+            return null;
+        return switch (hinhThuc) {
+            case 0 -> "Tại quầy";
+            case 1 -> "Online";
+            default -> "Không xác định";
+        };
     }
 }

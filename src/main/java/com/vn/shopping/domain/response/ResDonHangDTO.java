@@ -20,11 +20,11 @@ public class ResDonHangDTO {
     private Integer tienGiam;
     private Integer tongTienGiam;
     private Integer tongTienTra;
-    private Integer trangThai;
-    private Integer trangThaiThanhToan;
-    private Integer hinhThucDonHang;
-    private Long maKhuyenMaiHoaDon;
-    private Long maKhuyenMaiDiem;
+    private String trangThai;
+    private String trangThaiThanhToan;
+    private String hinhThucDonHang;
+    private KhuyenMaiHoaDonDTO khuyenMaiHoaDon;
+    private KhuyenMaiDiemDTO khuyenMaiDiem;
     private LocalDateTime ngayTao;
     private LocalDateTime ngayCapNhat;
 
@@ -83,5 +83,32 @@ public class ResDonHangDTO {
         private Double giaGiam;
         private Integer soLuong;
         private Double thanhTien;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class KhuyenMaiHoaDonDTO {
+        private Long id;
+        private String tenKhuyenMai;
+        private Double phanTramGiam;
+        private Integer giamToiDa;
+        private Integer hoaDonToiDa;
+        private Integer tienDaGiam;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class KhuyenMaiDiemDTO {
+        private Long id;
+        private String tenKhuyenMai;
+        private Double phanTramGiam;
+        private Integer giamToiDa;
+        private Integer hoaDonToiDa;
+        private Integer diemToiThieu;
+        private Integer tienDaGiam;
     }
 }
