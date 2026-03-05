@@ -35,8 +35,8 @@ public class PhieuNhap {
     @Column(name = "TrangThai")
     private Integer trangThai;
 
-    @Column(name = "NgayGiaoHang")
-    private LocalDateTime ngayGiaoHang;
+    @Column(name = "NgayDatHang")
+    private LocalDateTime ngayDatHang;
 
     @Column(name = "NgayNhanHang")
     private LocalDateTime ngayNhanHang;

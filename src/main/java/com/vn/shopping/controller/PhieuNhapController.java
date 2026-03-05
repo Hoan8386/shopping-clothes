@@ -37,15 +37,15 @@ public class PhieuNhapController {
             @RequestParam(required = false) String tenNhaCungCap,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime ngayTaoTu,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime ngayTaoDen,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime ngayGiaoHangTu,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime ngayGiaoHangDen,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime ngayDatHangTu,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime ngayDatHangDen,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime ngayNhanHangTu,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime ngayNhanHangDen,
             Pageable pageable) {
         ResultPaginationDTO result = phieuNhapService.filterPhieuNhap(
                 tenPhieuNhap, trangThai, tenCuaHang, tenNhaCungCap,
-                ngayTaoTu, ngayTaoDen, ngayGiaoHangTu, ngayGiaoHangDen,
-                ngayNhanHangTu, ngayNhanHangDen, pageable);
+                ngayTaoTu, ngayTaoDen,
+                ngayDatHangTu, ngayDatHangDen, ngayNhanHangTu, ngayNhanHangDen, pageable);
         return ResponseEntity.ok(result);
     }
 

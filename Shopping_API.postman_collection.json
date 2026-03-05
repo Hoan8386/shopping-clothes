@@ -1541,8 +1541,8 @@
 								{ "key": "tenNhaCungCap", "value": "Vải Việt", "disabled": true, "description": "Tìm theo tên nhà cung cấp (LIKE)" },
 								{ "key": "ngayTaoTu", "value": "2026-03-01T00:00:00", "disabled": true, "description": "Ngày tạo từ (ISO DateTime)" },
 								{ "key": "ngayTaoDen", "value": "2026-03-31T23:59:59", "disabled": true, "description": "Ngày tạo đến (ISO DateTime)" },
-								{ "key": "ngayGiaoHangTu", "value": "", "disabled": true, "description": "Ngày giao hàng từ" },
-								{ "key": "ngayGiaoHangDen", "value": "", "disabled": true, "description": "Ngày giao hàng đến" },
+								{ "key": "ngayDatHangTu", "value": "", "disabled": true, "description": "Ngày đặt hàng từ" },
+								{ "key": "ngayDatHangDen", "value": "", "disabled": true, "description": "Ngày đặt hàng đến" },
 								{ "key": "ngayNhanHangTu", "value": "", "disabled": true, "description": "Ngày nhận hàng từ" },
 								{ "key": "ngayNhanHangDen", "value": "", "disabled": true, "description": "Ngày nhận hàng đến" }
 							]
@@ -1570,14 +1570,14 @@
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"tenPhieuNhap\": \"Nhập hàng đợt 2 - CN Q.1\",\n    \"cuaHangId\": 1,\n    \"nhaCungCapId\": 2,\n    \"ngayGiaoHang\": null,\n    \"ngayNhanHang\": null\n}"
+							"raw": "{\n    \"tenPhieuNhap\": \"Nhập hàng đợt 2 - CN Q.1\",\n    \"cuaHangId\": 1,\n    \"nhaCungCapId\": 2\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/phieu-nhap",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "phieu-nhap"]
 						},
-						"description": " Admin — Tạo phiếu nhập mới (trạng thái mặc định = 0: Đã đặt)"
+						"description": " Admin — Tạo phiếu nhập mới (trạng thái mặc định = 0: Đã đặt, ngày đặt hàng = ngày hiện tại)"
 					}
 				},
 				{
@@ -1587,14 +1587,14 @@
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"id\": 1,\n    \"tenPhieuNhap\": \"Nhập hàng đợt 1 - CN Q.1 (Updated)\",\n    \"cuaHangId\": 1,\n    \"nhaCungCapId\": 1,\n    \"trangThai\": 1,\n    \"ngayGiaoHang\": null,\n    \"ngayNhanHang\": null\n}"
+							"raw": "{\n    \"id\": 1,\n    \"tenPhieuNhap\": \"Nhập hàng đợt 1 - CN Q.1 (Updated)\",\n    \"cuaHangId\": 1,\n    \"nhaCungCapId\": 1,\n    \"trangThai\": 1\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/phieu-nhap",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "phieu-nhap"]
 						},
-						"description": " Admin — Cập nhật phiếu nhập. Trạng thái: 0=Đã đặt, 1=Đã nhận (cập nhật SL), 2=Chậm giao, 3=Hủy (không thể cập nhật lại)"
+						"description": " Admin — Cập nhật phiếu nhập. Trạng thái: 0=Đã đặt, 1=Đã nhận (cập nhật SL + ngày nhận hàng tự động), 2=Chậm giao, 3=Hủy (không thể cập nhật lại)"
 					}
 				},
 				{

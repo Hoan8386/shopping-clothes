@@ -19,8 +19,8 @@ public class PhieuNhapSpecification {
             String tenNhaCungCap,
             LocalDateTime ngayTaoTu,
             LocalDateTime ngayTaoDen,
-            LocalDateTime ngayGiaoHangTu,
-            LocalDateTime ngayGiaoHangDen,
+            LocalDateTime ngayDatHangTu,
+            LocalDateTime ngayDatHangDen,
             LocalDateTime ngayNhanHangTu,
             LocalDateTime ngayNhanHangDen) {
 
@@ -56,11 +56,11 @@ public class PhieuNhapSpecification {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("ngayTao"), ngayTaoDen));
             }
 
-            if (ngayGiaoHangTu != null) {
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("ngayGiaoHang"), ngayGiaoHangTu));
+            if (ngayDatHangTu != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("ngayDatHang"), ngayDatHangTu));
             }
-            if (ngayGiaoHangDen != null) {
-                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("ngayGiaoHang"), ngayGiaoHangDen));
+            if (ngayDatHangDen != null) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("ngayDatHang"), ngayDatHangDen));
             }
 
             if (ngayNhanHangTu != null) {

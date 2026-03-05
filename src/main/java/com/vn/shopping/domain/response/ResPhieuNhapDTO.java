@@ -17,7 +17,7 @@ public class ResPhieuNhapDTO {
     private String tenPhieuNhap;
     private Integer trangThai;
     private String trangThaiText;
-    private LocalDateTime ngayGiaoHang;
+    private LocalDateTime ngayDatHang;
     private LocalDateTime ngayNhanHang;
     private LocalDateTime ngayTao;
     private LocalDateTime ngayCapNhat;

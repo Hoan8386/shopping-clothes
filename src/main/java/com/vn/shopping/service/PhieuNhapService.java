@@ -61,8 +61,7 @@ public class PhieuNhapService {
         PhieuNhap pn = new PhieuNhap();
         pn.setTenPhieuNhap(dto.getTenPhieuNhap());
         pn.setTrangThai(TRANG_THAI_DA_DAT);
-        pn.setNgayGiaoHang(dto.getNgayGiaoHang());
-        pn.setNgayNhanHang(dto.getNgayNhanHang());
+        pn.setNgayDatHang(LocalDateTime.now());
 
         if (dto.getCuaHangId() != null) {
             CuaHang ch = cuaHangRepository.findById(dto.getCuaHangId())
@@ -103,8 +102,6 @@ public class PhieuNhapService {
 
         existing.setTenPhieuNhap(dto.getTenPhieuNhap());
         existing.setTrangThai(newTrangThai);
-        existing.setNgayGiaoHang(dto.getNgayGiaoHang());
-        existing.setNgayNhanHang(dto.getNgayNhanHang());
 
         if (dto.getCuaHangId() != null) {
             CuaHang ch = cuaHangRepository.findById(dto.getCuaHangId())
@@ -125,6 +122,8 @@ public class PhieuNhapService {
                 && (oldTrangThai == null || oldTrangThai != TRANG_THAI_DA_NHAN));
 
         if (isNewSuccess) {
+            existing.setNgayNhanHang(LocalDateTime.now());
+            phieuNhapRepository.save(existing);
             capNhatSoLuongSauNhapHang(saved.getId());
         }
 
@@ -139,6 +138,10 @@ public class PhieuNhapService {
      * thuộc sản phẩm đó
      */
     private void capNhatSoLuongSauNhapHang(Long phieuNhapId) {
+        PhieuNhap phieuNhap = phieuNhapRepository.findById(phieuNhapId).orElse(null);
+        if (phieuNhap == null)
+            return;
+
         List<ChiTietPhieuNhap> danhSachChiTiet = chiTietPhieuNhapRepository.findByPhieuNhapId(phieuNhapId);
 
         for (ChiTietPhieuNhap ctpn : danhSachChiTiet) {
@@ -155,6 +158,13 @@ public class PhieuNhapService {
 
             int soLuongHienTai = ctsp.getSoLuong() != null ? ctsp.getSoLuong() : 0;
             ctsp.setSoLuong(soLuongHienTai + ctpn.getSoLuong());
+
+            // Cập nhật mã phiếu nhập và mã cửa hàng
+            ctsp.setMaPhieuNhap(phieuNhapId);
+            if (phieuNhap.getCuaHang() != null) {
+                ctsp.setMaCuaHang(phieuNhap.getCuaHang().getId());
+            }
+
             chiTietSanPhamRepository.save(ctsp);
 
             // Tính lại tổng số lượng sản phẩm
@@ -199,14 +209,14 @@ public class PhieuNhapService {
             String tenPhieuNhap, Integer trangThai,
             String tenCuaHang, String tenNhaCungCap,
             LocalDateTime ngayTaoTu, LocalDateTime ngayTaoDen,
-            LocalDateTime ngayGiaoHangTu, LocalDateTime ngayGiaoHangDen,
+            LocalDateTime ngayDatHangTu, LocalDateTime ngayDatHangDen,
             LocalDateTime ngayNhanHangTu, LocalDateTime ngayNhanHangDen,
             Pageable pageable) {
 
         Specification<PhieuNhap> spec = PhieuNhapSpecification.filter(
                 tenPhieuNhap, trangThai, tenCuaHang, tenNhaCungCap,
-                ngayTaoTu, ngayTaoDen, ngayGiaoHangTu, ngayGiaoHangDen,
-                ngayNhanHangTu, ngayNhanHangDen);
+                ngayTaoTu, ngayTaoDen,
+                ngayDatHangTu, ngayDatHangDen, ngayNhanHangTu, ngayNhanHangDen);
 
         Page<PhieuNhap> page = phieuNhapRepository.findAll(spec, pageable);
 
@@ -234,7 +244,7 @@ public class PhieuNhapService {
         dto.setTenPhieuNhap(pn.getTenPhieuNhap());
         dto.setTrangThai(pn.getTrangThai());
         dto.setTrangThaiText(getTrangThaiText(pn.getTrangThai()));
-        dto.setNgayGiaoHang(pn.getNgayGiaoHang());
+        dto.setNgayDatHang(pn.getNgayDatHang());
         dto.setNgayNhanHang(pn.getNgayNhanHang());
         dto.setNgayTao(pn.getNgayTao());
         dto.setNgayCapNhat(pn.getNgayCapNhat());

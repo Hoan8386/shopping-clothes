@@ -68,7 +68,7 @@ public class SanPhamService {
         sanPham.setGiaBan(giaBan);
         sanPham.setGiaGiam(giaGiam);
         sanPham.setMoTa(moTa);
-        sanPham.setSoLuong(soLuong);
+        sanPham.setSoLuong(0);
         sanPham.setTrangThai(trangThai);
 
         if (kieuSanPhamId != null) {
