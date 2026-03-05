@@ -2018,7 +2018,7 @@
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"tenKhuyenMai\": \"Đổi 30 điểm giảm 10%\",\n    \"giamToiDa\": 100000,\n    \"hoaDonToiDa\": 500000,\n    \"phanTramGiam\": 10.0,\n    \"hinhThuc\": 1,\n    \"thoiGianBatDau\": \"2026-03-01T00:00:00\",\n    \"thoiGianKetThuc\": \"2026-12-31T23:59:59\",\n    \"soLuong\": 100,\n    \"trangThai\": 1\n}"
+							"raw": "{\n    \"tenKhuyenMai\": \"Đổi 30 điểm giảm 10%\",\n    \"giamToiDa\": 100000,\n    \"hoaDonToiDa\": 500000,\n    \"phanTramGiam\": 10.0,\n    \"hinhThuc\": 1,\n    \"thoiGianBatDau\": \"2026-03-01T00:00:00\",\n    \"thoiGianKetThuc\": \"2026-12-31T23:59:59\",\n    \"diemToiThieu\": 30,\n    \"soLuong\": 100,\n    \"trangThai\": 1\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/khuyen-mai-theo-diem",
@@ -2035,7 +2035,7 @@
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"id\": 1,\n    \"tenKhuyenMai\": \"Đổi 50 điểm giảm 20% (cập nhật)\",\n    \"giamToiDa\": 300000,\n    \"hoaDonToiDa\": 1000000,\n    \"phanTramGiam\": 20.0,\n    \"hinhThuc\": 1,\n    \"thoiGianBatDau\": \"2026-03-01T00:00:00\",\n    \"thoiGianKetThuc\": \"2026-12-31T23:59:59\",\n    \"soLuong\": 150,\n    \"trangThai\": 1\n}"
+							"raw": "{\n    \"id\": 1,\n    \"tenKhuyenMai\": \"Đổi 50 điểm giảm 20% (cập nhật)\",\n    \"giamToiDa\": 300000,\n    \"hoaDonToiDa\": 1000000,\n    \"phanTramGiam\": 20.0,\n    \"hinhThuc\": 1,\n    \"thoiGianBatDau\": \"2026-03-01T00:00:00\",\n    \"thoiGianKetThuc\": \"2026-12-31T23:59:59\",\n    \"diemToiThieu\": 50,\n    \"soLuong\": 150,\n    \"trangThai\": 1\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/khuyen-mai-theo-diem",

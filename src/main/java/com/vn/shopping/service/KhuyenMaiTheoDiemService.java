@@ -30,6 +30,7 @@ public class KhuyenMaiTheoDiemService {
         existing.setHinhThuc(khuyenMai.getHinhThuc());
         existing.setThoiGianBatDau(khuyenMai.getThoiGianBatDau());
         existing.setThoiGianKetThuc(khuyenMai.getThoiGianKetThuc());
+        existing.setDiemToiThieu(khuyenMai.getDiemToiThieu());
         existing.setSoLuong(khuyenMai.getSoLuong());
         existing.setTrangThai(khuyenMai.getTrangThai());
         return khuyenMaiTheoDiemRepository.save(existing);

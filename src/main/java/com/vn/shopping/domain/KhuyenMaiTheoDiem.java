@@ -41,6 +41,9 @@ public class KhuyenMaiTheoDiem {
     @Column(name = "ThoiGianKetThuc")
     private LocalDateTime thoiGianKetThuc;
 
+    @Column(name = "DiemToiThieu")
+    private Integer diemToiThieu;
+
     @Column(name = "SoLuong")
     private Integer soLuong;
 

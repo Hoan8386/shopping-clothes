@@ -3,6 +3,7 @@ package com.vn.shopping.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,12 +34,15 @@ public class DonHangService {
     private final ChiTietSanPhamRepository chiTietSanPhamRepository;
     private final SanPhamRepository sanPhamRepository;
     private final CuaHangRepository cuaHangRepository;
+    private final KhuyenMaiTheoDiemRepository khuyenMaiTheoDiemRepository;
+    private final KhuyenMaiTheoHoaDonRepository khuyenMaiTheoHoaDonRepository;
 
     public DonHangService(DonHangRepository donHangRepository, EntityManager entityManager,
             KhachHangRepository khachHangRepository, NhanVienRepository nhanVienRepository,
             GioHangRepository gioHangRepository, ChiTietDonHangRepository chiTietDonHangRepository,
             ChiTietSanPhamRepository chiTietSanPhamRepository, SanPhamRepository sanPhamRepository,
-            CuaHangRepository cuaHangRepository) {
+            CuaHangRepository cuaHangRepository, KhuyenMaiTheoDiemRepository khuyenMaiTheoDiemRepository,
+            KhuyenMaiTheoHoaDonRepository khuyenMaiTheoHoaDonRepository) {
         this.donHangRepository = donHangRepository;
         this.entityManager = entityManager;
         this.khachHangRepository = khachHangRepository;
@@ -48,6 +52,8 @@ public class DonHangService {
         this.chiTietSanPhamRepository = chiTietSanPhamRepository;
         this.sanPhamRepository = sanPhamRepository;
         this.cuaHangRepository = cuaHangRepository;
+        this.khuyenMaiTheoDiemRepository = khuyenMaiTheoDiemRepository;
+        this.khuyenMaiTheoHoaDonRepository = khuyenMaiTheoHoaDonRepository;
     }
 
     @Transactional
@@ -134,6 +140,13 @@ public class DonHangService {
         savedDonHang.setTienGiam(0);
         savedDonHang.setTongTienGiam(0);
         savedDonHang.setTongTienTra(tongTien);
+
+        // 5.1. Áp dụng khuyến mãi theo hóa đơn (nếu người dùng nhập mã)
+        apDungKhuyenMaiTheoHoaDon(savedDonHang, req.getMaKhuyenMaiHoaDon());
+
+        // 5.2. Tự động áp dụng khuyến mãi theo điểm tích lũy
+        apDungKhuyenMaiTheoDiem(savedDonHang, khachHang);
+
         donHangRepository.save(savedDonHang);
 
         // 6. Trừ số lượng sản phẩm
@@ -306,6 +319,133 @@ public class DonHangService {
 
     public List<DonHang> findAll() {
         return donHangRepository.findAll();
+    }
+
+    /**
+     * Áp dụng khuyến mãi theo hóa đơn khi người dùng nhập mã khuyến mãi.
+     * Kiểm tra: tồn tại, đang hoạt động, còn hạn, còn số lượng, đơn hàng không vượt
+     * hoaDonToiDa.
+     * Tính tiền giảm theo phần trăm, giới hạn giảm tối đa.
+     */
+    private void apDungKhuyenMaiTheoHoaDon(DonHang donHang, Long maKhuyenMaiHoaDon) throws IdInvalidException {
+        if (maKhuyenMaiHoaDon == null) {
+            return;
+        }
+
+        KhuyenMaiTheoHoaDon km = khuyenMaiTheoHoaDonRepository.findById(maKhuyenMaiHoaDon)
+                .orElseThrow(() -> new IdInvalidException("Không tìm thấy mã khuyến mãi: " + maKhuyenMaiHoaDon));
+
+        // Kiểm tra trạng thái hoạt động
+        if (km.getTrangThai() == null || km.getTrangThai() != 1) {
+            throw new IdInvalidException("Mã khuyến mãi không còn hoạt động");
+        }
+
+        // Kiểm tra thời gian
+        LocalDateTime now = LocalDateTime.now();
+        if (km.getThoiGianBatDau() != null && now.isBefore(km.getThoiGianBatDau())) {
+            throw new IdInvalidException("Mã khuyến mãi chưa đến thời gian áp dụng");
+        }
+        if (km.getThoiGianKetThuc() != null && now.isAfter(km.getThoiGianKetThuc())) {
+            throw new IdInvalidException("Mã khuyến mãi đã hết hạn");
+        }
+
+        // Kiểm tra số lượng
+        if (km.getSoLuong() != null && km.getSoLuong() <= 0) {
+            throw new IdInvalidException("Mã khuyến mãi đã hết lượt sử dụng");
+        }
+
+        int tongTien = donHang.getTongTien() != null ? donHang.getTongTien() : 0;
+
+        // Kiểm tra hóa đơn tối đa (đơn hàng không được vượt giá trị tối đa)
+        if (km.getHoaDonToiDa() != null && km.getHoaDonToiDa() > 0 && tongTien > km.getHoaDonToiDa()) {
+            throw new IdInvalidException(
+                    "Đơn hàng vượt giá trị tối đa cho phép (" + km.getHoaDonToiDa() + ") của mã khuyến mãi");
+        }
+
+        int tienGiam = 0;
+
+        if (km.getPhanTramGiam() != null && km.getPhanTramGiam() > 0) {
+            tienGiam = (int) (tongTien * km.getPhanTramGiam() / 100);
+
+            // Áp dụng giới hạn giảm tối đa
+            if (km.getGiamToiDa() != null && km.getGiamToiDa() > 0 && tienGiam > km.getGiamToiDa()) {
+                tienGiam = km.getGiamToiDa();
+            }
+        }
+
+        if (tienGiam > 0) {
+            donHang.setMaKhuyenMaiHoaDon(km.getId());
+            donHang.setTienGiam(tienGiam);
+            donHang.setTongTienGiam(tienGiam);
+            donHang.setTongTienTra(tongTien - tienGiam);
+
+            // Trừ số lượng khuyến mãi
+            if (km.getSoLuong() != null && km.getSoLuong() > 0) {
+                km.setSoLuong(km.getSoLuong() - 1);
+                khuyenMaiTheoHoaDonRepository.save(km);
+            }
+        }
+    }
+
+    /**
+     * Tự động áp dụng khuyến mãi theo điểm tích lũy cho đơn hàng.
+     * - Tìm khuyến mãi hợp lệ (đang hoạt động, còn hạn, còn số lượng, điểm >= điểm
+     * tối thiểu)
+     * - Chọn khuyến mãi có phần trăm giảm cao nhất
+     * - Tính tiền giảm dựa trên hình thức (phần trăm hoặc giá trị cố định)
+     * - Áp dụng giới hạn giảm tối đa và hóa đơn tối đa
+     */
+    private void apDungKhuyenMaiTheoDiem(DonHang donHang, KhachHang khachHang) {
+        if (khachHang == null || khachHang.getDiemTichLuy() == null || khachHang.getDiemTichLuy() <= 0) {
+            return;
+        }
+
+        int diemKhachHang = khachHang.getDiemTichLuy();
+        int tongTien = donHang.getTongTien() != null ? donHang.getTongTien() : 0;
+
+        // Tìm khuyến mãi hợp lệ, sắp xếp theo phần trăm giảm giảm dần
+        List<KhuyenMaiTheoDiem> dsKhuyenMai = khuyenMaiTheoDiemRepository
+                .findKhuyenMaiHopLe(diemKhachHang, LocalDateTime.now());
+
+        if (dsKhuyenMai == null || dsKhuyenMai.isEmpty()) {
+            return;
+        }
+
+        // Chọn khuyến mãi tốt nhất (phần trăm giảm cao nhất)
+        KhuyenMaiTheoDiem km = dsKhuyenMai.get(0);
+
+        // Kiểm tra hóa đơn tối đa (nếu có) - đơn hàng phải đạt giá trị tối thiểu
+        if (km.getHoaDonToiDa() != null && km.getHoaDonToiDa() > 0 && tongTien > km.getHoaDonToiDa()) {
+            return;
+        }
+
+        int tienGiam = 0;
+
+        if (km.getPhanTramGiam() != null && km.getPhanTramGiam() > 0) {
+            // Tính tiền giảm theo phần trăm
+            tienGiam = (int) (tongTien * km.getPhanTramGiam() / 100);
+
+            // Áp dụng giới hạn giảm tối đa
+            if (km.getGiamToiDa() != null && km.getGiamToiDa() > 0 && tienGiam > km.getGiamToiDa()) {
+                tienGiam = km.getGiamToiDa();
+            }
+        }
+
+        if (tienGiam > 0) {
+            int tienGiamHienTai = donHang.getTienGiam() != null ? donHang.getTienGiam() : 0;
+            int tongTienGiamHienTai = donHang.getTongTienGiam() != null ? donHang.getTongTienGiam() : 0;
+
+            donHang.setMaKhuyenMaiDiem(km.getId());
+            donHang.setTienGiam(tienGiamHienTai + tienGiam);
+            donHang.setTongTienGiam(tongTienGiamHienTai + tienGiam);
+            donHang.setTongTienTra(tongTien - (tongTienGiamHienTai + tienGiam));
+
+            // Trừ số lượng khuyến mãi
+            if (km.getSoLuong() != null && km.getSoLuong() > 0) {
+                km.setSoLuong(km.getSoLuong() - 1);
+                khuyenMaiTheoDiemRepository.save(km);
+            }
+        }
     }
 
     /**
