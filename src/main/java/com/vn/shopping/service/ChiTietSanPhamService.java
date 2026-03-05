@@ -15,6 +15,10 @@ import com.vn.shopping.domain.MauSac;
 import com.vn.shopping.domain.SanPham;
 import com.vn.shopping.domain.response.ResChiTietSanPhamDTO;
 import com.vn.shopping.repository.ChiTietSanPhamRepository;
+import com.vn.shopping.repository.KichThuocRepository;
+import com.vn.shopping.repository.MauSacRepository;
+import com.vn.shopping.repository.SanPhamRepository;
+import com.vn.shopping.util.error.IdInvalidException;
 
 import jakarta.persistence.EntityManager;
 
@@ -26,17 +30,26 @@ public class ChiTietSanPhamService {
     private final MinioStorageService minioStorageService;
     private final HinhAnhService hinhAnhService;
     private final CuaHangService cuaHangService;
+    private final SanPhamRepository sanPhamRepository;
+    private final MauSacRepository mauSacRepository;
+    private final KichThuocRepository kichThuocRepository;
 
     public ChiTietSanPhamService(ChiTietSanPhamRepository chiTietSanPhamRepository,
             EntityManager entityManager,
             MinioStorageService minioStorageService,
             HinhAnhService hinhAnhService,
-            CuaHangService cuaHangService) {
+            CuaHangService cuaHangService,
+            SanPhamRepository sanPhamRepository,
+            MauSacRepository mauSacRepository,
+            KichThuocRepository kichThuocRepository) {
         this.chiTietSanPhamRepository = chiTietSanPhamRepository;
         this.entityManager = entityManager;
         this.minioStorageService = minioStorageService;
         this.hinhAnhService = hinhAnhService;
         this.cuaHangService = cuaHangService;
+        this.sanPhamRepository = sanPhamRepository;
+        this.mauSacRepository = mauSacRepository;
+        this.kichThuocRepository = kichThuocRepository;
     }
 
     @Transactional
@@ -65,18 +78,18 @@ public class ChiTietSanPhamService {
         ct.setGhiTru(ghiTru);
 
         if (sanPhamId != null) {
-            SanPham sp = new SanPham();
-            sp.setId(sanPhamId);
+            SanPham sp = sanPhamRepository.findById(sanPhamId)
+                    .orElseThrow(() -> new IdInvalidException("Không tìm thấy sản phẩm: " + sanPhamId));
             ct.setSanPham(sp);
         }
         if (mauSacId != null) {
-            MauSac ms = new MauSac();
-            ms.setId(mauSacId);
+            MauSac ms = mauSacRepository.findById(mauSacId)
+                    .orElseThrow(() -> new IdInvalidException("Không tìm thấy màu sắc: " + mauSacId));
             ct.setMauSac(ms);
         }
         if (kichThuocId != null) {
-            KichThuoc kt = new KichThuoc();
-            kt.setId(kichThuocId);
+            KichThuoc kt = kichThuocRepository.findById(kichThuocId)
+                    .orElseThrow(() -> new IdInvalidException("Không tìm thấy kích thước: " + kichThuocId));
             ct.setKichThuoc(kt);
         }
 
@@ -115,18 +128,18 @@ public class ChiTietSanPhamService {
         ct.setGhiTru(ghiTru);
 
         if (sanPhamId != null) {
-            SanPham sp = new SanPham();
-            sp.setId(sanPhamId);
+            SanPham sp = sanPhamRepository.findById(sanPhamId)
+                    .orElseThrow(() -> new IdInvalidException("Không tìm thấy sản phẩm: " + sanPhamId));
             ct.setSanPham(sp);
         }
         if (mauSacId != null) {
-            MauSac ms = new MauSac();
-            ms.setId(mauSacId);
+            MauSac ms = mauSacRepository.findById(mauSacId)
+                    .orElseThrow(() -> new IdInvalidException("Không tìm thấy màu sắc: " + mauSacId));
             ct.setMauSac(ms);
         }
         if (kichThuocId != null) {
-            KichThuoc kt = new KichThuoc();
-            kt.setId(kichThuocId);
+            KichThuoc kt = kichThuocRepository.findById(kichThuocId)
+                    .orElseThrow(() -> new IdInvalidException("Không tìm thấy kích thước: " + kichThuocId));
             ct.setKichThuoc(kt);
         }
 
@@ -147,9 +160,10 @@ public class ChiTietSanPhamService {
     }
 
     @Transactional
-    public ChiTietSanPham update(ChiTietSanPham chiTietSanPham) {
+    public ChiTietSanPham update(ChiTietSanPham chiTietSanPham) throws IdInvalidException {
         ChiTietSanPham existing = chiTietSanPhamRepository.findById(chiTietSanPham.getId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy chi tiết sản phẩm: " + chiTietSanPham.getId()));
+                .orElseThrow(
+                        () -> new IdInvalidException("Không tìm thấy chi tiết sản phẩm: " + chiTietSanPham.getId()));
         existing.setSanPham(chiTietSanPham.getSanPham());
         existing.setKichThuoc(chiTietSanPham.getKichThuoc());
         existing.setMauSac(chiTietSanPham.getMauSac());

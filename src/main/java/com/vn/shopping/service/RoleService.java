@@ -9,6 +9,7 @@ import com.vn.shopping.domain.Permission;
 import com.vn.shopping.domain.Role;
 import com.vn.shopping.repository.PermissionRepository;
 import com.vn.shopping.repository.RoleRepository;
+import com.vn.shopping.util.error.IdInvalidException;
 
 @Service
 public class RoleService {
@@ -33,9 +34,9 @@ public class RoleService {
         return roleRepository.save(role);
     }
 
-    public Role update(Role role) {
+    public Role update(Role role) throws IdInvalidException {
         Role existing = roleRepository.findById(role.getId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy vai trò: " + role.getId()));
+                .orElseThrow(() -> new IdInvalidException("Không tìm thấy vai trò: " + role.getId()));
         existing.setName(role.getName());
         existing.setDescription(role.getDescription());
         existing.setActive(role.isActive());

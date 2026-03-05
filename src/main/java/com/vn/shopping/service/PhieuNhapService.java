@@ -13,8 +13,11 @@ import com.vn.shopping.domain.PhieuNhap;
 import com.vn.shopping.domain.SanPham;
 import com.vn.shopping.repository.ChiTietPhieuNhapRepository;
 import com.vn.shopping.repository.ChiTietSanPhamRepository;
+import com.vn.shopping.repository.CuaHangRepository;
+import com.vn.shopping.repository.NhaCungCapRepository;
 import com.vn.shopping.repository.PhieuNhapRepository;
 import com.vn.shopping.repository.SanPhamRepository;
+import com.vn.shopping.util.error.IdInvalidException;
 
 @Service
 public class PhieuNhapService {
@@ -25,15 +28,21 @@ public class PhieuNhapService {
     private final ChiTietPhieuNhapRepository chiTietPhieuNhapRepository;
     private final ChiTietSanPhamRepository chiTietSanPhamRepository;
     private final SanPhamRepository sanPhamRepository;
+    private final CuaHangRepository cuaHangRepository;
+    private final NhaCungCapRepository nhaCungCapRepository;
 
     public PhieuNhapService(PhieuNhapRepository phieuNhapRepository,
             ChiTietPhieuNhapRepository chiTietPhieuNhapRepository,
             ChiTietSanPhamRepository chiTietSanPhamRepository,
-            SanPhamRepository sanPhamRepository) {
+            SanPhamRepository sanPhamRepository,
+            CuaHangRepository cuaHangRepository,
+            NhaCungCapRepository nhaCungCapRepository) {
         this.phieuNhapRepository = phieuNhapRepository;
         this.chiTietPhieuNhapRepository = chiTietPhieuNhapRepository;
         this.chiTietSanPhamRepository = chiTietSanPhamRepository;
         this.sanPhamRepository = sanPhamRepository;
+        this.cuaHangRepository = cuaHangRepository;
+        this.nhaCungCapRepository = nhaCungCapRepository;
     }
 
     public PhieuNhap create(PhieuNhap phieuNhap) {
@@ -41,19 +50,19 @@ public class PhieuNhapService {
     }
 
     public PhieuNhap create(String tenPhieuNhap, Long cuaHangId, Long nhaCungCapId,
-            Integer trangThai) {
+            Integer trangThai) throws IdInvalidException {
         PhieuNhap pn = new PhieuNhap();
         pn.setTenPhieuNhap(tenPhieuNhap);
         pn.setTrangThai(trangThai);
 
         if (cuaHangId != null) {
-            CuaHang ch = new CuaHang();
-            ch.setId(cuaHangId);
+            CuaHang ch = cuaHangRepository.findById(cuaHangId)
+                    .orElseThrow(() -> new IdInvalidException("Không tìm thấy cửa hàng: " + cuaHangId));
             pn.setCuaHang(ch);
         }
         if (nhaCungCapId != null) {
-            NhaCungCap ncc = new NhaCungCap();
-            ncc.setId(nhaCungCapId);
+            NhaCungCap ncc = nhaCungCapRepository.findById(nhaCungCapId)
+                    .orElseThrow(() -> new IdInvalidException("Không tìm thấy nhà cung cấp: " + nhaCungCapId));
             pn.setNhaCungCap(ncc);
         }
 
@@ -61,9 +70,9 @@ public class PhieuNhapService {
     }
 
     @Transactional
-    public PhieuNhap update(PhieuNhap phieuNhap) {
+    public PhieuNhap update(PhieuNhap phieuNhap) throws IdInvalidException {
         PhieuNhap existing = phieuNhapRepository.findById(phieuNhap.getId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy phiếu nhập: " + phieuNhap.getId()));
+                .orElseThrow(() -> new IdInvalidException("Không tìm thấy phiếu nhập: " + phieuNhap.getId()));
 
         Integer oldTrangThai = existing.getTrangThai();
 

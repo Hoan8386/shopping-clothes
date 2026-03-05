@@ -16,7 +16,11 @@ import com.vn.shopping.domain.SanPham;
 import com.vn.shopping.domain.ThuongHieu;
 import com.vn.shopping.domain.response.ResSanPhamDTO;
 import com.vn.shopping.domain.response.ResultPaginationDTO;
+import com.vn.shopping.repository.BoSuuTapRepository;
+import com.vn.shopping.repository.KieuSanPhamRepository;
 import com.vn.shopping.repository.SanPhamRepository;
+import com.vn.shopping.repository.ThuongHieuRepository;
+import com.vn.shopping.util.error.IdInvalidException;
 
 import jakarta.persistence.EntityManager;
 
@@ -26,12 +30,19 @@ public class SanPhamService {
     private final SanPhamRepository sanPhamRepository;
     private final EntityManager entityManager;
     private final MinioStorageService minioStorageService;
+    private final KieuSanPhamRepository kieuSanPhamRepository;
+    private final BoSuuTapRepository boSuuTapRepository;
+    private final ThuongHieuRepository thuongHieuRepository;
 
     public SanPhamService(SanPhamRepository sanPhamRepository, EntityManager entityManager,
-            MinioStorageService minioStorageService) {
+            MinioStorageService minioStorageService, KieuSanPhamRepository kieuSanPhamRepository,
+            BoSuuTapRepository boSuuTapRepository, ThuongHieuRepository thuongHieuRepository) {
         this.sanPhamRepository = sanPhamRepository;
         this.entityManager = entityManager;
         this.minioStorageService = minioStorageService;
+        this.kieuSanPhamRepository = kieuSanPhamRepository;
+        this.boSuuTapRepository = boSuuTapRepository;
+        this.thuongHieuRepository = thuongHieuRepository;
     }
 
     @Transactional
@@ -49,7 +60,7 @@ public class SanPhamService {
     @Transactional
     public SanPham createSanPham(String tenSanPham, Double giaVon, Double giaBan, Integer giaGiam,
             String moTa, Integer soLuong, Integer trangThai, Long kieuSanPhamId, Long boSuuTapId,
-            Long thuongHieuId, MultipartFile file) {
+            Long thuongHieuId, MultipartFile file) throws IdInvalidException {
 
         SanPham sanPham = new SanPham();
         sanPham.setTenSanPham(tenSanPham);
@@ -61,18 +72,18 @@ public class SanPhamService {
         sanPham.setTrangThai(trangThai);
 
         if (kieuSanPhamId != null) {
-            KieuSanPham ksp = new KieuSanPham();
-            ksp.setId(kieuSanPhamId);
+            KieuSanPham ksp = kieuSanPhamRepository.findById(kieuSanPhamId)
+                    .orElseThrow(() -> new IdInvalidException("Không tìm thấy kiểu sản phẩm: " + kieuSanPhamId));
             sanPham.setKieuSanPham(ksp);
         }
         if (boSuuTapId != null) {
-            BoSuuTap bst = new BoSuuTap();
-            bst.setId(boSuuTapId);
+            BoSuuTap bst = boSuuTapRepository.findById(boSuuTapId)
+                    .orElseThrow(() -> new IdInvalidException("Không tìm thấy bộ sưu tập: " + boSuuTapId));
             sanPham.setBoSuuTap(bst);
         }
         if (thuongHieuId != null) {
-            ThuongHieu th = new ThuongHieu();
-            th.setId(thuongHieuId);
+            ThuongHieu th = thuongHieuRepository.findById(thuongHieuId)
+                    .orElseThrow(() -> new IdInvalidException("Không tìm thấy thương hiệu: " + thuongHieuId));
             sanPham.setThuongHieu(th);
         }
 
@@ -86,9 +97,9 @@ public class SanPhamService {
     }
 
     @Transactional
-    public SanPham update(SanPham sanPham) {
+    public SanPham update(SanPham sanPham) throws IdInvalidException {
         SanPham existing = sanPhamRepository.findById(sanPham.getId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm: " + sanPham.getId()));
+                .orElseThrow(() -> new IdInvalidException("Không tìm thấy sản phẩm: " + sanPham.getId()));
 
         existing.setTenSanPham(sanPham.getTenSanPham());
         existing.setGiaVon(sanPham.getGiaVon());
@@ -125,7 +136,7 @@ public class SanPhamService {
     @Transactional
     public SanPham updateSanPham(Long id, String tenSanPham, Double giaVon, Double giaBan, Integer giaGiam,
             String moTa, Integer soLuong, Integer trangThai, Long kieuSanPhamId, Long boSuuTapId,
-            Long thuongHieuId, MultipartFile file) {
+            Long thuongHieuId, MultipartFile file) throws IdInvalidException {
 
         SanPham sanPham = new SanPham();
         sanPham.setId(id);
@@ -138,18 +149,18 @@ public class SanPhamService {
         sanPham.setTrangThai(trangThai);
 
         if (kieuSanPhamId != null) {
-            KieuSanPham ksp = new KieuSanPham();
-            ksp.setId(kieuSanPhamId);
+            KieuSanPham ksp = kieuSanPhamRepository.findById(kieuSanPhamId)
+                    .orElseThrow(() -> new IdInvalidException("Không tìm thấy kiểu sản phẩm: " + kieuSanPhamId));
             sanPham.setKieuSanPham(ksp);
         }
         if (boSuuTapId != null) {
-            BoSuuTap bst = new BoSuuTap();
-            bst.setId(boSuuTapId);
+            BoSuuTap bst = boSuuTapRepository.findById(boSuuTapId)
+                    .orElseThrow(() -> new IdInvalidException("Không tìm thấy bộ sưu tập: " + boSuuTapId));
             sanPham.setBoSuuTap(bst);
         }
         if (thuongHieuId != null) {
-            ThuongHieu th = new ThuongHieu();
-            th.setId(thuongHieuId);
+            ThuongHieu th = thuongHieuRepository.findById(thuongHieuId)
+                    .orElseThrow(() -> new IdInvalidException("Không tìm thấy thương hiệu: " + thuongHieuId));
             sanPham.setThuongHieu(th);
         }
 

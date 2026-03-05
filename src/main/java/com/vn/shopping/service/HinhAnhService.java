@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.vn.shopping.domain.HinhAnh;
 import com.vn.shopping.repository.HinhAnhRepository;
+import com.vn.shopping.util.error.IdInvalidException;
 
 @Service
 public class HinhAnhService {
@@ -20,9 +21,9 @@ public class HinhAnhService {
         return hinhAnhRepository.save(hinhAnh);
     }
 
-    public HinhAnh update(HinhAnh hinhAnh) {
+    public HinhAnh update(HinhAnh hinhAnh) throws IdInvalidException {
         HinhAnh existing = hinhAnhRepository.findById(hinhAnh.getId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy hình ảnh: " + hinhAnh.getId()));
+                .orElseThrow(() -> new IdInvalidException("Không tìm thấy hình ảnh: " + hinhAnh.getId()));
         existing.setTenHinhAnh(hinhAnh.getTenHinhAnh());
         existing.setChiTietSanPham(hinhAnh.getChiTietSanPham());
         return hinhAnhRepository.save(existing);

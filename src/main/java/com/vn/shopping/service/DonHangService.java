@@ -30,11 +30,13 @@ public class DonHangService {
     private final ChiTietDonHangRepository chiTietDonHangRepository;
     private final ChiTietSanPhamRepository chiTietSanPhamRepository;
     private final SanPhamRepository sanPhamRepository;
+    private final CuaHangRepository cuaHangRepository;
 
     public DonHangService(DonHangRepository donHangRepository, EntityManager entityManager,
             KhachHangRepository khachHangRepository, NhanVienRepository nhanVienRepository,
             GioHangRepository gioHangRepository, ChiTietDonHangRepository chiTietDonHangRepository,
-            ChiTietSanPhamRepository chiTietSanPhamRepository, SanPhamRepository sanPhamRepository) {
+            ChiTietSanPhamRepository chiTietSanPhamRepository, SanPhamRepository sanPhamRepository,
+            CuaHangRepository cuaHangRepository) {
         this.donHangRepository = donHangRepository;
         this.entityManager = entityManager;
         this.khachHangRepository = khachHangRepository;
@@ -43,6 +45,7 @@ public class DonHangService {
         this.chiTietDonHangRepository = chiTietDonHangRepository;
         this.chiTietSanPhamRepository = chiTietSanPhamRepository;
         this.sanPhamRepository = sanPhamRepository;
+        this.cuaHangRepository = cuaHangRepository;
     }
 
     @Transactional
@@ -87,8 +90,8 @@ public class DonHangService {
         donHang.setTrangThaiThanhToan(0); // 0 = chưa thanh toán
 
         if (req.getCuaHangId() != null) {
-            CuaHang ch = new CuaHang();
-            ch.setId(req.getCuaHangId());
+            CuaHang ch = cuaHangRepository.findById(req.getCuaHangId())
+                    .orElseThrow(() -> new IdInvalidException("Không tìm thấy cửa hàng: " + req.getCuaHangId()));
             donHang.setCuaHang(ch);
         }
 
@@ -174,9 +177,9 @@ public class DonHangService {
     }
 
     @Transactional
-    public DonHang update(DonHang donHang) {
+    public DonHang update(DonHang donHang) throws IdInvalidException {
         DonHang existing = donHangRepository.findById(donHang.getId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng: " + donHang.getId()));
+                .orElseThrow(() -> new IdInvalidException("Không tìm thấy đơn hàng: " + donHang.getId()));
 
         // Lưu trạng thái cũ để kiểm tra chuyển trạng thái
         Integer trangThaiCu = existing.getTrangThai();

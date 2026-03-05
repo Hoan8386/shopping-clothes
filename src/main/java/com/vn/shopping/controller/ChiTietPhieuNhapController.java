@@ -52,7 +52,7 @@ public class ChiTietPhieuNhapController {
             @RequestParam(value = "soLuong", required = false) Integer soLuong,
             @RequestParam(value = "ghiTru", required = false) String ghiTru,
             @RequestParam(value = "ghiTruKiemHang", required = false) String ghiTruKiemHang,
-            @RequestParam(value = "trangThai", required = false) Integer trangThai) {
+            @RequestParam(value = "trangThai", required = false) Integer trangThai) throws IdInvalidException {
         ChiTietPhieuNhap created = chiTietPhieuNhapService.create(
                 phieuNhapId, chiTietSanPhamId, soLuong, ghiTru, ghiTruKiemHang, trangThai);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);

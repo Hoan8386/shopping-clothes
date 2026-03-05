@@ -8,14 +8,23 @@ import com.vn.shopping.domain.ChiTietPhieuNhap;
 import com.vn.shopping.domain.ChiTietSanPham;
 import com.vn.shopping.domain.PhieuNhap;
 import com.vn.shopping.repository.ChiTietPhieuNhapRepository;
+import com.vn.shopping.repository.ChiTietSanPhamRepository;
+import com.vn.shopping.repository.PhieuNhapRepository;
+import com.vn.shopping.util.error.IdInvalidException;
 
 @Service
 public class ChiTietPhieuNhapService {
 
     private final ChiTietPhieuNhapRepository chiTietPhieuNhapRepository;
+    private final PhieuNhapRepository phieuNhapRepository;
+    private final ChiTietSanPhamRepository chiTietSanPhamRepository;
 
-    public ChiTietPhieuNhapService(ChiTietPhieuNhapRepository chiTietPhieuNhapRepository) {
+    public ChiTietPhieuNhapService(ChiTietPhieuNhapRepository chiTietPhieuNhapRepository,
+            PhieuNhapRepository phieuNhapRepository,
+            ChiTietSanPhamRepository chiTietSanPhamRepository) {
         this.chiTietPhieuNhapRepository = chiTietPhieuNhapRepository;
+        this.phieuNhapRepository = phieuNhapRepository;
+        this.chiTietSanPhamRepository = chiTietSanPhamRepository;
     }
 
     public ChiTietPhieuNhap create(ChiTietPhieuNhap chiTietPhieuNhap) {
@@ -23,7 +32,7 @@ public class ChiTietPhieuNhapService {
     }
 
     public ChiTietPhieuNhap create(Long phieuNhapId, Long chiTietSanPhamId, Integer soLuong,
-            String ghiTru, String ghiTruKiemHang, Integer trangThai) {
+            String ghiTru, String ghiTruKiemHang, Integer trangThai) throws IdInvalidException {
         ChiTietPhieuNhap ct = new ChiTietPhieuNhap();
         ct.setSoLuong(soLuong);
         ct.setGhiTru(ghiTru);
@@ -31,22 +40,22 @@ public class ChiTietPhieuNhapService {
         ct.setTrangThai(trangThai);
 
         if (phieuNhapId != null) {
-            PhieuNhap pn = new PhieuNhap();
-            pn.setId(phieuNhapId);
+            PhieuNhap pn = phieuNhapRepository.findById(phieuNhapId)
+                    .orElseThrow(() -> new IdInvalidException("Không tìm thấy phiếu nhập: " + phieuNhapId));
             ct.setPhieuNhap(pn);
         }
         if (chiTietSanPhamId != null) {
-            ChiTietSanPham ctsp = new ChiTietSanPham();
-            ctsp.setId(chiTietSanPhamId);
+            ChiTietSanPham ctsp = chiTietSanPhamRepository.findById(chiTietSanPhamId)
+                    .orElseThrow(() -> new IdInvalidException("Không tìm thấy chi tiết sản phẩm: " + chiTietSanPhamId));
             ct.setChiTietSanPham(ctsp);
         }
 
         return chiTietPhieuNhapRepository.save(ct);
     }
 
-    public ChiTietPhieuNhap update(ChiTietPhieuNhap chiTietPhieuNhap) {
+    public ChiTietPhieuNhap update(ChiTietPhieuNhap chiTietPhieuNhap) throws IdInvalidException {
         ChiTietPhieuNhap existing = chiTietPhieuNhapRepository.findById(chiTietPhieuNhap.getId())
-                .orElseThrow(() -> new RuntimeException(
+                .orElseThrow(() -> new IdInvalidException(
                         "Không tìm thấy chi tiết phiếu nhập: " + chiTietPhieuNhap.getId()));
         existing.setPhieuNhap(chiTietPhieuNhap.getPhieuNhap());
         existing.setChiTietSanPham(chiTietPhieuNhap.getChiTietSanPham());

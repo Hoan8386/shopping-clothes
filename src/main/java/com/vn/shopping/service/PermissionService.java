@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.vn.shopping.domain.Permission;
 import com.vn.shopping.repository.PermissionRepository;
+import com.vn.shopping.util.error.IdInvalidException;
 
 @Service
 public class PermissionService {
@@ -25,9 +26,9 @@ public class PermissionService {
         return permissionRepository.save(permission);
     }
 
-    public Permission update(Permission permission) {
+    public Permission update(Permission permission) throws IdInvalidException {
         Permission existing = permissionRepository.findById(permission.getId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy quyền: " + permission.getId()));
+                .orElseThrow(() -> new IdInvalidException("Không tìm thấy quyền: " + permission.getId()));
         existing.setName(permission.getName());
         existing.setApiPath(permission.getApiPath());
         existing.setMethod(permission.getMethod());

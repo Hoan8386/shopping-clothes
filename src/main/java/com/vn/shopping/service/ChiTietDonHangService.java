@@ -9,14 +9,23 @@ import com.vn.shopping.domain.ChiTietDonHang;
 import com.vn.shopping.domain.ChiTietSanPham;
 import com.vn.shopping.domain.DonHang;
 import com.vn.shopping.repository.ChiTietDonHangRepository;
+import com.vn.shopping.repository.ChiTietSanPhamRepository;
+import com.vn.shopping.repository.DonHangRepository;
+import com.vn.shopping.util.error.IdInvalidException;
 
 @Service
 public class ChiTietDonHangService {
 
     private final ChiTietDonHangRepository chiTietDonHangRepository;
+    private final DonHangRepository donHangRepository;
+    private final ChiTietSanPhamRepository chiTietSanPhamRepository;
 
-    public ChiTietDonHangService(ChiTietDonHangRepository chiTietDonHangRepository) {
+    public ChiTietDonHangService(ChiTietDonHangRepository chiTietDonHangRepository,
+            DonHangRepository donHangRepository,
+            ChiTietSanPhamRepository chiTietSanPhamRepository) {
         this.chiTietDonHangRepository = chiTietDonHangRepository;
+        this.donHangRepository = donHangRepository;
+        this.chiTietSanPhamRepository = chiTietSanPhamRepository;
     }
 
     @Transactional
@@ -27,18 +36,18 @@ public class ChiTietDonHangService {
     @Transactional
     public ChiTietDonHang create(Long donHangId, Long chiTietSanPhamId,
             Double giaSanPham, Double giamGia, Double giaGiam,
-            Integer soLuong, Double thanhTien) {
+            Integer soLuong, Double thanhTien) throws IdInvalidException {
 
         ChiTietDonHang ct = new ChiTietDonHang();
 
         if (donHangId != null) {
-            DonHang dh = new DonHang();
-            dh.setId(donHangId);
+            DonHang dh = donHangRepository.findById(donHangId)
+                    .orElseThrow(() -> new IdInvalidException("Không tìm thấy đơn hàng: " + donHangId));
             ct.setDonHang(dh);
         }
         if (chiTietSanPhamId != null) {
-            ChiTietSanPham ctsp = new ChiTietSanPham();
-            ctsp.setId(chiTietSanPhamId);
+            ChiTietSanPham ctsp = chiTietSanPhamRepository.findById(chiTietSanPhamId)
+                    .orElseThrow(() -> new IdInvalidException("Không tìm thấy chi tiết sản phẩm: " + chiTietSanPhamId));
             ct.setChiTietSanPham(ctsp);
         }
 
@@ -52,9 +61,9 @@ public class ChiTietDonHangService {
     }
 
     @Transactional
-    public ChiTietDonHang update(ChiTietDonHang chiTiet) {
+    public ChiTietDonHang update(ChiTietDonHang chiTiet) throws IdInvalidException {
         ChiTietDonHang existing = chiTietDonHangRepository.findById(chiTiet.getId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy chi tiết đơn hàng: " + chiTiet.getId()));
+                .orElseThrow(() -> new IdInvalidException("Không tìm thấy chi tiết đơn hàng: " + chiTiet.getId()));
 
         existing.setDonHang(chiTiet.getDonHang());
         existing.setChiTietSanPham(chiTiet.getChiTietSanPham());
