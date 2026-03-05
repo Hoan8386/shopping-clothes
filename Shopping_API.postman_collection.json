@@ -1520,19 +1520,34 @@
 		},
 		{
 			"name": "Phiếu Nhập ( Admin)",
-			"description": "Quản lý phiếu nhập hàng — Chỉ Admin có permission mới được thao tác",
+			"description": "Quản lý phiếu nhập hàng — Chỉ Admin có permission mới được thao tác\n\nTrạng thái: 0 = Đã đặt, 1 = Đã nhận (cập nhật số lượng), 2 = Chậm giao, 3 = Hủy",
 			"item": [
 				{
-					"name": "Xem tất cả phiếu nhập ( Admin)",
+					"name": "Xem tất cả phiếu nhập + Lọc + Phân trang ( Admin)",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/v1/phieu-nhap",
+							"raw": "{{base_url}}/api/v1/phieu-nhap?page=0&size=10&sort=id,desc",
 							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "phieu-nhap"]
+							"path": ["api", "v1", "phieu-nhap"],
+							"query": [
+								{ "key": "page", "value": "0" },
+								{ "key": "size", "value": "10" },
+								{ "key": "sort", "value": "id,desc" },
+								{ "key": "tenPhieuNhap", "value": "đợt 1", "disabled": true, "description": "Tìm theo tên phiếu nhập (LIKE)" },
+								{ "key": "trangThai", "value": "1", "disabled": true, "description": "0: Đã đặt, 1: Đã nhận, 2: Chậm giao, 3: Hủy" },
+								{ "key": "tenCuaHang", "value": "Quận 1", "disabled": true, "description": "Tìm theo tên cửa hàng (LIKE)" },
+								{ "key": "tenNhaCungCap", "value": "Vải Việt", "disabled": true, "description": "Tìm theo tên nhà cung cấp (LIKE)" },
+								{ "key": "ngayTaoTu", "value": "2026-03-01T00:00:00", "disabled": true, "description": "Ngày tạo từ (ISO DateTime)" },
+								{ "key": "ngayTaoDen", "value": "2026-03-31T23:59:59", "disabled": true, "description": "Ngày tạo đến (ISO DateTime)" },
+								{ "key": "ngayGiaoHangTu", "value": "", "disabled": true, "description": "Ngày giao hàng từ" },
+								{ "key": "ngayGiaoHangDen", "value": "", "disabled": true, "description": "Ngày giao hàng đến" },
+								{ "key": "ngayNhanHangTu", "value": "", "disabled": true, "description": "Ngày nhận hàng từ" },
+								{ "key": "ngayNhanHangDen", "value": "", "disabled": true, "description": "Ngày nhận hàng đến" }
+							]
 						},
-						"description": " Admin — Xem danh sách tất cả phiếu nhập"
+						"description": " Admin — Xem danh sách phiếu nhập có lọc + phân trang. Bật/tắt các query param để lọc."
 					}
 				},
 				{
@@ -1555,14 +1570,14 @@
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"tenPhieuNhap\": \"Nhập hàng đợt 2 - CN Q.1\",\n    \"cuaHang\": { \"id\": 1 },\n    \"nhaCungCap\": { \"id\": 2 },\n    \"trangThai\": 1\n}"
+							"raw": "{\n    \"tenPhieuNhap\": \"Nhập hàng đợt 2 - CN Q.1\",\n    \"cuaHangId\": 1,\n    \"nhaCungCapId\": 2,\n    \"ngayGiaoHang\": null,\n    \"ngayNhanHang\": null\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/phieu-nhap",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "phieu-nhap"]
 						},
-						"description": " Admin — Tạo phiếu nhập mới"
+						"description": " Admin — Tạo phiếu nhập mới (trạng thái mặc định = 0: Đã đặt)"
 					}
 				},
 				{
@@ -1572,14 +1587,14 @@
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"id\": 1,\n    \"tenPhieuNhap\": \"Nhập hàng đợt 1 - CN Q.1 (Updated)\",\n    \"cuaHang\": { \"id\": 1 },\n    \"nhaCungCap\": { \"id\": 1 },\n    \"trangThai\": 1\n}"
+							"raw": "{\n    \"id\": 1,\n    \"tenPhieuNhap\": \"Nhập hàng đợt 1 - CN Q.1 (Updated)\",\n    \"cuaHangId\": 1,\n    \"nhaCungCapId\": 1,\n    \"trangThai\": 1,\n    \"ngayGiaoHang\": null,\n    \"ngayNhanHang\": null\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/phieu-nhap",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "phieu-nhap"]
 						},
-						"description": " Admin — Cập nhật phiếu nhập"
+						"description": " Admin — Cập nhật phiếu nhập. Trạng thái: 0=Đã đặt, 1=Đã nhận (cập nhật SL), 2=Chậm giao, 3=Hủy (không thể cập nhật lại)"
 					}
 				},
 				{
@@ -1644,56 +1659,17 @@
 					"name": "Tạo chi tiết phiếu nhập ( Admin)",
 					"request": {
 						"method": "POST",
-						"header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
-							"mode": "urlencoded",
-							"urlencoded": [
-								{
-									"key": "phieuNhapId",
-									"value": "1",
-									"type": "text",
-									"description": "Mã phiếu nhập"
-								},
-								{
-									"key": "chiTietSanPhamId",
-									"value": "1",
-									"type": "text",
-									"description": "Mã chi tiết sản phẩm"
-								},
-								{
-									"key": "soLuong",
-									"value": "100",
-									"type": "text",
-									"description": "Số lượng nhập"
-								},
-								{
-									"key": "ghiTru",
-									"value": "",
-									"type": "text",
-									"description": "Ghi trừ (không bắt buộc)",
-									"disabled": true
-								},
-								{
-									"key": "ghiTruKiemHang",
-									"value": "",
-									"type": "text",
-									"description": "Ghi trừ kiểm hàng (không bắt buộc)",
-									"disabled": true
-								},
-								{
-									"key": "trangThai",
-									"value": "1",
-									"type": "text",
-									"description": "Trạng thái"
-								}
-							]
+							"mode": "raw",
+							"raw": "{\n    \"phieuNhapId\": 1,\n    \"chiTietSanPhamId\": 1,\n    \"soLuong\": 100,\n    \"ghiTru\": \"\",\n    \"ghiTruKiemHang\": \"\",\n    \"trangThai\": 1\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/chi-tiet-phieu-nhap",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "chi-tiet-phieu-nhap"]
 						},
-						"description": " Admin — Tạo chi tiết phiếu nhập (truyền từng trường qua form-urlencoded)"
+						"description": " Admin — Tạo chi tiết phiếu nhập (JSON body)"
 					}
 				},
 				{
@@ -1703,14 +1679,14 @@
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"id\": 1,\n    \"phieuNhap\": { \"id\": 1 },\n    \"chiTietSanPham\": { \"id\": 1 },\n    \"soLuong\": 60,\n    \"trangThai\": 1\n}"
+							"raw": "{\n    \"id\": 1,\n    \"phieuNhapId\": 1,\n    \"chiTietSanPhamId\": 1,\n    \"soLuong\": 60,\n    \"ghiTru\": \"\",\n    \"ghiTruKiemHang\": \"\",\n    \"trangThai\": 1\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/chi-tiet-phieu-nhap",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "chi-tiet-phieu-nhap"]
 						},
-						"description": " Admin — Cập nhật chi tiết phiếu nhập"
+						"description": " Admin — Cập nhật chi tiết phiếu nhập (JSON body)"
 					}
 				},
 				{
