@@ -1728,7 +1728,7 @@
 								{ "key": "hinhThucDonHang", "value": "1", "disabled": true }
 							]
 						},
-						"description": " Admin/NV: xem tất cả đơn hàng (có lọc + phân trang). KH: chỉ xem đơn hàng của chính mình.\nFilter params (tùy chọn): cuaHangId, nhanVienId, trangThai, trangThaiThanhToan, hinhThucDonHang (0=tại quầy, 1=online)"
+						"description": " Admin/NV: xem tất cả đơn hàng (có lọc + phân trang). KH: chỉ xem đơn hàng của chính mình.\nFilter params (tùy chọn): cuaHangId, nhanVienId, trangThai (0=đã đặt, 1=đã nhận đơn, 2=đang đóng gói, 3=đã gửi, 4=hủy, 5=đã nhận hàng), trangThaiThanhToan, hinhThucDonHang (0=tại quầy, 1=online)"
 					}
 				},
 				{
@@ -1751,14 +1751,14 @@
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"diaChi\": \"123 Nguyễn Trãi, Q.1, TP.HCM\",\n    \"cuaHangId\": null,\n    \"maKhuyenMaiHoaDon\": null,\n    \"maKhuyenMaiDiem\": null,\n    \"khachHangId\": null\n}"
+							"raw": "{\n    \"diaChi\": \"123 Nguyễn Trãi, Q.1, TP.HCM\",\n    \"sdt\": \"0901234567\",\n    \"cuaHangId\": null,\n    \"maKhuyenMaiHoaDon\": null,\n    \"maKhuyenMaiDiem\": null\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/don-hang/online",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "don-hang", "online"]
 						},
-						"description": " Khách hàng — Tạo đơn hàng online từ giỏ hàng. Thông tin KH lấy từ token, hàng lấy từ giỏ hàng, sau khi tạo đơn sẽ xóa giỏ hàng."
+						"description": " Khách hàng — Tạo đơn hàng online từ giỏ hàng. Thông tin KH lấy từ token, hàng lấy từ giỏ hàng, sau khi tạo đơn sẽ xóa giỏ hàng.\nBody: diaChi (bắt buộc), sdt (SĐT nhận hàng), cuaHangId, maKhuyenMaiHoaDon, maKhuyenMaiDiem (tùy chọn)."
 					}
 				},
 				{
@@ -1779,20 +1779,20 @@
 					}
 				},
 				{
-					"name": "Cập nhật đơn hàng ( Admin)",
+					"name": "Cập nhật trạng thái đơn hàng",
 					"request": {
 						"method": "PUT",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"id\": 1,\n    \"cuaHang\": { \"id\": 1 },\n    \"khachHang\": { \"id\": 1 },\n    \"nhanVien\": { \"id\": 1 },\n    \"diaChi\": \"456 Lê Lợi, Q.3, TP.HCM\",\n    \"tongTien\": 600000,\n    \"tienGiam\": 60000,\n    \"tongTienGiam\": 60000,\n    \"tongTienTra\": 540000,\n    \"trangThai\": 2,\n    \"trangThaiThanhToan\": 1,\n    \"hinhThucDonHang\": 1\n}"
+							"raw": "{\n    \"id\": 1,\n    \"trangThai\": 1\n    // \"trangThai\": 1   // NV nhận đơn (0→1)\n    // \"trangThai\": 2   // NV đóng gói (1→2)\n    // \"trangThai\": 3   // NV đã gửi (2→3)\n    // \"trangThai\": 4   // Hủy đơn (0,1→4)\n    // \"trangThai\": 5   // KH đã nhận hàng (3→5)\n    // \"diaChi\": \"456 Lê Lợi, Q.3, TP.HCM\"  // Chỉ cập nhật khi trangThai < 2\n    // \"sdt\": \"0987654321\"                    // Chỉ cập nhật khi trangThai < 2\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/don-hang",
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "don-hang"]
 						},
-						"description": " Admin — Cập nhật đơn hàng"
+						"description": "Cập nhật trạng thái đơn hàng.\nTrạng thái: 0=đã đặt hàng, 1=đã nhận đơn, 2=đang đóng gói, 3=đã gửi, 4=hủy, 5=đã nhận hàng.\nLuồng NV: 0→1→2→3. KH xác nhận: 3→5. Hủy: 0→4, 1→4.\nĐịa chỉ + SĐT chỉ được cập nhật khi trạng thái < 2 (chưa đóng gói)."
 					}
 				},
 				{

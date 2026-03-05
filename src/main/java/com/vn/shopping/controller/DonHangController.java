@@ -6,7 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.vn.shopping.domain.DonHang;
+import com.vn.shopping.domain.request.ReqCapNhatDonHangDTO;
 import com.vn.shopping.domain.request.ReqTaoDonHangDTO;
+import com.vn.shopping.domain.response.ResDonHangDTO;
 import com.vn.shopping.domain.response.ResultPaginationDTO;
 import com.vn.shopping.service.DonHangService;
 import com.vn.shopping.util.anotation.ApiMessage;
@@ -37,7 +39,7 @@ public class DonHangController {
 
     @GetMapping("/{id}")
     @ApiMessage("Lấy đơn hàng theo id")
-    public ResponseEntity<DonHang> getById(@PathVariable("id") long id) throws IdInvalidException {
+    public ResponseEntity<ResDonHangDTO> getById(@PathVariable("id") long id) throws IdInvalidException {
         return ResponseEntity.ok(donHangService.findByIdForCurrentUser(id));
     }
 
@@ -49,8 +51,9 @@ public class DonHangController {
      */
     @PostMapping("/online")
     @ApiMessage("Khách hàng tạo đơn hàng online từ giỏ hàng")
-    public ResponseEntity<DonHang> taoDonHangOnline(@RequestBody ReqTaoDonHangDTO req) throws IdInvalidException {
-        return ResponseEntity.status(HttpStatus.CREATED).body(donHangService.taoDonHangOnline(req));
+    public ResponseEntity<ResDonHangDTO> taoDonHangOnline(@RequestBody ReqTaoDonHangDTO req) throws IdInvalidException {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(donHangService.convertToDTO(donHangService.taoDonHangOnline(req)));
     }
 
     /**
@@ -60,17 +63,15 @@ public class DonHangController {
      */
     @PostMapping("/tai-quay")
     @ApiMessage("Nhân viên tạo đơn hàng tại quầy")
-    public ResponseEntity<DonHang> taoDonHangTaiQuay(@RequestBody DonHang donHang) throws IdInvalidException {
-        return ResponseEntity.status(HttpStatus.CREATED).body(donHangService.taoDonHangTaiQuay(donHang));
+    public ResponseEntity<ResDonHangDTO> taoDonHangTaiQuay(@RequestBody DonHang donHang) throws IdInvalidException {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(donHangService.convertToDTO(donHangService.taoDonHangTaiQuay(donHang)));
     }
 
     @PutMapping
-    @ApiMessage("Cập nhật đơn hàng")
-    public ResponseEntity<DonHang> update(@RequestBody DonHang donHang) throws IdInvalidException {
-        if (donHang.getId() == null || donHang.getId() == 0) {
-            throw new IdInvalidException("Mã đơn hàng không được để trống");
-        }
-        return ResponseEntity.ok(donHangService.update(donHang));
+    @ApiMessage("Cập nhật trạng thái đơn hàng")
+    public ResponseEntity<ResDonHangDTO> update(@RequestBody ReqCapNhatDonHangDTO req) throws IdInvalidException {
+        return ResponseEntity.ok(donHangService.convertToDTO(donHangService.capNhatDonHang(req)));
     }
 
     @DeleteMapping("/{id}")

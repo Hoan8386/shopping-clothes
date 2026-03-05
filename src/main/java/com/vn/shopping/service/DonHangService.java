@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vn.shopping.domain.*;
+import com.vn.shopping.domain.request.ReqCapNhatDonHangDTO;
 import com.vn.shopping.domain.request.ReqTaoDonHangDTO;
+import com.vn.shopping.domain.response.ResDonHangDTO;
 import com.vn.shopping.domain.response.ResultPaginationDTO;
 import com.vn.shopping.repository.*;
 import com.vn.shopping.util.error.IdInvalidException;
@@ -83,6 +85,7 @@ public class DonHangService {
         DonHang donHang = new DonHang();
         donHang.setKhachHang(khachHang);
         donHang.setDiaChi(req.getDiaChi());
+        donHang.setSdt(req.getSdt());
         donHang.setMaKhuyenMaiHoaDon(req.getMaKhuyenMaiHoaDon());
         donHang.setMaKhuyenMaiDiem(req.getMaKhuyenMaiDiem());
         donHang.setHinhThucDonHang(1); // 1 = online
@@ -176,33 +179,63 @@ public class DonHangService {
         return saved;
     }
 
+    /**
+     * Cập nhật trạng thái đơn hàng + địa chỉ (nếu chưa đóng gói).
+     * Trạng thái: 0=đã đặt hàng, 1=đã nhận đơn, 2=đang đóng gói, 3=đã gửi, 4=hủy,
+     * 5=đã nhận hàng
+     *
+     * Luồng chuyển trạng thái:
+     * - Nhân viên: 0→1, 1→2, 2→3
+     * - Khách hàng: 3→5 (xác nhận đã nhận hàng)
+     * - Hủy đơn: 0→4, 1→4 (chỉ khi chưa đóng gói)
+     * - Địa chỉ/SĐT chỉ được cập nhật khi trạng thái hiện tại < 2
+     */
     @Transactional
-    public DonHang update(DonHang donHang) throws IdInvalidException {
-        DonHang existing = donHangRepository.findById(donHang.getId())
-                .orElseThrow(() -> new IdInvalidException("Không tìm thấy đơn hàng: " + donHang.getId()));
+    public DonHang capNhatDonHang(ReqCapNhatDonHangDTO req) throws IdInvalidException {
+        if (req.getId() == null || req.getId() == 0) {
+            throw new IdInvalidException("Mã đơn hàng không được để trống");
+        }
 
-        // Lưu trạng thái cũ để kiểm tra chuyển trạng thái
-        Integer trangThaiCu = existing.getTrangThai();
+        DonHang existing = donHangRepository.findById(req.getId())
+                .orElseThrow(() -> new IdInvalidException("Không tìm thấy đơn hàng: " + req.getId()));
 
-        existing.setCuaHang(donHang.getCuaHang());
-        existing.setKhachHang(donHang.getKhachHang());
-        existing.setNhanVien(donHang.getNhanVien());
-        existing.setMaKhuyenMaiHoaDon(donHang.getMaKhuyenMaiHoaDon());
-        existing.setMaKhuyenMaiDiem(donHang.getMaKhuyenMaiDiem());
-        existing.setDiaChi(donHang.getDiaChi());
-        existing.setTongTien(donHang.getTongTien());
-        existing.setTienGiam(donHang.getTienGiam());
-        existing.setTongTienGiam(donHang.getTongTienGiam());
-        existing.setTongTienTra(donHang.getTongTienTra());
-        existing.setTrangThai(donHang.getTrangThai());
-        existing.setTrangThaiThanhToan(donHang.getTrangThaiThanhToan());
-        existing.setHinhThucDonHang(donHang.getHinhThucDonHang());
+        Integer trangThaiCu = existing.getTrangThai() != null ? existing.getTrangThai() : 0;
 
-        // Cộng điểm tích lũy khi trạng thái đơn hàng chuyển sang "Thành công" (3)
-        // Mỗi 100.000 VND = 10 điểm
-        if (donHang.getTrangThai() != null && donHang.getTrangThai() == 3
-                && (trangThaiCu == null || trangThaiCu != 3)) {
-            congDiemTichLuy(existing);
+        // Cập nhật địa chỉ + SĐT: chỉ cho phép khi chưa đóng gói (trangThai < 2)
+        if (req.getDiaChi() != null) {
+            if (trangThaiCu >= 2) {
+                throw new IdInvalidException("Không thể cập nhật địa chỉ khi đơn hàng đã đóng gói hoặc đã gửi");
+            }
+            existing.setDiaChi(req.getDiaChi());
+        }
+
+        if (req.getSdt() != null) {
+            if (trangThaiCu >= 2) {
+                throw new IdInvalidException("Không thể cập nhật số điện thoại khi đơn hàng đã đóng gói hoặc đã gửi");
+            }
+            existing.setSdt(req.getSdt());
+        }
+
+        // Cập nhật trạng thái
+        if (req.getTrangThai() != null) {
+            Integer trangThaiMoi = req.getTrangThai();
+            validateChuyenTrangThai(trangThaiCu, trangThaiMoi);
+            existing.setTrangThai(trangThaiMoi);
+
+            // Nếu đơn hàng online (1) và nhân viên cập nhật trạng thái → gán nhân viên
+            if (existing.getHinhThucDonHang() != null && existing.getHinhThucDonHang() == 1
+                    && (trangThaiMoi == 1 || trangThaiMoi == 2 || trangThaiMoi == 3)) {
+                String email = SecurityContextHolder.getContext().getAuthentication().getName();
+                NhanVien nv = nhanVienRepository.findByEmail(email).orElse(null);
+                if (nv != null) {
+                    existing.setNhanVien(nv);
+                }
+            }
+
+            // Cộng điểm tích lũy khi khách hàng xác nhận đã nhận hàng (5)
+            if (trangThaiMoi == 5 && trangThaiCu != 5) {
+                congDiemTichLuy(existing);
+            }
         }
 
         DonHang saved = donHangRepository.save(existing);
@@ -211,12 +244,37 @@ public class DonHangService {
         return donHangRepository.findById(saved.getId()).orElse(saved);
     }
 
+    /**
+     * Kiểm tra chuyển trạng thái hợp lệ.
+     * 0→1, 1→2, 2→3, 3→5: luồng chính
+     * 0→4, 1→4: hủy đơn (chỉ khi chưa đóng gói)
+     */
+    private void validateChuyenTrangThai(Integer trangThaiCu, Integer trangThaiMoi) throws IdInvalidException {
+        boolean hopLe = false;
+
+        if (trangThaiMoi == 4) {
+            // Hủy đơn: chỉ cho phép khi chưa đóng gói (0 hoặc 1)
+            hopLe = (trangThaiCu == 0 || trangThaiCu == 1);
+        } else {
+            // Luồng chính: 0→1, 1→2, 2→3, 3→5
+            hopLe = (trangThaiCu == 0 && trangThaiMoi == 1)
+                    || (trangThaiCu == 1 && trangThaiMoi == 2)
+                    || (trangThaiCu == 2 && trangThaiMoi == 3)
+                    || (trangThaiCu == 3 && trangThaiMoi == 5);
+        }
+
+        if (!hopLe) {
+            throw new IdInvalidException(
+                    "Không thể chuyển trạng thái từ " + trangThaiCu + " sang " + trangThaiMoi);
+        }
+    }
+
     public void delete(long id) {
         donHangRepository.deleteById(id);
     }
 
     /**
-     * Cộng điểm tích lũy cho khách hàng khi đơn hàng thành công.
+     * Cộng điểm tích lũy cho khách hàng khi xác nhận đã nhận hàng (trạng thái 5).
      * Mỗi 100.000 VND = 10 điểm
      */
     private void congDiemTichLuy(DonHang donHang) {
@@ -336,9 +394,13 @@ public class DonHangService {
         meta.setPages(page.getTotalPages());
         meta.setTotal(page.getTotalElements());
 
+        List<ResDonHangDTO> dtoList = page.getContent().stream()
+                .map(this::convertToDTO)
+                .toList();
+
         ResultPaginationDTO result = new ResultPaginationDTO();
         result.setMeta(meta);
-        result.setResult(page.getContent());
+        result.setResult(dtoList);
         return result;
     }
 
@@ -348,7 +410,7 @@ public class DonHangService {
      * - NHAN_VIEN / ADMIN xem được tất cả
      */
     @Transactional(readOnly = true)
-    public DonHang findByIdForCurrentUser(long id) throws IdInvalidException {
+    public ResDonHangDTO findByIdForCurrentUser(long id) throws IdInvalidException {
         DonHang donHang = donHangRepository.findById(id).orElse(null);
         if (donHang == null) {
             throw new IdInvalidException("Không tìm thấy đơn hàng: " + id);
@@ -364,6 +426,73 @@ public class DonHangService {
             }
         }
 
-        return donHang;
+        return convertToDTO(donHang);
+    }
+
+    public ResDonHangDTO convertToDTO(DonHang donHang) {
+        ResDonHangDTO dto = new ResDonHangDTO();
+        dto.setId(donHang.getId());
+        dto.setDiaChi(donHang.getDiaChi());
+        dto.setSdt(donHang.getSdt());
+        dto.setTongTien(donHang.getTongTien());
+        dto.setTienGiam(donHang.getTienGiam());
+        dto.setTongTienGiam(donHang.getTongTienGiam());
+        dto.setTongTienTra(donHang.getTongTienTra());
+        dto.setTrangThai(donHang.getTrangThai());
+        dto.setTrangThaiThanhToan(donHang.getTrangThaiThanhToan());
+        dto.setHinhThucDonHang(donHang.getHinhThucDonHang());
+        dto.setMaKhuyenMaiHoaDon(donHang.getMaKhuyenMaiHoaDon());
+        dto.setMaKhuyenMaiDiem(donHang.getMaKhuyenMaiDiem());
+        dto.setNgayTao(donHang.getNgayTao());
+        dto.setNgayCapNhat(donHang.getNgayCapNhat());
+
+        if (donHang.getCuaHang() != null) {
+            CuaHang ch = donHang.getCuaHang();
+            dto.setCuaHang(new ResDonHangDTO.CuaHangDTO(
+                    ch.getId(), ch.getTenCuaHang(), ch.getDiaChi(), ch.getSoDienThoai()));
+        }
+
+        if (donHang.getKhachHang() != null) {
+            KhachHang kh = donHang.getKhachHang();
+            dto.setKhachHang(new ResDonHangDTO.KhachHangDTO(
+                    kh.getId(), kh.getTenKhachHang(), kh.getSdt(), kh.getEmail(), kh.getDiemTichLuy()));
+        }
+
+        if (donHang.getNhanVien() != null) {
+            NhanVien nv = donHang.getNhanVien();
+            dto.setNhanVien(new ResDonHangDTO.NhanVienDTO(
+                    nv.getId(), nv.getTenNhanVien(), nv.getEmail(), nv.getSoDienThoai()));
+        }
+
+        if (donHang.getChiTietDonHangs() != null) {
+            List<ResDonHangDTO.ChiTietDonHangDTO> chiTietList = donHang.getChiTietDonHangs().stream()
+                    .map(ct -> {
+                        ResDonHangDTO.ChiTietDonHangDTO ctDto = new ResDonHangDTO.ChiTietDonHangDTO();
+                        ctDto.setId(ct.getId());
+                        ctDto.setGiaSanPham(ct.getGiaSanPham());
+                        ctDto.setGiamGia(ct.getGiamGia());
+                        ctDto.setGiaGiam(ct.getGiaGiam());
+                        ctDto.setSoLuong(ct.getSoLuong());
+                        ctDto.setThanhTien(ct.getThanhTien());
+
+                        if (ct.getChiTietSanPham() != null) {
+                            ctDto.setChiTietSanPhamId(ct.getChiTietSanPham().getId());
+                            if (ct.getChiTietSanPham().getSanPham() != null) {
+                                ctDto.setTenSanPham(ct.getChiTietSanPham().getSanPham().getTenSanPham());
+                                ctDto.setHinhAnhChinh(ct.getChiTietSanPham().getSanPham().getHinhAnhChinh());
+                            }
+                            if (ct.getChiTietSanPham().getMauSac() != null) {
+                                ctDto.setTenMauSac(ct.getChiTietSanPham().getMauSac().getTenMauSac());
+                            }
+                            if (ct.getChiTietSanPham().getKichThuoc() != null) {
+                                ctDto.setTenKichThuoc(ct.getChiTietSanPham().getKichThuoc().getTenKichThuoc());
+                            }
+                        }
+                        return ctDto;
+                    }).toList();
+            dto.setChiTietDonHangs(chiTietList);
+        }
+
+        return dto;
     }
 }

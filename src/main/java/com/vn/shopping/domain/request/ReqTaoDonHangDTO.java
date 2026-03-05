@@ -10,13 +10,13 @@ public class ReqTaoDonHangDTO {
     // Địa chỉ giao hàng (online bắt buộc, tại quầy có thể null)
     private String diaChi;
 
+    // Số điện thoại nhận hàng
+    private String sdt;
+
     // Mã cửa hàng (nhân viên tạo tại quầy thì truyền, online có thể null)
     private Long cuaHangId;
 
     // Mã khuyến mãi (tùy chọn)
     private Long maKhuyenMaiHoaDon;
     private Long maKhuyenMaiDiem;
-
-    // Mã khách hàng (nhân viên tạo cho khách thì truyền, online tự lấy từ token)
-    private Long khachHangId;
 }
