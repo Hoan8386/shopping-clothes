@@ -24,22 +24,26 @@
 
 ### Điều kiện đánh giá
 
-| Điều kiện                                     | Mô tả                                             |
-| --------------------------------------------- | ------------------------------------------------- |
-| ✅ Đã đăng nhập bằng tài khoản **khách hàng** | Lấy thông tin KH từ JWT token                     |
-| ✅ Đơn hàng thuộc về khách hàng               | KH chỉ đánh giá được đơn hàng của mình            |
-| ✅ Đơn hàng **trạng thái = 3** (Thành công)   | Chỉ đánh giá khi đơn hàng đã giao thành công      |
-| ✅ Sản phẩm có trong đơn hàng                 | SP phải nằm trong chi tiết đơn hàng               |
-| ✅ Chưa đánh giá sản phẩm này trong đơn này   | Mỗi SP chỉ được đánh giá 1 lần trong mỗi đơn hàng |
+| Điều kiện                                       | Mô tả                                                                       |
+| ----------------------------------------------- | --------------------------------------------------------------------------- |
+| ✅ Đã đăng nhập bằng tài khoản **khách hàng**   | Lấy thông tin KH từ JWT token                                               |
+| ✅ Đơn hàng thuộc về khách hàng                 | KH chỉ đánh giá được đơn hàng của mình                                      |
+| ✅ Đơn hàng **trạng thái = 3** (Đang giao hàng) | Chỉ đánh giá khi đơn hàng đã giao thành công (code kiểm tra trangThai == 3) |
+| ✅ Sản phẩm có trong đơn hàng                   | SP phải nằm trong chi tiết đơn hàng                                         |
+| ✅ Chưa đánh giá sản phẩm này trong đơn này     | Mỗi SP chỉ được đánh giá 1 lần trong mỗi đơn hàng                           |
 
 ### Trạng thái đơn hàng (tham khảo)
 
 | Giá trị | Ý nghĩa           |
 | ------- | ----------------- |
 | `0`     | Chờ xác nhận      |
-| `1`     | Đang xử lý        |
-| `2`     | Đang giao         |
-| `3`     | **Thành công** ✅ |
+| `1`     | Đã xác nhận       |
+| `2`     | Đang đóng gói     |
+| `3`     | Đang giao hàng ✅ |
+| `4`     | Đã hủy            |
+| `5`     | Đã nhận hàng      |
+
+> **Lưu ý:** Code hiện tại kiểm tra `trangThai == 3` để cho phép đánh giá.
 
 > **Xem ảnh đánh giá:** Truy cập `GET /storage/{fileName}` để lấy file ảnh (không cần xác thực).
 

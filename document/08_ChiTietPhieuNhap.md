@@ -16,11 +16,19 @@
 | `phieuNhap`      | PhieuNhap      | Phiếu nhập cha (FK, ẩn trong JSON)      |
 | `chiTietSanPham` | ChiTietSanPham | Biến thể sản phẩm được nhập (FK)        |
 | `soLuong`        | Integer        | Số lượng nhập                           |
+| `soLuongThieu`   | Integer        | Số lượng thiếu (dùng khi kiểm kê)       |
 | `ghiTru`         | String(255)    | Ghi chú trừ                             |
 | `ghiTruKiemHang` | String(255)    | Ghi chú kiểm hàng                       |
-| `trangThai`      | Integer        | Trạng thái                              |
+| `trangThai`      | Integer        | Trạng thái (0: Đủ, 1: Thiếu)            |
 | `ngayTao`        | LocalDateTime  | Ngày tạo (tự động)                      |
 | `ngayCapNhat`    | LocalDateTime  | Ngày cập nhật (tự động)                 |
+
+### Mã trạng thái chi tiết phiếu nhập (`trangThai`)
+
+| Giá trị | Ý nghĩa | `trangThaiText` |
+| ------- | ------- | --------------- |
+| `0`     | Đủ      | "Đủ"            |
+| `1`     | Thiếu   | "Thiếu"         |
 
 ---
 
@@ -32,7 +40,32 @@
 | **Method**   | `GET`                             |
 | **Xác thực** | Bearer Token (JWT)                |
 
-**Response:** `200 OK` — Trả về `List<ChiTietPhieuNhap>`
+**Response:** `200 OK` — Trả về `List<ResChiTietPhieuNhapDTO>`
+
+```json
+[
+  {
+    "id": 1,
+    "phieuNhapId": 1,
+    "tenPhieuNhap": "Nhập hàng đợt 1 - CN Q.1",
+    "chiTietSanPham": {
+      "id": 1,
+      "soLuong": 50,
+      "tenSanPham": "Áo Oxford",
+      "tenMauSac": "Trắng",
+      "tenKichThuoc": "M"
+    },
+    "soLuong": 50,
+    "soLuongThieu": null,
+    "ghiTru": null,
+    "ghiTruKiemHang": null,
+    "trangThai": 0,
+    "trangThaiText": "Đủ",
+    "ngayTao": "2026-03-01T10:00:00",
+    "ngayCapNhat": null
+  }
+]
+```
 
 ---
 
@@ -44,7 +77,7 @@
 | **Method**   | `GET`                                  |
 | **Xác thực** | Bearer Token (JWT)                     |
 
-**Response:** `200 OK` — Trả về `ChiTietPhieuNhap`
+**Response:** `200 OK` — Trả về `ResChiTietPhieuNhapDTO`
 
 **Lỗi:**
 
@@ -68,31 +101,55 @@
 | ------------- | ---- | ------------- |
 | `phieuNhapId` | Long | Mã phiếu nhập |
 
-**Response:** `200 OK` — Trả về `List<ChiTietPhieuNhap>`
+**Response:** `200 OK` — Trả về `List<ResChiTietPhieuNhapDTO>`
 
 ---
 
 ## 4. Tạo chi tiết phiếu nhập
 
-| Thuộc tính       | Chi tiết                            |
-| ---------------- | ----------------------------------- |
-| **URL**          | `POST /api/v1/chi-tiet-phieu-nhap`  |
-| **Method**       | `POST`                              |
-| **Content-Type** | `application/x-www-form-urlencoded` |
-| **Xác thực**     | Bearer Token (JWT)                  |
+| Thuộc tính       | Chi tiết                           |
+| ---------------- | ---------------------------------- |
+| **URL**          | `POST /api/v1/chi-tiet-phieu-nhap` |
+| **Method**       | `POST`                             |
+| **Content-Type** | `application/json`                 |
+| **Xác thực**     | Bearer Token (JWT)                 |
 
-**Request Parameters:**
+**Request Body:** `ReqChiTietPhieuNhapDTO`
 
-| Tham số            | Kiểu    | Bắt buộc | Mô tả                |
-| ------------------ | ------- | -------- | -------------------- |
-| `phieuNhapId`      | Long    | Không    | Mã phiếu nhập        |
-| `chiTietSanPhamId` | Long    | Không    | Mã chi tiết sản phẩm |
-| `soLuong`          | Integer | Không    | Số lượng nhập        |
-| `ghiTru`           | String  | Không    | Ghi chú trừ          |
-| `ghiTruKiemHang`   | String  | Không    | Ghi chú kiểm hàng    |
-| `trangThai`        | Integer | Không    | Trạng thái           |
+```json
+{
+  "phieuNhapId": 1,
+  "chiTietSanPhamId": 1,
+  "soLuong": 50,
+  "soLuongThieu": null,
+  "ghiTru": null,
+  "ghiTruKiemHang": null,
+  "trangThai": 0
+}
+```
 
-**Response:** `201 Created` — Trả về `ChiTietPhieuNhap`
+**Kiểu dữ liệu:**
+
+```json
+{
+  "phieuNhapId": "Long",
+  "chiTietSanPhamId": "Long",
+  "soLuong": "Integer",
+  "soLuongThieu": "Integer",
+  "ghiTru": "String",
+  "ghiTruKiemHang": "String",
+  "trangThai": "Integer"
+}
+```
+
+**Response:** `201 Created` — Trả về `ResChiTietPhieuNhapDTO`
+
+**Lỗi:**
+
+| HTTP Status | Mô tả                            |
+| ----------- | -------------------------------- |
+| `400`       | Không tìm thấy phiếu nhập        |
+| `400`       | Không tìm thấy chi tiết sản phẩm |
 
 ---
 
@@ -105,14 +162,18 @@
 | **Content-Type** | `application/json`                |
 | **Xác thực**     | Bearer Token (JWT)                |
 
-**Request Body:** (phải có `id`)
+**Request Body:** `ReqChiTietPhieuNhapDTO` (phải có `id`)
 
 ```json
 {
   "id": 1,
+  "phieuNhapId": 1,
+  "chiTietSanPhamId": 1,
   "soLuong": 50,
+  "soLuongThieu": 0,
+  "ghiTru": null,
   "ghiTruKiemHang": "Đã kiểm tra đủ",
-  "trangThai": 1
+  "trangThai": 0
 }
 ```
 
@@ -120,20 +181,27 @@
 
 ```json
 {
-  "id": "Long",
+  "id": "Long (bắt buộc)",
+  "phieuNhapId": "Long",
+  "chiTietSanPhamId": "Long",
   "soLuong": "Integer",
+  "soLuongThieu": "Integer",
+  "ghiTru": "String",
   "ghiTruKiemHang": "String",
   "trangThai": "Integer"
 }
 ```
 
-**Response:** `200 OK` — Trả về `ChiTietPhieuNhap`
+**Response:** `200 OK` — Trả về `ResChiTietPhieuNhapDTO`
 
 **Lỗi:**
 
 | HTTP Status | Mô tả                                      |
 | ----------- | ------------------------------------------ |
 | `400`       | Mã chi tiết phiếu nhập không được để trống |
+| `400`       | Không tìm thấy chi tiết phiếu nhập         |
+| `400`       | Không tìm thấy phiếu nhập                  |
+| `400`       | Không tìm thấy chi tiết sản phẩm           |
 
 ---
 

@@ -35,6 +35,8 @@ public class PhieuNhapService {
     private static final int TRANG_THAI_DA_NHAN = 1;
     private static final int TRANG_THAI_CHAM_GIAO = 2;
     private static final int TRANG_THAI_HUY = 3;
+    private static final int TRANG_THAI_THIEU_HANG = 4;
+    private static final int TRANG_THAI_HOAN_THANH = 5;
 
     private final PhieuNhapRepository phieuNhapRepository;
     private final ChiTietPhieuNhapRepository chiTietPhieuNhapRepository;
@@ -91,13 +93,16 @@ public class PhieuNhapService {
         }
 
         // Không cho phép thay đổi trạng thái khi đã nhận hàng
-        if (oldTrangThai != null && oldTrangThai == TRANG_THAI_DA_NHAN) {
+        if (oldTrangThai != null && (oldTrangThai == TRANG_THAI_DA_NHAN
+                || oldTrangThai == TRANG_THAI_HOAN_THANH
+                || oldTrangThai == TRANG_THAI_THIEU_HANG)) {
             throw new IdInvalidException("Phiếu nhập đã nhận hàng, không thể thay đổi trạng thái");
         }
 
-        // Validate trạng thái hợp lệ (0, 1, 2, 3)
-        if (newTrangThai != null && (newTrangThai < 0 || newTrangThai > 3)) {
-            throw new IdInvalidException("Trạng thái không hợp lệ. 0: Đã đặt, 1: Đã nhận, 2: Chậm giao, 3: Hủy");
+        // Validate trạng thái hợp lệ (0, 1, 2, 3, 4, 5)
+        if (newTrangThai != null && (newTrangThai < 0 || newTrangThai > 5)) {
+            throw new IdInvalidException(
+                    "Trạng thái không hợp lệ. 0: Đã đặt, 1: Đã nhận, 2: Chậm giao, 3: Hủy, 4: Thiếu hàng, 5: Hoàn thành");
         }
 
         existing.setTenPhieuNhap(dto.getTenPhieuNhap());
@@ -116,32 +121,61 @@ public class PhieuNhapService {
 
         PhieuNhap saved = phieuNhapRepository.save(existing);
 
-        // Khi trạng thái chuyển sang "đã nhận" (1) => cập nhật số lượng
-        boolean isNewSuccess = (newTrangThai != null
+        // Khi trạng thái chuyển sang "đã nhận" (1) => chỉ đánh dấu nhận hàng, chưa kiểm
+        // kê
+        boolean isNhanHang = (newTrangThai != null
                 && newTrangThai == TRANG_THAI_DA_NHAN
                 && (oldTrangThai == null || oldTrangThai != TRANG_THAI_DA_NHAN));
 
-        if (isNewSuccess) {
+        if (isNhanHang) {
             existing.setNgayNhanHang(LocalDateTime.now());
             phieuNhapRepository.save(existing);
-            capNhatSoLuongSauNhapHang(saved.getId());
         }
 
         return saved;
     }
 
     /**
-     * Cập nhật số lượng ChiTietSanPham và tổng SanPham sau khi nhập hàng thành
-     * công.
-     * - Cộng soLuong từ ChiTietPhieuNhap vào ChiTietSanPham tương ứng
-     * - Tính lại tổng soLuong trên SanPham = tổng soLuong của tất cả ChiTietSanPham
-     * thuộc sản phẩm đó
+     * Kiểm kê phiếu nhập: chỉ gọi khi phiếu đang ở trạng thái "Đã nhận" (1).
+     * - Duyệt từng chi tiết phiếu nhập: trangThai 0 = đủ, 1 = thiếu
+     * - Nếu thiếu: số lượng thực nhập = soLuong - soLuongThieu
+     * - Nếu đủ: số lượng thực nhập = soLuong
+     * - Cập nhật stock vào ChiTietSanPham + tổng SanPham
+     * - Nếu có ít nhất 1 chi tiết thiếu → phiếu nhập = 4 (Thiếu hàng)
+     * - Nếu tất cả đủ → phiếu nhập = 5 (Hoàn thành)
      */
-    private void capNhatSoLuongSauNhapHang(Long phieuNhapId) {
+    @Transactional
+    public PhieuNhap kiemKe(Long phieuNhapId) throws IdInvalidException {
+        PhieuNhap phieuNhap = phieuNhapRepository.findById(phieuNhapId)
+                .orElseThrow(() -> new IdInvalidException("Không tìm thấy phiếu nhập: " + phieuNhapId));
+
+        if (phieuNhap.getTrangThai() == null || phieuNhap.getTrangThai() != TRANG_THAI_DA_NHAN) {
+            throw new IdInvalidException("Chỉ có thể kiểm kê phiếu nhập ở trạng thái 'Đã nhận'");
+        }
+
+        boolean coThieuHang = capNhatSoLuongSauNhapHang(phieuNhapId);
+        if (coThieuHang) {
+            phieuNhap.setTrangThai(TRANG_THAI_THIEU_HANG);
+        } else {
+            phieuNhap.setTrangThai(TRANG_THAI_HOAN_THANH);
+        }
+
+        return phieuNhapRepository.save(phieuNhap);
+    }
+
+    /**
+     * Cập nhật số lượng ChiTietSanPham và tổng SanPham sau khi nhập hàng.
+     * - Kiểm tra trạng thái từng chi tiết phiếu nhập: 0 = đủ, 1 = thiếu
+     * - Nếu thiếu: số lượng thực nhập = soLuong - soLuongThieu
+     * - Nếu đủ: số lượng thực nhập = soLuong
+     * - Trả về true nếu có ít nhất 1 chi tiết bị thiếu hàng
+     */
+    private boolean capNhatSoLuongSauNhapHang(Long phieuNhapId) {
         PhieuNhap phieuNhap = phieuNhapRepository.findById(phieuNhapId).orElse(null);
         if (phieuNhap == null)
-            return;
+            return false;
 
+        boolean coThieuHang = false;
         List<ChiTietPhieuNhap> danhSachChiTiet = chiTietPhieuNhapRepository.findByPhieuNhapId(phieuNhapId);
 
         for (ChiTietPhieuNhap ctpn : danhSachChiTiet) {
@@ -156,8 +190,21 @@ public class PhieuNhapService {
                 continue;
             }
 
+            int soLuongDat = ctpn.getSoLuong();
+            int soLuongThucNhap = soLuongDat;
+
+            // Nếu chi tiết phiếu nhập bị thiếu hàng (trangThai = 1)
+            if (ctpn.getTrangThai() != null && ctpn.getTrangThai() == 1) {
+                coThieuHang = true;
+                int soLuongThieu = ctpn.getSoLuongThieu() != null ? ctpn.getSoLuongThieu() : 0;
+                soLuongThucNhap = soLuongDat - soLuongThieu;
+                if (soLuongThucNhap < 0) {
+                    soLuongThucNhap = 0;
+                }
+            }
+
             int soLuongHienTai = ctsp.getSoLuong() != null ? ctsp.getSoLuong() : 0;
-            ctsp.setSoLuong(soLuongHienTai + ctpn.getSoLuong());
+            ctsp.setSoLuong(soLuongHienTai + soLuongThucNhap);
 
             // Cập nhật mã phiếu nhập và mã cửa hàng
             ctsp.setMaPhieuNhap(phieuNhapId);
@@ -172,6 +219,7 @@ public class PhieuNhapService {
                 capNhatTongSoLuongSanPham(ctsp.getSanPham().getId());
             }
         }
+        return coThieuHang;
     }
 
     /**
@@ -275,9 +323,13 @@ public class PhieuNhapService {
         ResPhieuNhapDTO.ChiTietPhieuNhapDTO dto = new ResPhieuNhapDTO.ChiTietPhieuNhapDTO();
         dto.setId(ctpn.getId());
         dto.setSoLuong(ctpn.getSoLuong());
+        dto.setSoLuongThieu(ctpn.getSoLuongThieu());
         dto.setGhiTru(ctpn.getGhiTru());
         dto.setGhiTruKiemHang(ctpn.getGhiTruKiemHang());
         dto.setTrangThai(ctpn.getTrangThai());
+        if (ctpn.getTrangThai() != null) {
+            dto.setTrangThaiText(ctpn.getTrangThai() == 0 ? "Đủ" : "Thiếu");
+        }
 
         if (ctpn.getChiTietSanPham() != null) {
             ChiTietSanPham ctsp = ctpn.getChiTietSanPham();
@@ -308,6 +360,10 @@ public class PhieuNhapService {
                 return "Chậm giao";
             case TRANG_THAI_HUY:
                 return "Hủy";
+            case TRANG_THAI_THIEU_HANG:
+                return "Thiếu hàng";
+            case TRANG_THAI_HOAN_THANH:
+                return "Hoàn thành";
             default:
                 return "Không xác định";
         }

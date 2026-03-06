@@ -59,8 +59,10 @@ public class ResPhieuNhapDTO {
         private String tenMauSac;
         private String tenKichThuoc;
         private Integer soLuong;
+        private Integer soLuongThieu;
         private String ghiTru;
         private String ghiTruKiemHang;
         private Integer trangThai;
+        private String trangThaiText;
     }
 }

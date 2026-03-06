@@ -16,9 +16,11 @@ public class ResChiTietPhieuNhapDTO {
     private Long phieuNhapId;
     private String tenPhieuNhap;
     private Integer soLuong;
+    private Integer soLuongThieu;
     private String ghiTru;
     private String ghiTruKiemHang;
     private Integer trangThai;
+    private String trangThaiText;
     private LocalDateTime ngayTao;
     private LocalDateTime ngayCapNhat;
 

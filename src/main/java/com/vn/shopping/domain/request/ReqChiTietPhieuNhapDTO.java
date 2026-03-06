@@ -10,6 +10,7 @@ public class ReqChiTietPhieuNhapDTO {
     private Long phieuNhapId;
     private Long chiTietSanPhamId;
     private Integer soLuong;
+    private Integer soLuongThieu;
     private String ghiTru;
     private String ghiTruKiemHang;
     private Integer trangThai;

@@ -76,6 +76,13 @@ public class PhieuNhapController {
         return ResponseEntity.ok(phieuNhapService.convertToDTO(updated));
     }
 
+    @PutMapping("/kiem-ke/{id}")
+    @ApiMessage("Kiểm kê phiếu nhập")
+    public ResponseEntity<ResPhieuNhapDTO> kiemKe(@PathVariable("id") long id) throws IdInvalidException {
+        PhieuNhap result = phieuNhapService.kiemKe(id);
+        return ResponseEntity.ok(phieuNhapService.convertToDTO(result));
+    }
+
     @DeleteMapping("/{id}")
     @ApiMessage("Xóa phiếu nhập")
     public ResponseEntity<Void> delete(@PathVariable("id") long id) throws IdInvalidException {

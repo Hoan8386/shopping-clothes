@@ -1520,7 +1520,7 @@
 		},
 		{
 			"name": "Phiếu Nhập ( Admin)",
-			"description": "Quản lý phiếu nhập hàng — Chỉ Admin có permission mới được thao tác\n\nTrạng thái: 0 = Đã đặt, 1 = Đã nhận (cập nhật số lượng), 2 = Chậm giao, 3 = Hủy",
+			"description": "Quản lý phiếu nhập hàng — Chỉ Admin có permission mới được thao tác\n\nTrạng thái: 0 = Đã đặt, 1 = Đã nhận, 2 = Chậm giao, 3 = Hủy, 4 = Thiếu hàng, 5 = Hoàn thành",
 			"item": [
 				{
 					"name": "Xem tất cả phiếu nhập + Lọc + Phân trang ( Admin)",
@@ -1536,7 +1536,7 @@
 								{ "key": "size", "value": "10" },
 								{ "key": "sort", "value": "id,desc" },
 								{ "key": "tenPhieuNhap", "value": "đợt 1", "disabled": true, "description": "Tìm theo tên phiếu nhập (LIKE)" },
-								{ "key": "trangThai", "value": "1", "disabled": true, "description": "0: Đã đặt, 1: Đã nhận, 2: Chậm giao, 3: Hủy" },
+								{ "key": "trangThai", "value": "1", "disabled": true, "description": "0: Đã đặt, 1: Đã nhận, 2: Chậm giao, 3: Hủy, 4: Thiếu hàng, 5: Hoàn thành" },
 								{ "key": "tenCuaHang", "value": "Quận 1", "disabled": true, "description": "Tìm theo tên cửa hàng (LIKE)" },
 								{ "key": "tenNhaCungCap", "value": "Vải Việt", "disabled": true, "description": "Tìm theo tên nhà cung cấp (LIKE)" },
 								{ "key": "ngayTaoTu", "value": "2026-03-01T00:00:00", "disabled": true, "description": "Ngày tạo từ (ISO DateTime)" },
@@ -1594,7 +1594,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "phieu-nhap"]
 						},
-						"description": " Admin — Cập nhật phiếu nhập. Trạng thái: 0=Đã đặt, 1=Đã nhận (cập nhật SL + ngày nhận hàng tự động), 2=Chậm giao, 3=Hủy (không thể cập nhật lại)"
+						"description": " Admin — Cập nhật phiếu nhập. Trạng thái: 0=Đã đặt, 1=Đã nhận (ngày nhận hàng tự động), 2=Chậm giao, 3=Hủy (không thể cập nhật lại), 4=Thiếu hàng (kiểm kê), 5=Hoàn thành (kiểm kê)"
 					}
 				},
 				{
@@ -1608,6 +1608,19 @@
 							"path": ["api", "v1", "phieu-nhap", "4"]
 						},
 						"description": " Admin — Xóa phiếu nhập"
+					}
+				},
+				{
+					"name": "Kiểm kê phiếu nhập ( Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/phieu-nhap/kiem-ke/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "phieu-nhap", "kiem-ke", "1"]
+						},
+						"description": " Admin — Kiểm kê phiếu nhập (phải ở trạng thái 1: Đã nhận). Duyệt từng chi tiết: nếu soLuongThieu > 0 → thiếu hàng. Cập nhật tồn kho ChiTietSanPham. Kết quả: 4 (Thiếu hàng) hoặc 5 (Hoàn thành)."
 					}
 				}
 			]
@@ -1662,7 +1675,7 @@
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"phieuNhapId\": 1,\n    \"chiTietSanPhamId\": 1,\n    \"soLuong\": 100,\n    \"ghiTru\": \"\",\n    \"ghiTruKiemHang\": \"\",\n    \"trangThai\": 1\n}"
+							"raw": "{\n    \"phieuNhapId\": 1,\n    \"chiTietSanPhamId\": 1,\n    \"soLuong\": 100,\n    \"soLuongThieu\": null,\n    \"ghiTru\": \"\",\n    \"ghiTruKiemHang\": \"\",\n    \"trangThai\": 1\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/chi-tiet-phieu-nhap",
@@ -1679,7 +1692,7 @@
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"id\": 1,\n    \"phieuNhapId\": 1,\n    \"chiTietSanPhamId\": 1,\n    \"soLuong\": 60,\n    \"ghiTru\": \"\",\n    \"ghiTruKiemHang\": \"\",\n    \"trangThai\": 1\n}"
+							"raw": "{\n    \"id\": 1,\n    \"phieuNhapId\": 1,\n    \"chiTietSanPhamId\": 1,\n    \"soLuong\": 60,\n    \"soLuongThieu\": 0,\n    \"ghiTru\": \"\",\n    \"ghiTruKiemHang\": \"\",\n    \"trangThai\": 1\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/chi-tiet-phieu-nhap",

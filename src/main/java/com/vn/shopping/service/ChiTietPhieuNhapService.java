@@ -32,6 +32,7 @@ public class ChiTietPhieuNhapService {
     public ChiTietPhieuNhap create(ReqChiTietPhieuNhapDTO dto) throws IdInvalidException {
         ChiTietPhieuNhap ct = new ChiTietPhieuNhap();
         ct.setSoLuong(dto.getSoLuong());
+        ct.setSoLuongThieu(dto.getSoLuongThieu());
         ct.setGhiTru(dto.getGhiTru());
         ct.setGhiTruKiemHang(dto.getGhiTruKiemHang());
         ct.setTrangThai(dto.getTrangThai());
@@ -56,6 +57,7 @@ public class ChiTietPhieuNhapService {
                 .orElseThrow(() -> new IdInvalidException(
                         "Không tìm thấy chi tiết phiếu nhập: " + dto.getId()));
         existing.setSoLuong(dto.getSoLuong());
+        existing.setSoLuongThieu(dto.getSoLuongThieu());
         existing.setGhiTru(dto.getGhiTru());
         existing.setGhiTruKiemHang(dto.getGhiTruKiemHang());
         existing.setTrangThai(dto.getTrangThai());
@@ -95,9 +97,13 @@ public class ChiTietPhieuNhapService {
         ResChiTietPhieuNhapDTO dto = new ResChiTietPhieuNhapDTO();
         dto.setId(ct.getId());
         dto.setSoLuong(ct.getSoLuong());
+        dto.setSoLuongThieu(ct.getSoLuongThieu());
         dto.setGhiTru(ct.getGhiTru());
         dto.setGhiTruKiemHang(ct.getGhiTruKiemHang());
         dto.setTrangThai(ct.getTrangThai());
+        if (ct.getTrangThai() != null) {
+            dto.setTrangThaiText(ct.getTrangThai() == 0 ? "Đủ" : "Thiếu");
+        }
         dto.setNgayTao(ct.getNgayTao());
         dto.setNgayCapNhat(ct.getNgayCapNhat());
 

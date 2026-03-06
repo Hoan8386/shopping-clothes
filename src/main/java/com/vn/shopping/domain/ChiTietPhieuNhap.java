@@ -33,6 +33,9 @@ public class ChiTietPhieuNhap {
     @Column(name = "SoLuong")
     private Integer soLuong;
 
+    @Column(name = "SoLuongThieu")
+    private Integer soLuongThieu;
+
     @Column(name = "GhiTru", length = 255)
     private String ghiTru;
 
