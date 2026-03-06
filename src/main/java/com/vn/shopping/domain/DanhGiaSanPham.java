@@ -23,18 +23,14 @@ public class DanhGiaSanPham {
     private KhachHang khachHang;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "MaSanPham")
-    private SanPham sanPham;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "MaDon")
-    private DonHang donHang;
+    @JoinColumn(name = "MaChiTietDonHang")
+    private ChiTietDonHang chiTietDonHang;
 
     @Column(name = "SoSao")
     private Integer soSao;
 
     @Column(name = "GhiTru", length = 255)
-    private String ghiChu;
+    private String ghiTru;
 
     @Column(name = "HinhAnh", length = 255)
     private String hinhAnh;
@@ -44,6 +40,9 @@ public class DanhGiaSanPham {
 
     @Column(name = "NgayCapNhat")
     private LocalDateTime ngayCapNhat;
+
+    @Column(name = "Json", columnDefinition = "TEXT")
+    private String json;
 
     @PrePersist
     public void handleBeforeCreate() {

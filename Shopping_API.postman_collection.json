@@ -1718,7 +1718,7 @@
 			]
 		},
 		{
-			"name": "Đơn Hàng (🛒)",
+			"name": "Đơn Hàng ()",
 			"description": "Quản lý đơn hàng — Admin/NV xem tất cả, KH chỉ xem đơn của mình",
 			"item": [
 				{
@@ -2074,11 +2074,11 @@
 			]
 		},
 		{
-			"name": "Đánh Giá Sản Phẩm (⭐ KH đánh giá /  Admin xem)",
+			"name": "Đánh Giá Sản Phẩm ( KH đánh giá /  Admin xem)",
 			"description": "Quản lý đánh giá sản phẩm — KH chỉ đánh giá được khi đơn hàng đã giao thành công (trạng thái = 3)",
 			"item": [
 				{
-					"name": "Xem tất cả đánh giá (👤 Tất cả)",
+					"name": "Xem tất cả đánh giá ( Tất cả)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -2087,11 +2087,11 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "danh-gia-san-pham"]
 						},
-						"description": "👤 Tất cả — Xem danh sách tất cả đánh giá sản phẩm"
+						"description": " Tất cả — Xem danh sách tất cả đánh giá sản phẩm"
 					}
 				},
 				{
-					"name": "Xem đánh giá theo id (👤 Tất cả)",
+					"name": "Xem đánh giá theo id ( Tất cả)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -2100,28 +2100,37 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "danh-gia-san-pham", "1"]
 						},
-						"description": "👤 Tất cả — Xem chi tiết 1 đánh giá theo mã"
+						"description": " Tất cả — Xem chi tiết 1 đánh giá theo mã"
 					}
 				},
 				{
-					"name": "Xem đánh giá theo sản phẩm + phân trang (👤 Tất cả)",
+					"name": "Xem đánh giá theo sản phẩm ( Tất cả)",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/v1/danh-gia-san-pham/san-pham/3?page=1&size=10",
+							"raw": "{{base_url}}/api/v1/danh-gia-san-pham/san-pham/3",
 							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "danh-gia-san-pham", "san-pham", "3"],
-							"query": [
-								{ "key": "page", "value": "1" },
-								{ "key": "size", "value": "10" }
-							]
+							"path": ["api", "v1", "danh-gia-san-pham", "san-pham", "3"]
 						},
-						"description": "👤 Tất cả — Xem đánh giá của sản phẩm id=3 (Váy Hoa), có phân trang"
+						"description": " Tất cả — Xem tất cả đánh giá của sản phẩm id=3 (Váy Hoa)"
 					}
 				},
 				{
-					"name": "Xem đánh giá của tôi (🛒 Khách hàng)",
+					"name": "Xem đánh giá theo chi tiết đơn hàng ( Tất cả)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/danh-gia-san-pham/chi-tiet-don-hang/4",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "danh-gia-san-pham", "chi-tiet-don-hang", "4"]
+						},
+						"description": " Tất cả — Xem đánh giá của chi tiết đơn hàng id=4 (Váy Hoa trong đơn 3 của KH Hoa)"
+					}
+				},
+				{
+					"name": "Xem đánh giá của tôi ( Khách hàng)",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -2130,21 +2139,20 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "danh-gia-san-pham", "cua-toi"]
 						},
-						"description": "🛒 Khách hàng — Xem tất cả đánh giá của tôi (lấy KH từ token)"
+						"description": " Khách hàng — Xem tất cả đánh giá của tôi (lấy KH từ token)"
 					}
 				},
 				{
-					"name": "Tạo đánh giá + Upload ảnh (🛒 Khách hàng)",
+					"name": "Tạo đánh giá + Upload ảnh ( Khách hàng)",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
-								{ "key": "sanPhamId", "value": "3", "type": "text" },
-								{ "key": "donHangId", "value": "3", "type": "text" },
+								{ "key": "chiTietDonHangId", "value": "4", "type": "text" },
 								{ "key": "soSao", "value": "5", "type": "text" },
-								{ "key": "ghiChu", "value": "Sản phẩm rất đẹp, chất lượng tốt!", "type": "text" },
+								{ "key": "ghiTru", "value": "Sản phẩm rất đẹp, chất lượng tốt!", "type": "text" },
 								{ "key": "file", "type": "file", "src": "" }
 							]
 						},
@@ -2153,33 +2161,32 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "danh-gia-san-pham"]
 						},
-						"description": "🛒 Khách hàng — Tạo đánh giá sản phẩm.\n\n⚠️ Điều kiện:\n- Phải đăng nhập bằng TK khách hàng\n- Đơn hàng phải thuộc về khách hàng\n- Đơn hàng phải có trạng thái = 3 (Thành công)\n- Sản phẩm phải có trong đơn hàng\n- Chưa đánh giá SP này trong đơn này\n\n📌 Login bằng KH Hoa (h@g.com) → đánh giá SP Váy Hoa trong đơn 3 (đã thành công)"
+						"description": " Khách hàng — Tạo đánh giá sản phẩm.\n\n⚠️ Điều kiện:\n- Phải đăng nhập bằng TK khách hàng\n- Chi tiết đơn hàng phải thuộc về khách hàng\n- Đơn hàng phải có trạng thái = 5 (Đã nhận hàng)\n- Mỗi chi tiết đơn hàng chỉ đánh giá 1 lần\n\n📌 Login bằng KH Hoa (h@g.com) → chiTietDonHangId=4 (đơn 3, Váy Hoa S Đỏ)"
 					}
 				},
 				{
-					"name": "Cập nhật đánh giá + Upload ảnh mới (🛒 Khách hàng)",
+					"name": "Cập nhật đánh giá + Upload ảnh mới ( Khách hàng)",
 					"request": {
 						"method": "PUT",
 						"header": [],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
-								{ "key": "id", "value": "1", "type": "text" },
 								{ "key": "soSao", "value": "4", "type": "text" },
-								{ "key": "ghiChu", "value": "Cập nhật: vẫn rất ưng ý!", "type": "text" },
+								{ "key": "ghiTru", "value": "Cập nhật: vẫn rất ưng ý!", "type": "text" },
 								{ "key": "file", "type": "file", "src": "" }
 							]
 						},
 						"url": {
-							"raw": "{{base_url}}/api/v1/danh-gia-san-pham",
+							"raw": "{{base_url}}/api/v1/danh-gia-san-pham/1",
 							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "danh-gia-san-pham"]
+							"path": ["api", "v1", "danh-gia-san-pham", "1"]
 						},
-						"description": "🛒 Khách hàng — Cập nhật đánh giá (chỉ chủ đánh giá mới được sửa). Có thể upload ảnh mới."
+						"description": " Khách hàng — Cập nhật đánh giá (chỉ chủ đánh giá mới được sửa). Có thể upload ảnh mới."
 					}
 				},
 				{
-					"name": "Xóa đánh giá (🛒 KH /  Admin)",
+					"name": "Xóa đánh giá ( KH /  Admin)",
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -2188,7 +2195,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "danh-gia-san-pham", "1"]
 						},
-						"description": "🛒 Khách hàng xóa đánh giá của mình, hoặc  Admin xóa bất kỳ đánh giá nào"
+						"description": " Khách hàng xóa đánh giá của mình, hoặc  Admin xóa bất kỳ đánh giá nào"
 					}
 				}
 			]

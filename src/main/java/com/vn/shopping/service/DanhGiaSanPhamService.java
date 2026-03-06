@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.vn.shopping.domain.*;
 import com.vn.shopping.domain.request.ReqDanhGiaSanPhamDTO;
 import com.vn.shopping.domain.response.ResDanhGiaSanPhamDTO;
-import com.vn.shopping.domain.response.ResultPaginationDTO;
 import com.vn.shopping.repository.*;
 import com.vn.shopping.util.error.IdInvalidException;
 
@@ -23,21 +20,15 @@ public class DanhGiaSanPhamService {
 
     private final DanhGiaSanPhamRepository danhGiaSanPhamRepository;
     private final KhachHangRepository khachHangRepository;
-    private final SanPhamRepository sanPhamRepository;
-    private final DonHangRepository donHangRepository;
     private final ChiTietDonHangRepository chiTietDonHangRepository;
     private final MinioStorageService minioStorageService;
 
     public DanhGiaSanPhamService(DanhGiaSanPhamRepository danhGiaSanPhamRepository,
             KhachHangRepository khachHangRepository,
-            SanPhamRepository sanPhamRepository,
-            DonHangRepository donHangRepository,
             ChiTietDonHangRepository chiTietDonHangRepository,
             MinioStorageService minioStorageService) {
         this.danhGiaSanPhamRepository = danhGiaSanPhamRepository;
         this.khachHangRepository = khachHangRepository;
-        this.sanPhamRepository = sanPhamRepository;
-        this.donHangRepository = donHangRepository;
         this.chiTietDonHangRepository = chiTietDonHangRepository;
         this.minioStorageService = minioStorageService;
     }
@@ -45,11 +36,10 @@ public class DanhGiaSanPhamService {
     /**
      * Khách hàng tạo đánh giá sản phẩm.
      * Điều kiện:
-     * - Phải đăng nhập (lấy khách hàng từ token)
+     * - Phải đăng nhập
+     * - Đơn hàng phải ở trạng thái 5 (Đã nhận hàng)
      * - Đơn hàng phải thuộc về khách hàng
-     * - Đơn hàng phải có trạng thái = 3 (Thành công)
-     * - Sản phẩm phải tồn tại trong chi tiết đơn hàng đó
-     * - Chưa đánh giá sản phẩm này trong đơn hàng này
+     * - Mỗi chi tiết đơn hàng chỉ được đánh giá 1 lần duy nhất
      */
     @Transactional
     public DanhGiaSanPham create(ReqDanhGiaSanPhamDTO req, MultipartFile file) throws IdInvalidException {
@@ -58,73 +48,57 @@ public class DanhGiaSanPhamService {
         KhachHang khachHang = khachHangRepository.findByEmail(email)
                 .orElseThrow(() -> new IdInvalidException("Không tìm thấy khách hàng với email: " + email));
 
-        // 2. Kiểm tra sản phẩm tồn tại
-        SanPham sanPham = sanPhamRepository.findById(req.getSanPhamId())
-                .orElseThrow(() -> new IdInvalidException("Không tìm thấy sản phẩm: " + req.getSanPhamId()));
+        // 2. Kiểm tra chi tiết đơn hàng tồn tại
+        ChiTietDonHang chiTietDonHang = chiTietDonHangRepository.findById(req.getChiTietDonHangId())
+                .orElseThrow(
+                        () -> new IdInvalidException("Không tìm thấy chi tiết đơn hàng: " + req.getChiTietDonHangId()));
 
-        // 3. Kiểm tra đơn hàng tồn tại và thuộc về khách hàng
-        DonHang donHang = donHangRepository.findById(req.getDonHangId())
-                .orElseThrow(() -> new IdInvalidException("Không tìm thấy đơn hàng: " + req.getDonHangId()));
-
-        if (donHang.getKhachHang() == null || !donHang.getKhachHang().getId().equals(khachHang.getId())) {
+        // 3. Lấy đơn hàng và kiểm tra quyền sở hữu
+        DonHang donHang = chiTietDonHang.getDonHang();
+        if (donHang == null || donHang.getKhachHang() == null
+                || !donHang.getKhachHang().getId().equals(khachHang.getId())) {
             throw new IdInvalidException("Đơn hàng không thuộc về bạn");
         }
 
-        // 4. Kiểm tra trạng thái đơn hàng = 3 (Thành công)
-        if (donHang.getTrangThai() == null || donHang.getTrangThai() != 3) {
-            throw new IdInvalidException("Chỉ được đánh giá khi đơn hàng đã giao thành công (trạng thái = 3)");
+        // 4. Kiểm tra trạng thái đơn hàng = 5 (Đã nhận hàng)
+        if (donHang.getTrangThai() == null || donHang.getTrangThai() != 5) {
+            throw new IdInvalidException("Đơn hàng phải ở trạng thái đã nhận hàng mới có thể đánh giá");
         }
 
-        // 5. Kiểm tra sản phẩm có trong đơn hàng
-        List<ChiTietDonHang> chiTietDonHangs = chiTietDonHangRepository.findByDonHangId(donHang.getId());
-        boolean sanPhamTrongDon = chiTietDonHangs.stream()
-                .anyMatch(ct -> ct.getChiTietSanPham() != null
-                        && ct.getChiTietSanPham().getSanPham() != null
-                        && ct.getChiTietSanPham().getSanPham().getId().equals(sanPham.getId()));
-
-        if (!sanPhamTrongDon) {
-            throw new IdInvalidException("Sản phẩm này không có trong đơn hàng #" + donHang.getId());
+        // 5. Kiểm tra chưa đánh giá chi tiết sản phẩm này (mỗi chi tiết đơn chỉ đánh
+        // giá 1 lần)
+        if (danhGiaSanPhamRepository.existsByKhachHangIdAndChiTietDonHangId(
+                khachHang.getId(), chiTietDonHang.getId())) {
+            throw new IdInvalidException("Bạn đã đánh giá sản phẩm này rồi");
         }
 
-        // 6. Kiểm tra chưa đánh giá sản phẩm trong đơn này
-        boolean daDanhGia = danhGiaSanPhamRepository
-                .existsByKhachHangIdAndSanPhamIdAndDonHangId(khachHang.getId(), sanPham.getId(), donHang.getId());
-        if (daDanhGia) {
-            throw new IdInvalidException("Bạn đã đánh giá sản phẩm này trong đơn hàng #" + donHang.getId());
-        }
-
-        // 7. Validate số sao
+        // 6. Validate số sao
         if (req.getSoSao() == null || req.getSoSao() < 1 || req.getSoSao() > 5) {
             throw new IdInvalidException("Số sao phải từ 1 đến 5");
         }
 
-        // 8. Upload ảnh lên MinIO (nếu có)
+        // 7. Upload ảnh lên MinIO (nếu có)
         String hinhAnhUrl = null;
         if (file != null && !file.isEmpty()) {
             hinhAnhUrl = minioStorageService.uploadSingleFile(file);
         }
 
-        // 9. Tạo đánh giá
+        // 8. Tạo đánh giá
         DanhGiaSanPham danhGia = new DanhGiaSanPham();
         danhGia.setKhachHang(khachHang);
-        danhGia.setSanPham(sanPham);
-        danhGia.setDonHang(donHang);
+        danhGia.setChiTietDonHang(chiTietDonHang);
         danhGia.setSoSao(req.getSoSao());
-        danhGia.setGhiChu(req.getGhiChu());
+        danhGia.setGhiTru(req.getGhiTru());
         danhGia.setHinhAnh(hinhAnhUrl);
 
         return danhGiaSanPhamRepository.save(danhGia);
     }
 
-    /**
-     * Cập nhật đánh giá — chỉ chủ đánh giá mới được sửa
-     */
     @Transactional
     public DanhGiaSanPham update(Long id, ReqDanhGiaSanPhamDTO req, MultipartFile file) throws IdInvalidException {
         DanhGiaSanPham existing = danhGiaSanPhamRepository.findById(id)
                 .orElseThrow(() -> new IdInvalidException("Không tìm thấy đánh giá: " + id));
 
-        // Kiểm tra quyền sở hữu
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         KhachHang khachHang = khachHangRepository.findByEmail(email)
                 .orElseThrow(() -> new IdInvalidException("Không tìm thấy khách hàng với email: " + email));
@@ -133,7 +107,6 @@ public class DanhGiaSanPhamService {
             throw new IdInvalidException("Bạn không có quyền sửa đánh giá này");
         }
 
-        // Validate số sao
         if (req.getSoSao() != null) {
             if (req.getSoSao() < 1 || req.getSoSao() > 5) {
                 throw new IdInvalidException("Số sao phải từ 1 đến 5");
@@ -141,11 +114,10 @@ public class DanhGiaSanPhamService {
             existing.setSoSao(req.getSoSao());
         }
 
-        if (req.getGhiChu() != null) {
-            existing.setGhiChu(req.getGhiChu());
+        if (req.getGhiTru() != null) {
+            existing.setGhiTru(req.getGhiTru());
         }
 
-        // Upload ảnh mới nếu có
         if (file != null && !file.isEmpty()) {
             String hinhAnhUrl = minioStorageService.uploadSingleFile(file);
             existing.setHinhAnh(hinhAnhUrl);
@@ -154,23 +126,17 @@ public class DanhGiaSanPhamService {
         return danhGiaSanPhamRepository.save(existing);
     }
 
-    /**
-     * Xóa đánh giá — chủ đánh giá hoặc Admin
-     */
     public void delete(long id) throws IdInvalidException {
         DanhGiaSanPham danhGia = danhGiaSanPhamRepository.findById(id)
                 .orElseThrow(() -> new IdInvalidException("Không tìm thấy đánh giá: " + id));
 
-        // Kiểm tra quyền: chủ đánh giá hoặc admin/nhân viên
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<KhachHang> khOpt = khachHangRepository.findByEmail(email);
         if (khOpt.isPresent()) {
-            // Là khách hàng → chỉ được xóa đánh giá của mình
             if (!danhGia.getKhachHang().getId().equals(khOpt.get().getId())) {
                 throw new IdInvalidException("Bạn không có quyền xóa đánh giá này");
             }
         }
-        // Nếu là nhân viên/admin thì có quyền xóa
 
         danhGiaSanPhamRepository.deleteById(id);
     }
@@ -183,41 +149,14 @@ public class DanhGiaSanPhamService {
         return danhGiaSanPhamRepository.findAll();
     }
 
+    public List<DanhGiaSanPham> findByChiTietDonHangId(Long chiTietDonHangId) {
+        return danhGiaSanPhamRepository.findByChiTietDonHangId(chiTietDonHangId);
+    }
+
     public List<DanhGiaSanPham> findBySanPhamId(Long sanPhamId) {
         return danhGiaSanPhamRepository.findBySanPhamId(sanPhamId);
     }
 
-    public List<DanhGiaSanPham> findByDonHangId(Long donHangId) {
-        return danhGiaSanPhamRepository.findByDonHangId(donHangId);
-    }
-
-    /**
-     * Lấy đánh giá theo sản phẩm + phân trang
-     */
-    @Transactional(readOnly = true)
-    public ResultPaginationDTO findBySanPhamIdPaginated(Long sanPhamId, Pageable pageable) {
-        Page<DanhGiaSanPham> page = danhGiaSanPhamRepository.findAll(
-                (root, query, cb) -> cb.equal(root.get("sanPham").get("id"), sanPhamId), pageable);
-
-        ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
-        meta.setPage(pageable.getPageNumber() + 1);
-        meta.setPageSize(pageable.getPageSize());
-        meta.setPages(page.getTotalPages());
-        meta.setTotal(page.getTotalElements());
-
-        List<ResDanhGiaSanPhamDTO> dtos = page.getContent().stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-
-        ResultPaginationDTO result = new ResultPaginationDTO();
-        result.setMeta(meta);
-        result.setResult(dtos);
-        return result;
-    }
-
-    /**
-     * Lấy đánh giá của khách hàng đang đăng nhập
-     */
     @Transactional(readOnly = true)
     public List<ResDanhGiaSanPhamDTO> findByCurrentKhachHang() throws IdInvalidException {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -233,7 +172,7 @@ public class DanhGiaSanPhamService {
         ResDanhGiaSanPhamDTO dto = new ResDanhGiaSanPhamDTO();
         dto.setId(dg.getId());
         dto.setSoSao(dg.getSoSao());
-        dto.setGhiChu(dg.getGhiChu());
+        dto.setGhiTru(dg.getGhiTru());
         dto.setHinhAnh(dg.getHinhAnh());
         dto.setNgayTao(dg.getNgayTao());
         dto.setNgayCapNhat(dg.getNgayCapNhat());
@@ -242,13 +181,20 @@ public class DanhGiaSanPhamService {
             dto.setKhachHangId(dg.getKhachHang().getId());
             dto.setTenKhachHang(dg.getKhachHang().getTenKhachHang());
         }
-        if (dg.getSanPham() != null) {
-            dto.setSanPhamId(dg.getSanPham().getId());
-            dto.setTenSanPham(dg.getSanPham().getTenSanPham());
+
+        if (dg.getChiTietDonHang() != null) {
+            dto.setChiTietDonHangId(dg.getChiTietDonHang().getId());
+            if (dg.getChiTietDonHang().getDonHang() != null) {
+                dto.setDonHangId(dg.getChiTietDonHang().getDonHang().getId());
+            }
+            if (dg.getChiTietDonHang().getChiTietSanPham() != null
+                    && dg.getChiTietDonHang().getChiTietSanPham().getSanPham() != null) {
+                SanPham sp = dg.getChiTietDonHang().getChiTietSanPham().getSanPham();
+                dto.setSanPhamId(sp.getId());
+                dto.setTenSanPham(sp.getTenSanPham());
+            }
         }
-        if (dg.getDonHang() != null) {
-            dto.setDonHangId(dg.getDonHang().getId());
-        }
+
         return dto;
     }
 }

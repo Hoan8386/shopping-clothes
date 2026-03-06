@@ -6,8 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ReqDanhGiaSanPhamDTO {
-    private Long sanPhamId;
-    private Long donHangId;
+    private Long chiTietDonHangId;
     private Integer soSao;
-    private String ghiChu;
+    private String ghiTru;
 }

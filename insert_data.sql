@@ -167,8 +167,9 @@ INSERT INTO permissions (name, apiPath, method, module, createdAt) VALUES
     -- === PHIEU_NHAP_KIEM_KE (105) ===
     ('Kiểm kê phiếu nhập',           '/api/v1/phieu-nhap/kiem-ke/{id}',                          'PUT',    'PHIEU_NHAP',          NOW()),
 
-    -- === DANH_GIA_SP_UPDATE (106) ===
-    ('Cập nhật đánh giá SP',        '/api/v1/danh-gia-san-pham',                                'PUT',    'DANH_GIA_SP',         NOW());
+    -- === DANH_GIA_SP_UPDATE (106-107) ===
+    ('Cập nhật đánh giá SP',        '/api/v1/danh-gia-san-pham/{id}',                           'PUT',    'DANH_GIA_SP',         NOW()),
+    ('Xem đánh giá theo CTDH',      '/api/v1/danh-gia-san-pham/chi-tiet-don-hang/{chiTietDonHangId}', 'GET', 'DANH_GIA_SP',    NOW());
 
 -- ---------------------------------------------------------
 -- 3. PERMISSION_ROLE
@@ -196,7 +197,7 @@ INSERT INTO permission_role (role_id, permission_id) VALUES
     (1,89),(1,90),(1,91),(1,92),(1,93),
     (1,94),(1,95),(1,96),(1,97),(1,98),
     (1,99),(1,100),(1,101),(1,102),(1,103),(1,104),
-    (1,105),(1,106);
+    (1,105),(1,106),(1,107);
 
 -- NHAN_VIEN (role_id=3): Xem tất cả danh mục, SP, CTSP, hình ảnh, cửa hàng (chỉ GET) + Phiếu nhập + Đơn hàng
 INSERT INTO permission_role (role_id, permission_id) VALUES
@@ -215,7 +216,7 @@ INSERT INTO permission_role (role_id, permission_id) VALUES
     (3,83),(3,84),(3,85),  -- CHI_TIET_DON_HANG: xem all, xem theo đơn, xem id
     (3,89),(3,90),         -- KHUYEN_MAI_HOA_DON: xem all, xem id
     (3,94),(3,95),         -- KHUYEN_MAI_DIEM: xem all, xem id
-    (3,99),(3,100),(3,101); -- DANH_GIA_SP: xem all, xem id, xem theo SP
+    (3,99),(3,100),(3,101),(3,107); -- DANH_GIA_SP: xem all, xem id, xem theo SP, xem theo CTDH
 
 -- KHACH_HANG (role_id=4): Xem SP/danh mục + giỏ hàng (thêm/xem/xóa)
 INSERT INTO permission_role (role_id, permission_id) VALUES
@@ -233,7 +234,7 @@ INSERT INTO permission_role (role_id, permission_id) VALUES
     (4,83),(4,84),(4,85),  -- CHI_TIET_DON_HANG: xem all, xem theo đơn, xem id
     (4,89),(4,90),         -- KHUYEN_MAI_HOA_DON: xem all, xem id
     (4,94),(4,95),         -- KHUYEN_MAI_DIEM: xem all, xem id
-    (4,99),(4,100),(4,101),(4,102),(4,103),(4,104),(4,106); -- DANH_GIA_SP: xem all, xem id, xem theo SP, xem của tôi, tạo, xóa, cập nhật
+    (4,99),(4,100),(4,101),(4,102),(4,103),(4,104),(4,106),(4,107); -- DANH_GIA_SP: xem all, xem id, xem theo SP, xem của tôi, tạo, xóa, cập nhật, xem theo CTDH
 
 -- ---------------------------------------------------------
 -- 4. CỬA HÀNG
@@ -386,9 +387,9 @@ INSERT INTO KhuyenMaiTheoDiem (TenKhuyenMai, DiemToiThieu, GiamToiDa, HoaDonToiD
 INSERT INTO DonHang (MaCuaHang, MaKhachHang, MaNhanVien, MaKhuyenMaiHoaDon, MaKhuyenMaiDiem, DiaChi, Sdt, TongTien, TienGiam, TongTienGiam, TongTienTra, TrangThai, TrangThaiThanhToan, HinhThucDonHang, NgayTao) VALUES
     (1, 1, 5, NULL, NULL, '123 Nguyễn Trãi, Q.1, TP.HCM',     '0911000001', 600, 0,   0,   600, 1, 1, 1, NOW()),   -- id=1: KH Lan, NV Hùng, CN Q.1, online
     (1, 2, 2, NULL, NULL, '456 Lê Lợi, Q.3, TP.HCM',           '0922000002', 400, 40,  40,  360, 2, 1, 1, NOW()),   -- id=2: KH Minh, NV Bình, CN Q.1, online
-    (2, 3, 3, NULL, NULL, 'Mua tại cửa hàng',                   '0933000003', 300, 15,  15,  285, 3, 1, 0, NOW()),   -- id=3: KH Hoa, NV Chi, CN Q.3, tại quầy
+    (2, 3, 3, NULL, NULL, 'Mua tại cửa hàng',                   '0933000003', 300, 15,  15,  285, 5, 1, 0, NOW()),   -- id=3: KH Hoa, NV Chi, CN Q.3, đã nhận hàng
     (1, 4, 5, NULL, NULL, '789 Trần Hưng Đạo, Q.5, TP.HCM',    '0944000004', 200, 0,   0,   200, 0, 0, 1, NOW()),   -- id=4: KH Tuấn, NV Hùng, chờ xác nhận
-    (2, 5, 4, NULL, NULL, 'Mua tại cửa hàng',                  '0955000005', 1000, 100, 100, 900, 3, 1, 0, NOW());   -- id=5: KH Yến, NV Danh, CN Q.3, tại quầy
+    (2, 5, 4, NULL, NULL, 'Mua tại cửa hàng',                  '0955000005', 1000, 100, 100, 900, 5, 1, 0, NOW());   -- id=5: KH Yến, NV Danh, CN Q.3, đã nhận hàng
 
 -- ---------------------------------------------------------
 -- 21. CHI TIẾT ĐƠN HÀNG
@@ -405,10 +406,10 @@ INSERT INTO ChiTietDonHang (MaDon, MaChiTietSanPham, GiaSanPham, GiamGia, GiaGia
 -- ---------------------------------------------------------
 -- 22. ĐÁNH GIÁ SẢN PHẨM
 -- ---------------------------------------------------------
-INSERT INTO DanhGiaSanPham (MaKhachHang, MaSanPham, MaDon, SoSao, GhiTru, HinhAnh, NgayTao) VALUES
-    (3, 3, 3, 5, 'Váy rất đẹp, đúng size, vải mát', NULL, NOW()),      -- id=1: KH Hoa, đơn 3 (thành công), SP Váy Hoa
-    (5, 1, 5, 4, 'Áo Oxford chất lượng tốt', NULL, NOW()),              -- id=2: KH Yến, đơn 5 (thành công), SP Áo Oxford
-    (5, 2, 5, 3, 'Quần Jean hơi chật một chút', NULL, NOW());           -- id=3: KH Yến, đơn 5 (thành công), SP Quần Jean
+INSERT INTO DanhGiaSanPham (MaKhachHang, MaChiTietDonHang, SoSao, GhiTru, HinhAnh, NgayTao) VALUES
+    (3, 4, 5, 'Váy rất đẹp, đúng size, vải mát', NULL, NOW()),          -- id=1: KH Hoa, CTDH 4 (đơn 3, Váy Hoa S Đỏ)
+    (5, 6, 4, 'Áo Oxford chất lượng tốt', NULL, NOW()),                  -- id=2: KH Yến, CTDH 6 (đơn 5, Áo Oxford M Trắng)
+    (5, 7, 3, 'Quần Jean hơi chật một chút', NULL, NOW());               -- id=3: KH Yến, CTDH 7 (đơn 5, Quần Jean M Đen)
 
 -- ---------------------------------------------------------
 -- 23. GIỎ HÀNG

@@ -15,11 +15,12 @@ public class ResDanhGiaSanPhamDTO {
     private Long id;
     private Long khachHangId;
     private String tenKhachHang;
+    private Long chiTietDonHangId;
+    private Long donHangId;
     private Long sanPhamId;
     private String tenSanPham;
-    private Long donHangId;
     private Integer soSao;
-    private String ghiChu;
+    private String ghiTru;
     private String hinhAnh;
     private LocalDateTime ngayTao;
     private LocalDateTime ngayCapNhat;
