@@ -277,6 +277,5 @@ Khuyến mãi theo điểm cho phép khách hàng sử dụng điểm tích lũy
 | Vai trò    | GET (Xem) | POST (Tạo) | PUT (Sửa) | DELETE (Xóa) |
 | ---------- | --------- | ---------- | --------- | ------------ |
 | ADMIN      | ✅        | ✅         | ✅        | ✅           |
-| QUAN_LY    | ✅        | ❌         | ❌        | ❌           |
 | NHAN_VIEN  | ✅        | ❌         | ❌        | ❌           |
 | KHACH_HANG | ✅        | ❌         | ❌        | ❌           |

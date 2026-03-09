@@ -271,6 +271,5 @@ Khuyến mãi theo hóa đơn cho phép giảm giá trực tiếp trên tổng g
 | Vai trò    | GET (Xem) | POST (Tạo) | PUT (Sửa) | DELETE (Xóa) |
 | ---------- | --------- | ---------- | --------- | ------------ |
 | ADMIN      | ✅        | ✅         | ✅        | ✅           |
-| QUAN_LY    | ✅        | ❌         | ❌        | ❌           |
 | NHAN_VIEN  | ✅        | ❌         | ❌        | ❌           |
 | KHACH_HANG | ✅        | ❌         | ❌        | ❌           |

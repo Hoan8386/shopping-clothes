@@ -12,7 +12,6 @@ USE shopping;
 -- ---------------------------------------------------------
 INSERT INTO roles (name, description, active, createdAt) VALUES
     ('ADMIN',      'Quản trị viên toàn quyền', TRUE, NOW()),
-    ('QUAN_LY',    'Quản lý cửa hàng',         TRUE, NOW()),
     ('NHAN_VIEN',  'Nhân viên bán hàng',        TRUE, NOW()),
     ('KHACH_HANG', 'Khách hàng mua sắm',        TRUE, NOW());
 
@@ -199,42 +198,42 @@ INSERT INTO permission_role (role_id, permission_id) VALUES
     (1,99),(1,100),(1,101),(1,102),(1,103),(1,104),
     (1,105),(1,106),(1,107);
 
--- NHAN_VIEN (role_id=3): Xem tất cả danh mục, SP, CTSP, hình ảnh, cửa hàng (chỉ GET) + Phiếu nhập + Đơn hàng
+-- NHAN_VIEN (role_id=2): Xem tất cả danh mục, SP, CTSP, hình ảnh, cửa hàng (chỉ GET) + Phiếu nhập + Đơn hàng
+INSERT INTO permission_role (role_id, permission_id) VALUES
+    (2,1),(2,2),           -- SAN_PHAM: xem all, xem id
+    (2,6),(2,7),           -- MAU_SAC: xem all, xem id
+    (2,11),(2,12),         -- KICH_THUOC: xem all, xem id
+    (2,16),(2,17),(2,18),  -- CHI_TIET_SP: xem all, xem id, xem theo SP
+    (2,25),(2,26),         -- KIEU_SAN_PHAM: xem all, xem id
+    (2,30),(2,31),         -- BO_SUU_TAP: xem all, xem id
+    (2,35),(2,36),         -- THUONG_HIEU: xem all, xem id
+    (2,40),(2,41),(2,42),  -- HINH_ANH: xem all, xem id, xem theo CTSP
+    (2,46),(2,47),         -- CUA_HANG: xem all, xem id
+    (2,66),(2,67),(2,68),(2,69),(2,105), -- PHIEU_NHAP: xem all, xem id, tạo, cập nhật, kiểm kê
+    (2,71),(2,72),(2,73),(2,74),(2,75),  -- CHI_TIET_PHIEU_NHAP: xem all, xem id, xem theo PN, tạo, cập nhật
+    (2,77),(2,78),(2,80),(2,81),  -- DON_HANG: xem all, xem id, tạo tại quầy, cập nhật
+    (2,83),(2,84),(2,85),  -- CHI_TIET_DON_HANG: xem all, xem theo đơn, xem id
+    (2,89),(2,90),         -- KHUYEN_MAI_HOA_DON: xem all, xem id
+    (2,94),(2,95),         -- KHUYEN_MAI_DIEM: xem all, xem id
+    (2,99),(2,100),(2,101),(2,107); -- DANH_GIA_SP: xem all, xem id, xem theo SP, xem theo CTDH
+
+-- KHACH_HANG (role_id=3): Xem SP/danh mục + giỏ hàng (thêm/xem/xóa)
 INSERT INTO permission_role (role_id, permission_id) VALUES
     (3,1),(3,2),           -- SAN_PHAM: xem all, xem id
     (3,6),(3,7),           -- MAU_SAC: xem all, xem id
     (3,11),(3,12),         -- KICH_THUOC: xem all, xem id
     (3,16),(3,17),(3,18),  -- CHI_TIET_SP: xem all, xem id, xem theo SP
+    (3,22),(3,23),(3,24),  -- GIO_HANG: thêm SP, xem theo KH, xóa
     (3,25),(3,26),         -- KIEU_SAN_PHAM: xem all, xem id
     (3,30),(3,31),         -- BO_SUU_TAP: xem all, xem id
     (3,35),(3,36),         -- THUONG_HIEU: xem all, xem id
     (3,40),(3,41),(3,42),  -- HINH_ANH: xem all, xem id, xem theo CTSP
     (3,46),(3,47),         -- CUA_HANG: xem all, xem id
-    (3,66),(3,67),(3,68),(3,69),(3,105), -- PHIEU_NHAP: xem all, xem id, tạo, cập nhật, kiểm kê
-    (3,71),(3,72),(3,73),(3,74),(3,75),  -- CHI_TIET_PHIEU_NHAP: xem all, xem id, xem theo PN, tạo, cập nhật
-    (3,77),(3,78),(3,80),(3,81),  -- DON_HANG: xem all, xem id, tạo tại quầy, cập nhật
+    (3,77),(3,78),(3,79),(3,81),  -- DON_HANG: xem all, xem id, tạo online, cập nhật
     (3,83),(3,84),(3,85),  -- CHI_TIET_DON_HANG: xem all, xem theo đơn, xem id
     (3,89),(3,90),         -- KHUYEN_MAI_HOA_DON: xem all, xem id
     (3,94),(3,95),         -- KHUYEN_MAI_DIEM: xem all, xem id
-    (3,99),(3,100),(3,101),(3,107); -- DANH_GIA_SP: xem all, xem id, xem theo SP, xem theo CTDH
-
--- KHACH_HANG (role_id=4): Xem SP/danh mục + giỏ hàng (thêm/xem/xóa)
-INSERT INTO permission_role (role_id, permission_id) VALUES
-    (4,1),(4,2),           -- SAN_PHAM: xem all, xem id
-    (4,6),(4,7),           -- MAU_SAC: xem all, xem id
-    (4,11),(4,12),         -- KICH_THUOC: xem all, xem id
-    (4,16),(4,17),(4,18),  -- CHI_TIET_SP: xem all, xem id, xem theo SP
-    (4,22),(4,23),(4,24),  -- GIO_HANG: thêm SP, xem theo KH, xóa
-    (4,25),(4,26),         -- KIEU_SAN_PHAM: xem all, xem id
-    (4,30),(4,31),         -- BO_SUU_TAP: xem all, xem id
-    (4,35),(4,36),         -- THUONG_HIEU: xem all, xem id
-    (4,40),(4,41),(4,42),  -- HINH_ANH: xem all, xem id, xem theo CTSP
-    (4,46),(4,47),         -- CUA_HANG: xem all, xem id
-    (4,77),(4,78),(4,79),(4,81),  -- DON_HANG: xem all, xem id, tạo online, cập nhật
-    (4,83),(4,84),(4,85),  -- CHI_TIET_DON_HANG: xem all, xem theo đơn, xem id
-    (4,89),(4,90),         -- KHUYEN_MAI_HOA_DON: xem all, xem id
-    (4,94),(4,95),         -- KHUYEN_MAI_DIEM: xem all, xem id
-    (4,99),(4,100),(4,101),(4,102),(4,103),(4,104),(4,106),(4,107); -- DANH_GIA_SP: xem all, xem id, xem theo SP, xem của tôi, tạo, xóa, cập nhật, xem theo CTDH
+    (3,99),(3,100),(3,101),(3,102),(3,103),(3,104),(3,106),(3,107); -- DANH_GIA_SP: xem all, xem id, xem theo SP, xem của tôi, tạo, xóa, cập nhật, xem theo CTDH
 
 -- ---------------------------------------------------------
 -- 4. CỬA HÀNG
@@ -324,8 +323,8 @@ INSERT INTO HinhAnh (MaChiTietSanPham, TenHinhAnh, NgayTao) VALUES
 -- ---------------------------------------------------------
 INSERT INTO NhanVien (MaCuaHang, role_id, TenNhanVien, Email, SoDienThoai, MatKhau, TrangThai) VALUES
     (1, 2, 'An',   'an@s.com', '0901000001', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG', 1),
-    (1, 3, 'Bình', 'b@s.com',  '0901000002', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG', 1),
-    (2, 3, 'Chi',  'c@s.com',  '0901000003', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG', 1),
+    (1, 2, 'Bình', 'b@s.com',  '0901000002', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG', 1),
+    (2, 2, 'Chi',  'c@s.com',  '0901000003', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG', 1),
     (2, 2, 'Danh', 'd@s.com',  '0901000004', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG', 1),
     (1, 1, 'Hùng', 'h@s.com',  '0901000005', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG', 1);
 
@@ -333,11 +332,11 @@ INSERT INTO NhanVien (MaCuaHang, role_id, TenNhanVien, Email, SoDienThoai, MatKh
 -- 14. KHÁCH HÀNG (Password = BCrypt '123456')
 -- ---------------------------------------------------------
 INSERT INTO KhachHang (role_id, TenKhachHang, Email, Sdt, Password, DiemTichLuy) VALUES
-    (4, 'Lan',  'lan@g.com', '0911000001', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG',  10),
-    (4, 'Minh', 'm@g.com',   '0922000002', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG',   0),
-    (4, 'Hoa',  'h@g.com',   '0933000003', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG', 100),
-    (4, 'Tuấn', 't@g.com',   '0944000004', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG',   5),
-    (4, 'Yến',  'y@g.com',   '0955000005', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG',  50);
+    (3, 'Lan',  'lan@g.com', '0911000001', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG',  10),
+    (3, 'Minh', 'm@g.com',   '0922000002', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG',   0),
+    (3, 'Hoa',  'h@g.com',   '0933000003', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG', 100),
+    (3, 'Tuấn', 't@g.com',   '0944000004', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG',   5),
+    (3, 'Yến',  'y@g.com',   '0955000005', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG',  50);
 
 -- ---------------------------------------------------------
 -- 15. NHÀ CUNG CẤP

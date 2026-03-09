@@ -6,6 +6,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -47,12 +48,34 @@ public class SecurityConfiguration {
                 "/api/v1/auth/register", "/storage/**",
                 "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html"
         };
+
+        // Public read-only (GET) endpoints — accessible without authentication
+        String[] publicGetRoutes = {
+                "/api/v1/san-pham",
+                "/api/v1/san-pham/**",
+                "/api/v1/chi-tiet-san-pham",
+                "/api/v1/chi-tiet-san-pham/**",
+                "/api/v1/bo-suu-tap",
+                "/api/v1/bo-suu-tap/**",
+                "/api/v1/kieu-san-pham",
+                "/api/v1/kieu-san-pham/**",
+                "/api/v1/thuong-hieu",
+                "/api/v1/thuong-hieu/**",
+                "/api/v1/mau-sac",
+                "/api/v1/mau-sac/**",
+                "/api/v1/kich-thuoc",
+                "/api/v1/kich-thuoc/**",
+                "/api/v1/danh-gia-san-pham",
+                "/api/v1/danh-gia-san-pham/**",
+        };
+
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(
                         authz -> authz
                                 .requestMatchers(whiteList).permitAll()
+                                .requestMatchers(HttpMethod.GET, publicGetRoutes).permitAll()
                                 .anyRequest().authenticated())
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults())
                         .authenticationEntryPoint(customAuthenticationEntryPoint))

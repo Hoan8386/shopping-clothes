@@ -1,5 +1,6 @@
 package com.vn.shopping.domain.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vn.shopping.domain.Role;
 
@@ -24,6 +25,7 @@ public class ResLoginDTO {
         private long id;
         private String email;
         private String name;
+        @JsonIgnoreProperties("permissions")
         private Role role;
         private Integer diemTichLuy;
     }

@@ -326,7 +326,7 @@ Hệ thống sử dụng **JWT (JSON Web Token)** để xác thực. Hỗ trợ 
 | Loại       | Email       | Password | Vai trò    | Mô tả                 |
 | ---------- | ----------- | -------- | ---------- | --------------------- |
 | Nhân viên  | `h@s.com`   | `123456` | ADMIN      | NV Hùng - Admin       |
-| Nhân viên  | `an@s.com`  | `123456` | QUAN_LY    | NV An - Quản lý       |
+| Nhân viên  | `an@s.com`  | `123456` | NHAN_VIEN  | NV An - Nhân viên     |
 | Nhân viên  | `b@s.com`   | `123456` | NHAN_VIEN  | NV Bình - NV bán hàng |
 | Khách hàng | `lan@g.com` | `123456` | KHACH_HANG | KH Lan (10 điểm)      |
 | Khách hàng | `m@g.com`   | `123456` | KHACH_HANG | KH Minh (0 điểm)      |
