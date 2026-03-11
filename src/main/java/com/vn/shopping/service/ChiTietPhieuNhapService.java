@@ -17,6 +17,13 @@ import com.vn.shopping.util.error.IdInvalidException;
 @Service
 public class ChiTietPhieuNhapService {
 
+    private static final int TRANG_THAI_DA_DAT = 0;
+    private static final int TRANG_THAI_DA_NHAN = 1;
+    private static final int TRANG_THAI_CHAM_GIAO = 2;
+    private static final int TRANG_THAI_HUY = 3;
+    private static final int TRANG_THAI_THIEU_HANG = 4;
+    private static final int TRANG_THAI_HOAN_THANH = 5;
+
     private final ChiTietPhieuNhapRepository chiTietPhieuNhapRepository;
     private final PhieuNhapRepository phieuNhapRepository;
     private final ChiTietSanPhamRepository chiTietSanPhamRepository;
@@ -40,6 +47,13 @@ public class ChiTietPhieuNhapService {
         if (dto.getPhieuNhapId() != null) {
             PhieuNhap pn = phieuNhapRepository.findById(dto.getPhieuNhapId())
                     .orElseThrow(() -> new IdInvalidException("Không tìm thấy phiếu nhập: " + dto.getPhieuNhapId()));
+            // Chỉ được thêm chi tiết khi phiếu chưa nhận hoặc đang chậm giao
+            Integer tt = pn.getTrangThai();
+            if (tt != null && (tt == TRANG_THAI_HUY || tt == TRANG_THAI_DA_NHAN
+                    || tt == TRANG_THAI_THIEU_HANG || tt == TRANG_THAI_HOAN_THANH)) {
+                throw new IdInvalidException(
+                        "Không thể thêm chi tiết cho phiếu nhập ở trạng thái: " + getTrangThaiText(tt));
+            }
             ct.setPhieuNhap(pn);
         }
         if (dto.getChiTietSanPhamId() != null) {
@@ -56,6 +70,18 @@ public class ChiTietPhieuNhapService {
         ChiTietPhieuNhap existing = chiTietPhieuNhapRepository.findById(dto.getId())
                 .orElseThrow(() -> new IdInvalidException(
                         "Không tìm thấy chi tiết phiếu nhập: " + dto.getId()));
+
+        // Kiểm tra trạng thái phiếu nhập cha tương ứng
+        PhieuNhap phieuNhap = existing.getPhieuNhap();
+        if (phieuNhap != null) {
+            Integer tt = phieuNhap.getTrangThai();
+            if (tt != null && (tt == TRANG_THAI_HOAN_THANH || tt == TRANG_THAI_HUY)) {
+                throw new IdInvalidException(
+                        "Không thể cập nhật chi tiết phiếu nhập khi phiếu đã ở trạng thái: "
+                                + getTrangThaiText(tt));
+            }
+        }
+
         existing.setSoLuong(dto.getSoLuong());
         existing.setSoLuongThieu(dto.getSoLuongThieu());
         existing.setGhiTru(dto.getGhiTru());
@@ -98,6 +124,7 @@ public class ChiTietPhieuNhapService {
         dto.setId(ct.getId());
         dto.setSoLuong(ct.getSoLuong());
         dto.setSoLuongThieu(ct.getSoLuongThieu());
+        dto.setSoLuongDaNhap(ct.getSoLuongDaNhap());
         dto.setGhiTru(ct.getGhiTru());
         dto.setGhiTruKiemHang(ct.getGhiTruKiemHang());
         dto.setTrangThai(ct.getTrangThai());
@@ -130,5 +157,26 @@ public class ChiTietPhieuNhapService {
         }
 
         return dto;
+    }
+
+    private String getTrangThaiText(Integer trangThai) {
+        if (trangThai == null)
+            return "Không xác định";
+        switch (trangThai) {
+            case TRANG_THAI_DA_DAT:
+                return "Đã đặt";
+            case TRANG_THAI_DA_NHAN:
+                return "Đã nhận";
+            case TRANG_THAI_CHAM_GIAO:
+                return "Chậm giao";
+            case TRANG_THAI_HUY:
+                return "Hủy";
+            case TRANG_THAI_THIEU_HANG:
+                return "Thiếu hàng";
+            case TRANG_THAI_HOAN_THANH:
+                return "Hoàn thành";
+            default:
+                return "Không xác định";
+        }
     }
 }

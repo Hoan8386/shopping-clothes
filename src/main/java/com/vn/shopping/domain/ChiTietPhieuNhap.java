@@ -43,7 +43,10 @@ public class ChiTietPhieuNhap {
     private String ghiTruKiemHang;
 
     @Column(name = "TrangThai")
-    private Integer trangThai;
+    private Integer trangThai; // 0 = Đủ, 1 = Thiếu
+
+    @Column(name = "SoLuongDaNhap")
+    private Integer soLuongDaNhap; // Số lượng đã thực nhập vào kho (dùng để tính delta khi kiểm kê lại)
 
     @Column(name = "NgayTao")
     private LocalDateTime ngayTao;

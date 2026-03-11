@@ -92,11 +92,18 @@ public class PhieuNhapService {
             throw new IdInvalidException("Phiếu nhập đã hủy, không thể cập nhật");
         }
 
-        // Không cho phép thay đổi trạng thái khi đã nhận hàng
-        if (oldTrangThai != null && (oldTrangThai == TRANG_THAI_DA_NHAN
-                || oldTrangThai == TRANG_THAI_HOAN_THANH
-                || oldTrangThai == TRANG_THAI_THIEU_HANG)) {
-            throw new IdInvalidException("Phiếu nhập đã nhận hàng, không thể thay đổi trạng thái");
+        // Không cho phép cập nhật phiếu đã hoàn thành
+        if (oldTrangThai != null && oldTrangThai == TRANG_THAI_HOAN_THANH) {
+            throw new IdInvalidException("Phiếu nhập đã hoàn thành, không thể cập nhật");
+        }
+
+        // Khi phiếu đang ở trạng thái đã nhận hoặc thiếu hàng, không cho đổi trạng thái
+        // thủ công
+        if (oldTrangThai != null
+                && (oldTrangThai == TRANG_THAI_DA_NHAN || oldTrangThai == TRANG_THAI_THIEU_HANG)
+                && newTrangThai != null && newTrangThai != oldTrangThai) {
+            throw new IdInvalidException(
+                    "Không thể thay đổi trạng thái thủ công khi phiếu đã nhận hàng. Hãy dùng chức năng kiểm kê.");
         }
 
         // Validate trạng thái hợp lệ (0, 1, 2, 3, 4, 5)
@@ -149,8 +156,10 @@ public class PhieuNhapService {
         PhieuNhap phieuNhap = phieuNhapRepository.findById(phieuNhapId)
                 .orElseThrow(() -> new IdInvalidException("Không tìm thấy phiếu nhập: " + phieuNhapId));
 
-        if (phieuNhap.getTrangThai() == null || phieuNhap.getTrangThai() != TRANG_THAI_DA_NHAN) {
-            throw new IdInvalidException("Chỉ có thể kiểm kê phiếu nhập ở trạng thái 'Đã nhận'");
+        int trangThai = phieuNhap.getTrangThai() != null ? phieuNhap.getTrangThai() : -1;
+        if (trangThai != TRANG_THAI_DA_NHAN && trangThai != TRANG_THAI_THIEU_HANG) {
+            throw new IdInvalidException(
+                    "Chỉ có thể kiểm kê phiếu nhập ở trạng thái 'Đã nhận' hoặc 'Thiếu hàng'");
         }
 
         boolean coThieuHang = capNhatSoLuongSauNhapHang(phieuNhapId);
@@ -170,6 +179,12 @@ public class PhieuNhapService {
      * - Nếu đủ: số lượng thực nhập = soLuong
      * - Trả về true nếu có ít nhất 1 chi tiết bị thiếu hàng
      */
+    /**
+     * Cập nhật số lượng kho theo delta (số lượng mới - số lượng đã nhập trước đó).
+     * Nhờ trường soLuongDaNhap lưu trữ lượng đã thực nhập, việc kiểm kê lại sau khi
+     * cập nhật chi tiết phiếu nhập (thiếu hàng) sẽ chỉ cộng thêm phần chênh lệch,
+     * tránh tình trạng cộng trùng số lượng.
+     */
     private boolean capNhatSoLuongSauNhapHang(Long phieuNhapId) {
         PhieuNhap phieuNhap = phieuNhapRepository.findById(phieuNhapId).orElse(null);
         if (phieuNhap == null)
@@ -179,45 +194,39 @@ public class PhieuNhapService {
         List<ChiTietPhieuNhap> danhSachChiTiet = chiTietPhieuNhapRepository.findByPhieuNhapId(phieuNhapId);
 
         for (ChiTietPhieuNhap ctpn : danhSachChiTiet) {
-            if (ctpn.getChiTietSanPham() == null || ctpn.getSoLuong() == null || ctpn.getSoLuong() <= 0) {
+            if (ctpn.getChiTietSanPham() == null || ctpn.getSoLuong() == null || ctpn.getSoLuong() <= 0)
                 continue;
-            }
 
-            // Cập nhật số lượng chi tiết sản phẩm
-            ChiTietSanPham ctsp = chiTietSanPhamRepository.findById(ctpn.getChiTietSanPham().getId())
-                    .orElse(null);
-            if (ctsp == null) {
+            ChiTietSanPham ctsp = chiTietSanPhamRepository.findById(ctpn.getChiTietSanPham().getId()).orElse(null);
+            if (ctsp == null)
                 continue;
-            }
 
             int soLuongDat = ctpn.getSoLuong();
-            int soLuongThucNhap = soLuongDat;
+            int soLuongCanNhap = soLuongDat;
 
-            // Nếu chi tiết phiếu nhập bị thiếu hàng (trangThai = 1)
             if (ctpn.getTrangThai() != null && ctpn.getTrangThai() == 1) {
                 coThieuHang = true;
                 int soLuongThieu = ctpn.getSoLuongThieu() != null ? ctpn.getSoLuongThieu() : 0;
-                soLuongThucNhap = soLuongDat - soLuongThieu;
-                if (soLuongThucNhap < 0) {
-                    soLuongThucNhap = 0;
-                }
+                soLuongCanNhap = Math.max(soLuongDat - soLuongThieu, 0);
             }
+
+            // Tính delta: chỉ cộng thêm phần chênh lệch so với lần kiểm kê trước
+            int soLuongDaNhap = ctpn.getSoLuongDaNhap() != null ? ctpn.getSoLuongDaNhap() : 0;
+            int delta = soLuongCanNhap - soLuongDaNhap;
 
             int soLuongHienTai = ctsp.getSoLuong() != null ? ctsp.getSoLuong() : 0;
-            ctsp.setSoLuong(soLuongHienTai + soLuongThucNhap);
-
-            // Cập nhật mã phiếu nhập và mã cửa hàng
+            ctsp.setSoLuong(soLuongHienTai + delta);
             ctsp.setMaPhieuNhap(phieuNhapId);
-            if (phieuNhap.getCuaHang() != null) {
+            if (phieuNhap.getCuaHang() != null)
                 ctsp.setMaCuaHang(phieuNhap.getCuaHang().getId());
-            }
-
             chiTietSanPhamRepository.save(ctsp);
 
-            // Tính lại tổng số lượng sản phẩm
-            if (ctsp.getSanPham() != null) {
+            // Ghi lại số lượng đã nhập thực tế vào chi tiết phiếu nhập
+            ctpn.setSoLuongDaNhap(soLuongCanNhap);
+            chiTietPhieuNhapRepository.save(ctpn);
+
+            if (ctsp.getSanPham() != null)
                 capNhatTongSoLuongSanPham(ctsp.getSanPham().getId());
-            }
         }
         return coThieuHang;
     }
@@ -324,6 +333,7 @@ public class PhieuNhapService {
         dto.setId(ctpn.getId());
         dto.setSoLuong(ctpn.getSoLuong());
         dto.setSoLuongThieu(ctpn.getSoLuongThieu());
+        dto.setSoLuongDaNhap(ctpn.getSoLuongDaNhap());
         dto.setGhiTru(ctpn.getGhiTru());
         dto.setGhiTruKiemHang(ctpn.getGhiTruKiemHang());
         dto.setTrangThai(ctpn.getTrangThai());

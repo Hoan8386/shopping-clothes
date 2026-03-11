@@ -39,6 +39,7 @@
 ```
 Tạo phiếu → 0 (Đã đặt)
   ├── Cập nhật → 1 (Đã nhận) → Kiểm kê → 4 (Thiếu hàng) hoặc 5 (Hoàn thành)
+  │                               └── (Nếu 4) Cập nhật chi tiết → Kiểm kê lại → 5 (Hoàn thành)
   ├── Cập nhật → 2 (Chậm giao) → 1 (Đã nhận) → Kiểm kê
   └── Cập nhật → 3 (Hủy) ← Không thể cập nhật sau khi hủy
 ```
@@ -46,7 +47,8 @@ Tạo phiếu → 0 (Đã đặt)
 **Quy tắc:**
 
 - Phiếu đã **hủy** (3) → không thể cập nhật
-- Phiếu đã **nhận/thiếu hàng/hoàn thành** (1, 4, 5) → không thể thay đổi trạng thái
+- Phiếu đã **hoàn thành** (5) → không thể cập nhật
+- Phiếu đang **đã nhận** (1) hoặc **thiếu hàng** (4) → có thể cập nhật thông tin (tên, cửa hàng, nhà cung cấp) nhưng **không thể tự thay đổi trạng thái thủ công** — trạng thái chỉ thay đổi qua kiểm kê
 - Khi chuyển sang **Đã nhận** (1), `ngayNhanHang` tự động được gán
 
 ---
@@ -57,8 +59,8 @@ Tạo phiếu → 0 (Đã đặt)
 {
   "id": 1,
   "tenPhieuNhap": "Nhập hàng đợt 1 - CN Q.1",
-  "trangThai": 1,
-  "trangThaiText": "Đã nhận",
+  "trangThai": 4,
+  "trangThaiText": "Thiếu hàng",
   "ngayDatHang": "2026-03-01T10:00:00",
   "ngayNhanHang": "2026-03-03T10:00:00",
   "ngayTao": "2026-02-28T10:00:00",
@@ -82,12 +84,13 @@ Tạo phiếu → 0 (Đã đặt)
       "tenSanPham": "Áo Oxford",
       "tenMauSac": "Trắng",
       "tenKichThuoc": "M",
-      "soLuong": 50,
-      "soLuongThieu": null,
+      "soLuong": 10,
+      "soLuongThieu": 3,
+      "soLuongDaNhap": 7,
       "ghiTru": null,
-      "ghiTruKiemHang": null,
-      "trangThai": 0,
-      "trangThaiText": "Đủ"
+      "ghiTruKiemHang": "Thiếu 3 cái do hư hỏng",
+      "trangThai": 1,
+      "trangThaiText": "Thiếu"
     }
   ]
 }
@@ -236,20 +239,22 @@ Tạo phiếu → 0 (Đã đặt)
 **Logic:**
 
 - Khi chuyển sang **Đã nhận** (1): `ngayNhanHang` tự động gán
-- Không cho cập nhật phiếu đã **Hủy** (3)
-- Không cho thay đổi trạng thái khi đã **Đã nhận/Thiếu hàng/Hoàn thành** (1, 4, 5)
+- Không cho cập nhật phiếu đã **Hủy** (3) hoặc **Hoàn thành** (5)
+- Không cho thay đổi trạng thái thủ công khi đã **Đã nhận** (1) hoặc **Thiếu hàng** (4) — trạng thái chỉ thay đổi qua kiểm kê
+- Khi phiếu đang **Thiếu hàng** (4), vẫn có thể cập nhật thông tin (tên, cửa hàng, nhà cung cấp)
 
 **Response:** `200 OK` — Trả về `ResPhieuNhapDTO`
 
 **Lỗi:**
 
-| HTTP Status | Mô tả                                                  |
-| ----------- | ------------------------------------------------------ |
-| `400`       | Mã phiếu nhập không được để trống                      |
-| `400`       | Không tìm thấy phiếu nhập                              |
-| `400`       | Phiếu nhập đã hủy, không thể cập nhật                  |
-| `400`       | Phiếu nhập đã nhận hàng, không thể thay đổi trạng thái |
-| `400`       | Trạng thái không hợp lệ                                |
+| HTTP Status | Mô tả                                                         |
+| ----------- | ------------------------------------------------------------- |
+| `400`       | Mã phiếu nhập không được để trống                             |
+| `400`       | Không tìm thấy phiếu nhập                                     |
+| `400`       | Phiếu nhập đã hủy, không thể cập nhật                         |
+| `400`       | Phiếu nhập đã hoàn thành, không thể cập nhật                  |
+| `400`       | Không thể thay đổi trạng thái thủ công khi phiếu đã nhận hàng |
+| `400`       | Trạng thái không hợp lệ                                       |
 
 ---
 
@@ -267,28 +272,37 @@ Tạo phiếu → 0 (Đã đặt)
 | ------- | ---- | ------------- |
 | `id`    | Long | Mã phiếu nhập |
 
-**Điều kiện:** Phiếu nhập phải ở trạng thái **Đã nhận** (1).
+**Điều kiện:** Phiếu nhập phải ở trạng thái **Đã nhận** (1) hoặc **Thiếu hàng** (4).
 
-**Logic kiểm kê:**
+**Logic kiểm kê (sử dụng delta để tránh cộng trùng):**
 
 1. Duyệt từng chi tiết phiếu nhập:
-   - `trangThai = 0` (đủ hàng): số lượng thực nhập = `soLuong`
-   - `trangThai = 1` (thiếu hàng): số lượng thực nhập = `soLuong - soLuongThieu`
-2. Cập nhật `ChiTietSanPham.soLuong` += số lượng thực nhập
-3. Gán `ChiTietSanPham.maPhieuNhap` và `ChiTietSanPham.maCuaHang`
-4. Tính lại tổng `SanPham.soLuong` = tổng soLuong của tất cả ChiTietSanPham
-5. Kết quả:
+   - `trangThai = 0` (đủ hàng): số lượng cần nhập (`soLuongCanNhap`) = `soLuong`
+   - `trangThai = 1` (thiếu hàng): `soLuongCanNhap` = `soLuong - soLuongThieu`
+2. Tính **delta** = `soLuongCanNhap - soLuongDaNhap` (số lượng đã nhập từ lần kiểm kê trước)
+3. Cập nhật `ChiTietSanPham.soLuong` += delta
+4. Gán `ChiTietSanPham.maPhieuNhap` và `ChiTietSanPham.maCuaHang`
+5. Lưu lại `soLuongDaNhap = soLuongCanNhap` vào chi tiết phiếu nhập (dùng cho lần kiểm kê tiếp)
+6. Tính lại tổng `SanPham.soLuong` = tổng soLuong của tất cả ChiTietSanPham
+7. Kết quả:
    - Có ít nhất 1 chi tiết thiếu → phiếu nhập = **4 (Thiếu hàng)**
    - Tất cả đủ → phiếu nhập = **5 (Hoàn thành)**
+
+> **Ví dụ kiểm kê 2 lần:**
+>
+> - Lần 1: `soLuong=10`, `soLuongThieu=3` → `soLuongCanNhap=7`, `delta=7-0=7` → kho +7, `soLuongDaNhap=7`, phiếu = 4
+> - Cập nhật chi tiết: `soLuongThieu=0`, `trangThai=0`
+> - Lần 2: `soLuongCanNhap=10`, `delta=10-7=3` → kho +3, `soLuongDaNhap=10`, phiếu = 5
+> - Tổng kho = 10 ✓
 
 **Response:** `200 OK` — Trả về `ResPhieuNhapDTO`
 
 **Lỗi:**
 
-| HTTP Status | Mô tả                                                |
-| ----------- | ---------------------------------------------------- |
-| `400`       | Không tìm thấy phiếu nhập                            |
-| `400`       | Chỉ có thể kiểm kê phiếu nhập ở trạng thái 'Đã nhận' |
+| HTTP Status | Mô tả                                                                  |
+| ----------- | ---------------------------------------------------------------------- |
+| `400`       | Không tìm thấy phiếu nhập                                              |
+| `400`       | Chỉ có thể kiểm kê phiếu nhập ở trạng thái 'Đã nhận' hoặc 'Thiếu hàng' |
 
 ---
 
@@ -420,6 +434,8 @@ PUT /api/v1/chi-tiet-phieu-nhap
 }
 ```
 
+> Có thể cập nhật chi tiết khi phiếu đang ở trạng thái **Đã nhận** (1) hoặc **Thiếu hàng** (4).
+
 ---
 
 ### Bước 6: Kiểm kê (nhập kho thực tế)
@@ -430,12 +446,16 @@ PUT /api/v1/phieu-nhap/kiem-ke/1
 
 → Hệ thống sẽ:
 
-1. Cộng số lượng thực nhập (`soLuong - soLuongThieu`) vào tồn kho `ChiTietSanPham`
-2. Gán `maPhieuNhap` và `maCuaHang` cho `ChiTietSanPham`
-3. Tính lại tổng `SanPham.soLuong`
-4. Cập nhật trạng thái phiếu:
+1. Tính `delta = soLuongCanNhap - soLuongDaNhap` cho mỗi chi tiết
+2. Cộng delta vào tồn kho `ChiTietSanPham` (chỉ cộng phần chênh lệch, không cộng lại từ đầu)
+3. Gán `maPhieuNhap` và `maCuaHang` cho `ChiTietSanPham`
+4. Tính lại tổng `SanPham.soLuong`
+5. Lưu `soLuongDaNhap` = số lượng đã thực nhập để dùng cho lần kiểm kê tiếp theo
+6. Cập nhật trạng thái phiếu:
    - **5 (Hoàn thành)** nếu tất cả chi tiết đủ hàng
    - **4 (Thiếu hàng)** nếu có ít nhất 1 chi tiết thiếu
+
+> Có thể gọi kiểm kê nhiều lần khi phiếu đang **Thiếu hàng** (4) sau khi cập nhật lại chi tiết.
 
 ---
 
@@ -447,4 +467,6 @@ Login → Tạo phiếu nhập (0-Đã đặt)
       → Cập nhật trạng thái (1-Đã nhận)
       → (Tuỳ chọn) Cập nhật chi tiết nếu thiếu hàng
       → Kiểm kê → (4-Thiếu hàng) hoặc (5-Hoàn thành)
+                      ↑
+      (Nếu 4) Cập nhật chi tiết → Kiểm kê lại → (5-Hoàn thành)
 ```

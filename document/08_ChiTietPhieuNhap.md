@@ -10,18 +10,19 @@
 
 ### Cấu trúc dữ liệu `ChiTietPhieuNhap`
 
-| Trường           | Kiểu           | Mô tả                                   |
-| ---------------- | -------------- | --------------------------------------- |
-| `id`             | Long           | Mã chi tiết phiếu nhập (auto-increment) |
-| `phieuNhap`      | PhieuNhap      | Phiếu nhập cha (FK, ẩn trong JSON)      |
-| `chiTietSanPham` | ChiTietSanPham | Biến thể sản phẩm được nhập (FK)        |
-| `soLuong`        | Integer        | Số lượng nhập                           |
-| `soLuongThieu`   | Integer        | Số lượng thiếu (dùng khi kiểm kê)       |
-| `ghiTru`         | String(255)    | Ghi chú trừ                             |
-| `ghiTruKiemHang` | String(255)    | Ghi chú kiểm hàng                       |
-| `trangThai`      | Integer        | Trạng thái (0: Đủ, 1: Thiếu)            |
-| `ngayTao`        | LocalDateTime  | Ngày tạo (tự động)                      |
-| `ngayCapNhat`    | LocalDateTime  | Ngày cập nhật (tự động)                 |
+| Trường           | Kiểu           | Mô tả                                            |
+| ---------------- | -------------- | ------------------------------------------------ |
+| `id`             | Long           | Mã chi tiết phiếu nhập (auto-increment)          |
+| `phieuNhap`      | PhieuNhap      | Phiếu nhập cha (FK, ẩn trong JSON)               |
+| `chiTietSanPham` | ChiTietSanPham | Biến thể sản phẩm được nhập (FK)                 |
+| `soLuong`        | Integer        | Số lượng nhập theo phiếu                         |
+| `soLuongThieu`   | Integer        | Số lượng thiếu (dùng khi kiểm kê)                |
+| `soLuongDaNhap`  | Integer        | Số lượng đã thực nhập vào kho (tính sau kiểm kê) |
+| `ghiTru`         | String(255)    | Ghi chú trừ                                      |
+| `ghiTruKiemHang` | String(255)    | Ghi chú kiểm hàng                                |
+| `trangThai`      | Integer        | Trạng thái (0: Đủ, 1: Thiếu)                     |
+| `ngayTao`        | LocalDateTime  | Ngày tạo (tự động)                               |
+| `ngayCapNhat`    | LocalDateTime  | Ngày cập nhật (tự động)                          |
 
 ### Mã trạng thái chi tiết phiếu nhập (`trangThai`)
 
@@ -50,19 +51,20 @@
     "tenPhieuNhap": "Nhập hàng đợt 1 - CN Q.1",
     "chiTietSanPham": {
       "id": 1,
-      "soLuong": 50,
+      "soLuong": 7,
       "tenSanPham": "Áo Oxford",
       "tenMauSac": "Trắng",
       "tenKichThuoc": "M"
     },
-    "soLuong": 50,
-    "soLuongThieu": null,
+    "soLuong": 10,
+    "soLuongThieu": 3,
+    "soLuongDaNhap": 7,
     "ghiTru": null,
-    "ghiTruKiemHang": null,
-    "trangThai": 0,
-    "trangThaiText": "Đủ",
+    "ghiTruKiemHang": "Thiếu 3 cái do hư hỏng",
+    "trangThai": 1,
+    "trangThaiText": "Thiếu",
     "ngayTao": "2026-03-01T10:00:00",
-    "ngayCapNhat": null
+    "ngayCapNhat": "2026-03-03T10:00:00"
   }
 ]
 ```
@@ -144,12 +146,18 @@
 
 **Response:** `201 Created` — Trả về `ResChiTietPhieuNhapDTO`
 
+**Quy tắc:**
+
+- Chỉ được thêm chi tiết khi phiếu nhập đang ở trạng thái **Đã đặt** (0) hoặc **Chậm giao** (2)
+- Không được thêm chi tiết khi phiếu đã ở trạng thái **Đã nhận** (1), **Thiếu hàng** (4), **Hoàn thành** (5) hoặc **Hủy** (3)
+
 **Lỗi:**
 
-| HTTP Status | Mô tả                            |
-| ----------- | -------------------------------- |
-| `400`       | Không tìm thấy phiếu nhập        |
-| `400`       | Không tìm thấy chi tiết sản phẩm |
+| HTTP Status | Mô tả                                                        |
+| ----------- | ------------------------------------------------------------ |
+| `400`       | Không tìm thấy phiếu nhập                                    |
+| `400`       | Không thể thêm chi tiết cho phiếu nhập ở trạng thái hiện tại |
+| `400`       | Không tìm thấy chi tiết sản phẩm                             |
 
 ---
 
@@ -194,14 +202,21 @@
 
 **Response:** `200 OK` — Trả về `ResChiTietPhieuNhapDTO`
 
+**Quy tắc:**
+
+- Chỉ được cập nhật khi phiếu nhập cha đang ở trạng thái **Đã đặt** (0), **Đã nhận** (1), **Chậm giao** (2) hoặc **Thiếu hàng** (4)
+- Không được cập nhật khi phiếu đã **Hoàn thành** (5) hoặc **Hủy** (3)
+- Sau khi cập nhật chi tiết ở phiếu **Thiếu hàng** (4), gọi kiểm kê lại để cập nhật tồn kho
+
 **Lỗi:**
 
-| HTTP Status | Mô tả                                      |
-| ----------- | ------------------------------------------ |
-| `400`       | Mã chi tiết phiếu nhập không được để trống |
-| `400`       | Không tìm thấy chi tiết phiếu nhập         |
-| `400`       | Không tìm thấy phiếu nhập                  |
-| `400`       | Không tìm thấy chi tiết sản phẩm           |
+| HTTP Status | Mô tả                                                                   |
+| ----------- | ----------------------------------------------------------------------- |
+| `400`       | Mã chi tiết phiếu nhập không được để trống                              |
+| `400`       | Không tìm thấy chi tiết phiếu nhập                                      |
+| `400`       | Không thể cập nhật chi tiết phiếu nhập khi phiếu đã Hoàn thành hoặc Hủy |
+| `400`       | Không tìm thấy phiếu nhập                                               |
+| `400`       | Không tìm thấy chi tiết sản phẩm                                        |
 
 ---
 

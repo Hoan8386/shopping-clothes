@@ -60,6 +60,7 @@ public class ResPhieuNhapDTO {
         private String tenKichThuoc;
         private Integer soLuong;
         private Integer soLuongThieu;
+        private Integer soLuongDaNhap;
         private String ghiTru;
         private String ghiTruKiemHang;
         private Integer trangThai;

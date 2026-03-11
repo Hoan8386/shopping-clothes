@@ -209,6 +209,7 @@ INSERT INTO permission_role (role_id, permission_id) VALUES
     (2,35),(2,36),         -- THUONG_HIEU: xem all, xem id
     (2,40),(2,41),(2,42),  -- HINH_ANH: xem all, xem id, xem theo CTSP
     (2,46),(2,47),         -- CUA_HANG: xem all, xem id
+    (2,61),(2,62),         -- NHA_CUNG_CAP: xem all, xem id
     (2,66),(2,67),(2,68),(2,69),(2,105), -- PHIEU_NHAP: xem all, xem id, tạo, cập nhật, kiểm kê
     (2,71),(2,72),(2,73),(2,74),(2,75),  -- CHI_TIET_PHIEU_NHAP: xem all, xem id, xem theo PN, tạo, cập nhật
     (2,77),(2,78),(2,80),(2,81),  -- DON_HANG: xem all, xem id, tạo tại quầy, cập nhật
