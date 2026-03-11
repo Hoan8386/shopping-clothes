@@ -5,8 +5,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.vn.shopping.domain.ChiTietGioHang;
+import com.vn.shopping.domain.request.ReqApDungKhuyenMaiDTO;
 import com.vn.shopping.domain.request.ReqThemGioHangDTO;
+import com.vn.shopping.domain.response.ResApDungKhuyenMaiDTO;
 import com.vn.shopping.domain.response.ResGioHangDTO;
+import com.vn.shopping.domain.response.ResKhuyenMaiHopLeDTO;
 import com.vn.shopping.service.GioHangService;
 import com.vn.shopping.util.anotation.ApiMessage;
 import com.vn.shopping.util.error.IdInvalidException;
@@ -43,5 +46,18 @@ public class GioHangController {
             @PathVariable("maChiTietGioHang") Long maChiTietGioHang) throws IdInvalidException {
         gioHangService.xoaChiTietGioHang(maChiTietGioHang);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/khuyen-mai-hop-le")
+    @ApiMessage("Lấy danh sách khuyến mãi hợp lệ cho giỏ hàng")
+    public ResponseEntity<ResKhuyenMaiHopLeDTO> getKhuyenMaiHopLe() throws IdInvalidException {
+        return ResponseEntity.ok(gioHangService.getKhuyenMaiHopLe());
+    }
+
+    @PostMapping("/ap-dung-khuyen-mai")
+    @ApiMessage("Xem trước giảm giá khi áp dụng khuyến mãi")
+    public ResponseEntity<ResApDungKhuyenMaiDTO> apDungKhuyenMai(
+            @RequestBody ReqApDungKhuyenMaiDTO req) throws IdInvalidException {
+        return ResponseEntity.ok(gioHangService.xemTruocKhuyenMai(req));
     }
 }

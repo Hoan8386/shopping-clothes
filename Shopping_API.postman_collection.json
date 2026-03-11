@@ -626,6 +626,36 @@
 					}
 				},
 				{
+					"name": "Xem khuyến mãi hợp lệ cho giỏ hàng ( Khách hàng)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/gio-hang/khuyen-mai-hop-le",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "gio-hang", "khuyen-mai-hop-le"]
+						},
+						"description": " Khách hàng — Lấy danh sách khuyến mãi hợp lệ cho giỏ hàng hiện tại"
+					}
+				},
+				{
+					"name": "Xem trước áp dụng khuyến mãi ( Khách hàng)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"maKhuyenMaiHoaDon\": 1,\n    \"maKhuyenMaiDiem\": null\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/gio-hang/ap-dung-khuyen-mai",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "gio-hang", "ap-dung-khuyen-mai"]
+						},
+						"description": " Khách hàng — Xem trước tổng tiền giảm khi áp dụng mã khuyến mãi theo hóa đơn hoặc theo điểm"
+					}
+				},
+				{
 					"name": "Thêm SP vào giỏ ( Khách hàng)",
 					"request": {
 						"method": "POST",

@@ -168,13 +168,17 @@ INSERT INTO permissions (name, apiPath, method, module, createdAt) VALUES
 
     -- === DANH_GIA_SP_UPDATE (106-107) ===
     ('Cập nhật đánh giá SP',        '/api/v1/danh-gia-san-pham/{id}',                           'PUT',    'DANH_GIA_SP',         NOW()),
-    ('Xem đánh giá theo CTDH',      '/api/v1/danh-gia-san-pham/chi-tiet-don-hang/{chiTietDonHangId}', 'GET', 'DANH_GIA_SP',    NOW());
+    ('Xem đánh giá theo CTDH',      '/api/v1/danh-gia-san-pham/chi-tiet-don-hang/{chiTietDonHangId}', 'GET', 'DANH_GIA_SP',    NOW()),
+
+    -- === GIO_HANG_KHUYEN_MAI (108-109) ===
+    ('Xem khuyến mãi hợp lệ giỏ hàng', '/api/v1/gio-hang/khuyen-mai-hop-le',                    'GET',    'GIO_HANG',            NOW()),
+    ('Xem trước áp dụng khuyến mãi',   '/api/v1/gio-hang/ap-dung-khuyen-mai',                   'POST',   'GIO_HANG',            NOW());
 
 -- ---------------------------------------------------------
 -- 3. PERMISSION_ROLE
 -- ---------------------------------------------------------
 
--- ADMIN (role_id=1): TẤT CẢ QUYỀN (1-106)
+-- ADMIN (role_id=1): TẤT CẢ QUYỀN (1-109)
 INSERT INTO permission_role (role_id, permission_id) VALUES
     (1,1),(1,2),(1,3),(1,4),(1,5),
     (1,6),(1,7),(1,8),(1,9),(1,10),
@@ -196,7 +200,7 @@ INSERT INTO permission_role (role_id, permission_id) VALUES
     (1,89),(1,90),(1,91),(1,92),(1,93),
     (1,94),(1,95),(1,96),(1,97),(1,98),
     (1,99),(1,100),(1,101),(1,102),(1,103),(1,104),
-    (1,105),(1,106),(1,107);
+    (1,105),(1,106),(1,107),(1,108),(1,109);
 
 -- NHAN_VIEN (role_id=2): Xem tất cả danh mục, SP, CTSP, hình ảnh, cửa hàng (chỉ GET) + Phiếu nhập + Đơn hàng
 INSERT INTO permission_role (role_id, permission_id) VALUES
@@ -218,13 +222,13 @@ INSERT INTO permission_role (role_id, permission_id) VALUES
     (2,94),(2,95),         -- KHUYEN_MAI_DIEM: xem all, xem id
     (2,99),(2,100),(2,101),(2,107); -- DANH_GIA_SP: xem all, xem id, xem theo SP, xem theo CTDH
 
--- KHACH_HANG (role_id=3): Xem SP/danh mục + giỏ hàng (thêm/xem/xóa)
+-- KHACH_HANG (role_id=3): Xem SP/danh mục + giỏ hàng (thêm/xem/xóa/khuyến mãi)
 INSERT INTO permission_role (role_id, permission_id) VALUES
     (3,1),(3,2),           -- SAN_PHAM: xem all, xem id
     (3,6),(3,7),           -- MAU_SAC: xem all, xem id
     (3,11),(3,12),         -- KICH_THUOC: xem all, xem id
     (3,16),(3,17),(3,18),  -- CHI_TIET_SP: xem all, xem id, xem theo SP
-    (3,22),(3,23),(3,24),  -- GIO_HANG: thêm SP, xem theo KH, xóa
+    (3,22),(3,23),(3,24),(3,108),(3,109),  -- GIO_HANG: thêm SP, xem theo KH, xóa, khuyến mãi
     (3,25),(3,26),         -- KIEU_SAN_PHAM: xem all, xem id
     (3,30),(3,31),         -- BO_SUU_TAP: xem all, xem id
     (3,35),(3,36),         -- THUONG_HIEU: xem all, xem id

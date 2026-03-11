@@ -7,14 +7,22 @@ import com.vn.shopping.domain.ChiTietGioHang;
 import com.vn.shopping.domain.ChiTietSanPham;
 import com.vn.shopping.domain.GioHang;
 import com.vn.shopping.domain.KhachHang;
+import com.vn.shopping.domain.KhuyenMaiTheoDiem;
+import com.vn.shopping.domain.KhuyenMaiTheoHoaDon;
+import com.vn.shopping.domain.request.ReqApDungKhuyenMaiDTO;
 import com.vn.shopping.domain.request.ReqThemGioHangDTO;
+import com.vn.shopping.domain.response.ResApDungKhuyenMaiDTO;
 import com.vn.shopping.domain.response.ResGioHangDTO;
+import com.vn.shopping.domain.response.ResKhuyenMaiHopLeDTO;
 import com.vn.shopping.repository.ChiTietGioHangRepository;
 import com.vn.shopping.repository.ChiTietSanPhamRepository;
 import com.vn.shopping.repository.GioHangRepository;
 import com.vn.shopping.repository.KhachHangRepository;
+import com.vn.shopping.repository.KhuyenMaiTheoDiemRepository;
+import com.vn.shopping.repository.KhuyenMaiTheoHoaDonRepository;
 import com.vn.shopping.util.error.IdInvalidException;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,15 +34,21 @@ public class GioHangService {
     private final ChiTietGioHangRepository chiTietGioHangRepository;
     private final KhachHangRepository khachHangRepository;
     private final ChiTietSanPhamRepository chiTietSanPhamRepository;
+    private final KhuyenMaiTheoHoaDonRepository khuyenMaiTheoHoaDonRepository;
+    private final KhuyenMaiTheoDiemRepository khuyenMaiTheoDiemRepository;
 
     public GioHangService(GioHangRepository gioHangRepository,
             ChiTietGioHangRepository chiTietGioHangRepository,
             KhachHangRepository khachHangRepository,
-            ChiTietSanPhamRepository chiTietSanPhamRepository) {
+            ChiTietSanPhamRepository chiTietSanPhamRepository,
+            KhuyenMaiTheoHoaDonRepository khuyenMaiTheoHoaDonRepository,
+            KhuyenMaiTheoDiemRepository khuyenMaiTheoDiemRepository) {
         this.gioHangRepository = gioHangRepository;
         this.chiTietGioHangRepository = chiTietGioHangRepository;
         this.khachHangRepository = khachHangRepository;
         this.chiTietSanPhamRepository = chiTietSanPhamRepository;
+        this.khuyenMaiTheoHoaDonRepository = khuyenMaiTheoHoaDonRepository;
+        this.khuyenMaiTheoDiemRepository = khuyenMaiTheoDiemRepository;
     }
 
     private KhachHang getCurrentKhachHang() throws IdInvalidException {
@@ -141,5 +155,128 @@ public class GioHangService {
         dto.setChiTietGioHangs(chiTietList);
 
         return dto;
+    }
+
+    /**
+     * Tính tổng tiền giỏ hàng hiện tại (sau giảm giá sản phẩm, trước khuyến mãi).
+     */
+    private int tinhTongTienGioHang(GioHang gioHang) {
+        int tong = 0;
+        if (gioHang == null || gioHang.getChiTietGioHangs() == null)
+            return tong;
+        for (ChiTietGioHang ct : gioHang.getChiTietGioHangs()) {
+            ChiTietSanPham ctsp = ct.getChiTietSanPham();
+            if (ctsp != null && ctsp.getSanPham() != null) {
+                Double giaBan = ctsp.getSanPham().getGiaBan() != null ? ctsp.getSanPham().getGiaBan() : 0;
+                Integer giaGiamPhanTram = ctsp.getSanPham().getGiaGiam() != null ? ctsp.getSanPham().getGiaGiam() : 0;
+                double giaGiam = giaBan * giaGiamPhanTram / 100;
+                tong += (int) ((giaBan - giaGiam) * ct.getSoLuong());
+            }
+        }
+        return tong;
+    }
+
+    /**
+     * Trả về danh sách khuyến mãi hợp lệ cho giỏ hàng hiện tại của khách hàng.
+     * - Khuyến mãi hóa đơn: lọc theo tổng tiền giỏ hàng
+     * - Khuyến mãi điểm: lọc theo điểm tích lũy của khách hàng
+     */
+    public ResKhuyenMaiHopLeDTO getKhuyenMaiHopLe() throws IdInvalidException {
+        KhachHang khachHang = getCurrentKhachHang();
+        GioHang gioHang = gioHangRepository.findByKhachHangId(khachHang.getId()).orElse(null);
+        int tongTien = tinhTongTienGioHang(gioHang);
+        int diemKhachHang = khachHang.getDiemTichLuy() != null ? khachHang.getDiemTichLuy() : 0;
+        LocalDateTime now = LocalDateTime.now();
+
+        List<KhuyenMaiTheoHoaDon> khuyenMaiHoaDon = khuyenMaiTheoHoaDonRepository.findKhuyenMaiHopLe(tongTien, now);
+        List<KhuyenMaiTheoDiem> khuyenMaiDiem = khuyenMaiTheoDiemRepository.findKhuyenMaiHopLe(diemKhachHang, now);
+
+        return new ResKhuyenMaiHopLeDTO(khuyenMaiHoaDon, khuyenMaiDiem);
+    }
+
+    /**
+     * Xem trước số tiền được giảm khi áp dụng mã khuyến mãi vào giỏ hàng hiện tại.
+     * Không thay đổi dữ liệu, chỉ tính toán và trả về kết quả dự kiến.
+     */
+    public ResApDungKhuyenMaiDTO xemTruocKhuyenMai(ReqApDungKhuyenMaiDTO req) throws IdInvalidException {
+        KhachHang khachHang = getCurrentKhachHang();
+        GioHang gioHang = gioHangRepository.findByKhachHangId(khachHang.getId())
+                .orElseThrow(() -> new IdInvalidException("Giỏ hàng trống"));
+
+        int tongTienGoc = tinhTongTienGioHang(gioHang);
+        LocalDateTime now = LocalDateTime.now();
+
+        ResApDungKhuyenMaiDTO result = new ResApDungKhuyenMaiDTO();
+        result.setTongTienGoc(tongTienGoc);
+        int tongTienGiam = 0;
+
+        // --- Khuyến mãi theo hóa đơn ---
+        if (req.getMaKhuyenMaiHoaDon() != null) {
+            KhuyenMaiTheoHoaDon km = khuyenMaiTheoHoaDonRepository.findById(req.getMaKhuyenMaiHoaDon())
+                    .orElseThrow(() -> new IdInvalidException(
+                            "Không tìm thấy mã khuyến mãi hóa đơn: " + req.getMaKhuyenMaiHoaDon()));
+
+            if (km.getTrangThai() == null || km.getTrangThai() != 1)
+                throw new IdInvalidException("Mã khuyến mãi không còn hoạt động");
+            if (km.getThoiGianBatDau() != null && now.isBefore(km.getThoiGianBatDau()))
+                throw new IdInvalidException("Mã khuyến mãi chưa đến thời gian áp dụng");
+            if (km.getThoiGianKetThuc() != null && now.isAfter(km.getThoiGianKetThuc()))
+                throw new IdInvalidException("Mã khuyến mãi đã hết hạn");
+            if (km.getSoLuong() != null && km.getSoLuong() <= 0)
+                throw new IdInvalidException("Mã khuyến mãi đã hết lượt sử dụng");
+            if (km.getHoaDonToiDa() != null && km.getHoaDonToiDa() > 0 && tongTienGoc > km.getHoaDonToiDa())
+                throw new IdInvalidException(
+                        "Đơn hàng vượt giá trị tối đa (" + km.getHoaDonToiDa() + ") của mã khuyến mãi");
+
+            int tienGiam = 0;
+            if (km.getPhanTramGiam() != null && km.getPhanTramGiam() > 0) {
+                tienGiam = (int) (tongTienGoc * km.getPhanTramGiam() / 100);
+                if (km.getGiamToiDa() != null && km.getGiamToiDa() > 0 && tienGiam > km.getGiamToiDa())
+                    tienGiam = km.getGiamToiDa();
+            }
+            result.setMaKhuyenMaiHoaDon(km.getId());
+            result.setTenKhuyenMaiHoaDon(km.getTenKhuyenMai());
+            result.setTienGiamHoaDon(tienGiam);
+            tongTienGiam += tienGiam;
+        }
+
+        // --- Khuyến mãi theo điểm ---
+        if (req.getMaKhuyenMaiDiem() != null) {
+            KhuyenMaiTheoDiem km = khuyenMaiTheoDiemRepository.findById(req.getMaKhuyenMaiDiem())
+                    .orElseThrow(() -> new IdInvalidException(
+                            "Không tìm thấy mã khuyến mãi điểm: " + req.getMaKhuyenMaiDiem()));
+
+            if (km.getTrangThai() == null || km.getTrangThai() != 1)
+                throw new IdInvalidException("Mã khuyến mãi điểm không còn hoạt động");
+            if (km.getThoiGianBatDau() != null && now.isBefore(km.getThoiGianBatDau()))
+                throw new IdInvalidException("Mã khuyến mãi điểm chưa đến thời gian áp dụng");
+            if (km.getThoiGianKetThuc() != null && now.isAfter(km.getThoiGianKetThuc()))
+                throw new IdInvalidException("Mã khuyến mãi điểm đã hết hạn");
+            if (km.getSoLuong() != null && km.getSoLuong() <= 0)
+                throw new IdInvalidException("Mã khuyến mãi điểm đã hết lượt sử dụng");
+
+            int diemKhachHang = khachHang.getDiemTichLuy() != null ? khachHang.getDiemTichLuy() : 0;
+            if (km.getDiemToiThieu() != null && diemKhachHang < km.getDiemToiThieu())
+                throw new IdInvalidException(
+                        "Điểm tích lũy không đủ (cần tối thiểu " + km.getDiemToiThieu() + " điểm)");
+            if (km.getHoaDonToiDa() != null && km.getHoaDonToiDa() > 0 && tongTienGoc > km.getHoaDonToiDa())
+                throw new IdInvalidException(
+                        "Đơn hàng vượt giá trị tối đa (" + km.getHoaDonToiDa() + ") của mã khuyến mãi điểm");
+
+            int tienGiam = 0;
+            if (km.getPhanTramGiam() != null && km.getPhanTramGiam() > 0) {
+                tienGiam = (int) (tongTienGoc * km.getPhanTramGiam() / 100);
+                if (km.getGiamToiDa() != null && km.getGiamToiDa() > 0 && tienGiam > km.getGiamToiDa())
+                    tienGiam = km.getGiamToiDa();
+            }
+            result.setMaKhuyenMaiDiem(km.getId());
+            result.setTenKhuyenMaiDiem(km.getTenKhuyenMai());
+            result.setTienGiamDiem(tienGiam);
+            tongTienGiam += tienGiam;
+        }
+
+        result.setTongTienGiam(tongTienGiam);
+        result.setTongTienTra(tongTienGoc - tongTienGiam);
+        return result;
     }
 }
