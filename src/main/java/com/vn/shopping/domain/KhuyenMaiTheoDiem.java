@@ -26,8 +26,8 @@ public class KhuyenMaiTheoDiem {
     @Column(name = "GiamToiDa")
     private Integer giamToiDa;
 
-    @Column(name = "HoaDonToiDa")
-    private Integer hoaDonToiDa;
+    @Column(name = "HoaDonToiThieu")
+    private Integer hoaDonToiThieu;
 
     @Column(name = "PhanTramGiam")
     private Double phanTramGiam;

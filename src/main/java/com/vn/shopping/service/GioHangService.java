@@ -179,17 +179,30 @@ public class GioHangService {
     /**
      * Trả về danh sách khuyến mãi hợp lệ cho giỏ hàng hiện tại của khách hàng.
      * - Khuyến mãi hóa đơn: lọc theo tổng tiền giỏ hàng
-     * - Khuyến mãi điểm: lọc theo điểm tích lũy của khách hàng
+     * - Khuyến mãi điểm: lọc theo điểm tích lũy + tổng tiền giỏ hàng
      */
     public ResKhuyenMaiHopLeDTO getKhuyenMaiHopLe() throws IdInvalidException {
         KhachHang khachHang = getCurrentKhachHang();
         GioHang gioHang = gioHangRepository.findByKhachHangId(khachHang.getId()).orElse(null);
+
+        if (gioHang == null || gioHang.getChiTietGioHangs() == null || gioHang.getChiTietGioHangs().isEmpty()) {
+            return new ResKhuyenMaiHopLeDTO(new ArrayList<>(), new ArrayList<>());
+        }
+
         int tongTien = tinhTongTienGioHang(gioHang);
         int diemKhachHang = khachHang.getDiemTichLuy() != null ? khachHang.getDiemTichLuy() : 0;
         LocalDateTime now = LocalDateTime.now();
 
         List<KhuyenMaiTheoHoaDon> khuyenMaiHoaDon = khuyenMaiTheoHoaDonRepository.findKhuyenMaiHopLe(tongTien, now);
-        List<KhuyenMaiTheoDiem> khuyenMaiDiem = khuyenMaiTheoDiemRepository.findKhuyenMaiHopLe(diemKhachHang, now);
+        List<KhuyenMaiTheoDiem> khuyenMaiDiem = khuyenMaiTheoDiemRepository.findKhuyenMaiHopLe(
+                diemKhachHang,
+                tongTien,
+                now);
+
+        // Hậu kiểm điều kiện hóa đơn tối thiểu để đảm bảo chỉ trả về mã đủ điều kiện.
+        khuyenMaiHoaDon.removeIf(km -> km.getHoaDonToiThieu() != null
+                && km.getHoaDonToiThieu() > 0
+                && tongTien < km.getHoaDonToiThieu());
 
         return new ResKhuyenMaiHopLeDTO(khuyenMaiHoaDon, khuyenMaiDiem);
     }
@@ -224,9 +237,10 @@ public class GioHangService {
                 throw new IdInvalidException("Mã khuyến mãi đã hết hạn");
             if (km.getSoLuong() != null && km.getSoLuong() <= 0)
                 throw new IdInvalidException("Mã khuyến mãi đã hết lượt sử dụng");
-            if (km.getHoaDonToiDa() != null && km.getHoaDonToiDa() > 0 && tongTienGoc > km.getHoaDonToiDa())
+            if (km.getHoaDonToiThieu() != null && km.getHoaDonToiThieu() > 0
+                    && tongTienGoc < km.getHoaDonToiThieu())
                 throw new IdInvalidException(
-                        "Đơn hàng vượt giá trị tối đa (" + km.getHoaDonToiDa() + ") của mã khuyến mãi");
+                        "Đơn hàng chưa đạt giá trị tối thiểu (" + km.getHoaDonToiThieu() + ") của mã khuyến mãi");
 
             int tienGiam = 0;
             if (km.getPhanTramGiam() != null && km.getPhanTramGiam() > 0) {
@@ -259,9 +273,11 @@ public class GioHangService {
             if (km.getDiemToiThieu() != null && diemKhachHang < km.getDiemToiThieu())
                 throw new IdInvalidException(
                         "Điểm tích lũy không đủ (cần tối thiểu " + km.getDiemToiThieu() + " điểm)");
-            if (km.getHoaDonToiDa() != null && km.getHoaDonToiDa() > 0 && tongTienGoc > km.getHoaDonToiDa())
+            if (km.getHoaDonToiThieu() != null && km.getHoaDonToiThieu() > 0
+                    && tongTienGoc < km.getHoaDonToiThieu())
                 throw new IdInvalidException(
-                        "Đơn hàng vượt giá trị tối đa (" + km.getHoaDonToiDa() + ") của mã khuyến mãi điểm");
+                        "Đơn hàng chưa đạt giá trị tối thiểu (" + km.getHoaDonToiThieu()
+                                + ") của mã khuyến mãi điểm");
 
             int tienGiam = 0;
             if (km.getPhanTramGiam() != null && km.getPhanTramGiam() > 0) {

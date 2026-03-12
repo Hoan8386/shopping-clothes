@@ -25,7 +25,7 @@ public class KhuyenMaiTheoDiemService {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy khuyến mãi theo điểm: " + khuyenMai.getId()));
         existing.setTenKhuyenMai(khuyenMai.getTenKhuyenMai());
         existing.setGiamToiDa(khuyenMai.getGiamToiDa());
-        existing.setHoaDonToiDa(khuyenMai.getHoaDonToiDa());
+        existing.setHoaDonToiThieu(khuyenMai.getHoaDonToiThieu());
         existing.setPhanTramGiam(khuyenMai.getPhanTramGiam());
         existing.setHinhThuc(khuyenMai.getHinhThuc());
         existing.setThoiGianBatDau(khuyenMai.getThoiGianBatDau());

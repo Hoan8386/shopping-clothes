@@ -1,12 +1,12 @@
 package com.vn.shopping.controller;
 
-import java.util.List;
-
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.vn.shopping.domain.CuaHang;
+import com.vn.shopping.domain.response.ResultPaginationDTO;
 import com.vn.shopping.service.CuaHangService;
 import com.vn.shopping.util.anotation.ApiMessage;
 import com.vn.shopping.util.error.IdInvalidException;
@@ -23,8 +23,12 @@ public class CuaHangController {
 
     @GetMapping
     @ApiMessage("Lấy danh sách cửa hàng")
-    public ResponseEntity<List<CuaHang>> getAll() {
-        return ResponseEntity.ok(cuaHangService.findAll());
+    public ResponseEntity<ResultPaginationDTO> getAll(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String address,
+            @RequestParam(required = false) Integer status,
+            Pageable pageable) {
+        return ResponseEntity.ok(cuaHangService.filter(name, address, status, pageable));
     }
 
     @GetMapping("/{id}")

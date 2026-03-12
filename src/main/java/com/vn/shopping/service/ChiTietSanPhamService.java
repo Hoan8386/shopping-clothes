@@ -1,8 +1,10 @@
 package com.vn.shopping.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,6 +15,7 @@ import com.vn.shopping.domain.HinhAnh;
 import com.vn.shopping.domain.KichThuoc;
 import com.vn.shopping.domain.MauSac;
 import com.vn.shopping.domain.SanPham;
+import com.vn.shopping.repository.CuaHangRepository;
 import com.vn.shopping.domain.response.ResChiTietSanPhamDTO;
 import com.vn.shopping.repository.ChiTietSanPhamRepository;
 import com.vn.shopping.repository.KichThuocRepository;
@@ -30,6 +33,7 @@ public class ChiTietSanPhamService {
     private final MinioStorageService minioStorageService;
     private final HinhAnhService hinhAnhService;
     private final CuaHangService cuaHangService;
+    private final CuaHangRepository cuaHangRepository;
     private final SanPhamRepository sanPhamRepository;
     private final MauSacRepository mauSacRepository;
     private final KichThuocRepository kichThuocRepository;
@@ -39,6 +43,7 @@ public class ChiTietSanPhamService {
             MinioStorageService minioStorageService,
             HinhAnhService hinhAnhService,
             CuaHangService cuaHangService,
+            CuaHangRepository cuaHangRepository,
             SanPhamRepository sanPhamRepository,
             MauSacRepository mauSacRepository,
             KichThuocRepository kichThuocRepository) {
@@ -47,6 +52,7 @@ public class ChiTietSanPhamService {
         this.minioStorageService = minioStorageService;
         this.hinhAnhService = hinhAnhService;
         this.cuaHangService = cuaHangService;
+        this.cuaHangRepository = cuaHangRepository;
         this.sanPhamRepository = sanPhamRepository;
         this.mauSacRepository = mauSacRepository;
         this.kichThuocRepository = kichThuocRepository;
@@ -61,52 +67,70 @@ public class ChiTietSanPhamService {
     }
 
     /**
-     * Tạo chi tiết sản phẩm từ các trường riêng lẻ + upload nhiều ảnh lên MinIO
+     * Tạo chi tiết sản phẩm cho TẤT CẢ cửa hàng + upload nhiều ảnh lên MinIO
+     * Mỗi cửa hàng sẽ có 1 bản ghi ChiTietSanPham riêng với cùng thông tin sản phẩm
      */
     @Transactional
-    public ChiTietSanPham createChiTietSanPham(
+    public List<ResChiTietSanPhamDTO> createChiTietSanPham(
             Long sanPhamId, Long maPhieuNhap, Long mauSacId, Long kichThuocId,
-            Long maCuaHang, Integer soLuong, Integer trangThai, String moTa, String ghiTru,
+            Integer soLuong, Integer trangThai, String moTa, String ghiTru,
             List<MultipartFile> files) throws Exception {
 
-        ChiTietSanPham ct = new ChiTietSanPham();
-        ct.setMaPhieuNhap(maPhieuNhap);
-        ct.setMaCuaHang(maCuaHang);
-        ct.setSoLuong(soLuong);
-        ct.setTrangThai(trangThai);
-        ct.setMoTa(moTa);
-        ct.setGhiTru(ghiTru);
-
+        // Resolve shared entities once
+        SanPham sp = null;
         if (sanPhamId != null) {
-            SanPham sp = sanPhamRepository.findById(sanPhamId)
+            sp = sanPhamRepository.findById(sanPhamId)
                     .orElseThrow(() -> new IdInvalidException("Không tìm thấy sản phẩm: " + sanPhamId));
-            ct.setSanPham(sp);
         }
+        MauSac ms = null;
         if (mauSacId != null) {
-            MauSac ms = mauSacRepository.findById(mauSacId)
+            ms = mauSacRepository.findById(mauSacId)
                     .orElseThrow(() -> new IdInvalidException("Không tìm thấy màu sắc: " + mauSacId));
-            ct.setMauSac(ms);
         }
+        KichThuoc kt = null;
         if (kichThuocId != null) {
-            KichThuoc kt = kichThuocRepository.findById(kichThuocId)
+            kt = kichThuocRepository.findById(kichThuocId)
                     .orElseThrow(() -> new IdInvalidException("Không tìm thấy kích thước: " + kichThuocId));
-            ct.setKichThuoc(kt);
         }
 
-        ChiTietSanPham created = this.create(ct);
-
-        // Upload nhiều ảnh lên MinIO và lưu vào bảng HinhAnh
+        // Upload ảnh một lần, dùng chung URL cho tất cả cửa hàng
+        List<String> imageUrls = new ArrayList<>();
         if (files != null && !files.isEmpty()) {
-            List<String> imageUrls = minioStorageService.uploadMultipleFiles(files);
+            imageUrls = minioStorageService.uploadMultipleFiles(files);
+        }
+
+        List<CuaHang> cuaHangs = cuaHangRepository.findAll();
+        List<ResChiTietSanPhamDTO> results = new ArrayList<>();
+
+        for (CuaHang cuaHang : cuaHangs) {
+            ChiTietSanPham ct = new ChiTietSanPham();
+            ct.setMaPhieuNhap(maPhieuNhap);
+            ct.setMaCuaHang(cuaHang.getId());
+            ct.setSoLuong(soLuong);
+            ct.setTrangThai(trangThai);
+            ct.setMoTa(moTa);
+            ct.setGhiTru(ghiTru);
+            ct.setSanPham(sp);
+            ct.setMauSac(ms);
+            ct.setKichThuoc(kt);
+
+            // Lưu + flush, KHÔNG clear để tránh detach entity trước khi convert DTO
+            ChiTietSanPham created = chiTietSanPhamRepository.save(ct);
+            entityManager.flush();
+
+            // Gắn ảnh cho từng chi tiết sản phẩm
             for (String url : imageUrls) {
                 HinhAnh hinhAnh = new HinhAnh();
                 hinhAnh.setChiTietSanPham(created);
                 hinhAnh.setTenHinhAnh(url);
                 hinhAnhService.create(hinhAnh);
             }
+
+            // Convert sang DTO ngay lập tức khi entity vẫn còn attached trong session
+            results.add(convertToDTO(created));
         }
 
-        return created;
+        return results;
     }
 
     /**
@@ -250,6 +274,32 @@ public class ChiTietSanPhamService {
     @Transactional(readOnly = true)
     public List<ResChiTietSanPhamDTO> findAllDTO() {
         return convertToListDTO(chiTietSanPhamRepository.findAll());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ResChiTietSanPhamDTO> findAllDTOWithFilter(
+            Long sanPhamId, Long mauSacId, Long kichThuocId,
+            Long maCuaHang, Integer trangThai) {
+
+        Specification<ChiTietSanPham> spec = Specification.where(null);
+
+        if (sanPhamId != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("sanPham").get("id"), sanPhamId));
+        }
+        if (mauSacId != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("mauSac").get("id"), mauSacId));
+        }
+        if (kichThuocId != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("kichThuoc").get("id"), kichThuocId));
+        }
+        if (maCuaHang != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("maCuaHang"), maCuaHang));
+        }
+        if (trangThai != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("trangThai"), trangThai));
+        }
+
+        return convertToListDTO(chiTietSanPhamRepository.findAll(spec));
     }
 
     @Transactional(readOnly = true)

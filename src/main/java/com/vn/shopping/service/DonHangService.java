@@ -323,8 +323,8 @@ public class DonHangService {
 
     /**
      * Áp dụng khuyến mãi theo hóa đơn khi người dùng nhập mã khuyến mãi.
-     * Kiểm tra: tồn tại, đang hoạt động, còn hạn, còn số lượng, đơn hàng không vượt
-     * hoaDonToiDa.
+     * Kiểm tra: tồn tại, đang hoạt động, còn hạn, còn số lượng, đơn hàng đạt
+     * hoaDonToiThieu.
      * Tính tiền giảm theo phần trăm, giới hạn giảm tối đa.
      */
     private void apDungKhuyenMaiTheoHoaDon(DonHang donHang, Long maKhuyenMaiHoaDon) throws IdInvalidException {
@@ -356,10 +356,10 @@ public class DonHangService {
 
         int tongTien = donHang.getTongTien() != null ? donHang.getTongTien() : 0;
 
-        // Kiểm tra hóa đơn tối đa (đơn hàng không được vượt giá trị tối đa)
-        if (km.getHoaDonToiDa() != null && km.getHoaDonToiDa() > 0 && tongTien > km.getHoaDonToiDa()) {
+        // Kiểm tra hóa đơn tối thiểu (đơn hàng phải đạt giá trị tối thiểu)
+        if (km.getHoaDonToiThieu() != null && km.getHoaDonToiThieu() > 0 && tongTien < km.getHoaDonToiThieu()) {
             throw new IdInvalidException(
-                    "Đơn hàng vượt giá trị tối đa cho phép (" + km.getHoaDonToiDa() + ") của mã khuyến mãi");
+                    "Đơn hàng chưa đạt giá trị tối thiểu (" + km.getHoaDonToiThieu() + ") của mã khuyến mãi");
         }
 
         int tienGiam = 0;
@@ -437,10 +437,10 @@ public class DonHangService {
             throw new IdInvalidException("Bạn không đủ điểm để áp dụng mã khuyến mãi này");
         }
 
-        // Kiểm tra hóa đơn tối đa
-        if (km.getHoaDonToiDa() != null && km.getHoaDonToiDa() > 0 && tongTien > km.getHoaDonToiDa()) {
+        // Kiểm tra hóa đơn tối thiểu
+        if (km.getHoaDonToiThieu() != null && km.getHoaDonToiThieu() > 0 && tongTien < km.getHoaDonToiThieu()) {
             throw new IdInvalidException(
-                    "Đơn hàng vượt giá trị tối đa cho phép (" + km.getHoaDonToiDa() + ") của mã khuyến mãi điểm");
+                    "Đơn hàng chưa đạt giá trị tối thiểu (" + km.getHoaDonToiThieu() + ") của mã khuyến mãi điểm");
         }
 
         int tienGiam = 0;
@@ -625,7 +625,7 @@ public class DonHangService {
                 }
                 dto.setKhuyenMaiHoaDon(new ResDonHangDTO.KhuyenMaiHoaDonDTO(
                         km.getId(), km.getTenKhuyenMai(), km.getPhanTramGiam(),
-                        km.getGiamToiDa(), km.getHoaDonToiDa(), tienDaGiam));
+                        km.getGiamToiDa(), km.getHoaDonToiThieu(), tienDaGiam));
             });
         }
 
@@ -642,7 +642,7 @@ public class DonHangService {
                 }
                 dto.setKhuyenMaiDiem(new ResDonHangDTO.KhuyenMaiDiemDTO(
                         km.getId(), km.getTenKhuyenMai(), km.getPhanTramGiam(),
-                        km.getGiamToiDa(), km.getHoaDonToiDa(), km.getDiemToiThieu(), tienDaGiam));
+                        km.getGiamToiDa(), km.getHoaDonToiThieu(), km.getDiemToiThieu(), tienDaGiam));
             });
         }
 

@@ -372,7 +372,7 @@ INSERT INTO ChiTietPhieuNhap (MaPhieuNhap, MaChiTietSanPham, SoLuong, TrangThai,
 -- ---------------------------------------------------------
 -- 18. KHUYẾN MÃI THEO HÓA ĐƠN
 -- ---------------------------------------------------------
-INSERT INTO KhuyenMaiTheoHoaDon (TenKhuyenMai, GiamToiDa, HoaDonToiDa, PhanTramGiam, HinhThuc, ThoiGianBatDau, ThoiGianKetThuc, SoLuong, TrangThai, NgayTao) VALUES
+INSERT INTO KhuyenMaiTheoHoaDon (TenKhuyenMai, GiamToiDa, HoaDonToiThieu, PhanTramGiam, HinhThuc, ThoiGianBatDau, ThoiGianKetThuc, SoLuong, TrangThai, NgayTao) VALUES
     ('Giảm 10% đơn từ 500K',   100000,  500000,  10.0, 1, '2026-01-01 00:00:00', '2026-06-30 23:59:59', 100, 1, NOW()),   -- id=1
     ('Giảm 20% đơn từ 1 triệu', 300000, 1000000, 20.0, 1, '2026-02-01 00:00:00', '2026-04-30 23:59:59', 50,  1, NOW()),   -- id=2
     ('Giảm 5% tất cả đơn',      50000,  200000,   5.0, 0, '2026-03-01 00:00:00', '2026-12-31 23:59:59', 200, 1, NOW());   -- id=3
@@ -380,7 +380,7 @@ INSERT INTO KhuyenMaiTheoHoaDon (TenKhuyenMai, GiamToiDa, HoaDonToiDa, PhanTramG
 -- ---------------------------------------------------------
 -- 19. KHUYẾN MÃI THEO ĐIỂM
 -- ---------------------------------------------------------
-INSERT INTO KhuyenMaiTheoDiem (TenKhuyenMai, DiemToiThieu, GiamToiDa, HoaDonToiDa, PhanTramGiam, HinhThuc, ThoiGianBatDau, ThoiGianKetThuc, SoLuong, TrangThai, NgayTao) VALUES
+INSERT INTO KhuyenMaiTheoDiem (TenKhuyenMai, DiemToiThieu, GiamToiDa, HoaDonToiThieu, PhanTramGiam, HinhThuc, ThoiGianBatDau, ThoiGianKetThuc, SoLuong, TrangThai, NgayTao) VALUES
     ('Đổi 50 điểm giảm 15%',   50,  200000,  800000,  15.0, 1, '2026-01-01 00:00:00', '2026-12-31 23:59:59', 100, 1, NOW()),   -- id=1
     ('Đổi 100 điểm giảm 25%',  100, 500000,  1500000, 25.0, 1, '2026-01-01 00:00:00', '2026-12-31 23:59:59', 50,  1, NOW()),   -- id=2
     ('Đổi 20 điểm giảm 5%',     20,  80000,  300000,   5.0, 0, '2026-03-01 00:00:00', '2026-06-30 23:59:59', 200, 1, NOW());   -- id=3

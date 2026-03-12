@@ -2,9 +2,12 @@ package com.vn.shopping.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.vn.shopping.domain.CuaHang;
+import com.vn.shopping.domain.response.ResultPaginationDTO;
 import com.vn.shopping.repository.CuaHangRepository;
 
 @Service
@@ -42,5 +45,20 @@ public class CuaHangService {
 
     public List<CuaHang> findAll() {
         return cuaHangRepository.findAll();
+    }
+
+    public ResultPaginationDTO filter(String name, String address, Integer status, Pageable pageable) {
+        Page<CuaHang> page = cuaHangRepository.filter(name, address, status, pageable);
+
+        ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
+        meta.setPage(pageable.getPageNumber() + 1);
+        meta.setPageSize(pageable.getPageSize());
+        meta.setPages(page.getTotalPages());
+        meta.setTotal(page.getTotalElements());
+
+        ResultPaginationDTO result = new ResultPaginationDTO();
+        result.setMeta(meta);
+        result.setResult(page.getContent());
+        return result;
     }
 }

@@ -94,7 +94,7 @@ public class ResDonHangDTO {
         private String tenKhuyenMai;
         private Double phanTramGiam;
         private Integer giamToiDa;
-        private Integer hoaDonToiDa;
+        private Integer hoaDonToiThieu;
         private Integer tienDaGiam;
     }
 
@@ -107,7 +107,7 @@ public class ResDonHangDTO {
         private String tenKhuyenMai;
         private Double phanTramGiam;
         private Integer giamToiDa;
-        private Integer hoaDonToiDa;
+        private Integer hoaDonToiThieu;
         private Integer diemToiThieu;
         private Integer tienDaGiam;
     }

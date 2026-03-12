@@ -26,7 +26,19 @@ public class ChiTietSanPhamController {
 
     @GetMapping
     @ApiMessage("Get all product details")
-    public ResponseEntity<List<ResChiTietSanPhamDTO>> getAll() {
+    public ResponseEntity<List<ResChiTietSanPhamDTO>> getAll(
+            @RequestParam(value = "sanPhamId", required = false) Long sanPhamId,
+            @RequestParam(value = "mauSacId", required = false) Long mauSacId,
+            @RequestParam(value = "kichThuocId", required = false) Long kichThuocId,
+            @RequestParam(value = "maCuaHang", required = false) Long maCuaHang,
+            @RequestParam(value = "trangThai", required = false) Integer trangThai) {
+
+        boolean hasFilter = sanPhamId != null || mauSacId != null || kichThuocId != null
+                || maCuaHang != null || trangThai != null;
+        if (hasFilter) {
+            return ResponseEntity.ok(
+                    chiTietSanPhamService.findAllDTOWithFilter(sanPhamId, mauSacId, kichThuocId, maCuaHang, trangThai));
+        }
         return ResponseEntity.ok(chiTietSanPhamService.findAllDTO());
     }
 
@@ -48,26 +60,26 @@ public class ChiTietSanPhamController {
 
     /**
      * Tạo chi tiết sản phẩm + upload nhiều hình ảnh lên MinIO
+     * Tự động tạo cho TẤT CẢ cửa hàng hiện có
      * Gửi multipart/form-data: từng trường + "files" (nhiều ảnh, không bắt buộc)
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @ApiMessage("Create product detail")
-    public ResponseEntity<ResChiTietSanPhamDTO> create(
+    @ApiMessage("Create product detail for all stores")
+    public ResponseEntity<List<ResChiTietSanPhamDTO>> create(
             @RequestParam(value = "sanPhamId", required = false) Long sanPhamId,
             @RequestParam(value = "maPhieuNhap", required = false) Long maPhieuNhap,
             @RequestParam(value = "mauSacId", required = false) Long mauSacId,
             @RequestParam(value = "kichThuocId", required = false) Long kichThuocId,
-            @RequestParam(value = "maCuaHang", required = false) Long maCuaHang,
             @RequestParam(value = "soLuong", required = false) Integer soLuong,
             @RequestParam(value = "trangThai", required = false) Integer trangThai,
             @RequestParam(value = "moTa", required = false) String moTa,
             @RequestParam(value = "ghiTru", required = false) String ghiTru,
             @RequestPart(value = "files", required = false) List<MultipartFile> files) throws Exception {
 
-        ChiTietSanPham created = chiTietSanPhamService.createChiTietSanPham(
+        List<ResChiTietSanPhamDTO> created = chiTietSanPhamService.createChiTietSanPham(
                 sanPhamId, maPhieuNhap, mauSacId, kichThuocId,
-                maCuaHang, soLuong, trangThai, moTa, ghiTru, files);
-        return ResponseEntity.status(HttpStatus.CREATED).body(chiTietSanPhamService.convertToDTO(created));
+                soLuong, trangThai, moTa, ghiTru, files);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     /**

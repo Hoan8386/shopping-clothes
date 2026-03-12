@@ -1237,16 +1237,24 @@
 			"description": "Quản lý cửa hàng — Chỉ Admin có permission mới được thao tác",
 			"item": [
 				{
-					"name": "Xem tất cả cửa hàng ( Admin)",
+					"name": "Xem tất cả cửa hàng + Lọc + Phân trang ( Admin)",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/v1/cua-hang",
+							"raw": "{{base_url}}/api/v1/cua-hang?page=0&size=10",
 							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "cua-hang"]
+							"path": ["api", "v1", "cua-hang"],
+							"query": [
+								{ "key": "page", "value": "0" },
+								{ "key": "size", "value": "10" },
+								{ "key": "name", "value": "Quận", "disabled": true, "description": "Tìm kiếm theo tên cửa hàng (LIKE)" },
+								{ "key": "address", "value": "HCM", "disabled": true, "description": "Lọc theo địa chỉ (LIKE)" },
+								{ "key": "status", "value": "1", "disabled": true, "description": "Lọc theo trạng thái: 1=hoạt động, 0=ngừng" },
+								{ "key": "sort", "value": "id,asc", "disabled": true }
+							]
 						},
-						"description": " Admin — Xem danh sách tất cả cửa hàng"
+						"description": " Admin — Xem danh sách cửa hàng. Hỗ trợ lọc theo tên (name), địa chỉ (address), trạng thái (status) + phân trang. Bật/tắt query param để lọc kết hợp."
 					}
 				},
 				{
@@ -1982,7 +1990,7 @@
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"tenKhuyenMai\": \"Giảm 10% đơn từ 300K\",\n    \"giamToiDa\": 50000,\n    \"hoaDonToiDa\": 300000,\n    \"phanTramGiam\": 10.0,\n    \"hinhThuc\": 1,\n    \"thoiGianBatDau\": \"2026-03-01T00:00:00\",\n    \"thoiGianKetThuc\": \"2026-06-30T23:59:59\",\n    \"soLuong\": 100,\n    \"trangThai\": 1\n}"
+							"raw": "{\n    \"tenKhuyenMai\": \"Giảm 10% đơn từ 300K\",\n    \"giamToiDa\": 50000,\n    \"hoaDonToiThieu\": 300000,\n    \"phanTramGiam\": 10.0,\n    \"hinhThuc\": 1,\n    \"thoiGianBatDau\": \"2026-03-01T00:00:00\",\n    \"thoiGianKetThuc\": \"2026-06-30T23:59:59\",\n    \"soLuong\": 100,\n    \"trangThai\": 1\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/khuyen-mai-theo-hoa-don",
@@ -1999,7 +2007,7 @@
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"id\": 1,\n    \"tenKhuyenMai\": \"Giảm 15% đơn từ 500K (cập nhật)\",\n    \"giamToiDa\": 150000,\n    \"hoaDonToiDa\": 500000,\n    \"phanTramGiam\": 15.0,\n    \"hinhThuc\": 1,\n    \"thoiGianBatDau\": \"2026-03-01T00:00:00\",\n    \"thoiGianKetThuc\": \"2026-12-31T23:59:59\",\n    \"soLuong\": 200,\n    \"trangThai\": 1\n}"
+							"raw": "{\n    \"id\": 1,\n    \"tenKhuyenMai\": \"Giảm 15% đơn từ 500K (cập nhật)\",\n    \"giamToiDa\": 150000,\n    \"hoaDonToiThieu\": 500000,\n    \"phanTramGiam\": 15.0,\n    \"hinhThuc\": 1,\n    \"thoiGianBatDau\": \"2026-03-01T00:00:00\",\n    \"thoiGianKetThuc\": \"2026-12-31T23:59:59\",\n    \"soLuong\": 200,\n    \"trangThai\": 1\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/khuyen-mai-theo-hoa-don",
@@ -2061,7 +2069,7 @@
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"tenKhuyenMai\": \"Đổi 30 điểm giảm 10%\",\n    \"giamToiDa\": 100000,\n    \"hoaDonToiDa\": 500000,\n    \"phanTramGiam\": 10.0,\n    \"hinhThuc\": 1,\n    \"thoiGianBatDau\": \"2026-03-01T00:00:00\",\n    \"thoiGianKetThuc\": \"2026-12-31T23:59:59\",\n    \"diemToiThieu\": 30,\n    \"soLuong\": 100,\n    \"trangThai\": 1\n}"
+							"raw": "{\n    \"tenKhuyenMai\": \"Đổi 30 điểm giảm 10%\",\n    \"giamToiDa\": 100000,\n    \"hoaDonToiThieu\": 500000,\n    \"phanTramGiam\": 10.0,\n    \"hinhThuc\": 1,\n    \"thoiGianBatDau\": \"2026-03-01T00:00:00\",\n    \"thoiGianKetThuc\": \"2026-12-31T23:59:59\",\n    \"diemToiThieu\": 30,\n    \"soLuong\": 100,\n    \"trangThai\": 1\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/khuyen-mai-theo-diem",
@@ -2078,7 +2086,7 @@
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"id\": 1,\n    \"tenKhuyenMai\": \"Đổi 50 điểm giảm 20% (cập nhật)\",\n    \"giamToiDa\": 300000,\n    \"hoaDonToiDa\": 1000000,\n    \"phanTramGiam\": 20.0,\n    \"hinhThuc\": 1,\n    \"thoiGianBatDau\": \"2026-03-01T00:00:00\",\n    \"thoiGianKetThuc\": \"2026-12-31T23:59:59\",\n    \"diemToiThieu\": 50,\n    \"soLuong\": 150,\n    \"trangThai\": 1\n}"
+							"raw": "{\n    \"id\": 1,\n    \"tenKhuyenMai\": \"Đổi 50 điểm giảm 20% (cập nhật)\",\n    \"giamToiDa\": 300000,\n    \"hoaDonToiThieu\": 1000000,\n    \"phanTramGiam\": 20.0,\n    \"hinhThuc\": 1,\n    \"thoiGianBatDau\": \"2026-03-01T00:00:00\",\n    \"thoiGianKetThuc\": \"2026-12-31T23:59:59\",\n    \"diemToiThieu\": 50,\n    \"soLuong\": 150,\n    \"trangThai\": 1\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/khuyen-mai-theo-diem",

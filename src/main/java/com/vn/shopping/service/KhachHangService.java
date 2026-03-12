@@ -34,7 +34,7 @@ public class KhachHangService {
     public KhachHang handleCreateUser(KhachHang khachHang) {
         // Tự động gán role KHACH_HANG (id=4) nếu chưa có role
         if (khachHang.getRole() == null) {
-            Role khachHangRole = roleRepository.findById(4L).orElse(null);
+            Role khachHangRole = roleRepository.findById(3L).orElse(null);
             khachHang.setRole(khachHangRole);
         }
         return khachHangRepository.save(khachHang);

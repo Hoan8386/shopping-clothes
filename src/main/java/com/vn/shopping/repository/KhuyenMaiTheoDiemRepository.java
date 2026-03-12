@@ -19,11 +19,15 @@ public interface KhuyenMaiTheoDiemRepository extends JpaRepository<KhuyenMaiTheo
      * - Còn trong thời gian áp dụng
      * - Còn số lượng
      * - Điểm tích lũy của khách >= điểm tối thiểu
+     * - Tổng tiền giỏ hàng đạt mức hóa đơn tối thiểu (nếu có)
      */
     @Query("SELECT k FROM KhuyenMaiTheoDiem k WHERE k.trangThai = 1 " +
             "AND k.thoiGianBatDau <= :now AND k.thoiGianKetThuc >= :now " +
             "AND (k.soLuong IS NULL OR k.soLuong > 0) " +
             "AND (k.diemToiThieu IS NULL OR k.diemToiThieu <= :diem) " +
+            "AND (k.hoaDonToiThieu IS NULL OR k.hoaDonToiThieu = 0 OR :tongTien >= k.hoaDonToiThieu) " +
             "ORDER BY k.phanTramGiam DESC")
-    List<KhuyenMaiTheoDiem> findKhuyenMaiHopLe(@Param("diem") Integer diem, @Param("now") LocalDateTime now);
+    List<KhuyenMaiTheoDiem> findKhuyenMaiHopLe(@Param("diem") Integer diem,
+            @Param("tongTien") Integer tongTien,
+            @Param("now") LocalDateTime now);
 }
