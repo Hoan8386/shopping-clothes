@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.vn.shopping.domain.CuaHang;
+import com.vn.shopping.domain.response.ResCuaHangDTO;
 import com.vn.shopping.domain.response.ResultPaginationDTO;
 import com.vn.shopping.service.CuaHangService;
 import com.vn.shopping.util.anotation.ApiMessage;
@@ -33,27 +34,27 @@ public class CuaHangController {
 
     @GetMapping("/{id}")
     @ApiMessage("Lấy cửa hàng theo id")
-    public ResponseEntity<CuaHang> getById(@PathVariable("id") long id) throws IdInvalidException {
+    public ResponseEntity<ResCuaHangDTO> getById(@PathVariable("id") long id) throws IdInvalidException {
         CuaHang cuaHang = cuaHangService.findById(id);
         if (cuaHang == null) {
             throw new IdInvalidException("Không tìm thấy cửa hàng: " + id);
         }
-        return ResponseEntity.ok(cuaHang);
+        return ResponseEntity.ok(cuaHangService.toDTO(cuaHang));
     }
 
     @PostMapping
     @ApiMessage("Tạo cửa hàng")
-    public ResponseEntity<CuaHang> create(@RequestBody CuaHang cuaHang) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(cuaHangService.create(cuaHang));
+    public ResponseEntity<ResCuaHangDTO> create(@RequestBody CuaHang cuaHang) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(cuaHangService.toDTO(cuaHangService.create(cuaHang)));
     }
 
     @PutMapping
     @ApiMessage("Cập nhật cửa hàng")
-    public ResponseEntity<CuaHang> update(@RequestBody CuaHang cuaHang) throws IdInvalidException {
+    public ResponseEntity<ResCuaHangDTO> update(@RequestBody CuaHang cuaHang) throws IdInvalidException {
         if (cuaHang.getId() == null || cuaHang.getId() == 0) {
             throw new IdInvalidException("Mã cửa hàng không được để trống");
         }
-        return ResponseEntity.ok(cuaHangService.update(cuaHang));
+        return ResponseEntity.ok(cuaHangService.toDTO(cuaHangService.update(cuaHang)));
     }
 
     @DeleteMapping("/{id}")

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.vn.shopping.domain.CuaHang;
+import com.vn.shopping.domain.response.ResCuaHangDTO;
 import com.vn.shopping.domain.response.ResultPaginationDTO;
 import com.vn.shopping.repository.CuaHangRepository;
 
@@ -58,7 +59,29 @@ public class CuaHangService {
 
         ResultPaginationDTO result = new ResultPaginationDTO();
         result.setMeta(meta);
-        result.setResult(page.getContent());
+        result.setResult(page.getContent().stream().map(this::toDTO).toList());
         return result;
+    }
+
+    public ResCuaHangDTO toDTO(CuaHang cuaHang) {
+        ResCuaHangDTO dto = new ResCuaHangDTO();
+        dto.setId(cuaHang.getId());
+        dto.setTenCuaHang(cuaHang.getTenCuaHang());
+        dto.setDiaChi(cuaHang.getDiaChi());
+        dto.setViTri(cuaHang.getViTri());
+        dto.setSoDienThoai(cuaHang.getSoDienThoai());
+        dto.setEmail(cuaHang.getEmail());
+        dto.setTrangThai(cuaHang.getTrangThai());
+        if (cuaHang.getViTri() != null && cuaHang.getViTri().contains(",")) {
+            String[] parts = cuaHang.getViTri().split(",");
+            try {
+                dto.setLatitude(Double.parseDouble(parts[0].trim()));
+                dto.setLongitude(Double.parseDouble(parts[1].trim()));
+            } catch (NumberFormatException e) {
+                dto.setLatitude(null);
+                dto.setLongitude(null);
+            }
+        }
+        return dto;
     }
 }

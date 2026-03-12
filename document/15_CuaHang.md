@@ -18,6 +18,14 @@
 | `email`       | String(255) | Email liên hệ                |
 | `trangThai`   | Integer     | Trạng thái (0: đóng, 1: mở)  |
 
+### Quy ước vị trí
+
+- Dữ liệu vị trí khi lưu DB vẫn nằm trong `viTri` theo định dạng: `"latitude,longitude"`
+  - Ví dụ: `"10.7769,106.7009"`
+- Khi trả API, hệ thống tách `viTri` thành 2 trường:
+  - `latitude` (Double)
+  - `longitude` (Double)
+
 ---
 
 ## 1. Lấy danh sách cửa hàng (có lọc + phân trang)
@@ -60,7 +68,9 @@ GET /api/v1/cua-hang?name=Q1&status=1&page=0&size=10
       "id": 1,
       "tenCuaHang": "Chi nhánh Quận 1",
       "diaChi": "123 Nguyễn Trãi, Q.1, TP.HCM",
-      "viTri": "10.7769, 106.7009",
+      "viTri": "10.7769,106.7009",
+      "latitude": 10.7769,
+      "longitude": 106.7009,
       "soDienThoai": "028-1234-5678",
       "email": "q1@shop.vn",
       "trangThai": 1
@@ -85,6 +95,8 @@ GET /api/v1/cua-hang?name=Q1&status=1&page=0&size=10
       "tenCuaHang": "String",
       "diaChi": "String",
       "viTri": "String",
+      "latitude": "Double | null",
+      "longitude": "Double | null",
       "soDienThoai": "String",
       "email": "String",
       "trangThai": "Integer"
@@ -113,6 +125,7 @@ GET /api/v1/cua-hang?name=Q1&status=1&page=0&size=10
   "id": 1,
   "tenCuaHang": "Chi nhánh Quận 1",
   "diaChi": "123 Nguyễn Trãi, Q.1, TP.HCM",
+  "viTri": "10.7769,106.7009",
   "soDienThoai": "028-1234-5678",
   "email": "q1@shop.vn",
   "trangThai": 1
@@ -121,15 +134,33 @@ GET /api/v1/cua-hang?name=Q1&status=1&page=0&size=10
 
 **Kiểu dữ liệu:**
 
-```json
+````json
 {
   "id": "Long",
   "tenCuaHang": "String",
   "diaChi": "String",
+  "viTri": "String (latitude,longitude)",
   "soDienThoai": "String",
   "email": "String",
   "trangThai": "Integer"
 }
+
+**Response Body (GET by id / POST / PUT):**
+
+```json
+{
+  "id": 1,
+  "tenCuaHang": "Shop Quận 1",
+  "diaChi": "123 Nguyễn Trãi, Q.1, TP.HCM",
+  "viTri": "10.7769,106.7009",
+  "latitude": 10.7769,
+  "longitude": 106.7009,
+  "soDienThoai": "028-1234-5678",
+  "email": "q1@shop.vn",
+  "trangThai": 1
+}
+````
+
 ```
 
 **Lỗi:**
@@ -148,3 +179,4 @@ GET /api/v1/cua-hang?name=Q1&status=1&page=0&size=10
 | ADMIN      | ✅  | ✅   | ✅  | ✅     |
 | NHAN_VIEN  | ✅  | ❌   | ❌  | ❌     |
 | KHACH_HANG | ✅  | ❌   | ❌  | ❌     |
+```
