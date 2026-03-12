@@ -20,7 +20,7 @@
 
 ---
 
-## 1. Lấy danh sách cửa hàng
+## 1. Lấy danh sách cửa hàng (có lọc + phân trang)
 
 | Thuộc tính   | Chi tiết               |
 | ------------ | ---------------------- |
@@ -28,33 +28,72 @@
 | **Method**   | `GET`                  |
 | **Xác thực** | Bearer Token (JWT)     |
 
-**Response:** `200 OK`
+**Query Parameters:**
+
+| Tham số   | Kiểu    | Bắt buộc | Mô tả                                |
+| --------- | ------- | -------- | ------------------------------------ |
+| `name`    | String  | Không    | Lọc theo tên cửa hàng (like)         |
+| `address` | String  | Không    | Lọc theo địa chỉ (like)              |
+| `status`  | Integer | Không    | Lọc theo trạng thái (0: đóng, 1: mở) |
+| `page`    | Integer | Không    | Số trang (mặc định: 0)               |
+| `size`    | Integer | Không    | Kích thước trang (mặc định: 20)      |
+| `sort`    | String  | Không    | Sắp xếp (vd: `tenCuaHang,asc`)       |
+
+**Ví dụ request:**
+
+```
+GET /api/v1/cua-hang?name=Q1&status=1&page=0&size=10
+```
+
+**Response:** `200 OK` — Trả về `ResultPaginationDTO`
 
 ```json
-[
-  {
-    "id": 1,
-    "tenCuaHang": "Chi nhánh Quận 1",
-    "diaChi": "123 Nguyễn Trãi, Q.1, TP.HCM",
-    "soDienThoai": "028-1234-5678",
-    "email": "q1@shop.vn",
-    "trangThai": 1
-  }
-]
+{
+  "meta": {
+    "page": 1,
+    "pageSize": 10,
+    "pages": 1,
+    "total": 2
+  },
+  "result": [
+    {
+      "id": 1,
+      "tenCuaHang": "Chi nhánh Quận 1",
+      "diaChi": "123 Nguyễn Trãi, Q.1, TP.HCM",
+      "viTri": "10.7769, 106.7009",
+      "soDienThoai": "028-1234-5678",
+      "email": "q1@shop.vn",
+      "trangThai": 1
+    }
+  ]
+}
 ```
 
 **Kiểu dữ liệu:**
 
 ```json
 {
-  "id": "Long",
-  "tenCuaHang": "String",
-  "diaChi": "String",
-  "soDienThoai": "String",
-  "email": "String",
-  "trangThai": "Integer"
+  "meta": {
+    "page": "Integer",
+    "pageSize": "Integer",
+    "pages": "Integer",
+    "total": "Long"
+  },
+  "result": [
+    {
+      "id": "Long",
+      "tenCuaHang": "String",
+      "diaChi": "String",
+      "viTri": "String",
+      "soDienThoai": "String",
+      "email": "String",
+      "trangThai": "Integer"
+    }
+  ]
 }
 ```
+
+> **Lưu ý:** Nếu không truyền bất kỳ tham số lọc nào → trả về tất cả cửa hàng (có phân trang).
 
 ---
 

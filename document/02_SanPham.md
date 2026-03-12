@@ -45,6 +45,8 @@
 | `kieuSanPhamId` | Long    | Không    | Lọc theo mã kiểu sản phẩm       |
 | `boSuuTapId`    | Long    | Không    | Lọc theo mã bộ sưu tập          |
 | `thuongHieuId`  | Long    | Không    | Lọc theo mã thương hiệu         |
+| `kichThuocId`   | Long    | Không    | Lọc theo mã kích thước          |
+| `mauSacId`      | Long    | Không    | Lọc theo mã màu sắc             |
 | `trangThai`     | Integer | Không    | Lọc theo trạng thái             |
 | `giaMin`        | Double  | Không    | Giá bán tối thiểu               |
 | `giaMax`        | Double  | Không    | Giá bán tối đa                  |
@@ -55,7 +57,7 @@
 **Ví dụ request:**
 
 ```
-GET /api/v1/san-pham?tenSanPham=ao&kieuSanPhamId=1&thuongHieuId=2&trangThai=1&giaMin=100000&giaMax=500000&page=0&size=10&sort=giaBan,asc
+GET /api/v1/san-pham?tenSanPham=ao&kieuSanPhamId=1&thuongHieuId=2&kichThuocId=2&mauSacId=1&trangThai=1&giaMin=100000&giaMax=500000&page=0&size=10&sort=giaBan,asc
 ```
 
 **Response:** `200 OK` — Trả về `ResultPaginationDTO`
@@ -75,13 +77,13 @@ GET /api/v1/san-pham?tenSanPham=ao&kieuSanPhamId=1&thuongHieuId=2&trangThai=1&gi
       "giaVon": 120000,
       "giaBan": 250000,
       "giaGiam": 10,
+      "hinhAnhChinh": "polo-classic.jpg",
       "moTa": "Áo polo nam cao cấp",
       "soLuong": 50,
       "trangThai": 1,
-      "hinhAnh": "polo-classic.jpg",
-      "kieuSanPham": { "id": 1, "tenKieuSanPham": "Áo" },
-      "thuongHieu": { "id": 2, "tenThuongHieu": "Nike" },
-      "boSuuTap": { "id": 1, "tenSuuTap": "Xuân Hè 2025" }
+      "tenKieuSanPham": "Áo",
+      "tenBoSuuTap": "Xuân Hè 2025",
+      "tenThuongHieu": "Nike"
     }
   ]
 }
@@ -104,22 +106,13 @@ GET /api/v1/san-pham?tenSanPham=ao&kieuSanPhamId=1&thuongHieuId=2&trangThai=1&gi
       "giaVon": "Double",
       "giaBan": "Double",
       "giaGiam": "Integer",
+      "hinhAnhChinh": "String",
       "moTa": "String",
       "soLuong": "Integer",
       "trangThai": "Integer",
-      "hinhAnh": "String",
-      "kieuSanPham": {
-        "id": "Long",
-        "tenKieuSanPham": "String"
-      },
-      "thuongHieu": {
-        "id": "Long",
-        "tenThuongHieu": "String"
-      },
-      "boSuuTap": {
-        "id": "Long",
-        "tenSuuTap": "String"
-      }
+      "tenKieuSanPham": "String",
+      "tenBoSuuTap": "String",
+      "tenThuongHieu": "String"
     }
   ]
 }
@@ -152,13 +145,13 @@ GET /api/v1/san-pham?tenSanPham=ao&kieuSanPhamId=1&thuongHieuId=2&trangThai=1&gi
   "giaVon": 120000,
   "giaBan": 250000,
   "giaGiam": 10,
+  "hinhAnhChinh": "polo-classic.jpg",
   "moTa": "Áo polo nam cao cấp",
   "soLuong": 50,
   "trangThai": 1,
-  "hinhAnh": "polo-classic.jpg",
-  "kieuSanPham": { "id": 1, "tenKieuSanPham": "Áo" },
-  "thuongHieu": { "id": 2, "tenThuongHieu": "Nike" },
-  "boSuuTap": { "id": 1, "tenSuuTap": "Xuân Hè 2025" }
+  "tenKieuSanPham": "Áo",
+  "tenBoSuuTap": "Xuân Hè 2025",
+  "tenThuongHieu": "Nike"
 }
 ```
 
@@ -171,22 +164,13 @@ GET /api/v1/san-pham?tenSanPham=ao&kieuSanPhamId=1&thuongHieuId=2&trangThai=1&gi
   "giaVon": "Double",
   "giaBan": "Double",
   "giaGiam": "Integer",
+  "hinhAnhChinh": "String",
   "moTa": "String",
   "soLuong": "Integer",
   "trangThai": "Integer",
-  "hinhAnh": "String",
-  "kieuSanPham": {
-    "id": "Long",
-    "tenKieuSanPham": "String"
-  },
-  "thuongHieu": {
-    "id": "Long",
-    "tenThuongHieu": "String"
-  },
-  "boSuuTap": {
-    "id": "Long",
-    "tenSuuTap": "String"
-  }
+  "tenKieuSanPham": "String",
+  "tenBoSuuTap": "String",
+  "tenThuongHieu": "String"
 }
 ```
 

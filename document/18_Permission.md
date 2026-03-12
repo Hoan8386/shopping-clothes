@@ -50,7 +50,7 @@ Mỗi **Permission** đại diện cho 1 quyền truy cập vào 1 API endpoint 
 
 ---
 
-## 1. Lấy danh sách quyền (phân trang)
+## 1. Lấy danh sách quyền
 
 | Thuộc tính   | Chi tiết                  |
 | ------------ | ------------------------- |
@@ -58,52 +58,34 @@ Mỗi **Permission** đại diện cho 1 quyền truy cập vào 1 API endpoint 
 | **Method**   | `GET`                     |
 | **Xác thực** | Bearer Token (JWT)        |
 
-**Query Parameters:**
-
-| Tham số | Kiểu    | Mô tả      |
-| ------- | ------- | ---------- |
-| `page`  | Integer | Số trang   |
-| `size`  | Integer | Kích thước |
-
-**Response:** `200 OK` — Trả về `ResultPaginationDTO`
+**Response:** `200 OK` — Trả về `List<Permission>`
 
 ```json
-{
-  "meta": { "page": 1, "pageSize": 10, "pages": 10, "total": 98 },
-  "result": [
-    {
-      "id": 1,
-      "name": "Xem sản phẩm",
-      "apiPath": "/api/v1/san-pham",
-      "method": "GET",
-      "module": "SAN_PHAM",
-      "createdAt": "2026-01-01T00:00:00Z"
-    }
-  ]
-}
+[
+  {
+    "id": 1,
+    "name": "Xem sản phẩm",
+    "apiPath": "/api/v1/san-pham",
+    "method": "GET",
+    "module": "SAN_PHAM",
+    "createdAt": "2026-01-01T00:00:00Z"
+  }
+]
 ```
 
 **Kiểu dữ liệu:**
 
 ```json
-{
-  "meta": {
-    "page": "Integer",
-    "pageSize": "Integer",
-    "pages": "Integer",
-    "total": "Long"
-  },
-  "result": [
-    {
-      "id": "Long",
-      "name": "String",
-      "apiPath": "String",
-      "method": "String",
-      "module": "String",
-      "createdAt": "Instant"
-    }
-  ]
-}
+[
+  {
+    "id": "Long",
+    "name": "String",
+    "apiPath": "String",
+    "method": "String",
+    "module": "String",
+    "createdAt": "Instant"
+  }
+]
 ```
 
 ---

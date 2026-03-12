@@ -30,6 +30,7 @@
 | 19  | StorageController             | [19_Storage.md](19_Storage.md)                       | Phục vụ file từ MinIO                                  |
 | 20  | KhuyenMaiTheoHoaDonController | [Khuyến Mãi Theo Hóa Đơn](20_KhuyenMaiTheoHoaDon.md) | Quản lý khuyến mãi theo hóa đơn                        |
 | 21  | KhuyenMaiTheoDiemController   | [Khuyến Mãi Theo Điểm](21_KhuyenMaiTheoDiem.md)      | Quản lý khuyến mãi theo điểm tích lũy                  |
+| 22  | DanhGiaSanPhamController      | [22_DanhGiaSanPham.md](22_DanhGiaSanPham.md)         | Quản lý đánh giá sản phẩm                              |
 
 ---
 

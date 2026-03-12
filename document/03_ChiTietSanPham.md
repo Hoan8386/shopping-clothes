@@ -37,20 +37,38 @@ Mỗi sản phẩm (`SanPham`) có thể có nhiều biến thể (`ChiTietSanPh
 | **Method**   | `GET`                           |
 | **Xác thực** | Bearer Token (JWT)              |
 
+**Query Parameters (lọc tùy chọn):**
+
+| Tham số       | Kiểu    | Bắt buộc | Mô tả                                |
+| ------------- | ------- | -------- | ------------------------------------ |
+| `sanPhamId`   | Long    | Không    | Lọc theo mã sản phẩm                 |
+| `mauSacId`    | Long    | Không    | Lọc theo mã màu sắc                  |
+| `kichThuocId` | Long    | Không    | Lọc theo mã kích thước               |
+| `maCuaHang`   | Long    | Không    | Lọc theo mã cửa hàng                 |
+| `trangThai`   | Integer | Không    | Lọc theo trạng thái (0: ẩn, 1: hiển) |
+
+**Ví dụ request:**
+
+```
+GET /api/v1/chi-tiet-san-pham?sanPhamId=1&mauSacId=2&kichThuocId=3&maCuaHang=1&trangThai=1
+```
+
 **Response:** `200 OK` — Trả về `List<ResChiTietSanPhamDTO>`
 
 ```json
 [
   {
     "id": 1,
-    "sanPham": { "id": 1, "tenSanPham": "Áo Polo Classic" },
-    "mauSac": { "id": 1, "tenMauSac": "Đen" },
-    "kichThuoc": { "id": 2, "tenKichThuoc": "M" },
-    "maCuaHang": 1,
+    "maPhieuNhap": null,
+    "tenCuaHang": "Chi nhánh Quận 1",
     "soLuong": 15,
     "trangThai": 1,
     "moTa": "Áo polo đen size M",
-    "hinhAnhs": [{ "id": 1, "tenHinhAnh": "polo-den-m-1.jpg" }]
+    "ghiTru": null,
+    "tenSanPham": "Áo Polo Classic",
+    "tenMauSac": "Đen",
+    "tenKichThuoc": "M",
+    "hinhAnhUrls": ["polo-den-m-1.jpg", "polo-den-m-2.jpg"]
   }
 ]
 ```
@@ -60,30 +78,20 @@ Mỗi sản phẩm (`SanPham`) có thể có nhiều biến thể (`ChiTietSanPh
 ```json
 {
   "id": "Long",
-  "sanPham": {
-    "id": "Long",
-    "tenSanPham": "String"
-  },
-  "mauSac": {
-    "id": "Long",
-    "tenMauSac": "String"
-  },
-  "kichThuoc": {
-    "id": "Long",
-    "tenKichThuoc": "String"
-  },
-  "maCuaHang": "Long",
+  "maPhieuNhap": "Long | null",
+  "tenCuaHang": "String",
   "soLuong": "Integer",
   "trangThai": "Integer",
   "moTa": "String",
-  "hinhAnhs": [
-    {
-      "id": "Long",
-      "tenHinhAnh": "String"
-    }
-  ]
+  "ghiTru": "String",
+  "tenSanPham": "String",
+  "tenMauSac": "String",
+  "tenKichThuoc": "String",
+  "hinhAnhUrls": "List<String>"
 }
 ```
+
+> **Lưu ý:** Nếu không truyền bất kỳ tham số lọc nào → trả về tất cả chi tiết sản phẩm.
 
 ---
 
@@ -148,16 +156,15 @@ Mỗi sản phẩm (`SanPham`) có thể có nhiều biến thể (`ChiTietSanPh
 | `maPhieuNhap` | Long         | Không    | Mã phiếu nhập                         |
 | `mauSacId`    | Long         | Không    | Mã màu sắc                            |
 | `kichThuocId` | Long         | Không    | Mã kích thước                         |
-| `maCuaHang`   | Long         | Không    | Mã cửa hàng                           |
 | `soLuong`     | Integer      | Không    | Số lượng                              |
 | `trangThai`   | Integer      | Không    | Trạng thái                            |
 | `moTa`        | String       | Không    | Mô tả                                 |
 | `ghiTru`      | String       | Không    | Ghi chú trừ                           |
 | `files`       | List\<File\> | Không    | Danh sách hình ảnh (upload lên MinIO) |
 
-**Response:** `201 Created` — Trả về `ResChiTietSanPhamDTO`
+**Response:** `201 Created` — Trả về `List<ResChiTietSanPhamDTO>`
 
-> **Lưu ý:** Khi tạo chi tiết sản phẩm, hệ thống tự động cập nhật tổng `soLuong` của sản phẩm cha.
+> **Lưu ý:** Khi tạo chi tiết sản phẩm, hệ thống tự động tạo cho **TẤT CẢ cửa hàng** hiện có và cập nhật tổng `soLuong` của sản phẩm cha.
 
 ---
 
@@ -215,5 +222,5 @@ Mỗi sản phẩm (`SanPham`) có thể có nhiều biến thể (`ChiTietSanPh
 | Vai trò    | GET (Xem) | POST (Tạo) | PUT (Sửa) | DELETE (Xóa) |
 | ---------- | --------- | ---------- | --------- | ------------ |
 | ADMIN      | ✅        | ✅         | ✅        | ✅           |
-| NHAN_VIEN  | ✅        | ✅         | ✅        | ❌           |
+| NHAN_VIEN  | ✅        | ❌         | ❌        | ❌           |
 | KHACH_HANG | ✅        | ❌         | ❌        | ❌           |
