@@ -7,7 +7,9 @@ import java.util.List;
 public interface StorageService {
     void upload(List<MultipartFile> files);
 
-    String uploadSingleFile(MultipartFile flies);
+    String uploadSingleFile(MultipartFile file);
+
+    List<String> uploadMultipleFiles(List<MultipartFile> files);
 
     InputStream download(String fileName);
 

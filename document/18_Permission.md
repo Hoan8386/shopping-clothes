@@ -1,70 +1,70 @@
-# Permission Controller
+﻿# Permission Controller
 
 > **Base Path:** `/api/v1/permissions`  
 > **File:** `PermissionController.java`  
-> Quản lý quyền hạn (Permission) trong hệ thống.
+> Quáº£n lÃ½ quyá»n háº¡n (Permission) trong há»‡ thá»‘ng.
 
 ---
 
-## Tổng quan
+## Tá»•ng quan
 
-Mỗi **Permission** đại diện cho 1 quyền truy cập vào 1 API endpoint cụ thể. Quyền được gán cho **Role** qua quan hệ nhiều-nhiều.
+Má»—i **Permission** Ä‘áº¡i diá»‡n cho 1 quyá»n truy cáº­p vÃ o 1 API endpoint cá»¥ thá»ƒ. Quyá»n Ä‘Æ°á»£c gÃ¡n cho **Role** qua quan há»‡ nhiá»u-nhiá»u.
 
-### Cấu trúc dữ liệu `Permission`
+### Cáº¥u trÃºc dá»¯ liá»‡u `Permission`
 
-| Trường      | Kiểu              | Mô tả                                  |
+| TrÆ°á»ng      | Kiá»ƒu              | MÃ´ táº£                                  |
 | ----------- | ----------------- | -------------------------------------- |
-| `id`        | Long              | Mã quyền (auto-increment)              |
-| `name`      | String (NotBlank) | Tên quyền (vd: "Xem sản phẩm")         |
-| `apiPath`   | String (NotBlank) | Đường dẫn API (vd: `/api/v1/san-pham`) |
+| `id`        | Long              | MÃ£ quyá»n (auto-increment)              |
+| `name`      | String (NotBlank) | TÃªn quyá»n (vd: "Xem sáº£n pháº©m")         |
+| `apiPath`   | String (NotBlank) | ÄÆ°á»ng dáº«n API (vd: `/api/v1/san-pham`) |
 | `method`    | String (NotBlank) | HTTP method (GET/POST/PUT/DELETE)      |
 | `module`    | String (NotBlank) | Module (vd: SAN_PHAM, DON_HANG, ...)   |
-| `createdAt` | Instant           | Ngày tạo (tự động — audit)             |
-| `updatedAt` | Instant           | Ngày cập nhật (tự động — audit)        |
-| `createdBy` | String            | Người tạo (tự động — audit)            |
-| `updatedBy` | String            | Người cập nhật (tự động — audit)       |
+| `createdAt` | Instant           | NgÃ y táº¡o (tá»± Ä‘á»™ng â€” audit)             |
+| `updatedAt` | Instant           | NgÃ y cáº­p nháº­t (tá»± Ä‘á»™ng â€” audit)        |
+| `createdBy` | String            | NgÆ°á»i táº¡o (tá»± Ä‘á»™ng â€” audit)            |
+| `updatedBy` | String            | NgÆ°á»i cáº­p nháº­t (tá»± Ä‘á»™ng â€” audit)       |
 
-### Danh sách module
+### Danh sÃ¡ch module
 
-| Module                | Mô tả                   |
+| Module                | MÃ´ táº£                   |
 | --------------------- | ----------------------- |
-| `SAN_PHAM`            | Sản phẩm                |
-| `CHI_TIET_SAN_PHAM`   | Chi tiết sản phẩm       |
-| `DON_HANG`            | Đơn hàng                |
-| `CHI_TIET_DON_HANG`   | Chi tiết đơn hàng       |
-| `GIO_HANG`            | Giỏ hàng                |
-| `PHIEU_NHAP`          | Phiếu nhập              |
-| `CHI_TIET_PHIEU_NHAP` | Chi tiết phiếu nhập     |
-| `HINH_ANH`            | Hình ảnh                |
-| `BO_SUU_TAP`          | Bộ sưu tập              |
-| `KIEU_SAN_PHAM`       | Kiểu sản phẩm           |
-| `THUONG_HIEU`         | Thương hiệu             |
-| `MAU_SAC`             | Màu sắc                 |
-| `KICH_THUOC`          | Kích thước              |
-| `CUA_HANG`            | Cửa hàng                |
-| `NHA_CUNG_CAP`        | Nhà cung cấp            |
-| `ROLE`                | Vai trò                 |
-| `PERMISSION`          | Quyền hạn               |
-| `KHUYEN_MAI_HOA_DON`  | Khuyến mãi theo hóa đơn |
-| `KHUYEN_MAI_DIEM`     | Khuyến mãi theo điểm    |
+| `SAN_PHAM`            | Sáº£n pháº©m                |
+| `CHI_TIET_SAN_PHAM`   | Chi tiáº¿t sáº£n pháº©m       |
+| `DON_HANG`            | ÄÆ¡n hÃ ng                |
+| `CHI_TIET_DON_HANG`   | Chi tiáº¿t Ä‘Æ¡n hÃ ng       |
+| `GIO_HANG`            | Giá» hÃ ng                |
+| `PHIEU_NHAP`          | Phiáº¿u nháº­p              |
+| `CHI_TIET_PHIEU_NHAP` | Chi tiáº¿t phiáº¿u nháº­p     |
+| `HINH_ANH`            | HÃ¬nh áº£nh                |
+| `BO_SUU_TAP`          | Bá»™ sÆ°u táº­p              |
+| `KIEU_SAN_PHAM`       | Kiá»ƒu sáº£n pháº©m           |
+| `THUONG_HIEU`         | ThÆ°Æ¡ng hiá»‡u             |
+| `MAU_SAC`             | MÃ u sáº¯c                 |
+| `KICH_THUOC`          | KÃ­ch thÆ°á»›c              |
+| `CUA_HANG`            | Cá»­a hÃ ng                |
+| `NHA_CUNG_CAP`        | NhÃ  cung cáº¥p            |
+| `ROLE`                | Vai trÃ²                 |
+| `PERMISSION`          | Quyá»n háº¡n               |
+| `KHUYEN_MAI_HOA_DON`  | Khuyáº¿n mÃ£i theo hÃ³a Ä‘Æ¡n |
+| `KHUYEN_MAI_DIEM`     | Khuyáº¿n mÃ£i theo Ä‘iá»ƒm    |
 
 ---
 
-## 1. Lấy danh sách quyền
+## 1. Láº¥y danh sÃ¡ch quyá»n
 
-| Thuộc tính   | Chi tiết                  |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t                  |
 | ------------ | ------------------------- |
 | **URL**      | `GET /api/v1/permissions` |
 | **Method**   | `GET`                     |
-| **Xác thực** | Bearer Token (JWT)        |
+| **XÃ¡c thá»±c** | Bearer Token (JWT)        |
 
-**Response:** `200 OK` — Trả về `List<Permission>`
+**Response:** `200 OK` â€” Tráº£ vá» `List<Permission>`
 
 ```json
 [
   {
     "id": 1,
-    "name": "Xem sản phẩm",
+    "name": "Xem sáº£n pháº©m",
     "apiPath": "/api/v1/san-pham",
     "method": "GET",
     "module": "SAN_PHAM",
@@ -73,7 +73,7 @@ Mỗi **Permission** đại diện cho 1 quyền truy cập vào 1 API endpoint 
 ]
 ```
 
-**Kiểu dữ liệu:**
+**Kiá»ƒu dá»¯ liá»‡u:**
 
 ```json
 [
@@ -90,45 +90,45 @@ Mỗi **Permission** đại diện cho 1 quyền truy cập vào 1 API endpoint 
 
 ---
 
-## 2. Lấy quyền theo ID
+## 2. Láº¥y quyá»n theo ID
 
-| Thuộc tính   | Chi tiết                       |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t                       |
 | ------------ | ------------------------------ |
 | **URL**      | `GET /api/v1/permissions/{id}` |
 | **Method**   | `GET`                          |
-| **Xác thực** | Bearer Token (JWT)             |
+| **XÃ¡c thá»±c** | Bearer Token (JWT)             |
 
-**Response:** `200 OK` — Trả về `Permission`
+**Response:** `200 OK` â€” Tráº£ vá» `Permission`
 
-**Lỗi:**
+**Lá»—i:**
 
-| HTTP Status | Mô tả                |
+| HTTP Status | MÃ´ táº£                |
 | ----------- | -------------------- |
-| `400`       | Không tìm thấy quyền |
+| `400`       | KhÃ´ng tÃ¬m tháº¥y quyá»n |
 
 ---
 
-## 3. Tạo quyền
+## 3. Táº¡o quyá»n
 
-| Thuộc tính       | Chi tiết                   |
+| Thuá»™c tÃ­nh       | Chi tiáº¿t                   |
 | ---------------- | -------------------------- |
 | **URL**          | `POST /api/v1/permissions` |
 | **Method**       | `POST`                     |
 | **Content-Type** | `application/json`         |
-| **Xác thực**     | Bearer Token (JWT)         |
+| **XÃ¡c thá»±c**     | Bearer Token (JWT)         |
 
 **Request Body:**
 
 ```json
 {
-  "name": "Xem báo cáo",
+  "name": "Xem bÃ¡o cÃ¡o",
   "apiPath": "/api/v1/bao-cao",
   "method": "GET",
   "module": "BAO_CAO"
 }
 ```
 
-**Kiểu dữ liệu:**
+**Kiá»ƒu dá»¯ liá»‡u:**
 
 ```json
 {
@@ -139,45 +139,45 @@ Mỗi **Permission** đại diện cho 1 quyền truy cập vào 1 API endpoint 
 }
 ```
 
-| Trường    | Bắt buộc | Mô tả         |
+| TrÆ°á»ng    | Báº¯t buá»™c | MÃ´ táº£         |
 | --------- | -------- | ------------- |
-| `name`    | **Có**   | Tên quyền     |
-| `apiPath` | **Có**   | Đường dẫn API |
-| `method`  | **Có**   | HTTP method   |
-| `module`  | **Có**   | Tên module    |
+| `name`    | **CÃ³**   | TÃªn quyá»n     |
+| `apiPath` | **CÃ³**   | ÄÆ°á»ng dáº«n API |
+| `method`  | **CÃ³**   | HTTP method   |
+| `module`  | **CÃ³**   | TÃªn module    |
 
-**Response:** `201 Created` — Trả về `Permission`
+**Response:** `201 Created` â€” Tráº£ vá» `Permission`
 
-**Lỗi:**
+**Lá»—i:**
 
-| HTTP Status | Mô tả                                   |
+| HTTP Status | MÃ´ táº£                                   |
 | ----------- | --------------------------------------- |
-| `400`       | Quyền đã tồn tại (trùng apiPath+method) |
+| `400`       | Quyá»n Ä‘Ã£ tá»“n táº¡i (trÃ¹ng apiPath+method) |
 
 ---
 
-## 4. Cập nhật quyền
+## 4. Cáº­p nháº­t quyá»n
 
-| Thuộc tính       | Chi tiết                  |
+| Thuá»™c tÃ­nh       | Chi tiáº¿t                  |
 | ---------------- | ------------------------- |
 | **URL**          | `PUT /api/v1/permissions` |
 | **Method**       | `PUT`                     |
 | **Content-Type** | `application/json`        |
-| **Xác thực**     | Bearer Token (JWT)        |
+| **XÃ¡c thá»±c**     | Bearer Token (JWT)        |
 
-**Request Body:** (phải có `id`)
+**Request Body:** (pháº£i cÃ³ `id`)
 
 ```json
 {
   "id": 99,
-  "name": "Xem báo cáo — updated",
+  "name": "Xem bÃ¡o cÃ¡o â€” updated",
   "apiPath": "/api/v1/bao-cao",
   "method": "GET",
   "module": "BAO_CAO"
 }
 ```
 
-**Kiểu dữ liệu:**
+**Kiá»ƒu dá»¯ liá»‡u:**
 
 ```json
 {
@@ -189,38 +189,40 @@ Mỗi **Permission** đại diện cho 1 quyền truy cập vào 1 API endpoint 
 }
 ```
 
-**Response:** `200 OK` — Trả về `Permission`
+**Response:** `200 OK` â€” Tráº£ vá» `Permission`
 
-**Lỗi:**
+**Lá»—i:**
 
-| HTTP Status | Mô tả                |
+| HTTP Status | MÃ´ táº£                |
 | ----------- | -------------------- |
-| `400`       | Không tìm thấy quyền |
+| `400`       | KhÃ´ng tÃ¬m tháº¥y quyá»n |
 
 ---
 
-## 5. Xóa quyền
+## 5. XÃ³a quyá»n
 
-| Thuộc tính   | Chi tiết                          |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t                          |
 | ------------ | --------------------------------- |
 | **URL**      | `DELETE /api/v1/permissions/{id}` |
 | **Method**   | `DELETE`                          |
-| **Xác thực** | Bearer Token (JWT)                |
+| **XÃ¡c thá»±c** | Bearer Token (JWT)                |
 
 **Response:** `204 No Content`
 
-**Lỗi:**
+**Lá»—i:**
 
-| HTTP Status | Mô tả                |
+| HTTP Status | MÃ´ táº£                |
 | ----------- | -------------------- |
-| `400`       | Không tìm thấy quyền |
+| `400`       | KhÃ´ng tÃ¬m tháº¥y quyá»n |
 
 ---
 
-## Phân quyền
+## PhÃ¢n quyá»n
 
-| Vai trò    | GET | POST | PUT | DELETE |
+| Vai trÃ²    | GET | POST | PUT | DELETE |
 | ---------- | --- | ---- | --- | ------ |
-| ADMIN      | ✅  | ✅   | ✅  | ✅     |
-| NHAN_VIEN  | ❌  | ❌   | ❌  | ❌     |
-| KHACH_HANG | ❌  | ❌   | ❌  | ❌     |
+| ADMIN      | âœ…  | âœ…   | âœ…  | âœ…     |
+| NHAN_VIEN  | âŒ  | âŒ   | âŒ  | âŒ     |
+| KHACH_HANG | âŒ  | âŒ   | âŒ  | âŒ     |
+
+

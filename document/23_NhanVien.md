@@ -1,37 +1,37 @@
-# Nhân Viên Controller
+﻿# NhÃ¢n ViÃªn Controller
 
 > **Base Path:** `/api/v1/nhan-vien`  
 > **File:** `NhanVienController.java`  
-> Quản lý thông tin nhân viên (xem danh sách, thêm, cập nhật, xóa).
+> Quáº£n lÃ½ thÃ´ng tin nhÃ¢n viÃªn (xem danh sÃ¡ch, thÃªm, cáº­p nháº­t, xÃ³a).
 
 ---
 
-## Cấu trúc dữ liệu trả về `ResNhanVienDTO`
+## Cáº¥u trÃºc dá»¯ liá»‡u tráº£ vá» `ResNhanVienDTO`
 
-| Trường           | Kiểu          | Mô tả                            |
+| TrÆ°á»ng           | Kiá»ƒu          | MÃ´ táº£                            |
 | ---------------- | ------------- | -------------------------------- |
-| `id`             | Long          | Mã nhân viên                     |
-| `tenNhanVien`    | String        | Tên nhân viên                    |
+| `id`             | Long          | MÃ£ nhÃ¢n viÃªn                     |
+| `tenNhanVien`    | String        | TÃªn nhÃ¢n viÃªn                    |
 | `email`          | String        | Email                            |
-| `soDienThoai`    | String        | Số điện thoại                    |
-| `ngayBatDauLam`  | LocalDateTime | Ngày bắt đầu làm                 |
-| `ngayKetThucLam` | LocalDateTime | Ngày kết thúc làm                |
-| `trangThai`      | Integer       | Trạng thái nhân viên             |
-| `cuaHang`        | Object        | Thông tin cửa hàng của nhân viên |
-| `role`           | Object        | Thông tin vai trò                |
+| `soDienThoai`    | String        | Sá»‘ Ä‘iá»‡n thoáº¡i                    |
+| `ngayBatDauLam`  | LocalDateTime | NgÃ y báº¯t Ä‘áº§u lÃ m                 |
+| `ngayKetThucLam` | LocalDateTime | NgÃ y káº¿t thÃºc lÃ m                |
+| `trangThai`      | Integer       | Tráº¡ng thÃ¡i nhÃ¢n viÃªn             |
+| `cuaHang`        | Object        | ThÃ´ng tin cá»­a hÃ ng cá»§a nhÃ¢n viÃªn |
+| `role`           | Object        | ThÃ´ng tin vai trÃ²                |
 
-**`cuaHang` gồm:** `id`, `tenCuaHang`, `diaChi`, `soDienThoai`, `email`, `trangThai`  
-**`role` gồm:** `id`, `name`, `description`, `active`
+**`cuaHang` gá»“m:** `id`, `tenCuaHang`, `diaChi`, `soDienThoai`, `email`, `trangThai`  
+**`role` gá»“m:** `id`, `name`, `description`, `active`
 
 ---
 
-## 1. Xem danh sách nhân viên
+## 1. Xem danh sÃ¡ch nhÃ¢n viÃªn
 
-| Thuộc tính   | Chi tiết                |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t                |
 | ------------ | ----------------------- |
 | **URL**      | `GET /api/v1/nhan-vien` |
 | **Method**   | `GET`                   |
-| **Xác thực** | Bearer Token (JWT)      |
+| **XÃ¡c thá»±c** | Bearer Token (JWT)      |
 
 **Response:** `200 OK`
 
@@ -47,8 +47,8 @@
     "trangThai": 1,
     "cuaHang": {
       "id": 1,
-      "tenCuaHang": "Chi nhánh Quận 1",
-      "diaChi": "123 Nguyễn Huệ, Q.1, TP.HCM",
+      "tenCuaHang": "Chi nhÃ¡nh Quáº­n 1",
+      "diaChi": "123 Nguyá»…n Huá»‡, Q.1, TP.HCM",
       "soDienThoai": "02812345678",
       "email": "q1@shop.com",
       "trangThai": 1
@@ -56,27 +56,27 @@
     "role": {
       "id": 2,
       "name": "NHAN_VIEN",
-      "description": "Nhân viên bán hàng",
+      "description": "NhÃ¢n viÃªn bÃ¡n hÃ ng",
       "active": true
     }
   }
 ]
 ```
 
-**Quy tắc dữ liệu trả về theo vai trò:**
+**Quy táº¯c dá»¯ liá»‡u tráº£ vá» theo vai trÃ²:**
 
-- `ADMIN`: xem toàn bộ nhân viên.
-- `NHAN_VIEN`: chỉ xem nhân viên cùng cửa hàng với tài khoản đang đăng nhập.
+- `ADMIN`: xem toÃ n bá»™ nhÃ¢n viÃªn.
+- `NHAN_VIEN`: chá»‰ xem nhÃ¢n viÃªn cÃ¹ng cá»­a hÃ ng vá»›i tÃ i khoáº£n Ä‘ang Ä‘Äƒng nháº­p.
 
 ---
 
-## 2. Tạo nhân viên
+## 2. Táº¡o nhÃ¢n viÃªn
 
-| Thuộc tính   | Chi tiết                 |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t                 |
 | ------------ | ------------------------ |
 | **URL**      | `POST /api/v1/nhan-vien` |
 | **Method**   | `POST`                   |
-| **Xác thực** | Bearer Token (JWT)       |
+| **XÃ¡c thá»±c** | Bearer Token (JWT)       |
 
 **Request Body:**
 
@@ -93,7 +93,7 @@
 }
 ```
 
-> Nếu không truyền `role`, hệ thống sẽ tự gán role mặc định nhân viên.
+> Náº¿u khÃ´ng truyá»n `role`, há»‡ thá»‘ng sáº½ tá»± gÃ¡n role máº·c Ä‘á»‹nh nhÃ¢n viÃªn.
 
 **Response:** `201 Created`
 
@@ -108,8 +108,8 @@
   "trangThai": 1,
   "cuaHang": {
     "id": 1,
-    "tenCuaHang": "Chi nhánh Quận 1",
-    "diaChi": "123 Nguyễn Huệ, Q.1, TP.HCM",
+    "tenCuaHang": "Chi nhÃ¡nh Quáº­n 1",
+    "diaChi": "123 Nguyá»…n Huá»‡, Q.1, TP.HCM",
     "soDienThoai": "02812345678",
     "email": "q1@shop.com",
     "trangThai": 1
@@ -117,7 +117,7 @@
   "role": {
     "id": 2,
     "name": "NHAN_VIEN",
-    "description": "Nhân viên bán hàng",
+    "description": "NhÃ¢n viÃªn bÃ¡n hÃ ng",
     "active": true
   }
 }
@@ -125,13 +125,13 @@
 
 ---
 
-## 3. Cập nhật nhân viên
+## 3. Cáº­p nháº­t nhÃ¢n viÃªn
 
-| Thuộc tính   | Chi tiết                |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t                |
 | ------------ | ----------------------- |
 | **URL**      | `PUT /api/v1/nhan-vien` |
 | **Method**   | `PUT`                   |
-| **Xác thực** | Bearer Token (JWT)      |
+| **XÃ¡c thá»±c** | Bearer Token (JWT)      |
 
 **Request Body:**
 
@@ -150,35 +150,37 @@
 }
 ```
 
-**Response:** `200 OK` (dữ liệu `ResNhanVienDTO`)
+**Response:** `200 OK` (dá»¯ liá»‡u `ResNhanVienDTO`)
 
 ---
 
-## 4. Xóa nhân viên
+## 4. XÃ³a nhÃ¢n viÃªn
 
-| Thuộc tính   | Chi tiết                        |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t                        |
 | ------------ | ------------------------------- |
 | **URL**      | `DELETE /api/v1/nhan-vien/{id}` |
 | **Method**   | `DELETE`                        |
-| **Xác thực** | Bearer Token (JWT)              |
+| **XÃ¡c thá»±c** | Bearer Token (JWT)              |
 
 **Response:** `204 No Content`
 
 ---
 
-## Lỗi thường gặp
+## Lá»—i thÆ°á»ng gáº·p
 
-| HTTP Status | Mô tả                            |
+| HTTP Status | MÃ´ táº£                            |
 | ----------- | -------------------------------- |
-| `400`       | Mã nhân viên không được để trống |
-| `400`       | Không tìm thấy nhân viên theo ID |
+| `400`       | MÃ£ nhÃ¢n viÃªn khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng |
+| `400`       | KhÃ´ng tÃ¬m tháº¥y nhÃ¢n viÃªn theo ID |
 
 ---
 
-## Phân quyền
+## PhÃ¢n quyá»n
 
-| Vai trò    | GET | POST | PUT | DELETE |
+| Vai trÃ²    | GET | POST | PUT | DELETE |
 | ---------- | --- | ---- | --- | ------ |
-| ADMIN      | ✅  | ✅   | ✅  | ✅     |
-| NHAN_VIEN  | ✅  | ❌   | ❌  | ❌     |
-| KHACH_HANG | ❌  | ❌   | ❌  | ❌     |
+| ADMIN      | âœ…  | âœ…   | âœ…  | âœ…     |
+| NHAN_VIEN  | âœ…  | âŒ   | âŒ  | âŒ     |
+| KHACH_HANG | âŒ  | âŒ   | âŒ  | âŒ     |
+
+

@@ -1,66 +1,66 @@
-# Sản Phẩm Controller
+﻿# Sáº£n Pháº©m Controller
 
 > **Base Path:** `/api/v1/san-pham`  
 > **File:** `SanPhamController.java`  
-> Quản lý sản phẩm: CRUD + tìm kiếm/lọc + phân trang.
+> Quáº£n lÃ½ sáº£n pháº©m: CRUD + tÃ¬m kiáº¿m/lá»c + phÃ¢n trang.
 
 ---
 
-## Tổng quan
+## Tá»•ng quan
 
-### Cấu trúc dữ liệu `SanPham`
+### Cáº¥u trÃºc dá»¯ liá»‡u `SanPham`
 
-| Trường         | Kiểu          | Mô tả                               |
+| TrÆ°á»ng         | Kiá»ƒu          | MÃ´ táº£                               |
 | -------------- | ------------- | ----------------------------------- |
-| `id`           | Long          | Mã sản phẩm (auto-increment)        |
-| `kieuSanPham`  | KieuSanPham   | Kiểu/loại sản phẩm (FK)             |
-| `boSuuTap`     | BoSuuTap      | Bộ sưu tập (FK)                     |
-| `thuongHieu`   | ThuongHieu    | Thương hiệu (FK)                    |
-| `tenSanPham`   | String(255)   | Tên sản phẩm                        |
-| `giaVon`       | Double        | Giá vốn (VND)                       |
-| `giaBan`       | Double        | Giá bán (VND)                       |
-| `giaGiam`      | Integer       | Phần trăm giảm giá (%)              |
-| `hinhAnhChinh` | String(255)   | Tên file ảnh chính (lưu trên MinIO) |
-| `moTa`         | String(255)   | Mô tả sản phẩm                      |
-| `soLuong`      | Integer       | Tổng số lượng tồn kho               |
-| `trangThai`    | Integer       | Trạng thái (0: ẩn, 1: hiển thị)     |
-| `ngayTao`      | LocalDateTime | Ngày tạo (tự động)                  |
-| `ngayCapNhat`  | LocalDateTime | Ngày cập nhật (tự động)             |
+| `id`           | Long          | MÃ£ sáº£n pháº©m (auto-increment)        |
+| `kieuSanPham`  | KieuSanPham   | Kiá»ƒu/loáº¡i sáº£n pháº©m (FK)             |
+| `boSuuTap`     | BoSuuTap      | Bá»™ sÆ°u táº­p (FK)                     |
+| `thuongHieu`   | ThuongHieu    | ThÆ°Æ¡ng hiá»‡u (FK)                    |
+| `tenSanPham`   | String(255)   | TÃªn sáº£n pháº©m                        |
+| `giaVon`       | Double        | GiÃ¡ vá»‘n (VND)                       |
+| `giaBan`       | Double        | GiÃ¡ bÃ¡n (VND)                       |
+| `giaGiam`      | Integer       | Pháº§n trÄƒm giáº£m giÃ¡ (%)              |
+| `hinhAnhChinh` | String(255)   | TÃªn file áº£nh chÃ­nh (lÆ°u trÃªn Cloudinary) |
+| `moTa`         | String(255)   | MÃ´ táº£ sáº£n pháº©m                      |
+| `soLuong`      | Integer       | Tá»•ng sá»‘ lÆ°á»£ng tá»“n kho               |
+| `trangThai`    | Integer       | Tráº¡ng thÃ¡i (0: áº©n, 1: hiá»ƒn thá»‹)     |
+| `ngayTao`      | LocalDateTime | NgÃ y táº¡o (tá»± Ä‘á»™ng)                  |
+| `ngayCapNhat`  | LocalDateTime | NgÃ y cáº­p nháº­t (tá»± Ä‘á»™ng)             |
 
 ---
 
-## 1. Lấy danh sách sản phẩm (có lọc + phân trang)
+## 1. Láº¥y danh sÃ¡ch sáº£n pháº©m (cÃ³ lá»c + phÃ¢n trang)
 
-| Thuộc tính   | Chi tiết               |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t               |
 | ------------ | ---------------------- |
 | **URL**      | `GET /api/v1/san-pham` |
 | **Method**   | `GET`                  |
-| **Xác thực** | Bearer Token (JWT)     |
+| **XÃ¡c thá»±c** | Bearer Token (JWT)     |
 
 **Query Parameters:**
 
-| Tham số         | Kiểu    | Bắt buộc | Mô tả                           |
+| Tham sá»‘         | Kiá»ƒu    | Báº¯t buá»™c | MÃ´ táº£                           |
 | --------------- | ------- | -------- | ------------------------------- |
-| `tenSanPham`    | String  | Không    | Lọc theo tên sản phẩm (like)    |
-| `kieuSanPhamId` | Long    | Không    | Lọc theo mã kiểu sản phẩm       |
-| `boSuuTapId`    | Long    | Không    | Lọc theo mã bộ sưu tập          |
-| `thuongHieuId`  | Long    | Không    | Lọc theo mã thương hiệu         |
-| `kichThuocId`   | Long    | Không    | Lọc theo mã kích thước          |
-| `mauSacId`      | Long    | Không    | Lọc theo mã màu sắc             |
-| `trangThai`     | Integer | Không    | Lọc theo trạng thái             |
-| `giaMin`        | Double  | Không    | Giá bán tối thiểu               |
-| `giaMax`        | Double  | Không    | Giá bán tối đa                  |
-| `page`          | Integer | Không    | Số trang (mặc định: 0)          |
-| `size`          | Integer | Không    | Kích thước trang (mặc định: 20) |
-| `sort`          | String  | Không    | Sắp xếp (vd: `giaBan,asc`)      |
+| `tenSanPham`    | String  | KhÃ´ng    | Lá»c theo tÃªn sáº£n pháº©m (like)    |
+| `kieuSanPhamId` | Long    | KhÃ´ng    | Lá»c theo mÃ£ kiá»ƒu sáº£n pháº©m       |
+| `boSuuTapId`    | Long    | KhÃ´ng    | Lá»c theo mÃ£ bá»™ sÆ°u táº­p          |
+| `thuongHieuId`  | Long    | KhÃ´ng    | Lá»c theo mÃ£ thÆ°Æ¡ng hiá»‡u         |
+| `kichThuocId`   | Long    | KhÃ´ng    | Lá»c theo mÃ£ kÃ­ch thÆ°á»›c          |
+| `mauSacId`      | Long    | KhÃ´ng    | Lá»c theo mÃ£ mÃ u sáº¯c             |
+| `trangThai`     | Integer | KhÃ´ng    | Lá»c theo tráº¡ng thÃ¡i             |
+| `giaMin`        | Double  | KhÃ´ng    | GiÃ¡ bÃ¡n tá»‘i thiá»ƒu               |
+| `giaMax`        | Double  | KhÃ´ng    | GiÃ¡ bÃ¡n tá»‘i Ä‘a                  |
+| `page`          | Integer | KhÃ´ng    | Sá»‘ trang (máº·c Ä‘á»‹nh: 0)          |
+| `size`          | Integer | KhÃ´ng    | KÃ­ch thÆ°á»›c trang (máº·c Ä‘á»‹nh: 20) |
+| `sort`          | String  | KhÃ´ng    | Sáº¯p xáº¿p (vd: `giaBan,asc`)      |
 
-**Ví dụ request:**
+**VÃ­ dá»¥ request:**
 
 ```
 GET /api/v1/san-pham?tenSanPham=ao&kieuSanPhamId=1&thuongHieuId=2&kichThuocId=2&mauSacId=1&trangThai=1&giaMin=100000&giaMax=500000&page=0&size=10&sort=giaBan,asc
 ```
 
-**Response:** `200 OK` — Trả về `ResultPaginationDTO`
+**Response:** `200 OK` â€” Tráº£ vá» `ResultPaginationDTO`
 
 ```json
 {
@@ -73,23 +73,23 @@ GET /api/v1/san-pham?tenSanPham=ao&kieuSanPhamId=1&thuongHieuId=2&kichThuocId=2&
   "result": [
     {
       "id": 1,
-      "tenSanPham": "Áo Polo Classic",
+      "tenSanPham": "Ão Polo Classic",
       "giaVon": 120000,
       "giaBan": 250000,
       "giaGiam": 10,
       "hinhAnhChinh": "polo-classic.jpg",
-      "moTa": "Áo polo nam cao cấp",
+      "moTa": "Ão polo nam cao cáº¥p",
       "soLuong": 50,
       "trangThai": 1,
-      "tenKieuSanPham": "Áo",
-      "tenBoSuuTap": "Xuân Hè 2025",
+      "tenKieuSanPham": "Ão",
+      "tenBoSuuTap": "XuÃ¢n HÃ¨ 2025",
       "tenThuongHieu": "Nike"
     }
   ]
 }
 ```
 
-**Kiểu dữ liệu:**
+**Kiá»ƒu dá»¯ liá»‡u:**
 
 ```json
 {
@@ -118,44 +118,44 @@ GET /api/v1/san-pham?tenSanPham=ao&kieuSanPhamId=1&thuongHieuId=2&kichThuocId=2&
 }
 ```
 
-> **Lưu ý:** Nếu không truyền bất kỳ tham số lọc nào → trả về tất cả sản phẩm (có phân trang).
+> **LÆ°u Ã½:** Náº¿u khÃ´ng truyá»n báº¥t ká»³ tham sá»‘ lá»c nÃ o â†’ tráº£ vá» táº¥t cáº£ sáº£n pháº©m (cÃ³ phÃ¢n trang).
 
 ---
 
-## 2. Xem chi tiết sản phẩm
+## 2. Xem chi tiáº¿t sáº£n pháº©m
 
-| Thuộc tính   | Chi tiết                    |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t                    |
 | ------------ | --------------------------- |
 | **URL**      | `GET /api/v1/san-pham/{id}` |
 | **Method**   | `GET`                       |
-| **Xác thực** | Bearer Token (JWT)          |
+| **XÃ¡c thá»±c** | Bearer Token (JWT)          |
 
 **Path Parameters:**
 
-| Tham số | Kiểu | Mô tả       |
+| Tham sá»‘ | Kiá»ƒu | MÃ´ táº£       |
 | ------- | ---- | ----------- |
-| `id`    | Long | Mã sản phẩm |
+| `id`    | Long | MÃ£ sáº£n pháº©m |
 
-**Response:** `200 OK` — Trả về `ResSanPhamDTO`
+**Response:** `200 OK` â€” Tráº£ vá» `ResSanPhamDTO`
 
 ```json
 {
   "id": 1,
-  "tenSanPham": "Áo Polo Classic",
+  "tenSanPham": "Ão Polo Classic",
   "giaVon": 120000,
   "giaBan": 250000,
   "giaGiam": 10,
   "hinhAnhChinh": "polo-classic.jpg",
-  "moTa": "Áo polo nam cao cấp",
+  "moTa": "Ão polo nam cao cáº¥p",
   "soLuong": 50,
   "trangThai": 1,
-  "tenKieuSanPham": "Áo",
-  "tenBoSuuTap": "Xuân Hè 2025",
+  "tenKieuSanPham": "Ão",
+  "tenBoSuuTap": "XuÃ¢n HÃ¨ 2025",
   "tenThuongHieu": "Nike"
 }
 ```
 
-**Kiểu dữ liệu:**
+**Kiá»ƒu dá»¯ liá»‡u:**
 
 ```json
 {
@@ -174,98 +174,100 @@ GET /api/v1/san-pham?tenSanPham=ao&kieuSanPhamId=1&thuongHieuId=2&kichThuocId=2&
 }
 ```
 
-**Lỗi:**
+**Lá»—i:**
 
-| HTTP Status | Mô tả                   |
+| HTTP Status | MÃ´ táº£                   |
 | ----------- | ----------------------- |
-| `400`       | Không tìm thấy sản phẩm |
+| `400`       | KhÃ´ng tÃ¬m tháº¥y sáº£n pháº©m |
 
 ---
 
-## 3. Tạo sản phẩm mới
+## 3. Táº¡o sáº£n pháº©m má»›i
 
-| Thuộc tính       | Chi tiết                |
+| Thuá»™c tÃ­nh       | Chi tiáº¿t                |
 | ---------------- | ----------------------- |
 | **URL**          | `POST /api/v1/san-pham` |
 | **Method**       | `POST`                  |
 | **Content-Type** | `multipart/form-data`   |
-| **Xác thực**     | Bearer Token (JWT)      |
+| **XÃ¡c thá»±c**     | Bearer Token (JWT)      |
 
 **Form Data:**
 
-| Tham số         | Kiểu    | Bắt buộc | Mô tả                           |
+| Tham sá»‘         | Kiá»ƒu    | Báº¯t buá»™c | MÃ´ táº£                           |
 | --------------- | ------- | -------- | ------------------------------- |
-| `tenSanPham`    | String  | Không    | Tên sản phẩm                    |
-| `giaVon`        | Double  | Không    | Giá vốn (VND)                   |
-| `giaBan`        | Double  | Không    | Giá bán (VND)                   |
-| `giaGiam`       | Integer | Không    | Phần trăm giảm giá (%)          |
-| `moTa`          | String  | Không    | Mô tả                           |
-| `soLuong`       | Integer | Không    | Số lượng                        |
-| `trangThai`     | Integer | Không    | Trạng thái (0/1)                |
-| `kieuSanPhamId` | Long    | Không    | Mã kiểu sản phẩm                |
-| `boSuuTapId`    | Long    | Không    | Mã bộ sưu tập                   |
-| `thuongHieuId`  | Long    | Không    | Mã thương hiệu                  |
-| `file`          | File    | Không    | Ảnh sản phẩm (upload lên MinIO) |
+| `tenSanPham`    | String  | KhÃ´ng    | TÃªn sáº£n pháº©m                    |
+| `giaVon`        | Double  | KhÃ´ng    | GiÃ¡ vá»‘n (VND)                   |
+| `giaBan`        | Double  | KhÃ´ng    | GiÃ¡ bÃ¡n (VND)                   |
+| `giaGiam`       | Integer | KhÃ´ng    | Pháº§n trÄƒm giáº£m giÃ¡ (%)          |
+| `moTa`          | String  | KhÃ´ng    | MÃ´ táº£                           |
+| `soLuong`       | Integer | KhÃ´ng    | Sá»‘ lÆ°á»£ng                        |
+| `trangThai`     | Integer | KhÃ´ng    | Tráº¡ng thÃ¡i (0/1)                |
+| `kieuSanPhamId` | Long    | KhÃ´ng    | MÃ£ kiá»ƒu sáº£n pháº©m                |
+| `boSuuTapId`    | Long    | KhÃ´ng    | MÃ£ bá»™ sÆ°u táº­p                   |
+| `thuongHieuId`  | Long    | KhÃ´ng    | MÃ£ thÆ°Æ¡ng hiá»‡u                  |
+| `file`          | File    | KhÃ´ng    | áº¢nh sáº£n pháº©m (upload lÃªn Cloudinary) |
 
-**Response:** `201 Created` — Trả về `ResSanPhamDTO`
+**Response:** `201 Created` â€” Tráº£ vá» `ResSanPhamDTO`
 
-> **Lưu ý:** Ảnh sản phẩm được upload lên MinIO. URL ảnh có thể truy cập qua `GET /storage/{fileName}`.
+> **LÆ°u Ã½:** áº¢nh sáº£n pháº©m Ä‘Æ°á»£c upload lÃªn Cloudinary. URL áº£nh cÃ³ thá»ƒ truy cáº­p qua `GET {secure_url_cloudinary}`.
 
 ---
 
-## 4. Cập nhật sản phẩm
+## 4. Cáº­p nháº­t sáº£n pháº©m
 
-| Thuộc tính       | Chi tiết               |
+| Thuá»™c tÃ­nh       | Chi tiáº¿t               |
 | ---------------- | ---------------------- |
 | **URL**          | `PUT /api/v1/san-pham` |
 | **Method**       | `PUT`                  |
 | **Content-Type** | `multipart/form-data`  |
-| **Xác thực**     | Bearer Token (JWT)     |
+| **XÃ¡c thá»±c**     | Bearer Token (JWT)     |
 
-**Form Data:** Giống tạo mới, thêm trường:
+**Form Data:** Giá»‘ng táº¡o má»›i, thÃªm trÆ°á»ng:
 
-| Tham số | Kiểu | Bắt buộc | Mô tả                    |
+| Tham sá»‘ | Kiá»ƒu | Báº¯t buá»™c | MÃ´ táº£                    |
 | ------- | ---- | -------- | ------------------------ |
-| `id`    | Long | **Có**   | Mã sản phẩm cần cập nhật |
+| `id`    | Long | **CÃ³**   | MÃ£ sáº£n pháº©m cáº§n cáº­p nháº­t |
 
-**Response:** `200 OK` — Trả về `ResSanPhamDTO`
+**Response:** `200 OK` â€” Tráº£ vá» `ResSanPhamDTO`
 
-**Lỗi:**
+**Lá»—i:**
 
-| HTTP Status | Mô tả                           |
+| HTTP Status | MÃ´ táº£                           |
 | ----------- | ------------------------------- |
-| `400`       | Mã sản phẩm không được để trống |
+| `400`       | MÃ£ sáº£n pháº©m khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng |
 
 ---
 
-## 5. Xóa sản phẩm
+## 5. XÃ³a sáº£n pháº©m
 
-| Thuộc tính   | Chi tiết                       |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t                       |
 | ------------ | ------------------------------ |
 | **URL**      | `DELETE /api/v1/san-pham/{id}` |
 | **Method**   | `DELETE`                       |
-| **Xác thực** | Bearer Token (JWT)             |
+| **XÃ¡c thá»±c** | Bearer Token (JWT)             |
 
 **Path Parameters:**
 
-| Tham số | Kiểu | Mô tả       |
+| Tham sá»‘ | Kiá»ƒu | MÃ´ táº£       |
 | ------- | ---- | ----------- |
-| `id`    | Long | Mã sản phẩm |
+| `id`    | Long | MÃ£ sáº£n pháº©m |
 
 **Response:** `204 No Content`
 
-**Lỗi:**
+**Lá»—i:**
 
-| HTTP Status | Mô tả                   |
+| HTTP Status | MÃ´ táº£                   |
 | ----------- | ----------------------- |
-| `400`       | Không tìm thấy sản phẩm |
+| `400`       | KhÃ´ng tÃ¬m tháº¥y sáº£n pháº©m |
 
 ---
 
-## Phân quyền
+## PhÃ¢n quyá»n
 
-| Vai trò    | GET (Xem) | POST (Tạo) | PUT (Sửa) | DELETE (Xóa) |
+| Vai trÃ²    | GET (Xem) | POST (Táº¡o) | PUT (Sá»­a) | DELETE (XÃ³a) |
 | ---------- | --------- | ---------- | --------- | ------------ |
-| ADMIN      | ✅        | ✅         | ✅        | ✅           |
-| NHAN_VIEN  | ✅        | ❌         | ❌        | ❌           |
-| KHACH_HANG | ✅        | ❌         | ❌        | ❌           |
+| ADMIN      | âœ…        | âœ…         | âœ…        | âœ…           |
+| NHAN_VIEN  | âœ…        | âŒ         | âŒ        | âŒ           |
+| KHACH_HANG | âœ…        | âŒ         | âŒ        | âŒ           |
+
+

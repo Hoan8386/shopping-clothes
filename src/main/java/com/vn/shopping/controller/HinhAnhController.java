@@ -13,7 +13,7 @@ import com.vn.shopping.domain.ChiTietSanPham;
 import com.vn.shopping.domain.HinhAnh;
 import com.vn.shopping.service.ChiTietSanPhamService;
 import com.vn.shopping.service.HinhAnhService;
-import com.vn.shopping.service.MinioStorageService;
+import com.vn.shopping.service.StorageService;
 import com.vn.shopping.util.anotation.ApiMessage;
 import com.vn.shopping.util.error.IdInvalidException;
 
@@ -22,13 +22,13 @@ import com.vn.shopping.util.error.IdInvalidException;
 public class HinhAnhController {
 
     private final HinhAnhService hinhAnhService;
-    private final MinioStorageService minioStorageService;
+    private final StorageService storageService;
     private final ChiTietSanPhamService chiTietSanPhamService;
 
-    public HinhAnhController(HinhAnhService hinhAnhService, MinioStorageService minioStorageService,
+    public HinhAnhController(HinhAnhService hinhAnhService, StorageService storageService,
             ChiTietSanPhamService chiTietSanPhamService) {
         this.hinhAnhService = hinhAnhService;
-        this.minioStorageService = minioStorageService;
+        this.storageService = storageService;
         this.chiTietSanPhamService = chiTietSanPhamService;
     }
 
@@ -69,7 +69,7 @@ public class HinhAnhController {
             throw new IdInvalidException("Không tìm thấy chi tiết sản phẩm: " + chiTietSanPhamId);
         }
 
-        List<String> imageUrls = minioStorageService.uploadMultipleFiles(files);
+        List<String> imageUrls = storageService.uploadMultipleFiles(files);
         List<HinhAnh> savedImages = new ArrayList<>();
 
         for (String url : imageUrls) {

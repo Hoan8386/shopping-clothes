@@ -282,7 +282,7 @@
 									"key": "file",
 									"type": "file",
 									"src": "",
-									"description": "Hình ảnh chính (1 ảnh, không bắt buộc). Upload lên MinIO, URL lưu vào HinhAnhChinh"
+									"description": "Hình ảnh chính (1 ảnh, không bắt buộc). Upload lên Cloudinary, URL lưu vào HinhAnhChinh"
 								}
 							]
 						},
@@ -291,7 +291,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "san-pham"]
 						},
-						"description": " Chỉ Admin — Tạo sản phẩm mới (truyền từng trường) + upload 1 ảnh chính lên MinIO. Gửi multipart/form-data. Khách hàng gọi → 403"
+						"description": " Chỉ Admin — Tạo sản phẩm mới (truyền từng trường) + upload 1 ảnh chính lên Cloudinary. Gửi multipart/form-data. Khách hàng gọi → 403"
 					}
 				},
 				{
@@ -376,7 +376,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "san-pham"]
 						},
-						"description": " Chỉ Admin — Cập nhật sản phẩm (truyền từng trường) + thay đổi ảnh chính lên MinIO. Gửi multipart/form-data. Khách hàng gọi → 403"
+						"description": " Chỉ Admin — Cập nhật sản phẩm (truyền từng trường) + thay đổi ảnh chính lên Cloudinary. Gửi multipart/form-data. Khách hàng gọi → 403"
 					}
 				},
 				{
@@ -500,7 +500,7 @@
 									"key": "files",
 									"type": "file",
 									"src": [],
-									"description": "Nhiều hình ảnh cho CTSP (không bắt buộc). Upload lên MinIO, lưu vào bảng HinhAnh"
+									"description": "Nhiều hình ảnh cho CTSP (không bắt buộc). Upload lên Cloudinary, lưu vào bảng HinhAnh"
 								}
 							]
 						},
@@ -509,7 +509,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "chi-tiet-san-pham"]
 						},
-						"description": " Chỉ Admin — Tạo chi tiết sản phẩm (truyền từng trường) + upload nhiều ảnh lên MinIO. Gửi multipart/form-data. Khách hàng gọi → 403"
+						"description": " Chỉ Admin — Tạo chi tiết sản phẩm (truyền từng trường) + upload nhiều ảnh lên Cloudinary. Gửi multipart/form-data. Khách hàng gọi → 403"
 					}
 				},
 				{
@@ -581,7 +581,7 @@
 									"key": "files",
 									"type": "file",
 									"src": [],
-									"description": "Ảnh mới bổ sung (không bắt buộc). Upload lên MinIO, thêm vào bảng HinhAnh"
+									"description": "Ảnh mới bổ sung (không bắt buộc). Upload lên Cloudinary, thêm vào bảng HinhAnh"
 								}
 							]
 						},
@@ -590,7 +590,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "chi-tiet-san-pham"]
 						},
-						"description": " Chỉ Admin — Cập nhật chi tiết SP (truyền từng trường) + upload thêm ảnh mới lên MinIO. Gửi multipart/form-data. Khách hàng gọi → 403"
+						"description": " Chỉ Admin — Cập nhật chi tiết SP (truyền từng trường) + upload thêm ảnh mới lên Cloudinary. Gửi multipart/form-data. Khách hàng gọi → 403"
 					}
 				},
 				{
@@ -1171,7 +1171,7 @@
 									"key": "files",
 									"type": "file",
 									"src": [],
-									"description": "Chọn nhiều hình ảnh để upload lên MinIO"
+									"description": "Chọn nhiều hình ảnh để upload lên Cloudinary"
 								}
 							]
 						},
@@ -1180,7 +1180,7 @@
 							"host": ["{{base_url}}"],
 							"path": ["api", "v1", "hinh-anh", "upload", "1"]
 						},
-						"description": " Admin — Upload nhiều ảnh cho 1 chi tiết sản phẩm (ID=1). Ảnh upload lên MinIO, URL lưu vào bảng HinhAnh"
+						"description": " Admin — Upload nhiều ảnh cho 1 chi tiết sản phẩm (ID=1). Ảnh upload lên Cloudinary, URL lưu vào bảng HinhAnh"
 					}
 				},
 				{
@@ -2542,3 +2542,5 @@
 		}
 	]
 }
+
+

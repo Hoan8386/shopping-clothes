@@ -29,17 +29,17 @@ public class SanPhamService {
 
     private final SanPhamRepository sanPhamRepository;
     private final EntityManager entityManager;
-    private final MinioStorageService minioStorageService;
+    private final StorageService storageService;
     private final KieuSanPhamRepository kieuSanPhamRepository;
     private final BoSuuTapRepository boSuuTapRepository;
     private final ThuongHieuRepository thuongHieuRepository;
 
     public SanPhamService(SanPhamRepository sanPhamRepository, EntityManager entityManager,
-            MinioStorageService minioStorageService, KieuSanPhamRepository kieuSanPhamRepository,
+            StorageService storageService, KieuSanPhamRepository kieuSanPhamRepository,
             BoSuuTapRepository boSuuTapRepository, ThuongHieuRepository thuongHieuRepository) {
         this.sanPhamRepository = sanPhamRepository;
         this.entityManager = entityManager;
-        this.minioStorageService = minioStorageService;
+        this.storageService = storageService;
         this.kieuSanPhamRepository = kieuSanPhamRepository;
         this.boSuuTapRepository = boSuuTapRepository;
         this.thuongHieuRepository = thuongHieuRepository;
@@ -55,7 +55,7 @@ public class SanPhamService {
     }
 
     /**
-     * Tạo sản phẩm từ từng trường riêng lẻ + upload ảnh lên MinIO
+     * Tạo sản phẩm từ từng trường riêng lẻ + upload ảnh lên Cloudinary
      */
     @Transactional
     public SanPham createSanPham(String tenSanPham, Double giaVon, Double giaBan, Integer giaGiam,
@@ -87,9 +87,9 @@ public class SanPhamService {
             sanPham.setThuongHieu(th);
         }
 
-        // Upload ảnh lên MinIO nếu có
+        // Upload ảnh lên Cloudinary nếu có
         if (file != null && !file.isEmpty()) {
-            String imageUrl = minioStorageService.uploadSingleFile(file);
+            String imageUrl = storageService.uploadSingleFile(file);
             sanPham.setHinhAnhChinh(imageUrl);
         }
         System.out.println(file.getName());
@@ -131,7 +131,7 @@ public class SanPhamService {
     }
 
     /**
-     * Cập nhật sản phẩm từ từng trường riêng lẻ + upload ảnh mới lên MinIO
+     * Cập nhật sản phẩm từ từng trường riêng lẻ + upload ảnh mới lên Cloudinary
      */
     @Transactional
     public SanPham updateSanPham(Long id, String tenSanPham, Double giaVon, Double giaBan, Integer giaGiam,
@@ -164,9 +164,9 @@ public class SanPhamService {
             sanPham.setThuongHieu(th);
         }
 
-        // Upload ảnh mới lên MinIO nếu có
+        // Upload ảnh mới lên Cloudinary nếu có
         if (file != null && !file.isEmpty()) {
-            String imageUrl = minioStorageService.uploadSingleFile(file);
+            String imageUrl = storageService.uploadSingleFile(file);
             sanPham.setHinhAnhChinh(imageUrl);
         }
 

@@ -1,59 +1,59 @@
-# Cửa Hàng Controller
+﻿# Cá»­a HÃ ng Controller
 
 > **Base Path:** `/api/v1/cua-hang`  
 > **File:** `CuaHangController.java`  
-> Quản lý danh sách cửa hàng / chi nhánh.
+> Quáº£n lÃ½ danh sÃ¡ch cá»­a hÃ ng / chi nhÃ¡nh.
 
 ---
 
-## Cấu trúc dữ liệu `CuaHang`
+## Cáº¥u trÃºc dá»¯ liá»‡u `CuaHang`
 
-| Trường        | Kiểu        | Mô tả                        |
+| TrÆ°á»ng        | Kiá»ƒu        | MÃ´ táº£                        |
 | ------------- | ----------- | ---------------------------- |
-| `id`          | Long        | Mã cửa hàng (auto-increment) |
-| `tenCuaHang`  | String(255) | Tên cửa hàng / chi nhánh     |
-| `diaChi`      | String(255) | Địa chỉ                      |
-| `viTri`       | String(255) | Vị trí (tọa độ / khu vực)    |
-| `soDienThoai` | String(255) | Số điện thoại liên hệ        |
-| `email`       | String(255) | Email liên hệ                |
-| `trangThai`   | Integer     | Trạng thái (0: đóng, 1: mở)  |
+| `id`          | Long        | MÃ£ cá»­a hÃ ng (auto-increment) |
+| `tenCuaHang`  | String(255) | TÃªn cá»­a hÃ ng / chi nhÃ¡nh     |
+| `diaChi`      | String(255) | Äá»‹a chá»‰                      |
+| `viTri`       | String(255) | Vá»‹ trÃ­ (tá»a Ä‘á»™ / khu vá»±c)    |
+| `soDienThoai` | String(255) | Sá»‘ Ä‘iá»‡n thoáº¡i liÃªn há»‡        |
+| `email`       | String(255) | Email liÃªn há»‡                |
+| `trangThai`   | Integer     | Tráº¡ng thÃ¡i (0: Ä‘Ã³ng, 1: má»Ÿ)  |
 
-### Quy ước vị trí
+### Quy Æ°á»›c vá»‹ trÃ­
 
-- Dữ liệu vị trí khi lưu DB vẫn nằm trong `viTri` theo định dạng: `"latitude,longitude"`
-  - Ví dụ: `"10.7769,106.7009"`
-- Khi trả API, hệ thống tách `viTri` thành 2 trường:
+- Dá»¯ liá»‡u vá»‹ trÃ­ khi lÆ°u DB váº«n náº±m trong `viTri` theo Ä‘á»‹nh dáº¡ng: `"latitude,longitude"`
+  - VÃ­ dá»¥: `"10.7769,106.7009"`
+- Khi tráº£ API, há»‡ thá»‘ng tÃ¡ch `viTri` thÃ nh 2 trÆ°á»ng:
   - `latitude` (Double)
   - `longitude` (Double)
 
 ---
 
-## 1. Lấy danh sách cửa hàng (có lọc + phân trang)
+## 1. Láº¥y danh sÃ¡ch cá»­a hÃ ng (cÃ³ lá»c + phÃ¢n trang)
 
-| Thuộc tính   | Chi tiết               |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t               |
 | ------------ | ---------------------- |
 | **URL**      | `GET /api/v1/cua-hang` |
 | **Method**   | `GET`                  |
-| **Xác thực** | Bearer Token (JWT)     |
+| **XÃ¡c thá»±c** | Bearer Token (JWT)     |
 
 **Query Parameters:**
 
-| Tham số   | Kiểu    | Bắt buộc | Mô tả                                |
+| Tham sá»‘   | Kiá»ƒu    | Báº¯t buá»™c | MÃ´ táº£                                |
 | --------- | ------- | -------- | ------------------------------------ |
-| `name`    | String  | Không    | Lọc theo tên cửa hàng (like)         |
-| `address` | String  | Không    | Lọc theo địa chỉ (like)              |
-| `status`  | Integer | Không    | Lọc theo trạng thái (0: đóng, 1: mở) |
-| `page`    | Integer | Không    | Số trang (mặc định: 0)               |
-| `size`    | Integer | Không    | Kích thước trang (mặc định: 20)      |
-| `sort`    | String  | Không    | Sắp xếp (vd: `tenCuaHang,asc`)       |
+| `name`    | String  | KhÃ´ng    | Lá»c theo tÃªn cá»­a hÃ ng (like)         |
+| `address` | String  | KhÃ´ng    | Lá»c theo Ä‘á»‹a chá»‰ (like)              |
+| `status`  | Integer | KhÃ´ng    | Lá»c theo tráº¡ng thÃ¡i (0: Ä‘Ã³ng, 1: má»Ÿ) |
+| `page`    | Integer | KhÃ´ng    | Sá»‘ trang (máº·c Ä‘á»‹nh: 0)               |
+| `size`    | Integer | KhÃ´ng    | KÃ­ch thÆ°á»›c trang (máº·c Ä‘á»‹nh: 20)      |
+| `sort`    | String  | KhÃ´ng    | Sáº¯p xáº¿p (vd: `tenCuaHang,asc`)       |
 
-**Ví dụ request:**
+**VÃ­ dá»¥ request:**
 
 ```
 GET /api/v1/cua-hang?name=Q1&status=1&page=0&size=10
 ```
 
-**Response:** `200 OK` — Trả về `ResultPaginationDTO`
+**Response:** `200 OK` â€” Tráº£ vá» `ResultPaginationDTO`
 
 ```json
 {
@@ -66,8 +66,8 @@ GET /api/v1/cua-hang?name=Q1&status=1&page=0&size=10
   "result": [
     {
       "id": 1,
-      "tenCuaHang": "Chi nhánh Quận 1",
-      "diaChi": "123 Nguyễn Trãi, Q.1, TP.HCM",
+      "tenCuaHang": "Chi nhÃ¡nh Quáº­n 1",
+      "diaChi": "123 Nguyá»…n TrÃ£i, Q.1, TP.HCM",
       "viTri": "10.7769,106.7009",
       "latitude": 10.7769,
       "longitude": 106.7009,
@@ -79,7 +79,7 @@ GET /api/v1/cua-hang?name=Q1&status=1&page=0&size=10
 }
 ```
 
-**Kiểu dữ liệu:**
+**Kiá»ƒu dá»¯ liá»‡u:**
 
 ```json
 {
@@ -105,26 +105,26 @@ GET /api/v1/cua-hang?name=Q1&status=1&page=0&size=10
 }
 ```
 
-> **Lưu ý:** Nếu không truyền bất kỳ tham số lọc nào → trả về tất cả cửa hàng (có phân trang).
+> **LÆ°u Ã½:** Náº¿u khÃ´ng truyá»n báº¥t ká»³ tham sá»‘ lá»c nÃ o â†’ tráº£ vá» táº¥t cáº£ cá»­a hÃ ng (cÃ³ phÃ¢n trang).
 
 ---
 
-## 2-5. CRUD tiêu chuẩn
+## 2-5. CRUD tiÃªu chuáº©n
 
-| Endpoint                       | Method   | Mô tả                |
+| Endpoint                       | Method   | MÃ´ táº£                |
 | ------------------------------ | -------- | -------------------- |
-| `GET /api/v1/cua-hang/{id}`    | `GET`    | Lấy cửa hàng theo ID |
-| `POST /api/v1/cua-hang`        | `POST`   | Tạo cửa hàng mới     |
-| `PUT /api/v1/cua-hang`         | `PUT`    | Cập nhật cửa hàng    |
-| `DELETE /api/v1/cua-hang/{id}` | `DELETE` | Xóa cửa hàng         |
+| `GET /api/v1/cua-hang/{id}`    | `GET`    | Láº¥y cá»­a hÃ ng theo ID |
+| `POST /api/v1/cua-hang`        | `POST`   | Táº¡o cá»­a hÃ ng má»›i     |
+| `PUT /api/v1/cua-hang`         | `PUT`    | Cáº­p nháº­t cá»­a hÃ ng    |
+| `DELETE /api/v1/cua-hang/{id}` | `DELETE` | XÃ³a cá»­a hÃ ng         |
 
 **Request Body (POST/PUT):**
 
 ```json
 {
   "id": 1,
-  "tenCuaHang": "Chi nhánh Quận 1",
-  "diaChi": "123 Nguyễn Trãi, Q.1, TP.HCM",
+  "tenCuaHang": "Chi nhÃ¡nh Quáº­n 1",
+  "diaChi": "123 Nguyá»…n TrÃ£i, Q.1, TP.HCM",
   "viTri": "10.7769,106.7009",
   "soDienThoai": "028-1234-5678",
   "email": "q1@shop.vn",
@@ -132,7 +132,7 @@ GET /api/v1/cua-hang?name=Q1&status=1&page=0&size=10
 }
 ```
 
-**Kiểu dữ liệu:**
+**Kiá»ƒu dá»¯ liá»‡u:**
 
 ````json
 {
@@ -150,8 +150,8 @@ GET /api/v1/cua-hang?name=Q1&status=1&page=0&size=10
 ```json
 {
   "id": 1,
-  "tenCuaHang": "Shop Quận 1",
-  "diaChi": "123 Nguyễn Trãi, Q.1, TP.HCM",
+  "tenCuaHang": "Shop Quáº­n 1",
+  "diaChi": "123 Nguyá»…n TrÃ£i, Q.1, TP.HCM",
   "viTri": "10.7769,106.7009",
   "latitude": 10.7769,
   "longitude": 106.7009,
@@ -163,20 +163,22 @@ GET /api/v1/cua-hang?name=Q1&status=1&page=0&size=10
 
 ```
 
-**Lỗi:**
+**Lá»—i:**
 
-| HTTP Status | Mô tả                           |
+| HTTP Status | MÃ´ táº£                           |
 | ----------- | ------------------------------- |
-| `400`       | Không tìm thấy cửa hàng         |
-| `400`       | Mã cửa hàng không được để trống |
+| `400`       | KhÃ´ng tÃ¬m tháº¥y cá»­a hÃ ng         |
+| `400`       | MÃ£ cá»­a hÃ ng khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng |
 
 ---
 
-## Phân quyền
+## PhÃ¢n quyá»n
 
-| Vai trò    | GET | POST | PUT | DELETE |
+| Vai trÃ²    | GET | POST | PUT | DELETE |
 | ---------- | --- | ---- | --- | ------ |
-| ADMIN      | ✅  | ✅   | ✅  | ✅     |
-| NHAN_VIEN  | ✅  | ❌   | ❌  | ❌     |
-| KHACH_HANG | ✅  | ❌   | ❌  | ❌     |
+| ADMIN      | âœ…  | âœ…   | âœ…  | âœ…     |
+| NHAN_VIEN  | âœ…  | âŒ   | âŒ  | âŒ     |
+| KHACH_HANG | âœ…  | âŒ   | âŒ  | âŒ     |
 ```
+
+

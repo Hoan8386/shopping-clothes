@@ -1,31 +1,31 @@
-# Thương Hiệu Controller
+﻿# ThÆ°Æ¡ng Hiá»‡u Controller
 
 > **Base Path:** `/api/v1/thuong-hieu`  
 > **File:** `ThuongHieuController.java`  
-> Quản lý thương hiệu sản phẩm (ví dụ: Nike, Adidas, Uniqlo, ...).
+> Quáº£n lÃ½ thÆ°Æ¡ng hiá»‡u sáº£n pháº©m (vÃ­ dá»¥: Nike, Adidas, Uniqlo, ...).
 
 ---
 
-## Cấu trúc dữ liệu `ThuongHieu`
+## Cáº¥u trÃºc dá»¯ liá»‡u `ThuongHieu`
 
-| Trường              | Kiểu          | Mô tả                               |
+| TrÆ°á»ng              | Kiá»ƒu          | MÃ´ táº£                               |
 | ------------------- | ------------- | ----------------------------------- |
-| `id`                | Long          | Mã thương hiệu (auto-increment)     |
-| `tenThuongHieu`     | String(255)   | Tên thương hiệu                     |
-| `trangThaiHoatDong` | Integer       | TT hoạt động (0: ngừng, 1: đang HĐ) |
-| `trangThaiHienThi`  | Integer       | TT hiển thị (0: ẩn, 1: hiển thị)    |
-| `ngayTao`           | LocalDateTime | Ngày tạo (tự động)                  |
-| `ngayCapNhat`       | LocalDateTime | Ngày cập nhật (tự động)             |
+| `id`                | Long          | MÃ£ thÆ°Æ¡ng hiá»‡u (auto-increment)     |
+| `tenThuongHieu`     | String(255)   | TÃªn thÆ°Æ¡ng hiá»‡u                     |
+| `trangThaiHoatDong` | Integer       | TT hoáº¡t Ä‘á»™ng (0: ngá»«ng, 1: Ä‘ang HÄ) |
+| `trangThaiHienThi`  | Integer       | TT hiá»ƒn thá»‹ (0: áº©n, 1: hiá»ƒn thá»‹)    |
+| `ngayTao`           | LocalDateTime | NgÃ y táº¡o (tá»± Ä‘á»™ng)                  |
+| `ngayCapNhat`       | LocalDateTime | NgÃ y cáº­p nháº­t (tá»± Ä‘á»™ng)             |
 
 ---
 
-## 1. Lấy danh sách thương hiệu
+## 1. Láº¥y danh sÃ¡ch thÆ°Æ¡ng hiá»‡u
 
-| Thuộc tính   | Chi tiết                  |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t                  |
 | ------------ | ------------------------- |
 | **URL**      | `GET /api/v1/thuong-hieu` |
 | **Method**   | `GET`                     |
-| **Xác thực** | Bearer Token (JWT)        |
+| **XÃ¡c thá»±c** | Bearer Token (JWT)        |
 
 **Response:** `200 OK`
 
@@ -46,7 +46,7 @@
 ]
 ```
 
-**Kiểu dữ liệu:**
+**Kiá»ƒu dá»¯ liá»‡u:**
 
 ```json
 {
@@ -59,14 +59,14 @@
 
 ---
 
-## 2-5. CRUD tiêu chuẩn
+## 2-5. CRUD tiÃªu chuáº©n
 
-| Endpoint                          | Method   | Mô tả                   |
+| Endpoint                          | Method   | MÃ´ táº£                   |
 | --------------------------------- | -------- | ----------------------- |
-| `GET /api/v1/thuong-hieu/{id}`    | `GET`    | Lấy thương hiệu theo ID |
-| `POST /api/v1/thuong-hieu`        | `POST`   | Tạo thương hiệu mới     |
-| `PUT /api/v1/thuong-hieu`         | `PUT`    | Cập nhật thương hiệu    |
-| `DELETE /api/v1/thuong-hieu/{id}` | `DELETE` | Xóa thương hiệu         |
+| `GET /api/v1/thuong-hieu/{id}`    | `GET`    | Láº¥y thÆ°Æ¡ng hiá»‡u theo ID |
+| `POST /api/v1/thuong-hieu`        | `POST`   | Táº¡o thÆ°Æ¡ng hiá»‡u má»›i     |
+| `PUT /api/v1/thuong-hieu`         | `PUT`    | Cáº­p nháº­t thÆ°Æ¡ng hiá»‡u    |
+| `DELETE /api/v1/thuong-hieu/{id}` | `DELETE` | XÃ³a thÆ°Æ¡ng hiá»‡u         |
 
 **Request Body (POST/PUT):**
 
@@ -79,7 +79,7 @@
 }
 ```
 
-**Kiểu dữ liệu:**
+**Kiá»ƒu dá»¯ liá»‡u:**
 
 ```json
 {
@@ -90,19 +90,21 @@
 }
 ```
 
-**Lỗi:**
+**Lá»—i:**
 
-| HTTP Status | Mô tả                              |
+| HTTP Status | MÃ´ táº£                              |
 | ----------- | ---------------------------------- |
-| `400`       | Không tìm thấy thương hiệu         |
-| `400`       | Mã thương hiệu không được để trống |
+| `400`       | KhÃ´ng tÃ¬m tháº¥y thÆ°Æ¡ng hiá»‡u         |
+| `400`       | MÃ£ thÆ°Æ¡ng hiá»‡u khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng |
 
 ---
 
-## Phân quyền
+## PhÃ¢n quyá»n
 
-| Vai trò    | GET | POST | PUT | DELETE |
+| Vai trÃ²    | GET | POST | PUT | DELETE |
 | ---------- | --- | ---- | --- | ------ |
-| ADMIN      | ✅  | ✅   | ✅  | ✅     |
-| NHAN_VIEN  | ✅  | ❌   | ❌  | ❌     |
-| KHACH_HANG | ✅  | ❌   | ❌  | ❌     |
+| ADMIN      | âœ…  | âœ…   | âœ…  | âœ…     |
+| NHAN_VIEN  | âœ…  | âŒ   | âŒ  | âŒ     |
+| KHACH_HANG | âœ…  | âŒ   | âŒ  | âŒ     |
+
+

@@ -30,7 +30,7 @@ public class ChiTietSanPhamService {
 
     private final ChiTietSanPhamRepository chiTietSanPhamRepository;
     private final EntityManager entityManager;
-    private final MinioStorageService minioStorageService;
+    private final StorageService storageService;
     private final HinhAnhService hinhAnhService;
     private final CuaHangService cuaHangService;
     private final CuaHangRepository cuaHangRepository;
@@ -40,7 +40,7 @@ public class ChiTietSanPhamService {
 
     public ChiTietSanPhamService(ChiTietSanPhamRepository chiTietSanPhamRepository,
             EntityManager entityManager,
-            MinioStorageService minioStorageService,
+            StorageService storageService,
             HinhAnhService hinhAnhService,
             CuaHangService cuaHangService,
             CuaHangRepository cuaHangRepository,
@@ -49,7 +49,7 @@ public class ChiTietSanPhamService {
             KichThuocRepository kichThuocRepository) {
         this.chiTietSanPhamRepository = chiTietSanPhamRepository;
         this.entityManager = entityManager;
-        this.minioStorageService = minioStorageService;
+        this.storageService = storageService;
         this.hinhAnhService = hinhAnhService;
         this.cuaHangService = cuaHangService;
         this.cuaHangRepository = cuaHangRepository;
@@ -67,7 +67,7 @@ public class ChiTietSanPhamService {
     }
 
     /**
-     * Tạo chi tiết sản phẩm cho TẤT CẢ cửa hàng + upload nhiều ảnh lên MinIO
+     * Tạo chi tiết sản phẩm cho TẤT CẢ cửa hàng + upload nhiều ảnh lên Cloudinary
      * Mỗi cửa hàng sẽ có 1 bản ghi ChiTietSanPham riêng với cùng thông tin sản phẩm
      */
     @Transactional
@@ -96,7 +96,7 @@ public class ChiTietSanPhamService {
         // Upload ảnh một lần, dùng chung URL cho tất cả cửa hàng
         List<String> imageUrls = new ArrayList<>();
         if (files != null && !files.isEmpty()) {
-            imageUrls = minioStorageService.uploadMultipleFiles(files);
+            imageUrls = storageService.uploadMultipleFiles(files);
         }
 
         List<CuaHang> cuaHangs = cuaHangRepository.findAll();
@@ -169,9 +169,9 @@ public class ChiTietSanPhamService {
 
         ChiTietSanPham updated = this.update(ct);
 
-        // Upload ảnh mới lên MinIO và lưu vào bảng HinhAnh
+        // Upload ảnh mới lên Cloudinary và lưu vào bảng HinhAnh
         if (files != null && !files.isEmpty()) {
-            List<String> imageUrls = minioStorageService.uploadMultipleFiles(files);
+            List<String> imageUrls = storageService.uploadMultipleFiles(files);
             for (String url : imageUrls) {
                 HinhAnh hinhAnh = new HinhAnh();
                 hinhAnh.setChiTietSanPham(updated);

@@ -1,49 +1,49 @@
-# Khuyến Mãi Theo Hóa Đơn Controller
+﻿# Khuyáº¿n MÃ£i Theo HÃ³a ÄÆ¡n Controller
 
 > **Base Path:** `/api/v1/khuyen-mai-theo-hoa-don`  
 > **File:** `KhuyenMaiTheoHoaDonController.java`  
-> Quản lý chương trình khuyến mãi áp dụng cho hóa đơn (giảm giá theo tổng giá trị đơn hàng).
+> Quáº£n lÃ½ chÆ°Æ¡ng trÃ¬nh khuyáº¿n mÃ£i Ã¡p dá»¥ng cho hÃ³a Ä‘Æ¡n (giáº£m giÃ¡ theo tá»•ng giÃ¡ trá»‹ Ä‘Æ¡n hÃ ng).
 
 ---
 
-## Tổng quan
+## Tá»•ng quan
 
-Khuyến mãi theo hóa đơn cho phép giảm giá trực tiếp trên tổng giá trị đơn hàng. Mỗi chương trình khuyến mãi có thời gian hiệu lực, số lượng sử dụng giới hạn, và các điều kiện áp dụng (hóa đơn tối đa, giảm tối đa).
+Khuyáº¿n mÃ£i theo hÃ³a Ä‘Æ¡n cho phÃ©p giáº£m giÃ¡ trá»±c tiáº¿p trÃªn tá»•ng giÃ¡ trá»‹ Ä‘Æ¡n hÃ ng. Má»—i chÆ°Æ¡ng trÃ¬nh khuyáº¿n mÃ£i cÃ³ thá»i gian hiá»‡u lá»±c, sá»‘ lÆ°á»£ng sá»­ dá»¥ng giá»›i háº¡n, vÃ  cÃ¡c Ä‘iá»u kiá»‡n Ã¡p dá»¥ng (hÃ³a Ä‘Æ¡n tá»‘i Ä‘a, giáº£m tá»‘i Ä‘a).
 
-### Cấu trúc dữ liệu `KhuyenMaiTheoHoaDon`
+### Cáº¥u trÃºc dá»¯ liá»‡u `KhuyenMaiTheoHoaDon`
 
-| Trường            | Kiểu          | Mô tả                                          |
+| TrÆ°á»ng            | Kiá»ƒu          | MÃ´ táº£                                          |
 | ----------------- | ------------- | ---------------------------------------------- |
-| `id`              | Long          | Mã khuyến mãi (auto-increment)                 |
-| `tenKhuyenMai`    | String(255)   | Tên chương trình khuyến mãi                    |
-| `giamToiDa`       | Integer       | Số tiền giảm tối đa (VND)                      |
-| `hoaDonToiDa`     | Integer       | Giá trị hóa đơn tối thiểu để áp dụng (VND)     |
-| `phanTramGiam`    | Double        | Phần trăm giảm giá (%)                         |
-| `hinhThuc`        | Integer       | Hình thức áp dụng (0: tất cả, 1: có điều kiện) |
-| `thoiGianBatDau`  | LocalDateTime | Thời gian bắt đầu hiệu lực                     |
-| `thoiGianKetThuc` | LocalDateTime | Thời gian kết thúc hiệu lực                    |
-| `soLuong`         | Integer       | Số lượng mã khuyến mãi còn lại                 |
-| `trangThai`       | Integer       | Trạng thái (0: ngừng, 1: hoạt động)            |
-| `ngayTao`         | LocalDateTime | Ngày tạo (tự động)                             |
-| `ngayCapNhat`     | LocalDateTime | Ngày cập nhật (tự động)                        |
+| `id`              | Long          | MÃ£ khuyáº¿n mÃ£i (auto-increment)                 |
+| `tenKhuyenMai`    | String(255)   | TÃªn chÆ°Æ¡ng trÃ¬nh khuyáº¿n mÃ£i                    |
+| `giamToiDa`       | Integer       | Sá»‘ tiá»n giáº£m tá»‘i Ä‘a (VND)                      |
+| `hoaDonToiDa`     | Integer       | GiÃ¡ trá»‹ hÃ³a Ä‘Æ¡n tá»‘i thiá»ƒu Ä‘á»ƒ Ã¡p dá»¥ng (VND)     |
+| `phanTramGiam`    | Double        | Pháº§n trÄƒm giáº£m giÃ¡ (%)                         |
+| `hinhThuc`        | Integer       | HÃ¬nh thá»©c Ã¡p dá»¥ng (0: táº¥t cáº£, 1: cÃ³ Ä‘iá»u kiá»‡n) |
+| `thoiGianBatDau`  | LocalDateTime | Thá»i gian báº¯t Ä‘áº§u hiá»‡u lá»±c                     |
+| `thoiGianKetThuc` | LocalDateTime | Thá»i gian káº¿t thÃºc hiá»‡u lá»±c                    |
+| `soLuong`         | Integer       | Sá»‘ lÆ°á»£ng mÃ£ khuyáº¿n mÃ£i cÃ²n láº¡i                 |
+| `trangThai`       | Integer       | Tráº¡ng thÃ¡i (0: ngá»«ng, 1: hoáº¡t Ä‘á»™ng)            |
+| `ngayTao`         | LocalDateTime | NgÃ y táº¡o (tá»± Ä‘á»™ng)                             |
+| `ngayCapNhat`     | LocalDateTime | NgÃ y cáº­p nháº­t (tá»± Ä‘á»™ng)                        |
 
 ---
 
-## 1. Lấy danh sách khuyến mãi theo hóa đơn
+## 1. Láº¥y danh sÃ¡ch khuyáº¿n mÃ£i theo hÃ³a Ä‘Æ¡n
 
-| Thuộc tính   | Chi tiết                                 |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t                                 |
 | ------------ | ---------------------------------------- |
 | **URL**      | `GET /api/v1/khuyen-mai-theo-hoa-don`    |
 | **Method**   | `GET`                                    |
-| **Xác thực** | Bearer Token (JWT) — Tất cả đã đăng nhập |
+| **XÃ¡c thá»±c** | Bearer Token (JWT) â€” Táº¥t cáº£ Ä‘Ã£ Ä‘Äƒng nháº­p |
 
-**Response:** `200 OK` — Trả về `List<KhuyenMaiTheoHoaDon>`
+**Response:** `200 OK` â€” Tráº£ vá» `List<KhuyenMaiTheoHoaDon>`
 
 ```json
 [
   {
     "id": 1,
-    "tenKhuyenMai": "Giảm 10% đơn từ 500K",
+    "tenKhuyenMai": "Giáº£m 10% Ä‘Æ¡n tá»« 500K",
     "giamToiDa": 100000,
     "hoaDonToiDa": 500000,
     "phanTramGiam": 10.0,
@@ -58,7 +58,7 @@ Khuyến mãi theo hóa đơn cho phép giảm giá trực tiếp trên tổng g
 ]
 ```
 
-**Kiểu dữ liệu:**
+**Kiá»ƒu dá»¯ liá»‡u:**
 
 ```json
 {
@@ -79,26 +79,26 @@ Khuyến mãi theo hóa đơn cho phép giảm giá trực tiếp trên tổng g
 
 ---
 
-## 2. Lấy khuyến mãi theo hóa đơn theo ID
+## 2. Láº¥y khuyáº¿n mÃ£i theo hÃ³a Ä‘Æ¡n theo ID
 
-| Thuộc tính   | Chi tiết                                   |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t                                   |
 | ------------ | ------------------------------------------ |
 | **URL**      | `GET /api/v1/khuyen-mai-theo-hoa-don/{id}` |
 | **Method**   | `GET`                                      |
-| **Xác thực** | Bearer Token (JWT) — Tất cả đã đăng nhập   |
+| **XÃ¡c thá»±c** | Bearer Token (JWT) â€” Táº¥t cáº£ Ä‘Ã£ Ä‘Äƒng nháº­p   |
 
 **Path Parameters:**
 
-| Tham số | Kiểu | Mô tả                 |
+| Tham sá»‘ | Kiá»ƒu | MÃ´ táº£                 |
 | ------- | ---- | --------------------- |
-| `id`    | Long | Mã khuyến mãi hóa đơn |
+| `id`    | Long | MÃ£ khuyáº¿n mÃ£i hÃ³a Ä‘Æ¡n |
 
-**Response:** `200 OK` — Trả về `KhuyenMaiTheoHoaDon`
+**Response:** `200 OK` â€” Tráº£ vá» `KhuyenMaiTheoHoaDon`
 
 ```json
 {
   "id": 1,
-  "tenKhuyenMai": "Giảm 10% đơn từ 500K",
+  "tenKhuyenMai": "Giáº£m 10% Ä‘Æ¡n tá»« 500K",
   "giamToiDa": 100000,
   "hoaDonToiDa": 500000,
   "phanTramGiam": 10.0,
@@ -112,7 +112,7 @@ Khuyến mãi theo hóa đơn cho phép giảm giá trực tiếp trên tổng g
 }
 ```
 
-**Kiểu dữ liệu:**
+**Kiá»ƒu dá»¯ liá»‡u:**
 
 ```json
 {
@@ -131,28 +131,28 @@ Khuyến mãi theo hóa đơn cho phép giảm giá trực tiếp trên tổng g
 }
 ```
 
-**Lỗi:**
+**Lá»—i:**
 
-| HTTP Status | Mô tả                                  |
+| HTTP Status | MÃ´ táº£                                  |
 | ----------- | -------------------------------------- |
-| `400`       | Không tìm thấy khuyến mãi theo hóa đơn |
+| `400`       | KhÃ´ng tÃ¬m tháº¥y khuyáº¿n mÃ£i theo hÃ³a Ä‘Æ¡n |
 
 ---
 
-## 3. Tạo khuyến mãi theo hóa đơn
+## 3. Táº¡o khuyáº¿n mÃ£i theo hÃ³a Ä‘Æ¡n
 
-| Thuộc tính       | Chi tiết                                 |
+| Thuá»™c tÃ­nh       | Chi tiáº¿t                                 |
 | ---------------- | ---------------------------------------- |
 | **URL**          | `POST /api/v1/khuyen-mai-theo-hoa-don`   |
 | **Method**       | `POST`                                   |
 | **Content-Type** | `application/json`                       |
-| **Xác thực**     | Bearer Token (JWT) — Yêu cầu quyền ADMIN |
+| **XÃ¡c thá»±c**     | Bearer Token (JWT) â€” YÃªu cáº§u quyá»n ADMIN |
 
 **Request Body:**
 
 ```json
 {
-  "tenKhuyenMai": "Giảm 10% đơn từ 300K",
+  "tenKhuyenMai": "Giáº£m 10% Ä‘Æ¡n tá»« 300K",
   "giamToiDa": 50000,
   "hoaDonToiDa": 300000,
   "phanTramGiam": 10.0,
@@ -164,7 +164,7 @@ Khuyến mãi theo hóa đơn cho phép giảm giá trực tiếp trên tổng g
 }
 ```
 
-**Kiểu dữ liệu:**
+**Kiá»ƒu dá»¯ liá»‡u:**
 
 ```json
 {
@@ -180,27 +180,27 @@ Khuyến mãi theo hóa đơn cho phép giảm giá trực tiếp trên tổng g
 }
 ```
 
-**Response:** `201 Created` — Trả về `KhuyenMaiTheoHoaDon`
+**Response:** `201 Created` â€” Tráº£ vá» `KhuyenMaiTheoHoaDon`
 
-> **Lưu ý:** Trường `ngayTao` được tự động gán khi tạo mới.
+> **LÆ°u Ã½:** TrÆ°á»ng `ngayTao` Ä‘Æ°á»£c tá»± Ä‘á»™ng gÃ¡n khi táº¡o má»›i.
 
 ---
 
-## 4. Cập nhật khuyến mãi theo hóa đơn
+## 4. Cáº­p nháº­t khuyáº¿n mÃ£i theo hÃ³a Ä‘Æ¡n
 
-| Thuộc tính       | Chi tiết                                 |
+| Thuá»™c tÃ­nh       | Chi tiáº¿t                                 |
 | ---------------- | ---------------------------------------- |
 | **URL**          | `PUT /api/v1/khuyen-mai-theo-hoa-don`    |
 | **Method**       | `PUT`                                    |
 | **Content-Type** | `application/json`                       |
-| **Xác thực**     | Bearer Token (JWT) — Yêu cầu quyền ADMIN |
+| **XÃ¡c thá»±c**     | Bearer Token (JWT) â€” YÃªu cáº§u quyá»n ADMIN |
 
-**Request Body:** (phải có `id`)
+**Request Body:** (pháº£i cÃ³ `id`)
 
 ```json
 {
   "id": 1,
-  "tenKhuyenMai": "Giảm 15% đơn từ 500K (cập nhật)",
+  "tenKhuyenMai": "Giáº£m 15% Ä‘Æ¡n tá»« 500K (cáº­p nháº­t)",
   "giamToiDa": 150000,
   "hoaDonToiDa": 500000,
   "phanTramGiam": 15.0,
@@ -212,7 +212,7 @@ Khuyến mãi theo hóa đơn cho phép giảm giá trực tiếp trên tổng g
 }
 ```
 
-**Kiểu dữ liệu:**
+**Kiá»ƒu dá»¯ liá»‡u:**
 
 ```json
 {
@@ -229,47 +229,49 @@ Khuyến mãi theo hóa đơn cho phép giảm giá trực tiếp trên tổng g
 }
 ```
 
-**Response:** `200 OK` — Trả về `KhuyenMaiTheoHoaDon`
+**Response:** `200 OK` â€” Tráº£ vá» `KhuyenMaiTheoHoaDon`
 
-**Lỗi:**
+**Lá»—i:**
 
-| HTTP Status | Mô tả                                          |
+| HTTP Status | MÃ´ táº£                                          |
 | ----------- | ---------------------------------------------- |
-| `400`       | Mã khuyến mãi theo hóa đơn không được để trống |
-| `500`       | Không tìm thấy khuyến mãi để cập nhật          |
+| `400`       | MÃ£ khuyáº¿n mÃ£i theo hÃ³a Ä‘Æ¡n khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng |
+| `500`       | KhÃ´ng tÃ¬m tháº¥y khuyáº¿n mÃ£i Ä‘á»ƒ cáº­p nháº­t          |
 
-> **Lưu ý:** Trường `ngayCapNhat` được tự động cập nhật.
+> **LÆ°u Ã½:** TrÆ°á»ng `ngayCapNhat` Ä‘Æ°á»£c tá»± Ä‘á»™ng cáº­p nháº­t.
 
 ---
 
-## 5. Xóa khuyến mãi theo hóa đơn
+## 5. XÃ³a khuyáº¿n mÃ£i theo hÃ³a Ä‘Æ¡n
 
-| Thuộc tính   | Chi tiết                                      |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t                                      |
 | ------------ | --------------------------------------------- |
 | **URL**      | `DELETE /api/v1/khuyen-mai-theo-hoa-don/{id}` |
 | **Method**   | `DELETE`                                      |
-| **Xác thực** | Bearer Token (JWT) — Yêu cầu quyền ADMIN      |
+| **XÃ¡c thá»±c** | Bearer Token (JWT) â€” YÃªu cáº§u quyá»n ADMIN      |
 
 **Path Parameters:**
 
-| Tham số | Kiểu | Mô tả                 |
+| Tham sá»‘ | Kiá»ƒu | MÃ´ táº£                 |
 | ------- | ---- | --------------------- |
-| `id`    | Long | Mã khuyến mãi cần xóa |
+| `id`    | Long | MÃ£ khuyáº¿n mÃ£i cáº§n xÃ³a |
 
 **Response:** `204 No Content`
 
-**Lỗi:**
+**Lá»—i:**
 
-| HTTP Status | Mô tả                                  |
+| HTTP Status | MÃ´ táº£                                  |
 | ----------- | -------------------------------------- |
-| `400`       | Không tìm thấy khuyến mãi theo hóa đơn |
+| `400`       | KhÃ´ng tÃ¬m tháº¥y khuyáº¿n mÃ£i theo hÃ³a Ä‘Æ¡n |
 
 ---
 
-## Phân quyền
+## PhÃ¢n quyá»n
 
-| Vai trò    | GET (Xem) | POST (Tạo) | PUT (Sửa) | DELETE (Xóa) |
+| Vai trÃ²    | GET (Xem) | POST (Táº¡o) | PUT (Sá»­a) | DELETE (XÃ³a) |
 | ---------- | --------- | ---------- | --------- | ------------ |
-| ADMIN      | ✅        | ✅         | ✅        | ✅           |
-| NHAN_VIEN  | ✅        | ❌         | ❌        | ❌           |
-| KHACH_HANG | ✅        | ❌         | ❌        | ❌           |
+| ADMIN      | âœ…        | âœ…         | âœ…        | âœ…           |
+| NHAN_VIEN  | âœ…        | âŒ         | âŒ        | âŒ           |
+| KHACH_HANG | âœ…        | âŒ         | âŒ        | âŒ           |
+
+

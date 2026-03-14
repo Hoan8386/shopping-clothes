@@ -1,35 +1,35 @@
-# Auth Controller
+﻿# Auth Controller
 
 > **Base Path:** `/api/v1/auth`  
 > **File:** `AuthController.java`  
-> Quản lý xác thực người dùng: đăng nhập, đăng ký, refresh token, đăng xuất, xem thông tin tài khoản.
+> Quáº£n lÃ½ xÃ¡c thá»±c ngÆ°á»i dÃ¹ng: Ä‘Äƒng nháº­p, Ä‘Äƒng kÃ½, refresh token, Ä‘Äƒng xuáº¥t, xem thÃ´ng tin tÃ i khoáº£n.
 
 ---
 
-## Tổng quan
+## Tá»•ng quan
 
-Hệ thống sử dụng **JWT (JSON Web Token)** để xác thực. Hỗ trợ 2 loại người dùng:
+Há»‡ thá»‘ng sá»­ dá»¥ng **JWT (JSON Web Token)** Ä‘á»ƒ xÃ¡c thá»±c. Há»— trá»£ 2 loáº¡i ngÆ°á»i dÃ¹ng:
 
-- **NhanVien (Nhân viên):** Được kiểm tra trước khi đăng nhập.
-- **KhachHang (Khách hàng):** Được kiểm tra nếu không phải nhân viên.
+- **NhanVien (NhÃ¢n viÃªn):** ÄÆ°á»£c kiá»ƒm tra trÆ°á»›c khi Ä‘Äƒng nháº­p.
+- **KhachHang (KhÃ¡ch hÃ ng):** ÄÆ°á»£c kiá»ƒm tra náº¿u khÃ´ng pháº£i nhÃ¢n viÃªn.
 
-### Luồng xác thực
+### Luá»“ng xÃ¡c thá»±c
 
-1. Gọi `POST /api/v1/auth/login` → Nhận `access_token` + cookie `refresh_token`
-2. Đính kèm token vào header: `Authorization: Bearer <access_token>`
-3. Khi `access_token` hết hạn → Gọi `GET /api/v1/auth/refresh` (dùng cookie `refresh_token`)
-4. Đăng xuất → Gọi `POST /api/v1/auth/logout` → Xóa `refresh_token`
+1. Gá»i `POST /api/v1/auth/login` â†’ Nháº­n `access_token` + cookie `refresh_token`
+2. ÄÃ­nh kÃ¨m token vÃ o header: `Authorization: Bearer <access_token>`
+3. Khi `access_token` háº¿t háº¡n â†’ Gá»i `GET /api/v1/auth/refresh` (dÃ¹ng cookie `refresh_token`)
+4. ÄÄƒng xuáº¥t â†’ Gá»i `POST /api/v1/auth/logout` â†’ XÃ³a `refresh_token`
 
 ---
 
-## 1. Đăng nhập
+## 1. ÄÄƒng nháº­p
 
-| Thuộc tính       | Chi tiết                  |
+| Thuá»™c tÃ­nh       | Chi tiáº¿t                  |
 | ---------------- | ------------------------- |
 | **URL**          | `POST /api/v1/auth/login` |
 | **Method**       | `POST`                    |
 | **Content-Type** | `application/json`        |
-| **Xác thực**     | Không yêu cầu (🔓 Public) |
+| **XÃ¡c thá»±c**     | KhÃ´ng yÃªu cáº§u (ðŸ”“ Public) |
 
 **Request Body:**
 
@@ -40,7 +40,7 @@ Hệ thống sử dụng **JWT (JSON Web Token)** để xác thực. Hỗ trợ 
 }
 ```
 
-**Kiểu dữ liệu:**
+**Kiá»ƒu dá»¯ liá»‡u:**
 
 ```json
 {
@@ -49,10 +49,10 @@ Hệ thống sử dụng **JWT (JSON Web Token)** để xác thực. Hỗ trợ 
 }
 ```
 
-| Trường     | Kiểu   | Bắt buộc | Mô tả                 |
+| TrÆ°á»ng     | Kiá»ƒu   | Báº¯t buá»™c | MÃ´ táº£                 |
 | ---------- | ------ | -------- | --------------------- |
-| `username` | String | **Có**   | Email đăng nhập       |
-| `password` | String | **Có**   | Mật khẩu (plain text) |
+| `username` | String | **CÃ³**   | Email Ä‘Äƒng nháº­p       |
+| `password` | String | **CÃ³**   | Máº­t kháº©u (plain text) |
 
 **Response:** `200 OK`
 
@@ -66,7 +66,7 @@ Hệ thống sử dụng **JWT (JSON Web Token)** để xác thực. Hỗ trợ 
     "role": {
       "id": 4,
       "name": "KHACH_HANG",
-      "description": "Khách hàng mua sắm",
+      "description": "KhÃ¡ch hÃ ng mua sáº¯m",
       "active": 1
     },
     "diemTichLuy": 10
@@ -74,7 +74,7 @@ Hệ thống sử dụng **JWT (JSON Web Token)** để xác thực. Hỗ trợ 
 }
 ```
 
-**Kiểu dữ liệu:**
+**Kiá»ƒu dá»¯ liá»‡u:**
 
 ```json
 {
@@ -95,30 +95,30 @@ Hệ thống sử dụng **JWT (JSON Web Token)** để xác thực. Hỗ trợ 
 }
 ```
 
-| Trường             | Kiểu    | Mô tả                                                 |
+| TrÆ°á»ng             | Kiá»ƒu    | MÃ´ táº£                                                 |
 | ------------------ | ------- | ----------------------------------------------------- |
-| `access_token`     | String  | JWT token để xác thực các request tiếp theo           |
-| `user.id`          | Long    | Mã người dùng                                         |
-| `user.email`       | String  | Email đăng nhập                                       |
-| `user.name`        | String  | Tên hiển thị                                          |
-| `user.role`        | Object  | Thông tin vai trò + quyền hạn                         |
-| `user.diemTichLuy` | Integer | Điểm tích lũy (chỉ có với KhachHang, NhanVien = null) |
+| `access_token`     | String  | JWT token Ä‘á»ƒ xÃ¡c thá»±c cÃ¡c request tiáº¿p theo           |
+| `user.id`          | Long    | MÃ£ ngÆ°á»i dÃ¹ng                                         |
+| `user.email`       | String  | Email Ä‘Äƒng nháº­p                                       |
+| `user.name`        | String  | TÃªn hiá»ƒn thá»‹                                          |
+| `user.role`        | Object  | ThÃ´ng tin vai trÃ² + quyá»n háº¡n                         |
+| `user.diemTichLuy` | Integer | Äiá»ƒm tÃ­ch lÅ©y (chá»‰ cÃ³ vá»›i KhachHang, NhanVien = null) |
 
-> **Lưu ý:**
+> **LÆ°u Ã½:**
 >
-> - Response trả kèm cookie `refresh_token` (httpOnly, secure, path=/).
-> - Hệ thống kiểm tra bảng NhanVien trước → nếu không tìm thấy → kiểm tra KhachHang.
-> - Trường `diemTichLuy` chỉ trả về giá trị khi đăng nhập bằng tài khoản khách hàng. Nhân viên sẽ nhận `null`.
+> - Response tráº£ kÃ¨m cookie `refresh_token` (httpOnly, secure, path=/).
+> - Há»‡ thá»‘ng kiá»ƒm tra báº£ng NhanVien trÆ°á»›c â†’ náº¿u khÃ´ng tÃ¬m tháº¥y â†’ kiá»ƒm tra KhachHang.
+> - TrÆ°á»ng `diemTichLuy` chá»‰ tráº£ vá» giÃ¡ trá»‹ khi Ä‘Äƒng nháº­p báº±ng tÃ i khoáº£n khÃ¡ch hÃ ng. NhÃ¢n viÃªn sáº½ nháº­n `null`.
 
 ---
 
-## 2. Lấy thông tin tài khoản hiện tại
+## 2. Láº¥y thÃ´ng tin tÃ i khoáº£n hiá»‡n táº¡i
 
-| Thuộc tính   | Chi tiết                   |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t                   |
 | ------------ | -------------------------- |
 | **URL**      | `GET /api/v1/auth/account` |
 | **Method**   | `GET`                      |
-| **Xác thực** | Bearer Token (JWT)         |
+| **XÃ¡c thá»±c** | Bearer Token (JWT)         |
 
 **Response:** `200 OK`
 
@@ -131,7 +131,7 @@ Hệ thống sử dụng **JWT (JSON Web Token)** để xác thực. Hỗ trợ 
     "role": {
       "id": 4,
       "name": "KHACH_HANG",
-      "description": "Khách hàng mua sắm",
+      "description": "KhÃ¡ch hÃ ng mua sáº¯m",
       "active": 1,
       "permissions": [...]
     },
@@ -140,7 +140,7 @@ Hệ thống sử dụng **JWT (JSON Web Token)** để xác thực. Hỗ trợ 
 }
 ```
 
-**Kiểu dữ liệu:**
+**Kiá»ƒu dá»¯ liá»‡u:**
 
 ```json
 {
@@ -160,23 +160,23 @@ Hệ thống sử dụng **JWT (JSON Web Token)** để xác thực. Hỗ trợ 
 }
 ```
 
-> **Lưu ý:** Trường `diemTichLuy` chỉ có giá trị với tài khoản KhachHang, NhanVien trả `null`.
+> **LÆ°u Ã½:** TrÆ°á»ng `diemTichLuy` chá»‰ cÃ³ giÃ¡ trá»‹ vá»›i tÃ i khoáº£n KhachHang, NhanVien tráº£ `null`.
 
 ---
 
 ## 3. Refresh Token
 
-| Thuộc tính   | Chi tiết                   |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t                   |
 | ------------ | -------------------------- |
 | **URL**      | `GET /api/v1/auth/refresh` |
 | **Method**   | `GET`                      |
-| **Xác thực** | Cookie `refresh_token`     |
+| **XÃ¡c thá»±c** | Cookie `refresh_token`     |
 
 **Response:** `200 OK`
 
 ```json
 {
-  "access_token": "eyJhbGciOiJSUzI1NiJ9... (token mới)",
+  "access_token": "eyJhbGciOiJSUzI1NiJ9... (token má»›i)",
   "user": {
     "id": 1,
     "email": "lan@g.com",
@@ -190,7 +190,7 @@ Hệ thống sử dụng **JWT (JSON Web Token)** để xác thực. Hỗ trợ 
 }
 ```
 
-**Kiểu dữ liệu:**
+**Kiá»ƒu dá»¯ liá»‡u:**
 
 ```json
 {
@@ -208,64 +208,64 @@ Hệ thống sử dụng **JWT (JSON Web Token)** để xác thực. Hỗ trợ 
 }
 ```
 
-> **Lưu ý:**
+> **LÆ°u Ã½:**
 >
-> - Sử dụng cookie `refresh_token` được set tự động khi đăng nhập.
-> - Trả về `access_token` mới + cookie `refresh_token` mới thay thế cũ.
-> - Cả NhanVien và KhachHang đều có thể refresh.
+> - Sá»­ dá»¥ng cookie `refresh_token` Ä‘Æ°á»£c set tá»± Ä‘á»™ng khi Ä‘Äƒng nháº­p.
+> - Tráº£ vá» `access_token` má»›i + cookie `refresh_token` má»›i thay tháº¿ cÅ©.
+> - Cáº£ NhanVien vÃ  KhachHang Ä‘á»u cÃ³ thá»ƒ refresh.
 
-**Lỗi:**
+**Lá»—i:**
 
-| HTTP Status | Mô tả                      |
+| HTTP Status | MÃ´ táº£                      |
 | ----------- | -------------------------- |
-| `400`       | Refresh Token không hợp lệ |
+| `400`       | Refresh Token khÃ´ng há»£p lá»‡ |
 
 ---
 
-## 4. Đăng xuất
+## 4. ÄÄƒng xuáº¥t
 
-| Thuộc tính   | Chi tiết                   |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t                   |
 | ------------ | -------------------------- |
 | **URL**      | `POST /api/v1/auth/logout` |
 | **Method**   | `POST`                     |
-| **Xác thực** | Bearer Token (JWT)         |
+| **XÃ¡c thá»±c** | Bearer Token (JWT)         |
 
-**Response:** `200 OK` — Body rỗng
+**Response:** `200 OK` â€” Body rá»—ng
 
-> **Lưu ý:**
+> **LÆ°u Ã½:**
 >
-> - Xóa `refreshToken` trong database (cho cả NhanVien và KhachHang).
-> - Xóa cookie `refresh_token` (set maxAge=0).
+> - XÃ³a `refreshToken` trong database (cho cáº£ NhanVien vÃ  KhachHang).
+> - XÃ³a cookie `refresh_token` (set maxAge=0).
 
-**Lỗi:**
+**Lá»—i:**
 
-| HTTP Status | Mô tả                     |
+| HTTP Status | MÃ´ táº£                     |
 | ----------- | ------------------------- |
-| `400`       | Access Token không hợp lệ |
+| `400`       | Access Token khÃ´ng há»£p lá»‡ |
 
 ---
 
-## 5. Đăng ký tài khoản khách hàng
+## 5. ÄÄƒng kÃ½ tÃ i khoáº£n khÃ¡ch hÃ ng
 
-| Thuộc tính       | Chi tiết                     |
+| Thuá»™c tÃ­nh       | Chi tiáº¿t                     |
 | ---------------- | ---------------------------- |
 | **URL**          | `POST /api/v1/auth/register` |
 | **Method**       | `POST`                       |
 | **Content-Type** | `application/json`           |
-| **Xác thực**     | Không yêu cầu (🔓 Public)    |
+| **XÃ¡c thá»±c**     | KhÃ´ng yÃªu cáº§u (ðŸ”“ Public)    |
 
 **Request Body:**
 
 ```json
 {
-  "tenKhachHang": "Nguyễn Test",
+  "tenKhachHang": "Nguyá»…n Test",
   "sdt": "0999999999",
   "email": "test@gmail.com",
   "password": "123456"
 }
 ```
 
-**Kiểu dữ liệu:**
+**Kiá»ƒu dá»¯ liá»‡u:**
 
 ```json
 {
@@ -276,25 +276,25 @@ Hệ thống sử dụng **JWT (JSON Web Token)** để xác thực. Hỗ trợ 
 }
 ```
 
-| Trường         | Kiểu   | Bắt buộc | Mô tả                     |
+| TrÆ°á»ng         | Kiá»ƒu   | Báº¯t buá»™c | MÃ´ táº£                     |
 | -------------- | ------ | -------- | ------------------------- |
-| `tenKhachHang` | String | **Có**   | Tên khách hàng            |
-| `sdt`          | String | **Có**   | Số điện thoại (unique)    |
-| `email`        | String | **Có**   | Email đăng nhập (unique)  |
-| `password`     | String | **Có**   | Mật khẩu (sẽ được mã hóa) |
+| `tenKhachHang` | String | **CÃ³**   | TÃªn khÃ¡ch hÃ ng            |
+| `sdt`          | String | **CÃ³**   | Sá»‘ Ä‘iá»‡n thoáº¡i (unique)    |
+| `email`        | String | **CÃ³**   | Email Ä‘Äƒng nháº­p (unique)  |
+| `password`     | String | **CÃ³**   | Máº­t kháº©u (sáº½ Ä‘Æ°á»£c mÃ£ hÃ³a) |
 
 **Response:** `201 Created`
 
 ```json
 {
   "id": 6,
-  "tenKhachHang": "Nguyễn Test",
+  "tenKhachHang": "Nguyá»…n Test",
   "email": "test@gmail.com",
   "sdt": "0999999999"
 }
 ```
 
-**Kiểu dữ liệu:**
+**Kiá»ƒu dá»¯ liá»‡u:**
 
 ```json
 {
@@ -305,28 +305,30 @@ Hệ thống sử dụng **JWT (JSON Web Token)** để xác thực. Hỗ trợ 
 }
 ```
 
-> **Lưu ý:**
+> **LÆ°u Ã½:**
 >
-> - Tài khoản khách hàng mới tự động được gán `role_id = 4` (KHACH_HANG).
-> - Password được mã hóa bằng BCrypt trước khi lưu.
-> - `diemTichLuy` mặc định = 0.
+> - TÃ i khoáº£n khÃ¡ch hÃ ng má»›i tá»± Ä‘á»™ng Ä‘Æ°á»£c gÃ¡n `role_id = 4` (KHACH_HANG).
+> - Password Ä‘Æ°á»£c mÃ£ hÃ³a báº±ng BCrypt trÆ°á»›c khi lÆ°u.
+> - `diemTichLuy` máº·c Ä‘á»‹nh = 0.
 
-**Lỗi:**
+**Lá»—i:**
 
-| HTTP Status | Mô tả                    |
+| HTTP Status | MÃ´ táº£                    |
 | ----------- | ------------------------ |
-| `400`       | Email đã tồn tại         |
-| `400`       | Số điện thoại đã tồn tại |
+| `400`       | Email Ä‘Ã£ tá»“n táº¡i         |
+| `400`       | Sá»‘ Ä‘iá»‡n thoáº¡i Ä‘Ã£ tá»“n táº¡i |
 
 ---
 
-## Tài khoản mẫu
+## TÃ i khoáº£n máº«u
 
-| Loại       | Email       | Password | Vai trò    | Mô tả                 |
+| Loáº¡i       | Email       | Password | Vai trÃ²    | MÃ´ táº£                 |
 | ---------- | ----------- | -------- | ---------- | --------------------- |
-| Nhân viên  | `h@s.com`   | `123456` | ADMIN      | NV Hùng - Admin       |
-| Nhân viên  | `an@s.com`  | `123456` | NHAN_VIEN  | NV An - Nhân viên     |
-| Nhân viên  | `b@s.com`   | `123456` | NHAN_VIEN  | NV Bình - NV bán hàng |
-| Khách hàng | `lan@g.com` | `123456` | KHACH_HANG | KH Lan (10 điểm)      |
-| Khách hàng | `m@g.com`   | `123456` | KHACH_HANG | KH Minh (0 điểm)      |
-| Khách hàng | `h@g.com`   | `123456` | KHACH_HANG | KH Hoa (100 điểm)     |
+| NhÃ¢n viÃªn  | `h@s.com`   | `123456` | ADMIN      | NV HÃ¹ng - Admin       |
+| NhÃ¢n viÃªn  | `an@s.com`  | `123456` | NHAN_VIEN  | NV An - NhÃ¢n viÃªn     |
+| NhÃ¢n viÃªn  | `b@s.com`   | `123456` | NHAN_VIEN  | NV BÃ¬nh - NV bÃ¡n hÃ ng |
+| KhÃ¡ch hÃ ng | `lan@g.com` | `123456` | KHACH_HANG | KH Lan (10 Ä‘iá»ƒm)      |
+| KhÃ¡ch hÃ ng | `m@g.com`   | `123456` | KHACH_HANG | KH Minh (0 Ä‘iá»ƒm)      |
+| KhÃ¡ch hÃ ng | `h@g.com`   | `123456` | KHACH_HANG | KH Hoa (100 Ä‘iá»ƒm)     |
+
+

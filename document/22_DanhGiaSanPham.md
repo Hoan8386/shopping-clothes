@@ -1,58 +1,58 @@
-# Đánh Giá Sản Phẩm Controller
+﻿# ÄÃ¡nh GiÃ¡ Sáº£n Pháº©m Controller
 
 > **Base Path:** `/api/v1/danh-gia-san-pham`  
 > **File:** `DanhGiaSanPhamController.java`  
-> Quản lý đánh giá sản phẩm — Khách hàng đánh giá từng sản phẩm trong đơn hàng sau khi đã nhận hàng, hỗ trợ upload ảnh lên MinIO.
+> Quáº£n lÃ½ Ä‘Ã¡nh giÃ¡ sáº£n pháº©m â€” KhÃ¡ch hÃ ng Ä‘Ã¡nh giÃ¡ tá»«ng sáº£n pháº©m trong Ä‘Æ¡n hÃ ng sau khi Ä‘Ã£ nháº­n hÃ ng, há»— trá»£ upload áº£nh lÃªn Cloudinary.
 
 ---
 
-## Tổng quan
+## Tá»•ng quan
 
-### Cấu trúc dữ liệu `DanhGiaSanPham`
+### Cáº¥u trÃºc dá»¯ liá»‡u `DanhGiaSanPham`
 
-| Trường           | Kiểu           | Mô tả                                                      |
+| TrÆ°á»ng           | Kiá»ƒu           | MÃ´ táº£                                                      |
 | ---------------- | -------------- | ---------------------------------------------------------- |
-| `id`             | Long           | Mã đánh giá (auto-increment)                               |
-| `khachHang`      | KhachHang      | Khách hàng đánh giá (FK)                                   |
-| `chiTietDonHang` | ChiTietDonHang | Chi tiết đơn hàng được đánh giá (FK) — 1 đánh giá / 1 dòng |
-| `soSao`          | Integer        | Số sao đánh giá (1–5)                                      |
-| `ghiTru`         | String(255)    | Nội dung đánh giá                                          |
-| `hinhAnh`        | String(255)    | URL ảnh đánh giá (upload lên MinIO)                        |
-| `ngayTao`        | LocalDateTime  | Ngày tạo (tự động)                                         |
-| `ngayCapNhat`    | LocalDateTime  | Ngày cập nhật (tự động)                                    |
-| `json`           | String(TEXT)   | Dữ liệu mở rộng (tuỳ chọn)                                 |
+| `id`             | Long           | MÃ£ Ä‘Ã¡nh giÃ¡ (auto-increment)                               |
+| `khachHang`      | KhachHang      | KhÃ¡ch hÃ ng Ä‘Ã¡nh giÃ¡ (FK)                                   |
+| `chiTietDonHang` | ChiTietDonHang | Chi tiáº¿t Ä‘Æ¡n hÃ ng Ä‘Æ°á»£c Ä‘Ã¡nh giÃ¡ (FK) â€” 1 Ä‘Ã¡nh giÃ¡ / 1 dÃ²ng |
+| `soSao`          | Integer        | Sá»‘ sao Ä‘Ã¡nh giÃ¡ (1â€“5)                                      |
+| `ghiTru`         | String(255)    | Ná»™i dung Ä‘Ã¡nh giÃ¡                                          |
+| `hinhAnh`        | String(255)    | URL áº£nh Ä‘Ã¡nh giÃ¡ (upload lÃªn Cloudinary)                        |
+| `ngayTao`        | LocalDateTime  | NgÃ y táº¡o (tá»± Ä‘á»™ng)                                         |
+| `ngayCapNhat`    | LocalDateTime  | NgÃ y cáº­p nháº­t (tá»± Ä‘á»™ng)                                    |
+| `json`           | String(TEXT)   | Dá»¯ liá»‡u má»Ÿ rá»™ng (tuá»³ chá»n)                                 |
 
-### Điều kiện đánh giá
+### Äiá»u kiá»‡n Ä‘Ã¡nh giÃ¡
 
-| Điều kiện                                                | Mô tả                                                       |
+| Äiá»u kiá»‡n                                                | MÃ´ táº£                                                       |
 | -------------------------------------------------------- | ----------------------------------------------------------- |
-| ✅ Đã đăng nhập bằng tài khoản **khách hàng**            | Lấy thông tin KH từ JWT token                               |
-| ✅ `ChiTietDonHang` thuộc **đơn hàng của khách hàng đó** | KH chỉ đánh giá được đơn hàng của mình                      |
-| ✅ Đơn hàng **trạng thái = 5** (Đã nhận hàng)            | Phải nhận hàng xong mới được đánh giá                       |
-| ✅ Chưa đánh giá `ChiTietDonHang` này                    | Mỗi dòng sản phẩm trong đơn chỉ đánh giá **1 lần duy nhất** |
+| âœ… ÄÃ£ Ä‘Äƒng nháº­p báº±ng tÃ i khoáº£n **khÃ¡ch hÃ ng**            | Láº¥y thÃ´ng tin KH tá»« JWT token                               |
+| âœ… `ChiTietDonHang` thuá»™c **Ä‘Æ¡n hÃ ng cá»§a khÃ¡ch hÃ ng Ä‘Ã³** | KH chá»‰ Ä‘Ã¡nh giÃ¡ Ä‘Æ°á»£c Ä‘Æ¡n hÃ ng cá»§a mÃ¬nh                      |
+| âœ… ÄÆ¡n hÃ ng **tráº¡ng thÃ¡i = 5** (ÄÃ£ nháº­n hÃ ng)            | Pháº£i nháº­n hÃ ng xong má»›i Ä‘Æ°á»£c Ä‘Ã¡nh giÃ¡                       |
+| âœ… ChÆ°a Ä‘Ã¡nh giÃ¡ `ChiTietDonHang` nÃ y                    | Má»—i dÃ²ng sáº£n pháº©m trong Ä‘Æ¡n chá»‰ Ä‘Ã¡nh giÃ¡ **1 láº§n duy nháº¥t** |
 
-> Sau khi đã tạo đánh giá, khách hàng **chỉ có thể cập nhật hoặc xóa**, không thể tạo thêm đánh giá cho cùng 1 dòng sản phẩm.
+> Sau khi Ä‘Ã£ táº¡o Ä‘Ã¡nh giÃ¡, khÃ¡ch hÃ ng **chá»‰ cÃ³ thá»ƒ cáº­p nháº­t hoáº·c xÃ³a**, khÃ´ng thá»ƒ táº¡o thÃªm Ä‘Ã¡nh giÃ¡ cho cÃ¹ng 1 dÃ²ng sáº£n pháº©m.
 
-### Trạng thái đơn hàng (tham khảo)
+### Tráº¡ng thÃ¡i Ä‘Æ¡n hÃ ng (tham kháº£o)
 
-| Giá trị | Ý nghĩa         |
+| GiÃ¡ trá»‹ | Ã nghÄ©a         |
 | ------- | --------------- |
-| `0`     | Chờ xác nhận    |
-| `1`     | Đã xác nhận     |
-| `2`     | Đang đóng gói   |
-| `3`     | Đang giao hàng  |
-| `4`     | Đã hủy          |
-| `5`     | Đã nhận hàng ✅ |
+| `0`     | Chá» xÃ¡c nháº­n    |
+| `1`     | ÄÃ£ xÃ¡c nháº­n     |
+| `2`     | Äang Ä‘Ã³ng gÃ³i   |
+| `3`     | Äang giao hÃ ng  |
+| `4`     | ÄÃ£ há»§y          |
+| `5`     | ÄÃ£ nháº­n hÃ ng âœ… |
 
 ---
 
-## 1. Xem tất cả đánh giá
+## 1. Xem táº¥t cáº£ Ä‘Ã¡nh giÃ¡
 
-| Thuộc tính   | Chi tiết                        |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t                        |
 | ------------ | ------------------------------- |
 | **URL**      | `GET /api/v1/danh-gia-san-pham` |
 | **Method**   | `GET`                           |
-| **Xác thực** | Bearer Token (JWT)              |
+| **XÃ¡c thá»±c** | Bearer Token (JWT)              |
 
 **Response:** `200 OK`
 
@@ -65,9 +65,9 @@
     "chiTietDonHangId": 7,
     "donHangId": 3,
     "sanPhamId": 3,
-    "tenSanPham": "Váy Hoa",
+    "tenSanPham": "VÃ¡y Hoa",
     "soSao": 5,
-    "ghiTru": "Váy rất đẹp, đúng size, vải mát",
+    "ghiTru": "VÃ¡y ráº¥t Ä‘áº¹p, Ä‘Ãºng size, váº£i mÃ¡t",
     "hinhAnh": null,
     "ngayTao": "2026-03-01T10:00:00",
     "ngayCapNhat": null
@@ -77,19 +77,19 @@
 
 ---
 
-## 2. Xem đánh giá theo ID
+## 2. Xem Ä‘Ã¡nh giÃ¡ theo ID
 
-| Thuộc tính   | Chi tiết                             |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t                             |
 | ------------ | ------------------------------------ |
 | **URL**      | `GET /api/v1/danh-gia-san-pham/{id}` |
 | **Method**   | `GET`                                |
-| **Xác thực** | Bearer Token (JWT)                   |
+| **XÃ¡c thá»±c** | Bearer Token (JWT)                   |
 
 **Path Parameters:**
 
-| Tham số | Kiểu | Mô tả       |
+| Tham sá»‘ | Kiá»ƒu | MÃ´ táº£       |
 | ------- | ---- | ----------- |
-| `id`    | Long | Mã đánh giá |
+| `id`    | Long | MÃ£ Ä‘Ã¡nh giÃ¡ |
 
 **Response:** `200 OK`
 
@@ -101,39 +101,39 @@
   "chiTietDonHangId": 7,
   "donHangId": 3,
   "sanPhamId": 3,
-  "tenSanPham": "Váy Hoa",
+  "tenSanPham": "VÃ¡y Hoa",
   "soSao": 5,
-  "ghiTru": "Váy rất đẹp, đúng size, vải mát",
+  "ghiTru": "VÃ¡y ráº¥t Ä‘áº¹p, Ä‘Ãºng size, váº£i mÃ¡t",
   "hinhAnh": null,
   "ngayTao": "2026-03-01T10:00:00",
   "ngayCapNhat": null
 }
 ```
 
-**Lỗi:**
+**Lá»—i:**
 
-| HTTP Status | Mô tả                   |
+| HTTP Status | MÃ´ táº£                   |
 | ----------- | ----------------------- |
-| `400`       | Không tìm thấy đánh giá |
+| `400`       | KhÃ´ng tÃ¬m tháº¥y Ä‘Ã¡nh giÃ¡ |
 
 ---
 
-## 3. Xem đánh giá theo sản phẩm
+## 3. Xem Ä‘Ã¡nh giÃ¡ theo sáº£n pháº©m
 
-| Thuộc tính   | Chi tiết                                             |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t                                             |
 | ------------ | ---------------------------------------------------- |
 | **URL**      | `GET /api/v1/danh-gia-san-pham/san-pham/{sanPhamId}` |
 | **Method**   | `GET`                                                |
-| **Xác thực** | Bearer Token (JWT)                                   |
+| **XÃ¡c thá»±c** | Bearer Token (JWT)                                   |
 
-> Truy vấn tất cả đánh giá của một sản phẩm thông qua đường dẫn: `DanhGia → ChiTietDonHang → ChiTietSanPham → SanPham`.  
-> Dùng khi hiển thị danh sách đánh giá trên trang chi tiết sản phẩm.
+> Truy váº¥n táº¥t cáº£ Ä‘Ã¡nh giÃ¡ cá»§a má»™t sáº£n pháº©m thÃ´ng qua Ä‘Æ°á»ng dáº«n: `DanhGia â†’ ChiTietDonHang â†’ ChiTietSanPham â†’ SanPham`.  
+> DÃ¹ng khi hiá»ƒn thá»‹ danh sÃ¡ch Ä‘Ã¡nh giÃ¡ trÃªn trang chi tiáº¿t sáº£n pháº©m.
 
 **Path Parameters:**
 
-| Tham số     | Kiểu | Mô tả       |
+| Tham sá»‘     | Kiá»ƒu | MÃ´ táº£       |
 | ----------- | ---- | ----------- |
-| `sanPhamId` | Long | Mã sản phẩm |
+| `sanPhamId` | Long | MÃ£ sáº£n pháº©m |
 
 **Response:** `200 OK`
 
@@ -146,9 +146,9 @@
     "chiTietDonHangId": 7,
     "donHangId": 3,
     "sanPhamId": 3,
-    "tenSanPham": "Váy Hoa",
+    "tenSanPham": "VÃ¡y Hoa",
     "soSao": 5,
-    "ghiTru": "Váy rất đẹp, đúng size, vải mát",
+    "ghiTru": "VÃ¡y ráº¥t Ä‘áº¹p, Ä‘Ãºng size, váº£i mÃ¡t",
     "hinhAnh": null,
     "ngayTao": "2026-03-01T10:00:00",
     "ngayCapNhat": null
@@ -158,55 +158,55 @@
 
 ---
 
-## 4. Xem đánh giá theo chi tiết đơn hàng
+## 4. Xem Ä‘Ã¡nh giÃ¡ theo chi tiáº¿t Ä‘Æ¡n hÃ ng
 
-| Thuộc tính   | Chi tiết                                                             |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t                                                             |
 | ------------ | -------------------------------------------------------------------- |
 | **URL**      | `GET /api/v1/danh-gia-san-pham/chi-tiet-don-hang/{chiTietDonHangId}` |
 | **Method**   | `GET`                                                                |
-| **Xác thực** | Bearer Token (JWT)                                                   |
+| **XÃ¡c thá»±c** | Bearer Token (JWT)                                                   |
 
 **Path Parameters:**
 
-| Tham số            | Kiểu | Mô tả                |
+| Tham sá»‘            | Kiá»ƒu | MÃ´ táº£                |
 | ------------------ | ---- | -------------------- |
-| `chiTietDonHangId` | Long | Mã chi tiết đơn hàng |
+| `chiTietDonHangId` | Long | MÃ£ chi tiáº¿t Ä‘Æ¡n hÃ ng |
 
-**Response:** `200 OK` — Tương tự mục 3.
+**Response:** `200 OK` â€” TÆ°Æ¡ng tá»± má»¥c 3.
 
 ---
 
-## 5. Xem đánh giá của tôi
+## 5. Xem Ä‘Ã¡nh giÃ¡ cá»§a tÃ´i
 
-| Thuộc tính   | Chi tiết                                |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t                                |
 | ------------ | --------------------------------------- |
 | **URL**      | `GET /api/v1/danh-gia-san-pham/cua-toi` |
 | **Method**   | `GET`                                   |
-| **Xác thực** | Bearer Token (JWT) — Khách hàng         |
+| **XÃ¡c thá»±c** | Bearer Token (JWT) â€” KhÃ¡ch hÃ ng         |
 
-Trả về tất cả đánh giá của khách hàng đang đăng nhập.
+Tráº£ vá» táº¥t cáº£ Ä‘Ã¡nh giÃ¡ cá»§a khÃ¡ch hÃ ng Ä‘ang Ä‘Äƒng nháº­p.
 
-**Response:** `200 OK` — Tương tự mục 3.
+**Response:** `200 OK` â€” TÆ°Æ¡ng tá»± má»¥c 3.
 
 ---
 
-## 6. Tạo đánh giá sản phẩm
+## 6. Táº¡o Ä‘Ã¡nh giÃ¡ sáº£n pháº©m
 
-| Thuộc tính       | Chi tiết                         |
+| Thuá»™c tÃ­nh       | Chi tiáº¿t                         |
 | ---------------- | -------------------------------- |
 | **URL**          | `POST /api/v1/danh-gia-san-pham` |
 | **Method**       | `POST`                           |
 | **Content-Type** | `multipart/form-data`            |
-| **Xác thực**     | Bearer Token (JWT) — Khách hàng  |
+| **XÃ¡c thá»±c**     | Bearer Token (JWT) â€” KhÃ¡ch hÃ ng  |
 
 **Form Data:**
 
-| Tham số            | Kiểu    | Bắt buộc | Mô tả                                |
+| Tham sá»‘            | Kiá»ƒu    | Báº¯t buá»™c | MÃ´ táº£                                |
 | ------------------ | ------- | -------- | ------------------------------------ |
-| `chiTietDonHangId` | Long    | **Có**   | Mã chi tiết đơn hàng (dòng sản phẩm) |
-| `soSao`            | Integer | **Có**   | Số sao (1–5)                         |
-| `ghiTru`           | String  | Không    | Nội dung đánh giá                    |
-| `file`             | File    | Không    | Ảnh đánh giá (upload lên MinIO)      |
+| `chiTietDonHangId` | Long    | **CÃ³**   | MÃ£ chi tiáº¿t Ä‘Æ¡n hÃ ng (dÃ²ng sáº£n pháº©m) |
+| `soSao`            | Integer | **CÃ³**   | Sá»‘ sao (1â€“5)                         |
+| `ghiTru`           | String  | KhÃ´ng    | Ná»™i dung Ä‘Ã¡nh giÃ¡                    |
+| `file`             | File    | KhÃ´ng    | áº¢nh Ä‘Ã¡nh giÃ¡ (upload lÃªn Cloudinary)      |
 
 **Response:** `201 Created`
 
@@ -218,102 +218,102 @@ Trả về tất cả đánh giá của khách hàng đang đăng nhập.
   "chiTietDonHangId": 7,
   "donHangId": 3,
   "sanPhamId": 3,
-  "tenSanPham": "Váy Hoa",
+  "tenSanPham": "VÃ¡y Hoa",
   "soSao": 5,
-  "ghiTru": "Sản phẩm rất đẹp, chất lượng tốt!",
+  "ghiTru": "Sáº£n pháº©m ráº¥t Ä‘áº¹p, cháº¥t lÆ°á»£ng tá»‘t!",
   "hinhAnh": "/storage/abc123-uuid.jpg",
   "ngayTao": "2026-03-01T15:30:00",
   "ngayCapNhat": null
 }
 ```
 
-**Lỗi:**
+**Lá»—i:**
 
-| HTTP Status | Mô tả                                                       |
+| HTTP Status | MÃ´ táº£                                                       |
 | ----------- | ----------------------------------------------------------- |
-| `400`       | Không tìm thấy chi tiết đơn hàng                            |
-| `400`       | Đơn hàng không thuộc về bạn                                 |
-| `400`       | Đơn hàng phải ở trạng thái đã nhận hàng mới có thể đánh giá |
-| `400`       | Bạn đã đánh giá sản phẩm này rồi                            |
-| `400`       | Số sao phải từ 1 đến 5                                      |
+| `400`       | KhÃ´ng tÃ¬m tháº¥y chi tiáº¿t Ä‘Æ¡n hÃ ng                            |
+| `400`       | ÄÆ¡n hÃ ng khÃ´ng thuá»™c vá» báº¡n                                 |
+| `400`       | ÄÆ¡n hÃ ng pháº£i á»Ÿ tráº¡ng thÃ¡i Ä‘Ã£ nháº­n hÃ ng má»›i cÃ³ thá»ƒ Ä‘Ã¡nh giÃ¡ |
+| `400`       | Báº¡n Ä‘Ã£ Ä‘Ã¡nh giÃ¡ sáº£n pháº©m nÃ y rá»“i                            |
+| `400`       | Sá»‘ sao pháº£i tá»« 1 Ä‘áº¿n 5                                      |
 
 ---
 
-## 7. Cập nhật đánh giá
+## 7. Cáº­p nháº­t Ä‘Ã¡nh giÃ¡
 
-| Thuộc tính       | Chi tiết                             |
+| Thuá»™c tÃ­nh       | Chi tiáº¿t                             |
 | ---------------- | ------------------------------------ |
 | **URL**          | `PUT /api/v1/danh-gia-san-pham/{id}` |
 | **Method**       | `PUT`                                |
 | **Content-Type** | `multipart/form-data`                |
-| **Xác thực**     | Bearer Token (JWT) — Khách hàng      |
+| **XÃ¡c thá»±c**     | Bearer Token (JWT) â€” KhÃ¡ch hÃ ng      |
 
 **Path Parameters:**
 
-| Tham số | Kiểu | Mô tả       |
+| Tham sá»‘ | Kiá»ƒu | MÃ´ táº£       |
 | ------- | ---- | ----------- |
-| `id`    | Long | Mã đánh giá |
+| `id`    | Long | MÃ£ Ä‘Ã¡nh giÃ¡ |
 
 **Form Data:**
 
-| Tham số  | Kiểu    | Bắt buộc | Mô tả                      |
+| Tham sá»‘  | Kiá»ƒu    | Báº¯t buá»™c | MÃ´ táº£                      |
 | -------- | ------- | -------- | -------------------------- |
-| `soSao`  | Integer | Không    | Số sao mới (1–5)           |
-| `ghiTru` | String  | Không    | Nội dung đánh giá mới      |
-| `file`   | File    | Không    | Ảnh mới (upload lên MinIO) |
+| `soSao`  | Integer | KhÃ´ng    | Sá»‘ sao má»›i (1â€“5)           |
+| `ghiTru` | String  | KhÃ´ng    | Ná»™i dung Ä‘Ã¡nh giÃ¡ má»›i      |
+| `file`   | File    | KhÃ´ng    | áº¢nh má»›i (upload lÃªn Cloudinary) |
 
-**Response:** `200 OK` — Trả về `ResDanhGiaSanPhamDTO` đã cập nhật.
+**Response:** `200 OK` â€” Tráº£ vá» `ResDanhGiaSanPhamDTO` Ä‘Ã£ cáº­p nháº­t.
 
-**Lỗi:**
+**Lá»—i:**
 
-| HTTP Status | Mô tả                               |
+| HTTP Status | MÃ´ táº£                               |
 | ----------- | ----------------------------------- |
-| `400`       | Không tìm thấy đánh giá             |
-| `400`       | Bạn không có quyền sửa đánh giá này |
-| `400`       | Số sao phải từ 1 đến 5              |
+| `400`       | KhÃ´ng tÃ¬m tháº¥y Ä‘Ã¡nh giÃ¡             |
+| `400`       | Báº¡n khÃ´ng cÃ³ quyá»n sá»­a Ä‘Ã¡nh giÃ¡ nÃ y |
+| `400`       | Sá»‘ sao pháº£i tá»« 1 Ä‘áº¿n 5              |
 
 ---
 
-## 8. Xóa đánh giá
+## 8. XÃ³a Ä‘Ã¡nh giÃ¡
 
-| Thuộc tính   | Chi tiết                                |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t                                |
 | ------------ | --------------------------------------- |
 | **URL**      | `DELETE /api/v1/danh-gia-san-pham/{id}` |
 | **Method**   | `DELETE`                                |
-| **Xác thực** | Bearer Token (JWT)                      |
+| **XÃ¡c thá»±c** | Bearer Token (JWT)                      |
 
 **Path Parameters:**
 
-| Tham số | Kiểu | Mô tả       |
+| Tham sá»‘ | Kiá»ƒu | MÃ´ táº£       |
 | ------- | ---- | ----------- |
-| `id`    | Long | Mã đánh giá |
+| `id`    | Long | MÃ£ Ä‘Ã¡nh giÃ¡ |
 
 **Response:** `204 No Content`
 
-**Lỗi:**
+**Lá»—i:**
 
-| HTTP Status | Mô tả                               |
+| HTTP Status | MÃ´ táº£                               |
 | ----------- | ----------------------------------- |
-| `400`       | Không tìm thấy đánh giá             |
-| `400`       | Bạn không có quyền xóa đánh giá này |
+| `400`       | KhÃ´ng tÃ¬m tháº¥y Ä‘Ã¡nh giÃ¡             |
+| `400`       | Báº¡n khÃ´ng cÃ³ quyá»n xÃ³a Ä‘Ã¡nh giÃ¡ nÃ y |
 
-> **Lưu ý:** Khách hàng chỉ xóa được đánh giá của mình. Admin/Nhân viên có thể xóa bất kỳ đánh giá nào.
+> **LÆ°u Ã½:** KhÃ¡ch hÃ ng chá»‰ xÃ³a Ä‘Æ°á»£c Ä‘Ã¡nh giÃ¡ cá»§a mÃ¬nh. Admin/NhÃ¢n viÃªn cÃ³ thá»ƒ xÃ³a báº¥t ká»³ Ä‘Ã¡nh giÃ¡ nÃ o.
 
 ---
 
-## Phân quyền
+## PhÃ¢n quyá»n
 
-| Vai trò    | GET (Tất cả) | GET (Theo SP) | GET (Theo CTDH) | GET (Của tôi) | POST (Tạo) | PUT (Sửa)     | DELETE (Xóa)  |
+| Vai trÃ²    | GET (Táº¥t cáº£) | GET (Theo SP) | GET (Theo CTDH) | GET (Cá»§a tÃ´i) | POST (Táº¡o) | PUT (Sá»­a)     | DELETE (XÃ³a)  |
 | ---------- | ------------ | ------------- | --------------- | ------------- | ---------- | ------------- | ------------- |
-| ADMIN      | ✅           | ✅            | ✅              | ❌            | ❌         | ❌            | ✅ (tất cả)   |
-| NHAN_VIEN  | ✅           | ✅            | ✅              | ❌            | ❌         | ❌            | ❌            |
-| KHACH_HANG | ✅           | ✅            | ✅              | ✅            | ✅         | ✅ (của mình) | ✅ (của mình) |
+| ADMIN      | âœ…           | âœ…            | âœ…              | âŒ            | âŒ         | âŒ            | âœ… (táº¥t cáº£)   |
+| NHAN_VIEN  | âœ…           | âœ…            | âœ…              | âŒ            | âŒ         | âŒ            | âŒ            |
+| KHACH_HANG | âœ…           | âœ…            | âœ…              | âœ…            | âœ…         | âœ… (cá»§a mÃ¬nh) | âœ… (cá»§a mÃ¬nh) |
 
 ---
 
-## Ví dụ test thực tế (Postman / curl)
+## VÃ­ dá»¥ test thá»±c táº¿ (Postman / curl)
 
-### Bước 1 — Đăng nhập lấy token
+### BÆ°á»›c 1 â€” ÄÄƒng nháº­p láº¥y token
 
 ```
 POST /api/v1/auth/login
@@ -325,34 +325,34 @@ Content-Type: application/json
 }
 ```
 
-> Lưu lại `access_token` từ response để dùng ở các bước sau.
+> LÆ°u láº¡i `access_token` tá»« response Ä‘á»ƒ dÃ¹ng á»Ÿ cÃ¡c bÆ°á»›c sau.
 
 ---
 
-### Bước 2 — Xem đơn hàng đã nhận (trangThai = 5)
+### BÆ°á»›c 2 â€” Xem Ä‘Æ¡n hÃ ng Ä‘Ã£ nháº­n (trangThai = 5)
 
 ```
 GET /api/v1/don-hang/cua-toi
 Authorization: Bearer <access_token>
 ```
 
-> Tìm đơn hàng có `trangThai = 5`. Ghi lại `id` của đơn hàng đó.
+> TÃ¬m Ä‘Æ¡n hÃ ng cÃ³ `trangThai = 5`. Ghi láº¡i `id` cá»§a Ä‘Æ¡n hÃ ng Ä‘Ã³.
 
 ---
 
-### Bước 3 — Xem chi tiết đơn hàng để lấy `chiTietDonHangId`
+### BÆ°á»›c 3 â€” Xem chi tiáº¿t Ä‘Æ¡n hÃ ng Ä‘á»ƒ láº¥y `chiTietDonHangId`
 
 ```
 GET /api/v1/chi-tiet-don-hang/don-hang/{donHangId}
 Authorization: Bearer <access_token>
 ```
 
-> Mỗi dòng trong `result` là 1 sản phẩm trong đơn hàng.  
-> Ghi lại `id` của dòng sản phẩm muốn đánh giá — đây là `chiTietDonHangId`.
+> Má»—i dÃ²ng trong `result` lÃ  1 sáº£n pháº©m trong Ä‘Æ¡n hÃ ng.  
+> Ghi láº¡i `id` cá»§a dÃ²ng sáº£n pháº©m muá»‘n Ä‘Ã¡nh giÃ¡ â€” Ä‘Ã¢y lÃ  `chiTietDonHangId`.
 
 ---
 
-### Bước 4 — Tạo đánh giá
+### BÆ°á»›c 4 â€” Táº¡o Ä‘Ã¡nh giÃ¡
 
 ```
 POST /api/v1/danh-gia-san-pham
@@ -361,8 +361,8 @@ Content-Type: multipart/form-data
 
 chiTietDonHangId = 7
 soSao            = 5
-ghiTru           = Sản phẩm rất đẹp, đúng size!
-file             = (để trống hoặc chọn ảnh)
+ghiTru           = Sáº£n pháº©m ráº¥t Ä‘áº¹p, Ä‘Ãºng size!
+file             = (Ä‘á»ƒ trá»‘ng hoáº·c chá»n áº£nh)
 ```
 
 **Response `201 Created`:**
@@ -375,9 +375,9 @@ file             = (để trống hoặc chọn ảnh)
   "chiTietDonHangId": 7,
   "donHangId": 3,
   "sanPhamId": 3,
-  "tenSanPham": "Váy Hoa",
+  "tenSanPham": "VÃ¡y Hoa",
   "soSao": 5,
-  "ghiTru": "Sản phẩm rất đẹp, đúng size!",
+  "ghiTru": "Sáº£n pháº©m ráº¥t Ä‘áº¹p, Ä‘Ãºng size!",
   "hinhAnh": null,
   "ngayTao": "2026-03-06T10:00:00",
   "ngayCapNhat": null
@@ -386,18 +386,18 @@ file             = (để trống hoặc chọn ảnh)
 
 ---
 
-### Bước 5 — Xem đánh giá theo sản phẩm (không cần token nếu public)
+### BÆ°á»›c 5 â€” Xem Ä‘Ã¡nh giÃ¡ theo sáº£n pháº©m (khÃ´ng cáº§n token náº¿u public)
 
 ```
 GET /api/v1/danh-gia-san-pham/san-pham/3
 Authorization: Bearer <access_token>
 ```
 
-> Trả về tất cả đánh giá của sản phẩm `id = 3` từ tất cả khách hàng.
+> Tráº£ vá» táº¥t cáº£ Ä‘Ã¡nh giÃ¡ cá»§a sáº£n pháº©m `id = 3` tá»« táº¥t cáº£ khÃ¡ch hÃ ng.
 
 ---
 
-### Bước 6 — Cập nhật đánh giá
+### BÆ°á»›c 6 â€” Cáº­p nháº­t Ä‘Ã¡nh giÃ¡
 
 ```
 PUT /api/v1/danh-gia-san-pham/4
@@ -405,12 +405,12 @@ Authorization: Bearer <access_token>
 Content-Type: multipart/form-data
 
 soSao  = 4
-ghiTru = Đẹp nhưng giao hơi chậm
+ghiTru = Äáº¹p nhÆ°ng giao hÆ¡i cháº­m
 ```
 
 ---
 
-### Bước 7 — Xóa đánh giá
+### BÆ°á»›c 7 â€” XÃ³a Ä‘Ã¡nh giÃ¡
 
 ```
 DELETE /api/v1/danh-gia-san-pham/4
@@ -421,12 +421,14 @@ Authorization: Bearer <access_token>
 
 ---
 
-### Lưu ý khi test
+### LÆ°u Ã½ khi test
 
-| Trường hợp                                       | Kết quả mong đợi                                  |
+| TrÆ°á»ng há»£p                                       | Káº¿t quáº£ mong Ä‘á»£i                                  |
 | ------------------------------------------------ | ------------------------------------------------- |
-| Tạo đánh giá lần 2 cho cùng `chiTietDonHangId`   | `400` — "Bạn đã đánh giá sản phẩm này rồi"        |
-| Đơn hàng `trangThai != 5`                        | `400` — "Đơn hàng phải ở trạng thái đã nhận hàng" |
-| `chiTietDonHangId` không thuộc đơn hàng của mình | `400` — "Đơn hàng không thuộc về bạn"             |
-| `soSao = 0` hoặc `soSao = 6`                     | `400` — "Số sao phải từ 1 đến 5"                  |
-| Sửa/xóa đánh giá của người khác                  | `400` — "Bạn không có quyền..."                   |
+| Táº¡o Ä‘Ã¡nh giÃ¡ láº§n 2 cho cÃ¹ng `chiTietDonHangId`   | `400` â€” "Báº¡n Ä‘Ã£ Ä‘Ã¡nh giÃ¡ sáº£n pháº©m nÃ y rá»“i"        |
+| ÄÆ¡n hÃ ng `trangThai != 5`                        | `400` â€” "ÄÆ¡n hÃ ng pháº£i á»Ÿ tráº¡ng thÃ¡i Ä‘Ã£ nháº­n hÃ ng" |
+| `chiTietDonHangId` khÃ´ng thuá»™c Ä‘Æ¡n hÃ ng cá»§a mÃ¬nh | `400` â€” "ÄÆ¡n hÃ ng khÃ´ng thuá»™c vá» báº¡n"             |
+| `soSao = 0` hoáº·c `soSao = 6`                     | `400` â€” "Sá»‘ sao pháº£i tá»« 1 Ä‘áº¿n 5"                  |
+| Sá»­a/xÃ³a Ä‘Ã¡nh giÃ¡ cá»§a ngÆ°á»i khÃ¡c                  | `400` â€” "Báº¡n khÃ´ng cÃ³ quyá»n..."                   |
+
+

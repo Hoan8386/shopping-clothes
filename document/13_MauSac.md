@@ -1,41 +1,41 @@
-# Màu Sắc Controller
+﻿# MÃ u Sáº¯c Controller
 
 > **Base Path:** `/api/v1/mau-sac`  
 > **File:** `MauSacController.java`  
-> Quản lý danh sách màu sắc sản phẩm (ví dụ: Đen, Trắng, Đỏ, Xanh, ...).
+> Quáº£n lÃ½ danh sÃ¡ch mÃ u sáº¯c sáº£n pháº©m (vÃ­ dá»¥: Äen, Tráº¯ng, Äá», Xanh, ...).
 
 ---
 
-## Cấu trúc dữ liệu `MauSac`
+## Cáº¥u trÃºc dá»¯ liá»‡u `MauSac`
 
-| Trường        | Kiểu          | Mô tả                       |
+| TrÆ°á»ng        | Kiá»ƒu          | MÃ´ táº£                       |
 | ------------- | ------------- | --------------------------- |
-| `id`          | Long          | Mã màu sắc (auto-increment) |
-| `tenMauSac`   | String(255)   | Tên màu sắc                 |
-| `ngayTao`     | LocalDateTime | Ngày tạo (tự động)          |
-| `ngayCapNhat` | LocalDateTime | Ngày cập nhật (tự động)     |
+| `id`          | Long          | MÃ£ mÃ u sáº¯c (auto-increment) |
+| `tenMauSac`   | String(255)   | TÃªn mÃ u sáº¯c                 |
+| `ngayTao`     | LocalDateTime | NgÃ y táº¡o (tá»± Ä‘á»™ng)          |
+| `ngayCapNhat` | LocalDateTime | NgÃ y cáº­p nháº­t (tá»± Ä‘á»™ng)     |
 
 ---
 
-## 1. Lấy danh sách màu sắc
+## 1. Láº¥y danh sÃ¡ch mÃ u sáº¯c
 
-| Thuộc tính   | Chi tiết              |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t              |
 | ------------ | --------------------- |
 | **URL**      | `GET /api/v1/mau-sac` |
 | **Method**   | `GET`                 |
-| **Xác thực** | Bearer Token (JWT)    |
+| **XÃ¡c thá»±c** | Bearer Token (JWT)    |
 
 **Response:** `200 OK`
 
 ```json
 [
-  { "id": 1, "tenMauSac": "Đen", "ngayTao": "2026-01-01T00:00:00" },
-  { "id": 2, "tenMauSac": "Trắng", "ngayTao": "2026-01-01T00:00:00" },
-  { "id": 3, "tenMauSac": "Đỏ", "ngayTao": "2026-01-01T00:00:00" }
+  { "id": 1, "tenMauSac": "Äen", "ngayTao": "2026-01-01T00:00:00" },
+  { "id": 2, "tenMauSac": "Tráº¯ng", "ngayTao": "2026-01-01T00:00:00" },
+  { "id": 3, "tenMauSac": "Äá»", "ngayTao": "2026-01-01T00:00:00" }
 ]
 ```
 
-**Kiểu dữ liệu:**
+**Kiá»ƒu dá»¯ liá»‡u:**
 
 ```json
 {
@@ -47,22 +47,22 @@
 
 ---
 
-## 2-5. CRUD tiêu chuẩn
+## 2-5. CRUD tiÃªu chuáº©n
 
-| Endpoint                      | Method   | Mô tả               |
+| Endpoint                      | Method   | MÃ´ táº£               |
 | ----------------------------- | -------- | ------------------- |
-| `GET /api/v1/mau-sac/{id}`    | `GET`    | Lấy màu sắc theo ID |
-| `POST /api/v1/mau-sac`        | `POST`   | Tạo màu sắc mới     |
-| `PUT /api/v1/mau-sac`         | `PUT`    | Cập nhật màu sắc    |
-| `DELETE /api/v1/mau-sac/{id}` | `DELETE` | Xóa màu sắc         |
+| `GET /api/v1/mau-sac/{id}`    | `GET`    | Láº¥y mÃ u sáº¯c theo ID |
+| `POST /api/v1/mau-sac`        | `POST`   | Táº¡o mÃ u sáº¯c má»›i     |
+| `PUT /api/v1/mau-sac`         | `PUT`    | Cáº­p nháº­t mÃ u sáº¯c    |
+| `DELETE /api/v1/mau-sac/{id}` | `DELETE` | XÃ³a mÃ u sáº¯c         |
 
 **Request Body (POST/PUT):**
 
 ```json
-{ "id": 1, "tenMauSac": "Đen nhám" }
+{ "id": 1, "tenMauSac": "Äen nhÃ¡m" }
 ```
 
-**Kiểu dữ liệu:**
+**Kiá»ƒu dá»¯ liá»‡u:**
 
 ```json
 {
@@ -71,19 +71,21 @@
 }
 ```
 
-**Lỗi:**
+**Lá»—i:**
 
-| HTTP Status | Mô tả                          |
+| HTTP Status | MÃ´ táº£                          |
 | ----------- | ------------------------------ |
-| `400`       | Không tìm thấy màu sắc         |
-| `400`       | Mã màu sắc không được để trống |
+| `400`       | KhÃ´ng tÃ¬m tháº¥y mÃ u sáº¯c         |
+| `400`       | MÃ£ mÃ u sáº¯c khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng |
 
 ---
 
-## Phân quyền
+## PhÃ¢n quyá»n
 
-| Vai trò    | GET | POST | PUT | DELETE |
+| Vai trÃ²    | GET | POST | PUT | DELETE |
 | ---------- | --- | ---- | --- | ------ |
-| ADMIN      | ✅  | ✅   | ✅  | ✅     |
-| NHAN_VIEN  | ✅  | ❌   | ❌  | ❌     |
-| KHACH_HANG | ✅  | ❌   | ❌  | ❌     |
+| ADMIN      | âœ…  | âœ…   | âœ…  | âœ…     |
+| NHAN_VIEN  | âœ…  | âŒ   | âŒ  | âŒ     |
+| KHACH_HANG | âœ…  | âŒ   | âŒ  | âŒ     |
+
+

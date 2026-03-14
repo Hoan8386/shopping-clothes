@@ -21,16 +21,16 @@ public class DanhGiaSanPhamService {
     private final DanhGiaSanPhamRepository danhGiaSanPhamRepository;
     private final KhachHangRepository khachHangRepository;
     private final ChiTietDonHangRepository chiTietDonHangRepository;
-    private final MinioStorageService minioStorageService;
+    private final StorageService storageService;
 
     public DanhGiaSanPhamService(DanhGiaSanPhamRepository danhGiaSanPhamRepository,
             KhachHangRepository khachHangRepository,
             ChiTietDonHangRepository chiTietDonHangRepository,
-            MinioStorageService minioStorageService) {
+            StorageService storageService) {
         this.danhGiaSanPhamRepository = danhGiaSanPhamRepository;
         this.khachHangRepository = khachHangRepository;
         this.chiTietDonHangRepository = chiTietDonHangRepository;
-        this.minioStorageService = minioStorageService;
+        this.storageService = storageService;
     }
 
     /**
@@ -77,10 +77,10 @@ public class DanhGiaSanPhamService {
             throw new IdInvalidException("Số sao phải từ 1 đến 5");
         }
 
-        // 7. Upload ảnh lên MinIO (nếu có)
+        // 7. Upload ảnh lên Cloudinary (nếu có)
         String hinhAnhUrl = null;
         if (file != null && !file.isEmpty()) {
-            hinhAnhUrl = minioStorageService.uploadSingleFile(file);
+            hinhAnhUrl = storageService.uploadSingleFile(file);
         }
 
         // 8. Tạo đánh giá
@@ -119,7 +119,7 @@ public class DanhGiaSanPhamService {
         }
 
         if (file != null && !file.isEmpty()) {
-            String hinhAnhUrl = minioStorageService.uploadSingleFile(file);
+            String hinhAnhUrl = storageService.uploadSingleFile(file);
             existing.setHinhAnh(hinhAnhUrl);
         }
 

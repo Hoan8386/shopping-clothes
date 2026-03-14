@@ -1,34 +1,34 @@
-# Giỏ Hàng Controller
+﻿# Giá» HÃ ng Controller
 
 > **Base Path:** `/api/v1/gio-hang`  
 > **File:** `GioHangController.java`  
-> Quản lý giỏ hàng của khách hàng: thêm sản phẩm, xem giỏ, xóa sản phẩm.
+> Quáº£n lÃ½ giá» hÃ ng cá»§a khÃ¡ch hÃ ng: thÃªm sáº£n pháº©m, xem giá», xÃ³a sáº£n pháº©m.
 
 ---
 
-## Tổng quan
+## Tá»•ng quan
 
-Mỗi khách hàng có **1 giỏ hàng duy nhất** (quan hệ 1-1 với `KhachHang`). Giỏ hàng chứa danh sách `ChiTietGioHang` (các biến thể sản phẩm đã thêm).
+Má»—i khÃ¡ch hÃ ng cÃ³ **1 giá» hÃ ng duy nháº¥t** (quan há»‡ 1-1 vá»›i `KhachHang`). Giá» hÃ ng chá»©a danh sÃ¡ch `ChiTietGioHang` (cÃ¡c biáº¿n thá»ƒ sáº£n pháº©m Ä‘Ã£ thÃªm).
 
-### Cấu trúc dữ liệu `GioHang`
+### Cáº¥u trÃºc dá»¯ liá»‡u `GioHang`
 
-| Trường            | Kiểu                 | Mô tả                              |
+| TrÆ°á»ng            | Kiá»ƒu                 | MÃ´ táº£                              |
 | ----------------- | -------------------- | ---------------------------------- |
-| `maGioHang`       | Long                 | Mã giỏ hàng (auto-increment)       |
-| `khachHang`       | KhachHang            | Khách hàng sở hữu giỏ (FK, unique) |
-| `ngayTao`         | LocalDateTime        | Ngày tạo (tự động)                 |
-| `chiTietGioHangs` | List<ChiTietGioHang> | Danh sách sản phẩm trong giỏ       |
+| `maGioHang`       | Long                 | MÃ£ giá» hÃ ng (auto-increment)       |
+| `khachHang`       | KhachHang            | KhÃ¡ch hÃ ng sá»Ÿ há»¯u giá» (FK, unique) |
+| `ngayTao`         | LocalDateTime        | NgÃ y táº¡o (tá»± Ä‘á»™ng)                 |
+| `chiTietGioHangs` | List<ChiTietGioHang> | Danh sÃ¡ch sáº£n pháº©m trong giá»       |
 
 ---
 
-## 1. Thêm sản phẩm vào giỏ hàng
+## 1. ThÃªm sáº£n pháº©m vÃ o giá» hÃ ng
 
-| Thuộc tính       | Chi tiết                              |
+| Thuá»™c tÃ­nh       | Chi tiáº¿t                              |
 | ---------------- | ------------------------------------- |
 | **URL**          | `POST /api/v1/gio-hang/them-san-pham` |
 | **Method**       | `POST`                                |
 | **Content-Type** | `application/json`                    |
-| **Xác thực**     | Bearer Token (JWT) — KHACH_HANG       |
+| **XÃ¡c thá»±c**     | Bearer Token (JWT) â€” KHACH_HANG       |
 
 **Request Body:** `ReqThemGioHangDTO`
 
@@ -39,7 +39,7 @@ Mỗi khách hàng có **1 giỏ hàng duy nhất** (quan hệ 1-1 với `KhachH
 }
 ```
 
-**Kiểu dữ liệu:**
+**Kiá»ƒu dá»¯ liá»‡u:**
 
 ```json
 {
@@ -48,26 +48,26 @@ Mỗi khách hàng có **1 giỏ hàng duy nhất** (quan hệ 1-1 với `KhachH
 }
 ```
 
-| Trường             | Kiểu    | Bắt buộc | Mô tả                |
+| TrÆ°á»ng             | Kiá»ƒu    | Báº¯t buá»™c | MÃ´ táº£                |
 | ------------------ | ------- | -------- | -------------------- |
-| `maChiTietSanPham` | Long    | **Có**   | Mã biến thể sản phẩm |
-| `soLuong`          | Integer | **Có**   | Số lượng cần thêm    |
+| `maChiTietSanPham` | Long    | **CÃ³**   | MÃ£ biáº¿n thá»ƒ sáº£n pháº©m |
+| `soLuong`          | Integer | **CÃ³**   | Sá»‘ lÆ°á»£ng cáº§n thÃªm    |
 
-**Response:** `201 Created` — Trả về `ChiTietGioHang`
+**Response:** `201 Created` â€” Tráº£ vá» `ChiTietGioHang`
 
-> **Lưu ý:** Nếu sản phẩm đã có trong giỏ → tăng số lượng. Nếu chưa có → tạo dòng mới.
+> **LÆ°u Ã½:** Náº¿u sáº£n pháº©m Ä‘Ã£ cÃ³ trong giá» â†’ tÄƒng sá»‘ lÆ°á»£ng. Náº¿u chÆ°a cÃ³ â†’ táº¡o dÃ²ng má»›i.
 
 ---
 
-## 2. Lấy giỏ hàng của tôi
+## 2. Láº¥y giá» hÃ ng cá»§a tÃ´i
 
-| Thuộc tính   | Chi tiết                        |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t                        |
 | ------------ | ------------------------------- |
 | **URL**      | `GET /api/v1/gio-hang/cua-toi`  |
 | **Method**   | `GET`                           |
-| **Xác thực** | Bearer Token (JWT) — KHACH_HANG |
+| **XÃ¡c thá»±c** | Bearer Token (JWT) â€” KHACH_HANG |
 
-**Response:** `200 OK` — Trả về `ResGioHangDTO`
+**Response:** `200 OK` â€” Tráº£ vá» `ResGioHangDTO`
 
 ```json
 {
@@ -78,9 +78,9 @@ Mỗi khách hàng có **1 giỏ hàng duy nhất** (quan hệ 1-1 với `KhachH
     {
       "maChiTietGioHang": 1,
       "maChiTietSanPham": 1,
-      "tenSanPham": "Áo Polo Classic",
+      "tenSanPham": "Ão Polo Classic",
       "kichThuoc": "M",
-      "mauSac": "Đen",
+      "mauSac": "Äen",
       "giaBan": 250000,
       "soLuong": 2,
       "thanhTien": 500000
@@ -89,7 +89,7 @@ Mỗi khách hàng có **1 giỏ hàng duy nhất** (quan hệ 1-1 với `KhachH
 }
 ```
 
-**Kiểu dữ liệu:**
+**Kiá»ƒu dá»¯ liá»‡u:**
 
 ```json
 {
@@ -111,50 +111,50 @@ Mỗi khách hàng có **1 giỏ hàng duy nhất** (quan hệ 1-1 với `KhachH
 }
 ```
 
-> **Lưu ý:** Hệ thống tự xác định khách hàng từ JWT token (SecurityContext).
+> **LÆ°u Ã½:** Há»‡ thá»‘ng tá»± xÃ¡c Ä‘á»‹nh khÃ¡ch hÃ ng tá»« JWT token (SecurityContext).
 
-**Lỗi:**
+**Lá»—i:**
 
-| HTTP Status | Mô tả                   |
+| HTTP Status | MÃ´ táº£                   |
 | ----------- | ----------------------- |
-| `400`       | Không tìm thấy giỏ hàng |
+| `400`       | KhÃ´ng tÃ¬m tháº¥y giá» hÃ ng |
 
 ---
 
-## 3. Xóa sản phẩm khỏi giỏ hàng
+## 3. XÃ³a sáº£n pháº©m khá»i giá» hÃ ng
 
-| Thuộc tính   | Chi tiết                                              |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t                                              |
 | ------------ | ----------------------------------------------------- |
 | **URL**      | `DELETE /api/v1/gio-hang/chi-tiet/{maChiTietGioHang}` |
 | **Method**   | `DELETE`                                              |
-| **Xác thực** | Bearer Token (JWT) — KHACH_HANG                       |
+| **XÃ¡c thá»±c** | Bearer Token (JWT) â€” KHACH_HANG                       |
 
 **Path Parameters:**
 
-| Tham số            | Kiểu | Mô tả                        |
+| Tham sá»‘            | Kiá»ƒu | MÃ´ táº£                        |
 | ------------------ | ---- | ---------------------------- |
-| `maChiTietGioHang` | Long | Mã chi tiết giỏ hàng cần xóa |
+| `maChiTietGioHang` | Long | MÃ£ chi tiáº¿t giá» hÃ ng cáº§n xÃ³a |
 
 **Response:** `204 No Content`
 
 ---
 
-## 4. Lấy danh sách khuyến mãi hợp lệ cho giỏ hàng
+## 4. Láº¥y danh sÃ¡ch khuyáº¿n mÃ£i há»£p lá»‡ cho giá» hÃ ng
 
-| Thuộc tính   | Chi tiết                                 |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t                                 |
 | ------------ | ---------------------------------------- |
 | **URL**      | `GET /api/v1/gio-hang/khuyen-mai-hop-le` |
 | **Method**   | `GET`                                    |
-| **Xác thực** | Bearer Token (JWT) — KHACH_HANG          |
+| **XÃ¡c thá»±c** | Bearer Token (JWT) â€” KHACH_HANG          |
 
-**Response:** `200 OK` — Trả về `ResKhuyenMaiHopLeDTO`
+**Response:** `200 OK` â€” Tráº£ vá» `ResKhuyenMaiHopLeDTO`
 
 ```json
 {
   "khuyenMaiHoaDon": [
     {
       "id": 1,
-      "tenKhuyenMai": "Giảm 10% cho đơn từ 500k",
+      "tenKhuyenMai": "Giáº£m 10% cho Ä‘Æ¡n tá»« 500k",
       "hoaDonToiThieu": 500000,
       "phanTramGiam": 10,
       "giamToiDa": 100000,
@@ -164,7 +164,7 @@ Mỗi khách hàng có **1 giỏ hàng duy nhất** (quan hệ 1-1 với `KhachH
   "khuyenMaiDiem": [
     {
       "id": 1,
-      "tenKhuyenMai": "Đổi 50 điểm giảm 15%",
+      "tenKhuyenMai": "Äá»•i 50 Ä‘iá»ƒm giáº£m 15%",
       "diemToiThieu": 50,
       "hoaDonToiThieu": 300000,
       "phanTramGiam": 15,
@@ -175,7 +175,7 @@ Mỗi khách hàng có **1 giỏ hàng duy nhất** (quan hệ 1-1 với `KhachH
 }
 ```
 
-**Kiểu dữ liệu:**
+**Kiá»ƒu dá»¯ liá»‡u:**
 
 ```json
 {
@@ -184,21 +184,21 @@ Mỗi khách hàng có **1 giỏ hàng duy nhất** (quan hệ 1-1 với `KhachH
 }
 ```
 
-> **Lưu ý:** Hệ thống tự lọc chỉ trả về các khuyến mãi:
+> **LÆ°u Ã½:** Há»‡ thá»‘ng tá»± lá»c chá»‰ tráº£ vá» cÃ¡c khuyáº¿n mÃ£i:
 >
-> - Còn hạn (thời gian hiện tại nằm trong `thoiGianBatDau` – `thoiGianKetThuc`)
-> - Đủ điều kiện (tổng tiền giỏ hàng ≥ `hoaDonToiThieu`, điểm tích lũy ≥ `diemToiThieu`)
+> - CÃ²n háº¡n (thá»i gian hiá»‡n táº¡i náº±m trong `thoiGianBatDau` â€“ `thoiGianKetThuc`)
+> - Äá»§ Ä‘iá»u kiá»‡n (tá»•ng tiá»n giá» hÃ ng â‰¥ `hoaDonToiThieu`, Ä‘iá»ƒm tÃ­ch lÅ©y â‰¥ `diemToiThieu`)
 
 ---
 
-## 5. Xem trước giảm giá khi áp dụng khuyến mãi
+## 5. Xem trÆ°á»›c giáº£m giÃ¡ khi Ã¡p dá»¥ng khuyáº¿n mÃ£i
 
-| Thuộc tính       | Chi tiết                                   |
+| Thuá»™c tÃ­nh       | Chi tiáº¿t                                   |
 | ---------------- | ------------------------------------------ |
 | **URL**          | `POST /api/v1/gio-hang/ap-dung-khuyen-mai` |
 | **Method**       | `POST`                                     |
 | **Content-Type** | `application/json`                         |
-| **Xác thực**     | Bearer Token (JWT) — KHACH_HANG            |
+| **XÃ¡c thá»±c**     | Bearer Token (JWT) â€” KHACH_HANG            |
 
 **Request Body:** `ReqApDungKhuyenMaiDTO`
 
@@ -209,7 +209,7 @@ Mỗi khách hàng có **1 giỏ hàng duy nhất** (quan hệ 1-1 với `KhachH
 }
 ```
 
-**Kiểu dữ liệu:**
+**Kiá»ƒu dá»¯ liá»‡u:**
 
 ```json
 {
@@ -218,28 +218,28 @@ Mỗi khách hàng có **1 giỏ hàng duy nhất** (quan hệ 1-1 với `KhachH
 }
 ```
 
-| Trường              | Kiểu | Bắt buộc | Mô tả                      |
+| TrÆ°á»ng              | Kiá»ƒu | Báº¯t buá»™c | MÃ´ táº£                      |
 | ------------------- | ---- | -------- | -------------------------- |
-| `maKhuyenMaiHoaDon` | Long | Không    | Mã khuyến mãi theo hóa đơn |
-| `maKhuyenMaiDiem`   | Long | Không    | Mã khuyến mãi theo điểm    |
+| `maKhuyenMaiHoaDon` | Long | KhÃ´ng    | MÃ£ khuyáº¿n mÃ£i theo hÃ³a Ä‘Æ¡n |
+| `maKhuyenMaiDiem`   | Long | KhÃ´ng    | MÃ£ khuyáº¿n mÃ£i theo Ä‘iá»ƒm    |
 
-**Response:** `200 OK` — Trả về `ResApDungKhuyenMaiDTO`
+**Response:** `200 OK` â€” Tráº£ vá» `ResApDungKhuyenMaiDTO`
 
 ```json
 {
   "tongTienGoc": 750000,
   "maKhuyenMaiHoaDon": 1,
-  "tenKhuyenMaiHoaDon": "Giảm 10% cho đơn từ 500k",
+  "tenKhuyenMaiHoaDon": "Giáº£m 10% cho Ä‘Æ¡n tá»« 500k",
   "tienGiamHoaDon": 75000,
   "maKhuyenMaiDiem": 2,
-  "tenKhuyenMaiDiem": "Đổi 50 điểm giảm 15%",
+  "tenKhuyenMaiDiem": "Äá»•i 50 Ä‘iá»ƒm giáº£m 15%",
   "tienGiamDiem": 101250,
   "tongTienGiam": 176250,
   "tongTienTra": 573750
 }
 ```
 
-**Kiểu dữ liệu:**
+**Kiá»ƒu dá»¯ liá»‡u:**
 
 ```json
 {
@@ -255,14 +255,16 @@ Mỗi khách hàng có **1 giỏ hàng duy nhất** (quan hệ 1-1 với `KhachH
 }
 ```
 
-> **Lưu ý:** Endpoint này chỉ **xem trước** kết quả giảm giá, không thực sự tạo đơn hàng. Khách hàng dùng thông tin này để xác nhận trước khi đặt hàng.
+> **LÆ°u Ã½:** Endpoint nÃ y chá»‰ **xem trÆ°á»›c** káº¿t quáº£ giáº£m giÃ¡, khÃ´ng thá»±c sá»± táº¡o Ä‘Æ¡n hÃ ng. KhÃ¡ch hÃ ng dÃ¹ng thÃ´ng tin nÃ y Ä‘á»ƒ xÃ¡c nháº­n trÆ°á»›c khi Ä‘áº·t hÃ ng.
 
 ---
 
-## Phân quyền
+## PhÃ¢n quyá»n
 
-| Vai trò    | Thêm SP | Xem giỏ | Xóa SP | KM hợp lệ | Áp dụng KM |
+| Vai trÃ²    | ThÃªm SP | Xem giá» | XÃ³a SP | KM há»£p lá»‡ | Ãp dá»¥ng KM |
 | ---------- | ------- | ------- | ------ | --------- | ---------- |
-| ADMIN      | ✅      | ✅      | ✅     | ✅        | ✅         |
-| NHAN_VIEN  | ❌      | ❌      | ❌     | ❌        | ❌         |
-| KHACH_HANG | ✅      | ✅      | ✅     | ✅        | ✅         |
+| ADMIN      | âœ…      | âœ…      | âœ…     | âœ…        | âœ…         |
+| NHAN_VIEN  | âŒ      | âŒ      | âŒ     | âŒ        | âŒ         |
+| KHACH_HANG | âœ…      | âœ…      | âœ…     | âœ…        | âœ…         |
+
+

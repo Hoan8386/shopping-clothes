@@ -1,36 +1,36 @@
-# Hình Ảnh Controller
+﻿# HÃ¬nh áº¢nh Controller
 
 > **Base Path:** `/api/v1/hinh-anh`  
 > **File:** `HinhAnhController.java`  
-> Quản lý hình ảnh sản phẩm, hỗ trợ upload lên MinIO.
+> Quáº£n lÃ½ hÃ¬nh áº£nh sáº£n pháº©m, há»— trá»£ upload lÃªn Cloudinary.
 
 ---
 
-## Tổng quan
+## Tá»•ng quan
 
-### Cấu trúc dữ liệu `HinhAnh`
+### Cáº¥u trÃºc dá»¯ liá»‡u `HinhAnh`
 
-| Trường           | Kiểu           | Mô tả                           |
+| TrÆ°á»ng           | Kiá»ƒu           | MÃ´ táº£                           |
 | ---------------- | -------------- | ------------------------------- |
-| `id`             | Long           | Mã hình ảnh (auto-increment)    |
-| `chiTietSanPham` | ChiTietSanPham | Chi tiết sản phẩm liên kết (FK) |
-| `tenHinhAnh`     | String(255)    | Tên file ảnh (trên MinIO)       |
-| `ngayTao`        | LocalDateTime  | Ngày tạo (tự động)              |
-| `ngayCapNhat`    | LocalDateTime  | Ngày cập nhật (tự động)         |
+| `id`             | Long           | MÃ£ hÃ¬nh áº£nh (auto-increment)    |
+| `chiTietSanPham` | ChiTietSanPham | Chi tiáº¿t sáº£n pháº©m liÃªn káº¿t (FK) |
+| `tenHinhAnh`     | String(255)    | TÃªn file áº£nh (trÃªn Cloudinary)       |
+| `ngayTao`        | LocalDateTime  | NgÃ y táº¡o (tá»± Ä‘á»™ng)              |
+| `ngayCapNhat`    | LocalDateTime  | NgÃ y cáº­p nháº­t (tá»± Ä‘á»™ng)         |
 
-> **Xem ảnh:** Truy cập `GET /storage/{tenHinhAnh}` để lấy file ảnh (không cần xác thực).
+> **Xem áº£nh:** Truy cáº­p `GET {secure_url_cloudinary}` Ä‘á»ƒ láº¥y file áº£nh (khÃ´ng cáº§n xÃ¡c thá»±c).
 
 ---
 
-## 1. Lấy danh sách hình ảnh
+## 1. Láº¥y danh sÃ¡ch hÃ¬nh áº£nh
 
-| Thuộc tính   | Chi tiết               |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t               |
 | ------------ | ---------------------- |
 | **URL**      | `GET /api/v1/hinh-anh` |
 | **Method**   | `GET`                  |
-| **Xác thực** | Bearer Token (JWT)     |
+| **XÃ¡c thá»±c** | Bearer Token (JWT)     |
 
-**Response:** `200 OK` — Trả về `List<HinhAnh>`
+**Response:** `200 OK` â€” Tráº£ vá» `List<HinhAnh>`
 
 ```json
 [
@@ -43,7 +43,7 @@
 ]
 ```
 
-**Kiểu dữ liệu:**
+**Kiá»ƒu dá»¯ liá»‡u:**
 
 ```json
 {
@@ -58,83 +58,83 @@
 
 ---
 
-## 2. Lấy hình ảnh theo ID
+## 2. Láº¥y hÃ¬nh áº£nh theo ID
 
-| Thuộc tính   | Chi tiết                    |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t                    |
 | ------------ | --------------------------- |
 | **URL**      | `GET /api/v1/hinh-anh/{id}` |
 | **Method**   | `GET`                       |
-| **Xác thực** | Bearer Token (JWT)          |
+| **XÃ¡c thá»±c** | Bearer Token (JWT)          |
 
-**Response:** `200 OK` — Trả về `HinhAnh`
+**Response:** `200 OK` â€” Tráº£ vá» `HinhAnh`
 
-**Lỗi:**
+**Lá»—i:**
 
-| HTTP Status | Mô tả                   |
+| HTTP Status | MÃ´ táº£                   |
 | ----------- | ----------------------- |
-| `400`       | Không tìm thấy hình ảnh |
+| `400`       | KhÃ´ng tÃ¬m tháº¥y hÃ¬nh áº£nh |
 
 ---
 
-## 3. Lấy hình ảnh theo chi tiết sản phẩm
+## 3. Láº¥y hÃ¬nh áº£nh theo chi tiáº¿t sáº£n pháº©m
 
-| Thuộc tính   | Chi tiết                                                    |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t                                                    |
 | ------------ | ----------------------------------------------------------- |
 | **URL**      | `GET /api/v1/hinh-anh/chi-tiet-san-pham/{chiTietSanPhamId}` |
 | **Method**   | `GET`                                                       |
-| **Xác thực** | Bearer Token (JWT)                                          |
+| **XÃ¡c thá»±c** | Bearer Token (JWT)                                          |
 
 **Path Parameters:**
 
-| Tham số            | Kiểu | Mô tả                |
+| Tham sá»‘            | Kiá»ƒu | MÃ´ táº£                |
 | ------------------ | ---- | -------------------- |
-| `chiTietSanPhamId` | Long | Mã chi tiết sản phẩm |
+| `chiTietSanPhamId` | Long | MÃ£ chi tiáº¿t sáº£n pháº©m |
 
-**Response:** `200 OK` — Trả về `List<HinhAnh>`
+**Response:** `200 OK` â€” Tráº£ vá» `List<HinhAnh>`
 
 ---
 
-## 4. Upload hình ảnh cho chi tiết sản phẩm
+## 4. Upload hÃ¬nh áº£nh cho chi tiáº¿t sáº£n pháº©m
 
-| Thuộc tính       | Chi tiết                                          |
+| Thuá»™c tÃ­nh       | Chi tiáº¿t                                          |
 | ---------------- | ------------------------------------------------- |
 | **URL**          | `POST /api/v1/hinh-anh/upload/{chiTietSanPhamId}` |
 | **Method**       | `POST`                                            |
 | **Content-Type** | `multipart/form-data`                             |
-| **Xác thực**     | Bearer Token (JWT)                                |
+| **XÃ¡c thá»±c**     | Bearer Token (JWT)                                |
 
 **Path Parameters:**
 
-| Tham số            | Kiểu | Mô tả                |
+| Tham sá»‘            | Kiá»ƒu | MÃ´ táº£                |
 | ------------------ | ---- | -------------------- |
-| `chiTietSanPhamId` | Long | Mã chi tiết sản phẩm |
+| `chiTietSanPhamId` | Long | MÃ£ chi tiáº¿t sáº£n pháº©m |
 
 **Form Data:**
 
-| Tham số | Kiểu         | Bắt buộc | Mô tả                         |
+| Tham sá»‘ | Kiá»ƒu         | Báº¯t buá»™c | MÃ´ táº£                         |
 | ------- | ------------ | -------- | ----------------------------- |
-| `files` | List\<File\> | **Có**   | Danh sách file ảnh cần upload |
+| `files` | List\<File\> | **CÃ³**   | Danh sÃ¡ch file áº£nh cáº§n upload |
 
-**Response:** `201 Created` — Trả về `List<HinhAnh>`
+**Response:** `201 Created` â€” Tráº£ vá» `List<HinhAnh>`
 
-> **Lưu ý:** Ảnh được upload lên MinIO storage. URL truy cập: `GET /storage/{tenHinhAnh}`.
+> **LÆ°u Ã½:** áº¢nh Ä‘Æ°á»£c upload lÃªn Cloudinary storage. URL truy cáº­p: `GET {secure_url_cloudinary}`.
 
-**Lỗi:**
+**Lá»—i:**
 
-| HTTP Status | Mô tả                            |
+| HTTP Status | MÃ´ táº£                            |
 | ----------- | -------------------------------- |
-| `400`       | Không tìm thấy chi tiết sản phẩm |
+| `400`       | KhÃ´ng tÃ¬m tháº¥y chi tiáº¿t sáº£n pháº©m |
 
 ---
 
-## 5. Tạo hình ảnh (JSON)
+## 5. Táº¡o hÃ¬nh áº£nh (JSON)
 
-| Thuộc tính       | Chi tiết                |
+| Thuá»™c tÃ­nh       | Chi tiáº¿t                |
 | ---------------- | ----------------------- |
 | **URL**          | `POST /api/v1/hinh-anh` |
 | **Method**       | `POST`                  |
 | **Content-Type** | `application/json`      |
-| **Xác thực**     | Bearer Token (JWT)      |
+| **XÃ¡c thá»±c**     | Bearer Token (JWT)      |
 
 **Request Body:**
 
@@ -145,7 +145,7 @@
 }
 ```
 
-**Kiểu dữ liệu:**
+**Kiá»ƒu dá»¯ liá»‡u:**
 
 ```json
 {
@@ -156,20 +156,20 @@
 }
 ```
 
-**Response:** `201 Created` — Trả về `HinhAnh`
+**Response:** `201 Created` â€” Tráº£ vá» `HinhAnh`
 
 ---
 
-## 6. Cập nhật hình ảnh
+## 6. Cáº­p nháº­t hÃ¬nh áº£nh
 
-| Thuộc tính       | Chi tiết               |
+| Thuá»™c tÃ­nh       | Chi tiáº¿t               |
 | ---------------- | ---------------------- |
 | **URL**          | `PUT /api/v1/hinh-anh` |
 | **Method**       | `PUT`                  |
 | **Content-Type** | `application/json`     |
-| **Xác thực**     | Bearer Token (JWT)     |
+| **XÃ¡c thá»±c**     | Bearer Token (JWT)     |
 
-**Request Body:** (phải có `id`)
+**Request Body:** (pháº£i cÃ³ `id`)
 
 ```json
 {
@@ -178,7 +178,7 @@
 }
 ```
 
-**Kiểu dữ liệu:**
+**Kiá»ƒu dá»¯ liá»‡u:**
 
 ```json
 {
@@ -187,38 +187,40 @@
 }
 ```
 
-**Response:** `200 OK` — Trả về `HinhAnh`
+**Response:** `200 OK` â€” Tráº£ vá» `HinhAnh`
 
-**Lỗi:**
+**Lá»—i:**
 
-| HTTP Status | Mô tả                           |
+| HTTP Status | MÃ´ táº£                           |
 | ----------- | ------------------------------- |
-| `400`       | Mã hình ảnh không được để trống |
+| `400`       | MÃ£ hÃ¬nh áº£nh khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng |
 
 ---
 
-## 7. Xóa hình ảnh
+## 7. XÃ³a hÃ¬nh áº£nh
 
-| Thuộc tính   | Chi tiết                       |
+| Thuá»™c tÃ­nh   | Chi tiáº¿t                       |
 | ------------ | ------------------------------ |
 | **URL**      | `DELETE /api/v1/hinh-anh/{id}` |
 | **Method**   | `DELETE`                       |
-| **Xác thực** | Bearer Token (JWT)             |
+| **XÃ¡c thá»±c** | Bearer Token (JWT)             |
 
 **Response:** `204 No Content`
 
-**Lỗi:**
+**Lá»—i:**
 
-| HTTP Status | Mô tả                   |
+| HTTP Status | MÃ´ táº£                   |
 | ----------- | ----------------------- |
-| `400`       | Không tìm thấy hình ảnh |
+| `400`       | KhÃ´ng tÃ¬m tháº¥y hÃ¬nh áº£nh |
 
 ---
 
-## Phân quyền
+## PhÃ¢n quyá»n
 
-| Vai trò    | GET (Xem) | POST/Upload | PUT (Sửa) | DELETE (Xóa) |
+| Vai trÃ²    | GET (Xem) | POST/Upload | PUT (Sá»­a) | DELETE (XÃ³a) |
 | ---------- | --------- | ----------- | --------- | ------------ |
-| ADMIN      | ✅        | ✅          | ✅        | ✅           |
-| NHAN_VIEN  | ✅        | ✅          | ✅        | ❌           |
-| KHACH_HANG | ✅        | ❌          | ❌        | ❌           |
+| ADMIN      | âœ…        | âœ…          | âœ…        | âœ…           |
+| NHAN_VIEN  | âœ…        | âœ…          | âœ…        | âŒ           |
+| KHACH_HANG | âœ…        | âŒ          | âŒ        | âŒ           |
+
+

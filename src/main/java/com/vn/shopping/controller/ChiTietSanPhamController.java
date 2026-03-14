@@ -59,7 +59,7 @@ public class ChiTietSanPhamController {
     }
 
     /**
-     * Tạo chi tiết sản phẩm + upload nhiều hình ảnh lên MinIO
+     * Tạo chi tiết sản phẩm + upload nhiều hình ảnh lên Cloudinary
      * Tự động tạo cho TẤT CẢ cửa hàng hiện có
      * Gửi multipart/form-data: từng trường + "files" (nhiều ảnh, không bắt buộc)
      */
