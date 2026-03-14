@@ -678,6 +678,7 @@ public class DonHangService {
                         if (ct.getChiTietSanPham() != null) {
                             ctDto.setChiTietSanPhamId(ct.getChiTietSanPham().getId());
                             if (ct.getChiTietSanPham().getSanPham() != null) {
+                                ctDto.setSanPhamId(ct.getChiTietSanPham().getSanPham().getId());
                                 ctDto.setTenSanPham(ct.getChiTietSanPham().getSanPham().getTenSanPham());
                                 ctDto.setHinhAnhChinh(ct.getChiTietSanPham().getSanPham().getHinhAnhChinh());
                             }

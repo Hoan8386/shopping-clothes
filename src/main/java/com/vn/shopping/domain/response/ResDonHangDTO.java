@@ -74,6 +74,7 @@ public class ResDonHangDTO {
     public static class ChiTietDonHangDTO {
         private Long id;
         private Long chiTietSanPhamId;
+        private Long sanPhamId;
         private String tenSanPham;
         private String hinhAnhChinh;
         private String tenMauSac;

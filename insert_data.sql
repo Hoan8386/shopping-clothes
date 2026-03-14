@@ -16,7 +16,7 @@ INSERT INTO roles (name, description, active, createdAt) VALUES
     ('KHACH_HANG', 'Khách hàng mua sắm',        TRUE, NOW());
 
 -- ---------------------------------------------------------
--- 2. PERMISSIONS (60 quyền cho tất cả endpoint)
+-- 2. PERMISSIONS (113 quyền cho tất cả endpoint)
 -- ---------------------------------------------------------
 INSERT INTO permissions (name, apiPath, method, module, createdAt) VALUES
     -- === SAN_PHAM (1-5) ===
@@ -172,13 +172,26 @@ INSERT INTO permissions (name, apiPath, method, module, createdAt) VALUES
 
     -- === GIO_HANG_KHUYEN_MAI (108-109) ===
     ('Xem khuyến mãi hợp lệ giỏ hàng', '/api/v1/gio-hang/khuyen-mai-hop-le',                    'GET',    'GIO_HANG',            NOW()),
-    ('Xem trước áp dụng khuyến mãi',   '/api/v1/gio-hang/ap-dung-khuyen-mai',                   'POST',   'GIO_HANG',            NOW());
+    ('Xem trước áp dụng khuyến mãi',   '/api/v1/gio-hang/ap-dung-khuyen-mai',                   'POST',   'GIO_HANG',            NOW()),
+
+    -- === NHAN_VIEN (110-113) ===
+    ('Xem tất cả nhân viên',           '/api/v1/nhan-vien',                                     'GET',    'NHAN_VIEN',           NOW()),
+    ('Tạo nhân viên',                  '/api/v1/nhan-vien',                                     'POST',   'NHAN_VIEN',           NOW()),
+    ('Cập nhật nhân viên',             '/api/v1/nhan-vien',                                     'PUT',    'NHAN_VIEN',           NOW()),
+    ('Xóa nhân viên',                  '/api/v1/nhan-vien/{id}',                                'DELETE', 'NHAN_VIEN',           NOW()),
+
+    -- === TRA_HANG (114-118) ===
+    ('Tạo phiếu trả hàng',             '/api/v1/tra-hang',                                      'POST',   'TRA_HANG',            NOW()),
+    ('Xem tất cả phiếu trả hàng',      '/api/v1/tra-hang',                                      'GET',    'TRA_HANG',            NOW()),
+    ('Xem phiếu trả hàng theo mã',     '/api/v1/tra-hang/{id}',                                 'GET',    'TRA_HANG',            NOW()),
+    ('Xem phiếu trả theo đơn hàng',    '/api/v1/tra-hang/don-hang/{donHangId}',                 'GET',    'TRA_HANG',            NOW()),
+    ('Cập nhật trạng thái trả hàng',   '/api/v1/tra-hang/{id}/trang-thai',                      'PUT',    'TRA_HANG',            NOW());
 
 -- ---------------------------------------------------------
 -- 3. PERMISSION_ROLE
 -- ---------------------------------------------------------
 
--- ADMIN (role_id=1): TẤT CẢ QUYỀN (1-109)
+-- ADMIN (role_id=1): TẤT CẢ QUYỀN (1-113)
 INSERT INTO permission_role (role_id, permission_id) VALUES
     (1,1),(1,2),(1,3),(1,4),(1,5),
     (1,6),(1,7),(1,8),(1,9),(1,10),
@@ -200,7 +213,9 @@ INSERT INTO permission_role (role_id, permission_id) VALUES
     (1,89),(1,90),(1,91),(1,92),(1,93),
     (1,94),(1,95),(1,96),(1,97),(1,98),
     (1,99),(1,100),(1,101),(1,102),(1,103),(1,104),
-    (1,105),(1,106),(1,107),(1,108),(1,109);
+    (1,105),(1,106),(1,107),(1,108),(1,109),
+    (1,110),(1,111),(1,112),(1,113),
+    (1,114),(1,115),(1,116),(1,117),(1,118);
 
 -- NHAN_VIEN (role_id=2): Xem tất cả danh mục, SP, CTSP, hình ảnh, cửa hàng (chỉ GET) + Phiếu nhập + Đơn hàng
 INSERT INTO permission_role (role_id, permission_id) VALUES
@@ -220,7 +235,9 @@ INSERT INTO permission_role (role_id, permission_id) VALUES
     (2,83),(2,84),(2,85),  -- CHI_TIET_DON_HANG: xem all, xem theo đơn, xem id
     (2,89),(2,90),         -- KHUYEN_MAI_HOA_DON: xem all, xem id
     (2,94),(2,95),         -- KHUYEN_MAI_DIEM: xem all, xem id
-    (2,99),(2,100),(2,101),(2,107); -- DANH_GIA_SP: xem all, xem id, xem theo SP, xem theo CTDH
+    (2,99),(2,100),(2,101),(2,107), -- DANH_GIA_SP: xem all, xem id, xem theo SP, xem theo CTDH
+    (2,110),          -- NHAN_VIEN: xem danh sách nhân viên (cùng cửa hàng)
+    (2,115),(2,116),(2,117),(2,118); -- TRA_HANG: xem all, xem mã, xem theo đơn, cập nhật trạng thái
 
 -- KHACH_HANG (role_id=3): Xem SP/danh mục + giỏ hàng (thêm/xem/xóa/khuyến mãi)
 INSERT INTO permission_role (role_id, permission_id) VALUES
@@ -238,7 +255,8 @@ INSERT INTO permission_role (role_id, permission_id) VALUES
     (3,83),(3,84),(3,85),  -- CHI_TIET_DON_HANG: xem all, xem theo đơn, xem id
     (3,89),(3,90),         -- KHUYEN_MAI_HOA_DON: xem all, xem id
     (3,94),(3,95),         -- KHUYEN_MAI_DIEM: xem all, xem id
-    (3,99),(3,100),(3,101),(3,102),(3,103),(3,104),(3,106),(3,107); -- DANH_GIA_SP: xem all, xem id, xem theo SP, xem của tôi, tạo, xóa, cập nhật, xem theo CTDH
+    (3,99),(3,100),(3,101),(3,102),(3,103),(3,104),(3,106),(3,107), -- DANH_GIA_SP: xem all, xem id, xem theo SP, xem của tôi, tạo, xóa, cập nhật, xem theo CTDH
+    (3,114),(3,116),(3,117); -- TRA_HANG: tạo phiếu, xem theo mã, xem theo đơn hàng
 
 -- ---------------------------------------------------------
 -- 4. CỬA HÀNG
@@ -434,3 +452,17 @@ INSERT INTO ChiTietGioHang (MaGioHang, MaChiTietSanPham, SoLuong) VALUES
     (2, 1, 1),   -- KH Minh: Áo Oxford M Trắng x1
     (4, 5, 3),   -- KH Tuấn: Nịt Da L Đen x3
     (5, 2, 2);   -- KH Yến: Áo Oxford L Trắng x2
+
+-- ---------------------------------------------------------
+-- 25. TRẢ HÀNG
+-- ---------------------------------------------------------
+INSERT INTO TraHang (MaDonHang, LyDoTraHang, TrangThai, TongTien, NgayTao) VALUES
+    (5, 'Quần Jean không đúng màu đã đặt', 0, 500, NOW()),   -- id=1: KH Yến trả CTDH 7 (Quần Jean x1), tongTien = 900 - 400 = 500
+    (3, 'Váy bị lỗi đường may',            1, 0,   NOW());   -- id=2: KH Hoa trả CTDH 4 (Váy Hoa x1), tongTien = 285 - 300 = -15 → 0 (đã duyệt)
+
+-- ---------------------------------------------------------
+-- 26. CHI TIẾT TRẢ HÀNG
+-- ---------------------------------------------------------
+INSERT INTO ChiTietTraHang (MaTraHang, MaSanPhamTra, GhiTru, TrangThai, NgayTao) VALUES
+    (1, 7, 'Màu đen nhưng nhận được màu xanh',   0, NOW()),   -- Trả Quần Jean M Đen x1 (CTDH 7 - đơn 5)
+    (2, 4, 'Đường may bị lỗi ở phần eo',         1, NOW());   -- Trả Váy Hoa S Đỏ x1 (CTDH 4 - đơn 3), đã duyệt

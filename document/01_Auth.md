@@ -67,8 +67,7 @@ Hệ thống sử dụng **JWT (JSON Web Token)** để xác thực. Hỗ trợ 
       "id": 4,
       "name": "KHACH_HANG",
       "description": "Khách hàng mua sắm",
-      "active": 1,
-      "permissions": [...]
+      "active": 1
     },
     "diemTichLuy": 10
   }

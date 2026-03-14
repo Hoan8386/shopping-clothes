@@ -1320,6 +1320,72 @@
 			]
 		},
 		{
+			"name": "Nhân Viên ( Admin / Nhân viên)",
+			"description": "Quản lý nhân viên — Admin CRUD, Nhân viên chỉ xem danh sách cùng cửa hàng",
+			"item": [
+				{
+					"name": "Xem tất cả nhân viên ( Admin/Nhân viên)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/nhan-vien",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "nhan-vien"]
+						},
+						"description": " Admin: xem toàn bộ nhân viên. Nhân viên: chỉ xem nhân viên cùng cửa hàng."
+					}
+				},
+				{
+					"name": "Tạo nhân viên ( Admin)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cuaHang\": { \"id\": 1 },\n    \"tenNhanVien\": \"Nhân viên test\",\n    \"email\": \"nv.test@s.com\",\n    \"soDienThoai\": \"0901999999\",\n    \"matKhau\": \"123456\",\n    \"ngayBatDauLam\": \"2026-03-12T08:00:00\",\n    \"trangThai\": 1,\n    \"role\": { \"id\": 2 }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/nhan-vien",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "nhan-vien"]
+						},
+						"description": " Admin — Tạo nhân viên mới. Response trả về ResNhanVienDTO"
+					}
+				},
+				{
+					"name": "Cập nhật nhân viên ( Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"cuaHang\": { \"id\": 1 },\n    \"tenNhanVien\": \"An Updated\",\n    \"email\": \"an@s.com\",\n    \"soDienThoai\": \"0901000001\",\n    \"matKhau\": \"123456\",\n    \"ngayBatDauLam\": \"2026-03-12T08:00:00\",\n    \"ngayKetThucLam\": null,\n    \"trangThai\": 1,\n    \"role\": { \"id\": 2 }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/nhan-vien",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "nhan-vien"]
+						},
+						"description": " Admin — Cập nhật thông tin nhân viên. Response trả về ResNhanVienDTO"
+					}
+				},
+				{
+					"name": "Xóa nhân viên ( Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/nhan-vien/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "nhan-vien", "1"]
+						},
+						"description": " Admin — Xóa nhân viên theo id"
+					}
+				}
+			]
+		},
+		{
 			"name": "Roles — Vai trò ( Admin)",
 			"description": "Quản lý vai trò — Chỉ Admin có permission mới được thao tác",
 			"item": [
@@ -2371,6 +2437,105 @@
 							"path": ["api", "v1", "roles"]
 						},
 						"description": "Khách hàng xem roles → Phải bị 403 Forbidden"
+					}
+				}
+			]
+		},
+		{
+			"name": "Trả Hàng (🔒 Khách hàng / Admin)",
+			"description": "Quản lý phiếu trả hàng — Khách hàng tạo yêu cầu trả khi đơn đã nhận (trạng thái 5), Admin/Nhân viên duyệt hoặc từ chối",
+			"item": [
+				{
+					"name": "Tạo phiếu trả hàng (KH Yến - đơn 5)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"donHangId\": 5,\n    \"lyDoTraHang\": \"Quần Jean không đúng màu đã đặt\",\n    \"chiTietTraHangs\": [\n        {\n            \"chiTietDonHangId\": 7,\n            \"ghiTru\": \"Màu đen nhưng nhận được màu xanh\"\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/tra-hang",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "tra-hang"]
+						},
+						"description": "Tạo phiếu trả hàng — Đơn hàng phải ở trạng thái 5 (Đã nhận hàng) và KH phải là chủ đơn"
+					}
+				},
+				{
+					"name": "Lấy danh sách phiếu trả (phân trang)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/tra-hang?page=0&size=10&sort=ngayTao,desc",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "tra-hang"],
+							"query": [
+								{ "key": "page", "value": "0" },
+								{ "key": "size", "value": "10" },
+								{ "key": "sort", "value": "ngayTao,desc" }
+							]
+						},
+						"description": "Lấy danh sách tất cả phiếu trả hàng (có phân trang)"
+					}
+				},
+				{
+					"name": "Xem phiếu trả theo mã",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/tra-hang/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "tra-hang", "1"]
+						},
+						"description": "Lấy chi tiết phiếu trả hàng theo mã"
+					}
+				},
+				{
+					"name": "Xem phiếu trả theo đơn hàng",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/tra-hang/don-hang/5",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "tra-hang", "don-hang", "5"]
+						},
+						"description": "Lấy danh sách phiếu trả hàng theo mã đơn hàng"
+					}
+				},
+				{
+					"name": "Duyệt phiếu trả hàng (Admin/NV)",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/tra-hang/1/trang-thai?trangThai=1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "tra-hang", "1", "trang-thai"],
+							"query": [
+								{ "key": "trangThai", "value": "1" }
+							]
+						},
+						"description": "Cập nhật trạng thái phiếu trả: 1 = Duyệt, 2 = Từ chối. Chỉ cập nhật được khi phiếu đang ở trạng thái 0 (Chờ xử lý)"
+					}
+				},
+				{
+					"name": "Từ chối phiếu trả hàng (Admin/NV)",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/tra-hang/1/trang-thai?trangThai=2",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "tra-hang", "1", "trang-thai"],
+							"query": [
+								{ "key": "trangThai", "value": "2" }
+							]
+						},
+						"description": "Từ chối phiếu trả hàng — trạng thái = 2"
 					}
 				}
 			]

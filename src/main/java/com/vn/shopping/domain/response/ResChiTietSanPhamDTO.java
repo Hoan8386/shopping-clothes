@@ -14,9 +14,11 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ResChiTietSanPhamDTO {
     private Long id;
+    private Long sanPhamId;
     private Long maPhieuNhap;
     private String tenCuaHang;
     private Integer soLuong;
+    private Double giaBan;
     private Integer trangThai;
     private String moTa;
     private String ghiTru;

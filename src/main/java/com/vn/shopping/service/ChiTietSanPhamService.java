@@ -241,7 +241,9 @@ public class ChiTietSanPhamService {
         }
 
         if (ct.getSanPham() != null) {
+            dto.setSanPhamId(ct.getSanPham().getId());
             dto.setTenSanPham(ct.getSanPham().getTenSanPham());
+            dto.setGiaBan(ct.getSanPham().getGiaBan());
         }
         if (ct.getMauSac() != null) {
             dto.setTenMauSac(ct.getMauSac().getTenMauSac());
