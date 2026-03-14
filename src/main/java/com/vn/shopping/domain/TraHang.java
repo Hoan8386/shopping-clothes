@@ -28,6 +28,9 @@ public class TraHang {
     @Column(name = "LyDoTraHang", length = 255)
     private String lyDoTraHang;
 
+    @Column(name = "LinkAnh", length = 500)
+    private String linkAnh;
+
     @Column(name = "TrangThai")
     private Integer trangThai;
 

@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,10 +44,17 @@ public class PhieuNhapController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime ngayNhanHangTu,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime ngayNhanHangDen,
             Pageable pageable) {
+        Pageable effectivePageable = pageable;
+        if (pageable == null || pageable.getSort().isUnsorted()) {
+            int page = pageable != null ? pageable.getPageNumber() : 0;
+            int size = pageable != null ? pageable.getPageSize() : 20;
+            effectivePageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "ngayTao"));
+        }
+
         ResultPaginationDTO result = phieuNhapService.filterPhieuNhap(
                 tenPhieuNhap, trangThai, tenCuaHang, tenNhaCungCap,
                 ngayTaoTu, ngayTaoDen,
-                ngayDatHangTu, ngayDatHangDen, ngayNhanHangTu, ngayNhanHangDen, pageable);
+                ngayDatHangTu, ngayDatHangDen, ngayNhanHangTu, ngayNhanHangDen, effectivePageable);
         return ResponseEntity.ok(result);
     }
 

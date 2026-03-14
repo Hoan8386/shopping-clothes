@@ -1,6 +1,8 @@
 package com.vn.shopping.controller;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,8 +35,15 @@ public class DonHangController {
             @RequestParam(required = false) Integer trangThaiThanhToan,
             @RequestParam(required = false) Integer hinhThucDonHang,
             Pageable pageable) {
+        Pageable effectivePageable = pageable;
+        if (pageable == null || pageable.getSort().isUnsorted()) {
+            int page = pageable != null ? pageable.getPageNumber() : 0;
+            int size = pageable != null ? pageable.getPageSize() : 20;
+            effectivePageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "ngayTao"));
+        }
+
         return ResponseEntity.ok(donHangService.findAllWithFilter(
-                cuaHangId, nhanVienId, trangThai, trangThaiThanhToan, hinhThucDonHang, pageable));
+                cuaHangId, nhanVienId, trangThai, trangThaiThanhToan, hinhThucDonHang, effectivePageable));
     }
 
     @GetMapping("/{id}")

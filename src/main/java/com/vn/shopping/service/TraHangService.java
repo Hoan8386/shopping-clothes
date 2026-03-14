@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.vn.shopping.domain.*;
 import com.vn.shopping.domain.request.ReqTraHangDTO;
@@ -25,30 +26,42 @@ public class TraHangService {
     private final ChiTietDonHangRepository chiTietDonHangRepository;
     private final ChiTietSanPhamRepository chiTietSanPhamRepository;
     private final KhachHangRepository khachHangRepository;
+    private final StorageService storageService;
 
     public TraHangService(TraHangRepository traHangRepository,
             ChiTietTraHangRepository chiTietTraHangRepository,
             DonHangRepository donHangRepository,
             ChiTietDonHangRepository chiTietDonHangRepository,
             ChiTietSanPhamRepository chiTietSanPhamRepository,
-            KhachHangRepository khachHangRepository) {
+            KhachHangRepository khachHangRepository,
+            StorageService storageService) {
         this.traHangRepository = traHangRepository;
         this.chiTietTraHangRepository = chiTietTraHangRepository;
         this.donHangRepository = donHangRepository;
         this.chiTietDonHangRepository = chiTietDonHangRepository;
         this.chiTietSanPhamRepository = chiTietSanPhamRepository;
         this.khachHangRepository = khachHangRepository;
+        this.storageService = storageService;
     }
 
     /**
      * Tạo phiếu trả hàng:
      * - Đơn hàng phải ở trạng thái 5 (Đã nhận hàng)
-     * - Tính tongTien = tổng tiền đơn hàng (tongTienTra) - tổng giá gốc sản phẩm
-     * trả
+     * - Tính tongTien = tổng tiền đơn hàng đã thanh toán - tổng tiền sản phẩm trả
+     * theo
+     * giá đã giảm thực tế của đơn hàng
      * - Trạng thái phiếu trả: 0 = Chờ xử lý
      */
     @Transactional
     public TraHang taoPhieuTraHang(ReqTraHangDTO req) throws IdInvalidException {
+        return taoPhieuTraHang(req, null);
+    }
+
+    /**
+     * Tạo phiếu trả hàng có thể đính kèm ảnh bằng chứng.
+     */
+    @Transactional
+    public TraHang taoPhieuTraHang(ReqTraHangDTO req, MultipartFile file) throws IdInvalidException {
         // 1. Validate đơn hàng
         DonHang donHang = donHangRepository.findById(req.getDonHangId())
                 .orElseThrow(() -> new IdInvalidException("Không tìm thấy đơn hàng: " + req.getDonHangId()));
@@ -74,11 +87,19 @@ public class TraHangService {
         TraHang traHang = new TraHang();
         traHang.setDonHang(donHang);
         traHang.setLyDoTraHang(req.getLyDoTraHang());
+        if (file != null && !file.isEmpty()) {
+            String contentType = file.getContentType() == null ? "" : file.getContentType().toLowerCase();
+            if (!contentType.startsWith("image/")) {
+                throw new IdInvalidException("Ảnh trả hàng không hợp lệ. Vui lòng chọn file ảnh.");
+            }
+            String linkAnh = storageService.uploadSingleFile(file, "return");
+            traHang.setLinkAnh(linkAnh);
+        }
         traHang.setTrangThai(0); // 0 = Chờ xử lý
 
-        // 5. Tạo chi tiết trả hàng và tính tổng giá gốc sản phẩm trả
+        // 5. Tạo chi tiết trả hàng và tính tổng tiền sản phẩm trả theo giá thực thu
         List<ChiTietTraHang> chiTietList = new ArrayList<>();
-        double tongGiaGocSanPhamTra = 0;
+        double tongTienSanPhamTraTheoGiaDaGiam = 0;
 
         for (ReqTraHangDTO.ChiTietTraHangItem item : req.getChiTietTraHangs()) {
             ChiTietDonHang ctdh = chiTietDonHangRepository.findById(item.getChiTietDonHangId())
@@ -97,16 +118,18 @@ public class TraHangService {
             chiTiet.setTrangThai(0); // 0 = Chờ xử lý
             chiTietList.add(chiTiet);
 
-            // Giá gốc sản phẩm trả = giaSanPham * soLuong (giá trước giảm)
-            tongGiaGocSanPhamTra += ctdh.getGiaSanPham() * ctdh.getSoLuong();
+            // Dùng thành tiền dòng đã phân bổ đầy đủ giảm giá toàn đơn để hoàn trả chính
+            // xác.
+            tongTienSanPhamTraTheoGiaDaGiam += ctdh.getThanhTien() != null ? ctdh.getThanhTien() : 0;
         }
 
         traHang.setChiTietTraHangs(chiTietList);
 
-        // 6. Tổng tiền trả = tổng tiền đơn hàng đã thanh toán - giá gốc sản phẩm trả
+        // 6. Tổng tiền còn lại sau trả = tổng tiền đơn hàng đã thanh toán - tiền trả
+        // theo giá đã giảm
         int tongTienDonHang = donHang.getTongTienTra() != null ? donHang.getTongTienTra() : donHang.getTongTien();
-        double tongTienTra = tongTienDonHang - tongGiaGocSanPhamTra;
-        traHang.setTongTien(tongTienTra);
+        double tongTienConLaiSauTra = tongTienDonHang - tongTienSanPhamTraTheoGiaDaGiam;
+        traHang.setTongTien(Math.max(tongTienConLaiSauTra, 0));
 
         return traHangRepository.save(traHang);
     }
@@ -184,6 +207,7 @@ public class TraHangService {
         dto.setId(traHang.getId());
         dto.setDonHangId(traHang.getDonHang() != null ? traHang.getDonHang().getId() : null);
         dto.setLyDoTraHang(traHang.getLyDoTraHang());
+        dto.setLinkAnh(traHang.getLinkAnh());
         dto.setTrangThai(mapTrangThai(traHang.getTrangThai()));
         dto.setTongTien(traHang.getTongTien());
         dto.setNgayTao(traHang.getNgayTao());
@@ -200,7 +224,7 @@ public class TraHangService {
                 ChiTietDonHang ctdh = ct.getSanPhamTra();
                 if (ctdh != null) {
                     ctDto.setChiTietDonHangId(ctdh.getId());
-                    ctDto.setGiaSanPham(ctdh.getGiaSanPham());
+                    ctDto.setGiaSanPham(ctdh.getThanhTien());
                     ctDto.setSoLuong(ctdh.getSoLuong());
                     ctDto.setThanhTien(ctdh.getThanhTien());
 

@@ -89,6 +89,7 @@ public class AuthController {
                     nhanVien.getId(),
                     nhanVien.getEmail(),
                     nhanVien.getTenNhanVien(),
+                    nhanVien.getSoDienThoai(),
                     role,
                     null);
             res.setUser(userLogin);
@@ -105,6 +106,7 @@ public class AuthController {
                         currentUserDB.getId(),
                         currentUserDB.getEmail(),
                         currentUserDB.getTenKhachHang(),
+                        currentUserDB.getSdt(),
                         role,
                         currentUserDB.getDiemTichLuy());
                 res.setUser(userLogin);
@@ -156,6 +158,7 @@ public class AuthController {
             userLogin.setId(nhanVienDB.getId());
             userLogin.setEmail(nhanVienDB.getEmail());
             userLogin.setName(nhanVienDB.getTenNhanVien());
+            userLogin.setSdt(nhanVienDB.getSoDienThoai());
             userLogin.setRole(role);
             userLogin.setDiemTichLuy(null);
             userGetAccount.setUser(userLogin);
@@ -170,6 +173,7 @@ public class AuthController {
                 userLogin.setId(currentUserDB.getId());
                 userLogin.setEmail(currentUserDB.getEmail());
                 userLogin.setName(currentUserDB.getTenKhachHang());
+                userLogin.setSdt(currentUserDB.getSdt());
                 userLogin.setRole(role);
                 userLogin.setDiemTichLuy(currentUserDB.getDiemTichLuy());
                 userGetAccount.setUser(userLogin);
@@ -207,6 +211,7 @@ public class AuthController {
                     nhanVien.getId(),
                     nhanVien.getEmail(),
                     nhanVien.getTenNhanVien(),
+                    nhanVien.getSoDienThoai(),
                     role,
                     null);
             res.setUser(userLogin);
@@ -220,6 +225,7 @@ public class AuthController {
                     khachHang.getId(),
                     khachHang.getEmail(),
                     khachHang.getTenKhachHang(),
+                    khachHang.getSdt(),
                     role,
                     khachHang.getDiemTichLuy());
             res.setUser(userLogin);

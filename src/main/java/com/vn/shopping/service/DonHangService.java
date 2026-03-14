@@ -107,6 +107,7 @@ public class DonHangService {
         DonHang savedDonHang = donHangRepository.save(donHang);
 
         // 4. Tạo chi tiết đơn hàng từ giỏ hàng
+        // Giá sản phẩm ở chi tiết đơn hàng là giá đã gồm giảm của sản phẩm (nếu có).
         int tongTien = 0;
         List<ChiTietDonHang> chiTietDonHangs = new ArrayList<>();
 
@@ -115,17 +116,16 @@ public class DonHangService {
             SanPham sp = ctsp.getSanPham();
 
             Double giaBan = sp.getGiaBan() != null ? sp.getGiaBan() : 0;
-            Integer giaGiamPhanTram = sp.getGiaGiam() != null ? sp.getGiaGiam() : 0;
-            Double giaGiam = giaBan * giaGiamPhanTram / 100;
-            Double giaSauGiam = giaBan - giaGiam;
-            Double thanhTien = giaSauGiam * ctgh.getSoLuong();
+            Integer phanTramGiamSanPham = sp.getGiaGiam() != null ? sp.getGiaGiam() : 0;
+            Double giaSauGiamSanPham = giaBan - (giaBan * phanTramGiamSanPham / 100);
+            Double thanhTien = giaSauGiamSanPham * ctgh.getSoLuong();
 
             ChiTietDonHang ctdh = new ChiTietDonHang();
             ctdh.setDonHang(savedDonHang);
             ctdh.setChiTietSanPham(ctsp);
-            ctdh.setGiaSanPham(giaBan);
-            ctdh.setGiamGia(giaGiamPhanTram.doubleValue());
-            ctdh.setGiaGiam(giaGiam);
+            ctdh.setGiaSanPham(giaSauGiamSanPham);
+            ctdh.setGiamGia(0d);
+            ctdh.setGiaGiam(0d);
             ctdh.setSoLuong(ctgh.getSoLuong());
             ctdh.setThanhTien(thanhTien);
 
@@ -147,7 +147,11 @@ public class DonHangService {
         // 5.2. Áp dụng khuyến mãi theo điểm tích lũy theo mã người dùng chọn
         apDungKhuyenMaiTheoDiem(savedDonHang, khachHang, req.getMaKhuyenMaiDiem());
 
+        // 5.3. Phân bổ giảm giá toàn đơn xuống từng sản phẩm để dùng đúng khi trả hàng.
+        phanBoGiamGiaToanDonChoChiTiet(savedDonHang, chiTietDonHangs);
+
         donHangRepository.save(savedDonHang);
+        chiTietDonHangRepository.saveAll(chiTietDonHangs);
 
         // 6. Trừ số lượng sản phẩm
         truSoLuongSanPham(chiTietDonHangs);
@@ -479,6 +483,61 @@ public class DonHangService {
         // Trừ điểm tích lũy theo mức điểm yêu cầu của mã
         khachHang.setDiemTichLuy(diemKhachHang - diemCan);
         khachHangRepository.save(khachHang);
+    }
+
+    /**
+     * Phân bổ tổng giảm giá của hóa đơn xuống từng dòng sản phẩm theo tỷ trọng
+     * thành tiền.
+     * - tongTienChuaGiam = tổng tiền trước mã giảm (đã gồm giảm theo sản phẩm)
+     * - tongTienSauGiam = tổng tiền phải trả sau tất cả mã giảm
+     * - tỷ lệ giảm = (tongTienChuaGiam - tongTienSauGiam) / tongTienChuaGiam
+     */
+    private void phanBoGiamGiaToanDonChoChiTiet(DonHang donHang, List<ChiTietDonHang> chiTietDonHangs) {
+        if (chiTietDonHangs == null || chiTietDonHangs.isEmpty()) {
+            return;
+        }
+
+        double tongTienChuaGiam = donHang.getTongTien() != null ? donHang.getTongTien() : 0;
+        double tongTienSauGiam = donHang.getTongTienTra() != null ? donHang.getTongTienTra() : tongTienChuaGiam;
+        double tongTienGiam = Math.max(tongTienChuaGiam - tongTienSauGiam, 0);
+
+        if (tongTienChuaGiam <= 0 || tongTienGiam <= 0) {
+            for (ChiTietDonHang ct : chiTietDonHangs) {
+                ct.setGiamGia(0d);
+                ct.setGiaGiam(0d);
+                double gia = ct.getGiaSanPham() != null ? ct.getGiaSanPham() : 0;
+                int soLuong = ct.getSoLuong() != null ? ct.getSoLuong() : 0;
+                ct.setThanhTien(gia * soLuong);
+            }
+            return;
+        }
+
+        double tongDaPhanBo = 0;
+        for (int i = 0; i < chiTietDonHangs.size(); i++) {
+            ChiTietDonHang ct = chiTietDonHangs.get(i);
+            double giaDonVi = ct.getGiaSanPham() != null ? ct.getGiaSanPham() : 0;
+            int soLuong = ct.getSoLuong() != null ? ct.getSoLuong() : 0;
+            double thanhTienDong = giaDonVi * soLuong;
+
+            double giamDong;
+            if (i == chiTietDonHangs.size() - 1) {
+                giamDong = Math.max(tongTienGiam - tongDaPhanBo, 0);
+            } else {
+                giamDong = (thanhTienDong / tongTienChuaGiam) * tongTienGiam;
+                tongDaPhanBo += giamDong;
+            }
+
+            // Không để giảm vượt quá thành tiền dòng.
+            giamDong = Math.min(giamDong, thanhTienDong);
+
+            double giaGiamDonVi = soLuong > 0 ? giamDong / soLuong : 0;
+            double phanTramGiam = giaDonVi > 0 ? (giaGiamDonVi / giaDonVi) * 100 : 0;
+            double thanhTienSauGiam = Math.max(thanhTienDong - giamDong, 0);
+
+            ct.setGiaGiam(giaGiamDonVi);
+            ct.setGiamGia(phanTramGiam);
+            ct.setThanhTien(thanhTienSauGiam);
+        }
     }
 
     /**

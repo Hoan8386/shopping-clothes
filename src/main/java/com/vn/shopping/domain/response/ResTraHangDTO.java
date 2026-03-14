@@ -16,6 +16,7 @@ public class ResTraHangDTO {
     private Long id;
     private Long donHangId;
     private String lyDoTraHang;
+    private String linkAnh;
     private String trangThai;
     private Double tongTien;
     private LocalDateTime ngayTao;

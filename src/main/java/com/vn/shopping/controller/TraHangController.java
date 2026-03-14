@@ -5,8 +5,10 @@ import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.vn.shopping.domain.TraHang;
 import com.vn.shopping.domain.request.ReqTraHangDTO;
@@ -30,6 +32,15 @@ public class TraHangController {
     @ApiMessage("Tạo phiếu trả hàng")
     public ResponseEntity<ResTraHangDTO> taoPhieuTraHang(@RequestBody ReqTraHangDTO req) throws IdInvalidException {
         TraHang traHang = traHangService.taoPhieuTraHang(req);
+        return ResponseEntity.status(HttpStatus.CREATED).body(traHangService.convertToDTO(traHang));
+    }
+
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ApiMessage("Tạo phiếu trả hàng kèm ảnh")
+    public ResponseEntity<ResTraHangDTO> taoPhieuTraHangKemAnh(
+            @RequestPart("data") ReqTraHangDTO req,
+            @RequestPart(value = "file", required = false) MultipartFile file) throws IdInvalidException {
+        TraHang traHang = traHangService.taoPhieuTraHang(req, file);
         return ResponseEntity.status(HttpStatus.CREATED).body(traHangService.convertToDTO(traHang));
     }
 
