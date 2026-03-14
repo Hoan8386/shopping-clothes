@@ -2,6 +2,7 @@ package com.vn.shopping.controller;
 
 import java.util.List;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -9,8 +10,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.vn.shopping.domain.ChiTietSanPham;
+import com.vn.shopping.domain.NhanVien;
 import com.vn.shopping.domain.response.ResChiTietSanPhamDTO;
 import com.vn.shopping.service.ChiTietSanPhamService;
+import com.vn.shopping.service.NhanVienService;
 import com.vn.shopping.util.anotation.ApiMessage;
 import com.vn.shopping.util.error.IdInvalidException;
 
@@ -19,9 +22,12 @@ import com.vn.shopping.util.error.IdInvalidException;
 public class ChiTietSanPhamController {
 
     private final ChiTietSanPhamService chiTietSanPhamService;
+    private final NhanVienService nhanVienService;
 
-    public ChiTietSanPhamController(ChiTietSanPhamService chiTietSanPhamService) {
+    public ChiTietSanPhamController(ChiTietSanPhamService chiTietSanPhamService,
+            NhanVienService nhanVienService) {
         this.chiTietSanPhamService = chiTietSanPhamService;
+        this.nhanVienService = nhanVienService;
     }
 
     @GetMapping
@@ -56,6 +62,23 @@ public class ChiTietSanPhamController {
     @ApiMessage("Get product details by product id")
     public ResponseEntity<List<ResChiTietSanPhamDTO>> getBySanPhamId(@PathVariable("sanPhamId") long sanPhamId) {
         return ResponseEntity.ok(chiTietSanPhamService.findBySanPhamIdDTO(sanPhamId));
+    }
+
+    @GetMapping("/san-pham-tai-cua-hang")
+    @ApiMessage("Lấy chi tiết sản phẩm theo cửa hàng của nhân viên đang đăng nhập")
+    public ResponseEntity<List<ResChiTietSanPhamDTO>> getSanPhamTaiCuaHang() throws IdInvalidException {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        NhanVien nhanVien = nhanVienService.findByEmail(email);
+        if (nhanVien == null) {
+            throw new IdInvalidException("Không tìm thấy nhân viên với email: " + email);
+        }
+        if (nhanVien.getCuaHang() == null || nhanVien.getCuaHang().getId() == null) {
+            throw new IdInvalidException("Nhân viên chưa được gán cửa hàng");
+        }
+
+        Long maCuaHang = nhanVien.getCuaHang().getId();
+        return ResponseEntity.ok(
+                chiTietSanPhamService.findAllDTOWithFilter(null, null, null, maCuaHang, null));
     }
 
     /**

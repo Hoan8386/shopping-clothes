@@ -438,6 +438,19 @@
 					}
 				},
 				{
+					"name": "Xem CTSP tại cửa hàng của nhân viên ( Nhân viên)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/chi-tiet-san-pham/san-pham-tai-cua-hang",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "chi-tiet-san-pham", "san-pham-tai-cua-hang"]
+						},
+						"description": " Nhân viên — Lấy danh sách CTSP theo đúng cửa hàng đang được gán qua token đăng nhập"
+					}
+				},
+				{
 					"name": "Tạo chi tiết SP + Upload nhiều ảnh ( Admin)",
 					"request": {
 						"method": "POST",

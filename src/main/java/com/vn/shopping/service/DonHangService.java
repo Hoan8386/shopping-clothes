@@ -235,6 +235,11 @@ public class DonHangService {
             validateChuyenTrangThai(trangThaiCu, trangThaiMoi);
             existing.setTrangThai(trangThaiMoi);
 
+            // Khi khách xác nhận đã nhận hàng, đơn được xem là đã thanh toán.
+            if (trangThaiMoi == 5) {
+                existing.setTrangThaiThanhToan(1);
+            }
+
             // Nếu đơn hàng online (1) và nhân viên cập nhật trạng thái → gán nhân viên
             if (existing.getHinhThucDonHang() != null && existing.getHinhThucDonHang() == 1
                     && (trangThaiMoi == 1 || trangThaiMoi == 2 || trangThaiMoi == 3)) {

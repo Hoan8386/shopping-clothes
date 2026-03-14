@@ -24,32 +24,32 @@
 
 Há»‡ thá»‘ng **Shopping** lÃ  á»©ng dá»¥ng quáº£n lÃ½ bÃ¡n hÃ ng thá»i trang vá»›i cÃ¡c module:
 
-| STT | Module              | Base Path API                     | MÃ´ táº£                              |
-| --- | ------------------- | --------------------------------- | ---------------------------------- |
-| 1   | XÃ¡c thá»±c            | `/api/v1/auth`                    | ÄÄƒng nháº­p, Ä‘Äƒng kÃ½, refresh token  |
-| 2   | Sáº£n pháº©m            | `/api/v1/san-pham`                | Quáº£n lÃ½ sáº£n pháº©m                   |
-| 3   | Chi tiáº¿t sáº£n pháº©m   | `/api/v1/chi-tiet-san-pham`       | Biáº¿n thá»ƒ SP (mÃ u, size, cá»­a hÃ ng)  |
-| 4   | ÄÆ¡n hÃ ng            | `/api/v1/don-hang`                | Quáº£n lÃ½ Ä‘Æ¡n hÃ ng online & táº¡i quáº§y |
-| 5   | Chi tiáº¿t Ä‘Æ¡n hÃ ng   | `/api/v1/chi-tiet-don-hang`       | DÃ²ng sáº£n pháº©m trong Ä‘Æ¡n hÃ ng       |
-| 6   | Giá» hÃ ng            | `/api/v1/gio-hang`                | Giá» hÃ ng khÃ¡ch hÃ ng                |
-| 7   | Phiáº¿u nháº­p          | `/api/v1/phieu-nhap`              | Nháº­p hÃ ng tá»« nhÃ  cung cáº¥p          |
-| 8   | Chi tiáº¿t phiáº¿u nháº­p | `/api/v1/chi-tiet-phieu-nhap`     | DÃ²ng SP trong phiáº¿u nháº­p           |
-| 9   | HÃ¬nh áº£nh            | `/api/v1/hinh-anh`                | Quáº£n lÃ½ áº£nh SP (Cloudinary)             |
-| 10  | Bá»™ sÆ°u táº­p          | `/api/v1/bo-suu-tap`              | BST theo mÃ¹a                       |
-| 11  | Kiá»ƒu sáº£n pháº©m       | `/api/v1/kieu-san-pham`           | Loáº¡i SP: Ão, Quáº§n, VÃ¡y, ...        |
-| 12  | ThÆ°Æ¡ng hiá»‡u         | `/api/v1/thuong-hieu`             | Nike, Adidas, Uniqlo, ...          |
-| 13  | MÃ u sáº¯c             | `/api/v1/mau-sac`                 | Äen, Tráº¯ng, Äá», ...                |
-| 14  | KÃ­ch thÆ°á»›c          | `/api/v1/kich-thuoc`              | S, M, L, XL, ...                   |
-| 15  | Cá»­a hÃ ng            | `/api/v1/cua-hang`                | Chi nhÃ¡nh cá»­a hÃ ng                 |
-| 16  | NhÃ  cung cáº¥p        | `/api/v1/nha-cung-cap`            | NhÃ  cung cáº¥p hÃ ng hÃ³a              |
-| 17  | Vai trÃ²             | `/api/v1/roles`                   | Quáº£n lÃ½ Role (RBAC)                |
-| 18  | Quyá»n háº¡n           | `/api/v1/permissions`             | Quáº£n lÃ½ Permission                 |
-| 19  | KM theo hÃ³a Ä‘Æ¡n     | `/api/v1/khuyen-mai-theo-hoa-don` | Giáº£m giÃ¡ theo tá»•ng Ä‘Æ¡n hÃ ng        |
-| 20  | KM theo Ä‘iá»ƒm        | `/api/v1/khuyen-mai-theo-diem`    | Äá»•i Ä‘iá»ƒm tÃ­ch lÅ©y láº¥y mÃ£ giáº£m      |
-| 21  | ÄÃ¡nh giÃ¡ sáº£n pháº©m   | `/api/v1/danh-gia-san-pham`       | ÄÃ¡nh giÃ¡ & bÃ¬nh luáº­n SP            |
-| 22  | Storage (Public)    | `{secure_url_cloudinary}`             | Truy cáº­p áº£nh (khÃ´ng cáº§n auth)      |
-| 23  | NhÃ¢n viÃªn           | `/api/v1/nhan-vien`               | Quáº£n lÃ½ thÃ´ng tin nhÃ¢n viÃªn        |
-| 24  | Tráº£ hÃ ng            | `/api/v1/tra-hang`                | Phiáº¿u tráº£ hÃ ng & hoÃ n tiá»n         |
+| STT | Module                    | Base Path API                     | MÃ´ táº£                                     |
+| --- | ------------------------- | --------------------------------- | -------------------------------------------- |
+| 1   | XÃ¡c thá»±c               | `/api/v1/auth`                    | ÄÄƒng nháº­p, Ä‘Äƒng kÃ½, refresh token      |
+| 2   | Sáº£n pháº©m              | `/api/v1/san-pham`                | Quáº£n lÃ½ sáº£n pháº©m                      |
+| 3   | Chi tiáº¿t sáº£n pháº©m   | `/api/v1/chi-tiet-san-pham`       | Biáº¿n thá»ƒ SP (mÃ u, size, cá»­a hÃ ng)    |
+| 4   | ÄÆ¡n hÃ ng                | `/api/v1/don-hang`                | Quáº£n lÃ½ Ä‘Æ¡n hÃ ng online & táº¡i quáº§y |
+| 5   | Chi tiáº¿t Ä‘Æ¡n hÃ ng    | `/api/v1/chi-tiet-don-hang`       | DÃ²ng sáº£n pháº©m trong Ä‘Æ¡n hÃ ng         |
+| 6   | Giá» hÃ ng                | `/api/v1/gio-hang`                | Giá» hÃ ng khÃ¡ch hÃ ng                      |
+| 7   | Phiáº¿u nháº­p            | `/api/v1/phieu-nhap`              | Nháº­p hÃ ng tá»« nhÃ  cung cáº¥p            |
+| 8   | Chi tiáº¿t phiáº¿u nháº­p | `/api/v1/chi-tiet-phieu-nhap`     | DÃ²ng SP trong phiáº¿u nháº­p                |
+| 9   | HÃ¬nh áº£nh               | `/api/v1/hinh-anh`                | Quáº£n lÃ½ áº£nh SP (Cloudinary)             |
+| 10  | Bá»™ sÆ°u táº­p           | `/api/v1/bo-suu-tap`              | BST theo mÃ¹a                                |
+| 11  | Kiá»ƒu sáº£n pháº©m       | `/api/v1/kieu-san-pham`           | Loáº¡i SP: Ão, Quáº§n, VÃ¡y, ...             |
+| 12  | ThÆ°Æ¡ng hiá»‡u           | `/api/v1/thuong-hieu`             | Nike, Adidas, Uniqlo, ...                    |
+| 13  | MÃ u sáº¯c                | `/api/v1/mau-sac`                 | Äen, Tráº¯ng, Äá», ...                       |
+| 14  | KÃ­ch thÆ°á»›c            | `/api/v1/kich-thuoc`              | S, M, L, XL, ...                             |
+| 15  | Cá»­a hÃ ng               | `/api/v1/cua-hang`                | Chi nhÃ¡nh cá»­a hÃ ng                       |
+| 16  | NhÃ  cung cáº¥p           | `/api/v1/nha-cung-cap`            | NhÃ  cung cáº¥p hÃ ng hÃ³a                   |
+| 17  | Vai trÃ²                  | `/api/v1/roles`                   | Quáº£n lÃ½ Role (RBAC)                       |
+| 18  | Quyá»n háº¡n              | `/api/v1/permissions`             | Quáº£n lÃ½ Permission                        |
+| 19  | KM theo hÃ³a Ä‘Æ¡n        | `/api/v1/khuyen-mai-theo-hoa-don` | Giáº£m giÃ¡ theo tá»•ng Ä‘Æ¡n hÃ ng          |
+| 20  | KM theo Ä‘iá»ƒm           | `/api/v1/khuyen-mai-theo-diem`    | Äá»•i Ä‘iá»ƒm tÃ­ch lÅ©y láº¥y mÃ£ giáº£m    |
+| 21  | ÄÃ¡nh giÃ¡ sáº£n pháº©m   | `/api/v1/danh-gia-san-pham`       | ÄÃ¡nh giÃ¡ & bÃ¬nh luáº­n SP                 |
+| 22  | Storage (Public)          | `{secure_url_cloudinary}`         | Truy cáº­p áº£nh (khÃ´ng cáº§n auth)         |
+| 23  | NhÃ¢n viÃªn               | `/api/v1/nhan-vien`               | Quáº£n lÃ½ thÃ´ng tin nhÃ¢n viÃªn            |
+| 24  | Tráº£ hÃ ng               | `/api/v1/tra-hang`                | Phiáº¿u tráº£ hÃ ng & hoÃ n tiá»n            |
 
 ---
 
@@ -74,24 +74,24 @@ Há»‡ thá»‘ng **Shopping** lÃ  á»©ng dá»¥ng quáº£n lÃ½ bÃ¡
 
 ### 2.3 CÃ¡c endpoint Ä‘Äƒng nháº­p / Ä‘Äƒng kÃ½ (Whitelist â€” khÃ´ng cáº§n token)
 
-| Endpoint                | Method | MÃ´ táº£                                      |
-| ----------------------- | ------ | ------------------------------------------ |
-| `/api/v1/auth/login`    | POST   | ÄÄƒng nháº­p (email + password)               |
-| `/api/v1/auth/register` | POST   | ÄÄƒng kÃ½ tÃ i khoáº£n khÃ¡ch hÃ ng má»›i           |
-| `/api/v1/auth/refresh`  | GET    | Gia háº¡n access token (dÃ¹ng refresh cookie) |
-| `{secure_url_cloudinary}`   | GET    | Xem áº£nh sáº£n pháº©m (public)                  |
-| `/v3/api-docs/**`       | GET    | Swagger API docs                           |
-| `/swagger-ui/**`        | GET    | Swagger UI                                 |
+| Endpoint                  | Method | MÃ´ táº£                                      |
+| ------------------------- | ------ | --------------------------------------------- |
+| `/api/v1/auth/login`      | POST   | ÄÄƒng nháº­p (email + password)               |
+| `/api/v1/auth/register`   | POST   | ÄÄƒng kÃ½ tÃ i khoáº£n khÃ¡ch hÃ ng má»›i     |
+| `/api/v1/auth/refresh`    | GET    | Gia háº¡n access token (dÃ¹ng refresh cookie) |
+| `{secure_url_cloudinary}` | GET    | Xem áº£nh sáº£n pháº©m (public)               |
+| `/v3/api-docs/**`         | GET    | Swagger API docs                              |
+| `/swagger-ui/**`          | GET    | Swagger UI                                    |
 
 ---
 
 ## 3. CÃ¡c vai trÃ² trong há»‡ thá»‘ng
 
-| ID  | TÃªn vai trÃ²  | Loáº¡i user | MÃ´ táº£                                                          |
-| --- | ------------ | --------- | -------------------------------------------------------------- |
-| 1   | `ADMIN`      | NhanVien  | Quáº£n trá»‹ viÃªn toÃ n quyá»n â€” truy cáº­p má»i chá»©c nÄƒng              |
-| 2   | `NHAN_VIEN`  | NhanVien  | NhÃ¢n viÃªn bÃ¡n hÃ ng â€” xem danh má»¥c, xá»­ lÃ½ Ä‘Æ¡n hÃ ng & phiáº¿u nháº­p |
-| 3   | `KHACH_HANG` | KhachHang | KhÃ¡ch hÃ ng â€” mua sáº¯m, giá» hÃ ng, Ä‘áº·t hÃ ng, Ä‘Ã¡nh giÃ¡ sáº£n pháº©m    |
+| ID  | TÃªn vai trÃ² | Loáº¡i user | MÃ´ táº£                                                                         |
+| --- | ------------- | ----------- | -------------------------------------------------------------------------------- |
+| 1   | `ADMIN`       | NhanVien    | Quáº£n trá»‹ viÃªn toÃ n quyá»n â€” truy cáº­p má»i chá»©c nÄƒng                 |
+| 2   | `NHAN_VIEN`   | NhanVien    | NhÃ¢n viÃªn bÃ¡n hÃ ng â€” xem danh má»¥c, xá»­ lÃ½ Ä‘Æ¡n hÃ ng & phiáº¿u nháº­p |
+| 3   | `KHACH_HANG`  | KhachHang   | KhÃ¡ch hÃ ng â€” mua sáº¯m, giá» hÃ ng, Ä‘áº·t hÃ ng, Ä‘Ã¡nh giÃ¡ sáº£n pháº©m   |
 
 ---
 
@@ -101,56 +101,57 @@ Há»‡ thá»‘ng **Shopping** lÃ  á»©ng dá»¥ng quáº£n lÃ½ bÃ¡
 
 ### 4.1 Quáº£n lÃ½ sáº£n pháº©m & danh má»¥c
 
-| Chá»©c nÄƒng                                | Endpoint                                                                                                           | Method |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | ------ |
+| Chá»©c nÄƒng                                    | Endpoint                                                                                                           | Method |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | ------ |
 | Xem danh sÃ¡ch sáº£n pháº©m (lá»c, phÃ¢n trang) | `GET /api/v1/san-pham?tenSanPham=&kieuSanPhamId=&boSuuTapId=&thuongHieuId=&trangThai=&giaMin=&giaMax=&page=&size=` | GET    |
-| Xem chi tiáº¿t sáº£n pháº©m                    | `GET /api/v1/san-pham/{id}`                                                                                        | GET    |
-| Táº¡o sáº£n pháº©m (upload áº£nh)                | `POST /api/v1/san-pham` (multipart/form-data)                                                                      | POST   |
-| Cáº­p nháº­t sáº£n pháº©m                        | `PUT /api/v1/san-pham`                                                                                             | PUT    |
-| XÃ³a sáº£n pháº©m                             | `DELETE /api/v1/san-pham/{id}`                                                                                     | DELETE |
-| CRUD Kiá»ƒu sáº£n pháº©m                       | `/api/v1/kieu-san-pham` + `/{id}`                                                                                  | CRUD   |
-| CRUD Bá»™ sÆ°u táº­p                          | `/api/v1/bo-suu-tap` + `/{id}`                                                                                     | CRUD   |
-| CRUD ThÆ°Æ¡ng hiá»‡u                         | `/api/v1/thuong-hieu` + `/{id}`                                                                                    | CRUD   |
-| CRUD MÃ u sáº¯c                             | `/api/v1/mau-sac` + `/{id}`                                                                                        | CRUD   |
-| CRUD KÃ­ch thÆ°á»›c                          | `/api/v1/kich-thuoc` + `/{id}`                                                                                     | CRUD   |
+| Xem chi tiáº¿t sáº£n pháº©m                     | `GET /api/v1/san-pham/{id}`                                                                                        | GET    |
+| Táº¡o sáº£n pháº©m (upload áº£nh)               | `POST /api/v1/san-pham` (multipart/form-data)                                                                      | POST   |
+| Cáº­p nháº­t sáº£n pháº©m                       | `PUT /api/v1/san-pham`                                                                                             | PUT    |
+| XÃ³a sáº£n pháº©m                               | `DELETE /api/v1/san-pham/{id}`                                                                                     | DELETE |
+| CRUD Kiá»ƒu sáº£n pháº©m                        | `/api/v1/kieu-san-pham` + `/{id}`                                                                                  | CRUD   |
+| CRUD Bá»™ sÆ°u táº­p                            | `/api/v1/bo-suu-tap` + `/{id}`                                                                                     | CRUD   |
+| CRUD ThÆ°Æ¡ng hiá»‡u                            | `/api/v1/thuong-hieu` + `/{id}`                                                                                    | CRUD   |
+| CRUD MÃ u sáº¯c                                 | `/api/v1/mau-sac` + `/{id}`                                                                                        | CRUD   |
+| CRUD KÃ­ch thÆ°á»›c                             | `/api/v1/kich-thuoc` + `/{id}`                                                                                     | CRUD   |
 
 ### 4.2 Quáº£n lÃ½ chi tiáº¿t sáº£n pháº©m & hÃ¬nh áº£nh
 
-| Chá»©c nÄƒng                    | Endpoint                                                      | Method |
-| ---------------------------- | ------------------------------------------------------------- | ------ |
-| Xem táº¥t cáº£ biáº¿n thá»ƒ SP       | `GET /api/v1/chi-tiet-san-pham`                               | GET    |
-| Xem biáº¿n thá»ƒ theo ID         | `GET /api/v1/chi-tiet-san-pham/{id}`                          | GET    |
-| Xem biáº¿n thá»ƒ theo sáº£n pháº©m   | `GET /api/v1/chi-tiet-san-pham/san-pham/{sanPhamId}`          | GET    |
-| Táº¡o biáº¿n thá»ƒ SP (upload áº£nh) | `POST /api/v1/chi-tiet-san-pham` (multipart)                  | POST   |
-| Cáº­p nháº­t biáº¿n thá»ƒ            | `PUT /api/v1/chi-tiet-san-pham`                               | PUT    |
-| XÃ³a biáº¿n thá»ƒ                 | `DELETE /api/v1/chi-tiet-san-pham/{id}`                       | DELETE |
-| Xem hÃ¬nh áº£nh theo CTSP       | `GET /api/v1/hinh-anh/chi-tiet-san-pham/{chiTietSanPhamId}`   | GET    |
-| Upload hÃ¬nh áº£nh cho CTSP     | `POST /api/v1/hinh-anh/upload/{chiTietSanPhamId}` (multipart) | POST   |
-| Táº¡o/Cáº­p nháº­t/XÃ³a hÃ¬nh áº£nh    | `/api/v1/hinh-anh` + `/{id}`                                  | CRUD   |
+| Chá»©c nÄƒng                                          | Endpoint                                                      | Method |
+| ----------------------------------------------------- | ------------------------------------------------------------- | ------ |
+| Xem táº¥t cáº£ biáº¿n thá»ƒ SP                        | `GET /api/v1/chi-tiet-san-pham`                               | GET    |
+| Xem biáº¿n thá»ƒ theo ID                              | `GET /api/v1/chi-tiet-san-pham/{id}`                          | GET    |
+| Xem biáº¿n thá»ƒ theo sáº£n pháº©m                    | `GET /api/v1/chi-tiet-san-pham/san-pham/{sanPhamId}`          | GET    |
+| Xem biáº¿n thá»ƒ theo cá»­a hÃ ng Ä‘ang Ä‘Äƒng nháº­p | `GET /api/v1/chi-tiet-san-pham/san-pham-tai-cua-hang`         | GET    |
+| Táº¡o biáº¿n thá»ƒ SP (upload áº£nh)                  | `POST /api/v1/chi-tiet-san-pham` (multipart)                  | POST   |
+| Cáº­p nháº­t biáº¿n thá»ƒ                             | `PUT /api/v1/chi-tiet-san-pham`                               | PUT    |
+| XÃ³a biáº¿n thá»ƒ                                     | `DELETE /api/v1/chi-tiet-san-pham/{id}`                       | DELETE |
+| Xem hÃ¬nh áº£nh theo CTSP                             | `GET /api/v1/hinh-anh/chi-tiet-san-pham/{chiTietSanPhamId}`   | GET    |
+| Upload hÃ¬nh áº£nh cho CTSP                           | `POST /api/v1/hinh-anh/upload/{chiTietSanPhamId}` (multipart) | POST   |
+| Táº¡o/Cáº­p nháº­t/XÃ³a hÃ¬nh áº£nh                   | `/api/v1/hinh-anh` + `/{id}`                                  | CRUD   |
 
 ### 4.3 Quáº£n lÃ½ Ä‘Æ¡n hÃ ng
 
-| Chá»©c nÄƒng                                | Endpoint                                                                                                  | Method |
-| ---------------------------------------- | --------------------------------------------------------------------------------------------------------- | ------ |
+| Chá»©c nÄƒng                                   | Endpoint                                                                                                  | Method |
+| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ------ |
 | Xem danh sÃ¡ch Ä‘Æ¡n hÃ ng (lá»c, phÃ¢n trang) | `GET /api/v1/don-hang?cuaHangId=&nhanVienId=&trangThai=&trangThaiThanhToan=&hinhThucDonHang=&page=&size=` | GET    |
-| Xem chi tiáº¿t Ä‘Æ¡n hÃ ng                    | `GET /api/v1/don-hang/{id}`                                                                               | GET    |
-| Táº¡o Ä‘Æ¡n hÃ ng online                      | `POST /api/v1/don-hang/online`                                                                            | POST   |
-| Táº¡o Ä‘Æ¡n hÃ ng táº¡i quáº§y                    | `POST /api/v1/don-hang/tai-quay`                                                                          | POST   |
-| Cáº­p nháº­t tráº¡ng thÃ¡i Ä‘Æ¡n hÃ ng             | `PUT /api/v1/don-hang`                                                                                    | PUT    |
-| XÃ³a Ä‘Æ¡n hÃ ng                             | `DELETE /api/v1/don-hang/{id}`                                                                            | DELETE |
-| Xem chi tiáº¿t dÃ²ng sáº£n pháº©m trong Ä‘Æ¡n     | `GET /api/v1/chi-tiet-don-hang/don-hang/{donHangId}`                                                      | GET    |
-| CRUD chi tiáº¿t Ä‘Æ¡n hÃ ng                   | `/api/v1/chi-tiet-don-hang` + `/{id}`                                                                     | CRUD   |
+| Xem chi tiáº¿t Ä‘Æ¡n hÃ ng                     | `GET /api/v1/don-hang/{id}`                                                                               | GET    |
+| Táº¡o Ä‘Æ¡n hÃ ng online                       | `POST /api/v1/don-hang/online`                                                                            | POST   |
+| Táº¡o Ä‘Æ¡n hÃ ng táº¡i quáº§y                 | `POST /api/v1/don-hang/tai-quay`                                                                          | POST   |
+| Cáº­p nháº­t tráº¡ng thÃ¡i Ä‘Æ¡n hÃ ng         | `PUT /api/v1/don-hang`                                                                                    | PUT    |
+| XÃ³a Ä‘Æ¡n hÃ ng                               | `DELETE /api/v1/don-hang/{id}`                                                                            | DELETE |
+| Xem chi tiáº¿t dÃ²ng sáº£n pháº©m trong Ä‘Æ¡n  | `GET /api/v1/chi-tiet-don-hang/don-hang/{donHangId}`                                                      | GET    |
+| CRUD chi tiáº¿t Ä‘Æ¡n hÃ ng                    | `/api/v1/chi-tiet-don-hang` + `/{id}`                                                                     | CRUD   |
 
 **Tráº¡ng thÃ¡i Ä‘Æ¡n hÃ ng (trangThai):**
 
-| GiÃ¡ trá»‹ | Ã nghÄ©a         | Ghi chÃº                                      |
-| ------- | --------------- | -------------------------------------------- |
-| 0       | Chá» xÃ¡c nháº­n    | Máº·c Ä‘á»‹nh khi táº¡o Ä‘Æ¡n online                  |
-| 1       | ÄÃ£ xÃ¡c nháº­n     | NV/Admin xÃ¡c nháº­n                            |
-| 2       | Äang Ä‘Ã³ng gÃ³i   | Äang chuáº©n bá»‹ hÃ ng                           |
-| 3       | Äang giao hÃ ng  | ÄÃ£ gá»­i cho váº­n chuyá»ƒn                        |
-| 4       | ÄÃ£ há»§y          | Há»§y Ä‘Æ¡n hÃ ng                                 |
-| 5       | ÄÃ£ nháº­n hÃ ng âœ… | Giao thÃ nh cÃ´ng â†’ tá»± Ä‘á»™ng cá»™ng Ä‘iá»ƒm tÃ­ch lÅ©y |
+| GiÃ¡ trá»‹ | Ã nghÄ©a             | Ghi chÃº                                                     |
+| ---------- | -------------------- | ------------------------------------------------------------ |
+| 0          | Chá» xÃ¡c nháº­n     | Máº·c Ä‘á»‹nh khi táº¡o Ä‘Æ¡n online                         |
+| 1          | ÄÃ£ xÃ¡c nháº­n      | NV/Admin xÃ¡c nháº­n                                         |
+| 2          | Äang Ä‘Ã³ng gÃ³i     | Äang chuáº©n bá»‹ hÃ ng                                      |
+| 3          | Äang giao hÃ ng      | ÄÃ£ gá»­i cho váº­n chuyá»ƒn                                 |
+| 4          | ÄÃ£ há»§y            | Há»§y Ä‘Æ¡n hÃ ng                                            |
+| 5          | ÄÃ£ nháº­n hÃ ng âœ… | Giao thÃ nh cÃ´ng â†’ tá»± Ä‘á»™ng cá»™ng Ä‘iá»ƒm tÃ­ch lÅ©y |
 
 **Tráº¡ng thÃ¡i thanh toÃ¡n (trangThaiThanhToan):** `0` = ChÆ°a thanh toÃ¡n, `1` = ÄÃ£ thanh toÃ¡n
 
@@ -158,69 +159,69 @@ Há»‡ thá»‘ng **Shopping** lÃ  á»©ng dá»¥ng quáº£n lÃ½ bÃ¡
 
 ### 4.4 Quáº£n lÃ½ nháº­p hÃ ng
 
-| Chá»©c nÄƒng                      | Endpoint                                                                                        | Method |
-| ------------------------------ | ----------------------------------------------------------------------------------------------- | ------ |
+| Chá»©c nÄƒng                         | Endpoint                                                                                        | Method |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------- | ------ |
 | Xem danh sÃ¡ch phiáº¿u nháº­p (lá»c) | `GET /api/v1/phieu-nhap?tenPhieuNhap=&trangThai=&cuaHang=&nhaCungCap=&ngayBatDau=&ngayKetThuc=` | GET    |
 | Xem chi tiáº¿t phiáº¿u nháº­p        | `GET /api/v1/phieu-nhap/{id}`                                                                   | GET    |
 | Táº¡o phiáº¿u nháº­p                 | `POST /api/v1/phieu-nhap`                                                                       | POST   |
-| Cáº­p nháº­t phiáº¿u nháº­p            | `PUT /api/v1/phieu-nhap`                                                                        | PUT    |
-| **Kiá»ƒm kÃª phiáº¿u nháº­p**         | `PUT /api/v1/phieu-nhap/kiem-ke/{id}`                                                           | PUT    |
-| XÃ³a phiáº¿u nháº­p                 | `DELETE /api/v1/phieu-nhap/{id}`                                                                | DELETE |
+| Cáº­p nháº­t phiáº¿u nháº­p          | `PUT /api/v1/phieu-nhap`                                                                        | PUT    |
+| **Kiá»ƒm kÃª phiáº¿u nháº­p**        | `PUT /api/v1/phieu-nhap/kiem-ke/{id}`                                                           | PUT    |
+| XÃ³a phiáº¿u nháº­p                  | `DELETE /api/v1/phieu-nhap/{id}`                                                                | DELETE |
 | CRUD chi tiáº¿t phiáº¿u nháº­p       | `/api/v1/chi-tiet-phieu-nhap` + `/{id}` + `/phieu-nhap/{phieuNhapId}`                           | CRUD   |
 
 **Tráº¡ng thÃ¡i phiáº¿u nháº­p:**
 
-| GiÃ¡ trá»‹ | Ã nghÄ©a       |
-| ------- | ------------- |
-| 0       | ÄÃ£ Ä‘áº·t hÃ ng   |
-| 1       | ÄÃ£ nháº­n hÃ ng  |
-| 2       | Cháº­m giao     |
-| 3       | ÄÃ£ há»§y        |
-| 4       | Thiáº¿u hÃ ng    |
-| 5       | HoÃ n thÃ nh âœ… |
+| GiÃ¡ trá»‹ | Ã nghÄ©a         |
+| ---------- | ---------------- |
+| 0          | ÄÃ£ Ä‘áº·t hÃ ng |
+| 1          | ÄÃ£ nháº­n hÃ ng |
+| 2          | Cháº­m giao      |
+| 3          | ÄÃ£ há»§y        |
+| 4          | Thiáº¿u hÃ ng    |
+| 5          | HoÃ n thÃ nh âœ… |
 
 ### 4.5 Quáº£n lÃ½ khuyáº¿n mÃ£i
 
-| Chá»©c nÄƒng                    | Endpoint                                    | Method |
-| ---------------------------- | ------------------------------------------- | ------ |
+| Chá»©c nÄƒng                       | Endpoint                                    | Method |
+| ---------------------------------- | ------------------------------------------- | ------ |
 | CRUD Khuyáº¿n mÃ£i theo hÃ³a Ä‘Æ¡n | `/api/v1/khuyen-mai-theo-hoa-don` + `/{id}` | CRUD   |
 | CRUD Khuyáº¿n mÃ£i theo Ä‘iá»ƒm    | `/api/v1/khuyen-mai-theo-diem` + `/{id}`    | CRUD   |
 
 ### 4.6 Quáº£n lÃ½ cá»­a hÃ ng & nhÃ  cung cáº¥p
 
 | Chá»©c nÄƒng         | Endpoint                         | Method |
-| ----------------- | -------------------------------- | ------ |
+| -------------------- | -------------------------------- | ------ |
 | CRUD Cá»­a hÃ ng     | `/api/v1/cua-hang` + `/{id}`     | CRUD   |
 | CRUD NhÃ  cung cáº¥p | `/api/v1/nha-cung-cap` + `/{id}` | CRUD   |
-| CRUD NhÃ¢n viÃªn    | `/api/v1/nhan-vien` + `/{id}`    | CRUD   |
+| CRUD NhÃ¢n viÃªn     | `/api/v1/nhan-vien` + `/{id}`    | CRUD   |
 
 ### 4.7 Quáº£n lÃ½ phÃ¢n quyá»n (RBAC)
 
 | Chá»©c nÄƒng      | Endpoint                        | Method |
-| -------------- | ------------------------------- | ------ |
-| CRUD Vai trÃ²   | `/api/v1/roles` + `/{id}`       | CRUD   |
+| ----------------- | ------------------------------- | ------ |
+| CRUD Vai trÃ²     | `/api/v1/roles` + `/{id}`       | CRUD   |
 | CRUD Quyá»n háº¡n | `/api/v1/permissions` + `/{id}` | CRUD   |
 
 ### 4.8 Quáº£n lÃ½ Ä‘Ã¡nh giÃ¡ sáº£n pháº©m
 
-| Chá»©c nÄƒng                           | Endpoint                                                             | Method |
-| ----------------------------------- | -------------------------------------------------------------------- | ------ |
-| Xem táº¥t cáº£ Ä‘Ã¡nh giÃ¡                 | `GET /api/v1/danh-gia-san-pham`                                      | GET    |
-| Xem Ä‘Ã¡nh giÃ¡ theo ID                | `GET /api/v1/danh-gia-san-pham/{id}`                                 | GET    |
-| Xem Ä‘Ã¡nh giÃ¡ theo sáº£n pháº©m          | `GET /api/v1/danh-gia-san-pham/san-pham/{sanPhamId}`                 | GET    |
+| Chá»©c nÄƒng                                | Endpoint                                                             | Method |
+| ------------------------------------------- | -------------------------------------------------------------------- | ------ |
+| Xem táº¥t cáº£ Ä‘Ã¡nh giÃ¡                  | `GET /api/v1/danh-gia-san-pham`                                      | GET    |
+| Xem Ä‘Ã¡nh giÃ¡ theo ID                     | `GET /api/v1/danh-gia-san-pham/{id}`                                 | GET    |
+| Xem Ä‘Ã¡nh giÃ¡ theo sáº£n pháº©m           | `GET /api/v1/danh-gia-san-pham/san-pham/{sanPhamId}`                 | GET    |
 | Xem Ä‘Ã¡nh giÃ¡ theo chi tiáº¿t Ä‘Æ¡n hÃ ng | `GET /api/v1/danh-gia-san-pham/chi-tiet-don-hang/{chiTietDonHangId}` | GET    |
-| **XÃ³a báº¥t ká»³ Ä‘Ã¡nh giÃ¡ nÃ o**         | `DELETE /api/v1/danh-gia-san-pham/{id}`                              | DELETE |
+| **XÃ³a báº¥t ká»³ Ä‘Ã¡nh giÃ¡ nÃ o**        | `DELETE /api/v1/danh-gia-san-pham/{id}`                              | DELETE |
 
 > **LÆ°u Ã½:** Admin KHÃ”NG táº¡o/sá»­a Ä‘Ã¡nh giÃ¡, chá»‰ cÃ³ thá»ƒ xÃ³a báº¥t ká»³ Ä‘Ã¡nh giÃ¡ nÃ o (kiá»ƒm duyá»‡t).
 
 ### 4.9 XÃ¡c thá»±c
 
-| Chá»©c nÄƒng               | Endpoint                   | Method |
-| ----------------------- | -------------------------- | ------ |
-| ÄÄƒng nháº­p               | `POST /api/v1/auth/login`  | POST   |
+| Chá»©c nÄƒng                | Endpoint                   | Method |
+| --------------------------- | -------------------------- | ------ |
+| ÄÄƒng nháº­p                | `POST /api/v1/auth/login`  | POST   |
 | Xem thÃ´ng tin tÃ i khoáº£n | `GET /api/v1/auth/account` | GET    |
-| Gia háº¡n token           | `GET /api/v1/auth/refresh` | GET    |
-| ÄÄƒng xuáº¥t               | `POST /api/v1/auth/logout` | POST   |
+| Gia háº¡n token             | `GET /api/v1/auth/refresh` | GET    |
+| ÄÄƒng xuáº¥t                | `POST /api/v1/auth/logout` | POST   |
 
 ---
 
@@ -232,66 +233,67 @@ Há»‡ thá»‘ng **Shopping** lÃ  á»©ng dá»¥ng quáº£n lÃ½ bÃ¡
 
 ### 5.1 Xem sáº£n pháº©m & danh má»¥c (CHá»ˆ XEM â€” khÃ´ng táº¡o/sá»­a/xÃ³a)
 
-| Chá»©c nÄƒng                   | Endpoint                                                         | Method |
-| --------------------------- | ---------------------------------------------------------------- | ------ |
-| Xem danh sÃ¡ch sáº£n pháº©m      | `GET /api/v1/san-pham`                                           | GET    |
-| Xem chi tiáº¿t sáº£n pháº©m       | `GET /api/v1/san-pham/{id}`                                      | GET    |
-| Xem táº¥t cáº£ biáº¿n thá»ƒ SP      | `GET /api/v1/chi-tiet-san-pham`                                  | GET    |
-| Xem biáº¿n thá»ƒ theo ID        | `GET /api/v1/chi-tiet-san-pham/{id}`                             | GET    |
-| Xem biáº¿n thá»ƒ theo sáº£n pháº©m  | `GET /api/v1/chi-tiet-san-pham/san-pham/{sanPhamId}`             | GET    |
-| Xem danh sÃ¡ch mÃ u sáº¯c       | `GET /api/v1/mau-sac` + `/{id}`                                  | GET    |
-| Xem danh sÃ¡ch kÃ­ch thÆ°á»›c    | `GET /api/v1/kich-thuoc` + `/{id}`                               | GET    |
-| Xem danh sÃ¡ch kiá»ƒu sáº£n pháº©m | `GET /api/v1/kieu-san-pham` + `/{id}`                            | GET    |
-| Xem danh sÃ¡ch bá»™ sÆ°u táº­p    | `GET /api/v1/bo-suu-tap` + `/{id}`                               | GET    |
-| Xem danh sÃ¡ch thÆ°Æ¡ng hiá»‡u   | `GET /api/v1/thuong-hieu` + `/{id}`                              | GET    |
-| Xem hÃ¬nh áº£nh SP             | `GET /api/v1/hinh-anh` + `/{id}` + `/chi-tiet-san-pham/{ctspId}` | GET    |
-| Xem danh sÃ¡ch cá»­a hÃ ng      | `GET /api/v1/cua-hang` + `/{id}`                                 | GET    |
-| Xem danh sÃ¡ch nhÃ¢n viÃªn     | `GET /api/v1/nhan-vien`                                          | GET    |
+| Chá»©c nÄƒng                                          | Endpoint                                                         | Method |
+| ----------------------------------------------------- | ---------------------------------------------------------------- | ------ |
+| Xem danh sÃ¡ch sáº£n pháº©m                           | `GET /api/v1/san-pham`                                           | GET    |
+| Xem chi tiáº¿t sáº£n pháº©m                           | `GET /api/v1/san-pham/{id}`                                      | GET    |
+| Xem táº¥t cáº£ biáº¿n thá»ƒ SP                        | `GET /api/v1/chi-tiet-san-pham`                                  | GET    |
+| Xem biáº¿n thá»ƒ theo ID                              | `GET /api/v1/chi-tiet-san-pham/{id}`                             | GET    |
+| Xem biáº¿n thá»ƒ theo sáº£n pháº©m                    | `GET /api/v1/chi-tiet-san-pham/san-pham/{sanPhamId}`             | GET    |
+| Xem biáº¿n thá»ƒ theo cá»­a hÃ ng Ä‘ang Ä‘Äƒng nháº­p | `GET /api/v1/chi-tiet-san-pham/san-pham-tai-cua-hang`            | GET    |
+| Xem danh sÃ¡ch mÃ u sáº¯c                             | `GET /api/v1/mau-sac` + `/{id}`                                  | GET    |
+| Xem danh sÃ¡ch kÃ­ch thÆ°á»›c                         | `GET /api/v1/kich-thuoc` + `/{id}`                               | GET    |
+| Xem danh sÃ¡ch kiá»ƒu sáº£n pháº©m                    | `GET /api/v1/kieu-san-pham` + `/{id}`                            | GET    |
+| Xem danh sÃ¡ch bá»™ sÆ°u táº­p                        | `GET /api/v1/bo-suu-tap` + `/{id}`                               | GET    |
+| Xem danh sÃ¡ch thÆ°Æ¡ng hiá»‡u                        | `GET /api/v1/thuong-hieu` + `/{id}`                              | GET    |
+| Xem hÃ¬nh áº£nh SP                                    | `GET /api/v1/hinh-anh` + `/{id}` + `/chi-tiet-san-pham/{ctspId}` | GET    |
+| Xem danh sÃ¡ch cá»­a hÃ ng                            | `GET /api/v1/cua-hang` + `/{id}`                                 | GET    |
+| Xem danh sÃ¡ch nhÃ¢n viÃªn                            | `GET /api/v1/nhan-vien`                                          | GET    |
 
 > Vá»›i endpoint `GET /api/v1/nhan-vien`: nhÃ¢n viÃªn chá»‰ xem danh sÃ¡ch nhÃ¢n viÃªn cÃ¹ng cá»­a hÃ ng vá»›i tÃ i khoáº£n Ä‘ang Ä‘Äƒng nháº­p.
 
 ### 5.2 Quáº£n lÃ½ Ä‘Æ¡n hÃ ng (XEM + Táº O Táº I QUáº¦Y + Cáº¬P NHáº¬T)
 
-| Chá»©c nÄƒng                        | Endpoint                                           | Method |
-| -------------------------------- | -------------------------------------------------- | ------ |
-| Xem danh sÃ¡ch Ä‘Æ¡n hÃ ng           | `GET /api/v1/don-hang`                             | GET    |
-| Xem chi tiáº¿t Ä‘Æ¡n hÃ ng            | `GET /api/v1/don-hang/{id}`                        | GET    |
-| **Táº¡o Ä‘Æ¡n hÃ ng táº¡i quáº§y**        | `POST /api/v1/don-hang/tai-quay`                   | POST   |
+| Chá»©c nÄƒng                               | Endpoint                                           | Method |
+| ------------------------------------------ | -------------------------------------------------- | ------ |
+| Xem danh sÃ¡ch Ä‘Æ¡n hÃ ng                 | `GET /api/v1/don-hang`                             | GET    |
+| Xem chi tiáº¿t Ä‘Æ¡n hÃ ng                 | `GET /api/v1/don-hang/{id}`                        | GET    |
+| **Táº¡o Ä‘Æ¡n hÃ ng táº¡i quáº§y**         | `POST /api/v1/don-hang/tai-quay`                   | POST   |
 | **Cáº­p nháº­t tráº¡ng thÃ¡i Ä‘Æ¡n hÃ ng** | `PUT /api/v1/don-hang`                             | PUT    |
-| Xem chi tiáº¿t sáº£n pháº©m trong Ä‘Æ¡n  | `GET /api/v1/chi-tiet-don-hang` + `/don-hang/{id}` | GET    |
-| Xem chi tiáº¿t Ä‘Æ¡n hÃ ng theo ID    | `GET /api/v1/chi-tiet-don-hang/{id}`               | GET    |
+| Xem chi tiáº¿t sáº£n pháº©m trong Ä‘Æ¡n    | `GET /api/v1/chi-tiet-don-hang` + `/don-hang/{id}` | GET    |
+| Xem chi tiáº¿t Ä‘Æ¡n hÃ ng theo ID         | `GET /api/v1/chi-tiet-don-hang/{id}`               | GET    |
 
 > **NhÃ¢n viÃªn KHÃ”NG thá»ƒ:** Táº¡o Ä‘Æ¡n hÃ ng online, xÃ³a Ä‘Æ¡n hÃ ng, táº¡o/sá»­a/xÃ³a chi tiáº¿t Ä‘Æ¡n hÃ ng.
 
 ### 5.3 Quáº£n lÃ½ nháº­p hÃ ng (PHIáº¾U NHáº¬P â€” gáº§n nhÆ° toÃ n quyá»n)
 
-| Chá»©c nÄƒng                        | Endpoint                                                                  | Method |
-| -------------------------------- | ------------------------------------------------------------------------- | ------ |
-| Xem danh sÃ¡ch phiáº¿u nháº­p         | `GET /api/v1/phieu-nhap`                                                  | GET    |
-| Xem chi tiáº¿t phiáº¿u nháº­p          | `GET /api/v1/phieu-nhap/{id}`                                             | GET    |
-| **Táº¡o phiáº¿u nháº­p**               | `POST /api/v1/phieu-nhap`                                                 | POST   |
-| **Cáº­p nháº­t phiáº¿u nháº­p**          | `PUT /api/v1/phieu-nhap`                                                  | PUT    |
-| **Kiá»ƒm kÃª phiáº¿u nháº­p**           | `PUT /api/v1/phieu-nhap/kiem-ke/{id}`                                     | PUT    |
-| Xem chi tiáº¿t phiáº¿u nháº­p (dÃ²ng)   | `GET /api/v1/chi-tiet-phieu-nhap` + `/{id}` + `/phieu-nhap/{phieuNhapId}` | GET    |
-| **Táº¡o chi tiáº¿t phiáº¿u nháº­p**      | `POST /api/v1/chi-tiet-phieu-nhap`                                        | POST   |
+| Chá»©c nÄƒng                               | Endpoint                                                                  | Method |
+| ------------------------------------------ | ------------------------------------------------------------------------- | ------ |
+| Xem danh sÃ¡ch phiáº¿u nháº­p              | `GET /api/v1/phieu-nhap`                                                  | GET    |
+| Xem chi tiáº¿t phiáº¿u nháº­p              | `GET /api/v1/phieu-nhap/{id}`                                             | GET    |
+| **Táº¡o phiáº¿u nháº­p**                   | `POST /api/v1/phieu-nhap`                                                 | POST   |
+| **Cáº­p nháº­t phiáº¿u nháº­p**            | `PUT /api/v1/phieu-nhap`                                                  | PUT    |
+| **Kiá»ƒm kÃª phiáº¿u nháº­p**              | `PUT /api/v1/phieu-nhap/kiem-ke/{id}`                                     | PUT    |
+| Xem chi tiáº¿t phiáº¿u nháº­p (dÃ²ng)      | `GET /api/v1/chi-tiet-phieu-nhap` + `/{id}` + `/phieu-nhap/{phieuNhapId}` | GET    |
+| **Táº¡o chi tiáº¿t phiáº¿u nháº­p**        | `POST /api/v1/chi-tiet-phieu-nhap`                                        | POST   |
 | **Cáº­p nháº­t chi tiáº¿t phiáº¿u nháº­p** | `PUT /api/v1/chi-tiet-phieu-nhap`                                         | PUT    |
 
 > **NhÃ¢n viÃªn KHÃ”NG thá»ƒ:** XÃ³a phiáº¿u nháº­p, xÃ³a chi tiáº¿t phiáº¿u nháº­p.
 
 ### 5.4 Xem khuyáº¿n mÃ£i (CHá»ˆ XEM)
 
-| Chá»©c nÄƒng                   | Endpoint                                        | Method |
-| --------------------------- | ----------------------------------------------- | ------ |
+| Chá»©c nÄƒng                      | Endpoint                                        | Method |
+| --------------------------------- | ----------------------------------------------- | ------ |
 | Xem khuyáº¿n mÃ£i theo hÃ³a Ä‘Æ¡n | `GET /api/v1/khuyen-mai-theo-hoa-don` + `/{id}` | GET    |
 | Xem khuyáº¿n mÃ£i theo Ä‘iá»ƒm    | `GET /api/v1/khuyen-mai-theo-diem` + `/{id}`    | GET    |
 
 ### 5.5 Xem Ä‘Ã¡nh giÃ¡ sáº£n pháº©m (CHá»ˆ XEM)
 
-| Chá»©c nÄƒng                           | Endpoint                                                             | Method |
-| ----------------------------------- | -------------------------------------------------------------------- | ------ |
-| Xem táº¥t cáº£ Ä‘Ã¡nh giÃ¡                 | `GET /api/v1/danh-gia-san-pham`                                      | GET    |
-| Xem Ä‘Ã¡nh giÃ¡ theo ID                | `GET /api/v1/danh-gia-san-pham/{id}`                                 | GET    |
-| Xem Ä‘Ã¡nh giÃ¡ theo sáº£n pháº©m          | `GET /api/v1/danh-gia-san-pham/san-pham/{sanPhamId}`                 | GET    |
+| Chá»©c nÄƒng                                | Endpoint                                                             | Method |
+| ------------------------------------------- | -------------------------------------------------------------------- | ------ |
+| Xem táº¥t cáº£ Ä‘Ã¡nh giÃ¡                  | `GET /api/v1/danh-gia-san-pham`                                      | GET    |
+| Xem Ä‘Ã¡nh giÃ¡ theo ID                     | `GET /api/v1/danh-gia-san-pham/{id}`                                 | GET    |
+| Xem Ä‘Ã¡nh giÃ¡ theo sáº£n pháº©m           | `GET /api/v1/danh-gia-san-pham/san-pham/{sanPhamId}`                 | GET    |
 | Xem Ä‘Ã¡nh giÃ¡ theo chi tiáº¿t Ä‘Æ¡n hÃ ng | `GET /api/v1/danh-gia-san-pham/chi-tiet-don-hang/{chiTietDonHangId}` | GET    |
 
 ### 5.6 NhÃ¢n viÃªn KHÃ”NG CÃ“ quyá»n
@@ -316,13 +318,13 @@ Há»‡ thá»‘ng **Shopping** lÃ  á»©ng dá»¥ng quáº£n lÃ½ bÃ¡
 
 ### 6.1 ÄÄƒng kÃ½ & ÄÄƒng nháº­p
 
-| Chá»©c nÄƒng               | Endpoint                     | Method | Ghi chÃº                 |
-| ----------------------- | ---------------------------- | ------ | ----------------------- |
-| ÄÄƒng kÃ½ tÃ i khoáº£n       | `POST /api/v1/auth/register` | POST   | Public, khÃ´ng cáº§n token |
-| ÄÄƒng nháº­p               | `POST /api/v1/auth/login`    | POST   | Email + Password        |
-| Xem thÃ´ng tin tÃ i khoáº£n | `GET /api/v1/auth/account`   | GET    | Bao gá»“m `diemTichLuy`   |
-| Gia háº¡n token           | `GET /api/v1/auth/refresh`   | GET    | DÃ¹ng refresh cookie     |
-| ÄÄƒng xuáº¥t               | `POST /api/v1/auth/logout`   | POST   | XÃ³a refresh token       |
+| Chá»©c nÄƒng                | Endpoint                     | Method | Ghi chÃº                   |
+| --------------------------- | ---------------------------- | ------ | -------------------------- |
+| ÄÄƒng kÃ½ tÃ i khoáº£n      | `POST /api/v1/auth/register` | POST   | Public, khÃ´ng cáº§n token |
+| ÄÄƒng nháº­p                | `POST /api/v1/auth/login`    | POST   | Email + Password           |
+| Xem thÃ´ng tin tÃ i khoáº£n | `GET /api/v1/auth/account`   | GET    | Bao gá»“m `diemTichLuy`    |
+| Gia háº¡n token             | `GET /api/v1/auth/refresh`   | GET    | DÃ¹ng refresh cookie       |
+| ÄÄƒng xuáº¥t                | `POST /api/v1/auth/logout`   | POST   | XÃ³a refresh token         |
 
 **Response Ä‘Äƒng nháº­p chá»©a:**
 
@@ -344,31 +346,31 @@ Há»‡ thá»‘ng **Shopping** lÃ  á»©ng dá»¥ng quáº£n lÃ½ bÃ¡
 
 ### 6.2 Duyá»‡t sáº£n pháº©m (CHá»ˆ XEM)
 
-| Chá»©c nÄƒng                                  | Endpoint                                                                                               | Method |
-| ------------------------------------------ | ------------------------------------------------------------------------------------------------------ | ------ |
-| Xem danh sÃ¡ch sáº£n pháº©m (lá»c, tÃ¬m kiáº¿m)     | `GET /api/v1/san-pham?tenSanPham=&kieuSanPhamId=&boSuuTapId=&thuongHieuId=&trangThai=&giaMin=&giaMax=` | GET    |
-| Xem chi tiáº¿t sáº£n pháº©m                      | `GET /api/v1/san-pham/{id}`                                                                            | GET    |
+| Chá»©c nÄƒng                                          | Endpoint                                                                                               | Method |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | ------ |
+| Xem danh sÃ¡ch sáº£n pháº©m (lá»c, tÃ¬m kiáº¿m)       | `GET /api/v1/san-pham?tenSanPham=&kieuSanPhamId=&boSuuTapId=&thuongHieuId=&trangThai=&giaMin=&giaMax=` | GET    |
+| Xem chi tiáº¿t sáº£n pháº©m                           | `GET /api/v1/san-pham/{id}`                                                                            | GET    |
 | Xem biáº¿n thá»ƒ sáº£n pháº©m (mÃ u, size, tá»“n kho) | `GET /api/v1/chi-tiet-san-pham/san-pham/{sanPhamId}`                                                   | GET    |
-| Xem biáº¿n thá»ƒ theo ID                       | `GET /api/v1/chi-tiet-san-pham/{id}`                                                                   | GET    |
-| Xem táº¥t cáº£ biáº¿n thá»ƒ                        | `GET /api/v1/chi-tiet-san-pham`                                                                        | GET    |
-| Xem hÃ¬nh áº£nh sáº£n pháº©m                      | `GET /api/v1/hinh-anh/chi-tiet-san-pham/{ctspId}`                                                      | GET    |
-| Xem danh sÃ¡ch danh má»¥c                     | `GET /api/v1/kieu-san-pham` + `/{id}`                                                                  | GET    |
-| Xem danh sÃ¡ch bá»™ sÆ°u táº­p                   | `GET /api/v1/bo-suu-tap` + `/{id}`                                                                     | GET    |
-| Xem danh sÃ¡ch thÆ°Æ¡ng hiá»‡u                  | `GET /api/v1/thuong-hieu` + `/{id}`                                                                    | GET    |
-| Xem danh sÃ¡ch mÃ u sáº¯c                      | `GET /api/v1/mau-sac` + `/{id}`                                                                        | GET    |
-| Xem danh sÃ¡ch kÃ­ch thÆ°á»›c                   | `GET /api/v1/kich-thuoc` + `/{id}`                                                                     | GET    |
-| Xem danh sÃ¡ch cá»­a hÃ ng                     | `GET /api/v1/cua-hang` + `/{id}`                                                                       | GET    |
-| Xem áº£nh sáº£n pháº©m (public)                  | `GET {secure_url_cloudinary}`                                                                              | GET    |
+| Xem biáº¿n thá»ƒ theo ID                              | `GET /api/v1/chi-tiet-san-pham/{id}`                                                                   | GET    |
+| Xem táº¥t cáº£ biáº¿n thá»ƒ                           | `GET /api/v1/chi-tiet-san-pham`                                                                        | GET    |
+| Xem hÃ¬nh áº£nh sáº£n pháº©m                          | `GET /api/v1/hinh-anh/chi-tiet-san-pham/{ctspId}`                                                      | GET    |
+| Xem danh sÃ¡ch danh má»¥c                             | `GET /api/v1/kieu-san-pham` + `/{id}`                                                                  | GET    |
+| Xem danh sÃ¡ch bá»™ sÆ°u táº­p                        | `GET /api/v1/bo-suu-tap` + `/{id}`                                                                     | GET    |
+| Xem danh sÃ¡ch thÆ°Æ¡ng hiá»‡u                        | `GET /api/v1/thuong-hieu` + `/{id}`                                                                    | GET    |
+| Xem danh sÃ¡ch mÃ u sáº¯c                             | `GET /api/v1/mau-sac` + `/{id}`                                                                        | GET    |
+| Xem danh sÃ¡ch kÃ­ch thÆ°á»›c                         | `GET /api/v1/kich-thuoc` + `/{id}`                                                                     | GET    |
+| Xem danh sÃ¡ch cá»­a hÃ ng                            | `GET /api/v1/cua-hang` + `/{id}`                                                                       | GET    |
+| Xem áº£nh sáº£n pháº©m (public)                       | `GET {secure_url_cloudinary}`                                                                          | GET    |
 
 ### 6.3 Giá» hÃ ng (CHá»ˆ KHÃCH HÃ€NG)
 
-| Chá»©c nÄƒng                 | Endpoint                                              | Method |
-| ------------------------- | ----------------------------------------------------- | ------ |
+| Chá»©c nÄƒng                     | Endpoint                                              | Method |
+| -------------------------------- | ----------------------------------------------------- | ------ |
 | **ThÃªm sáº£n pháº©m vÃ o giá»** | `POST /api/v1/gio-hang/them-san-pham`                 | POST   |
-| **Xem giá» hÃ ng cá»§a tÃ´i**  | `GET /api/v1/gio-hang/cua-toi`                        | GET    |
+| **Xem giá» hÃ ng cá»§a tÃ´i**    | `GET /api/v1/gio-hang/cua-toi`                        | GET    |
 | **XÃ³a sáº£n pháº©m khá»i giá»** | `DELETE /api/v1/gio-hang/chi-tiet/{maChiTietGioHang}` | DELETE |
 | **Xem khuyáº¿n mÃ£i há»£p lá»‡** | `GET /api/v1/gio-hang/khuyen-mai-hop-le`              | GET    |
-| **Xem trÆ°á»›c giáº£m giÃ¡**    | `POST /api/v1/gio-hang/ap-dung-khuyen-mai`            | POST   |
+| **Xem trÆ°á»›c giáº£m giÃ¡**     | `POST /api/v1/gio-hang/ap-dung-khuyen-mai`            | POST   |
 
 **Request thÃªm SP vÃ o giá»:**
 
@@ -383,15 +385,15 @@ Há»‡ thá»‘ng **Shopping** lÃ  á»©ng dá»¥ng quáº£n lÃ½ bÃ¡
 
 ### 6.4 Äáº·t hÃ ng online
 
-| Chá»©c nÄƒng                                         | Endpoint                                             | Method |
-| ------------------------------------------------- | ---------------------------------------------------- | ------ |
-| **Táº¡o Ä‘Æ¡n hÃ ng online**                           | `POST /api/v1/don-hang/online`                       | POST   |
-| Xem danh sÃ¡ch Ä‘Æ¡n hÃ ng cá»§a tÃ´i                    | `GET /api/v1/don-hang`                               | GET    |
-| Xem chi tiáº¿t Ä‘Æ¡n hÃ ng                             | `GET /api/v1/don-hang/{id}`                          | GET    |
+| Chá»©c nÄƒng                                                          | Endpoint                                             | Method |
+| --------------------------------------------------------------------- | ---------------------------------------------------- | ------ |
+| **Táº¡o Ä‘Æ¡n hÃ ng online**                                          | `POST /api/v1/don-hang/online`                       | POST   |
+| Xem danh sÃ¡ch Ä‘Æ¡n hÃ ng cá»§a tÃ´i                                 | `GET /api/v1/don-hang`                               | GET    |
+| Xem chi tiáº¿t Ä‘Æ¡n hÃ ng                                            | `GET /api/v1/don-hang/{id}`                          | GET    |
 | **Cáº­p nháº­t Ä‘Æ¡n hÃ ng** (há»§y Ä‘Æ¡n, cáº­p nháº­t Ä‘á»‹a chá»‰) | `PUT /api/v1/don-hang`                               | PUT    |
-| Xem sáº£n pháº©m trong Ä‘Æ¡n hÃ ng                       | `GET /api/v1/chi-tiet-don-hang/don-hang/{donHangId}` | GET    |
-| Xem chi tiáº¿t dÃ²ng sáº£n pháº©m                        | `GET /api/v1/chi-tiet-don-hang/{id}`                 | GET    |
-| Xem táº¥t cáº£ chi tiáº¿t Ä‘Æ¡n hÃ ng                      | `GET /api/v1/chi-tiet-don-hang`                      | GET    |
+| Xem sáº£n pháº©m trong Ä‘Æ¡n hÃ ng                                    | `GET /api/v1/chi-tiet-don-hang/don-hang/{donHangId}` | GET    |
+| Xem chi tiáº¿t dÃ²ng sáº£n pháº©m                                     | `GET /api/v1/chi-tiet-don-hang/{id}`                 | GET    |
+| Xem táº¥t cáº£ chi tiáº¿t Ä‘Æ¡n hÃ ng                                 | `GET /api/v1/chi-tiet-don-hang`                      | GET    |
 
 **Request táº¡o Ä‘Æ¡n hÃ ng online:**
 
@@ -420,23 +422,23 @@ Há»‡ thá»‘ng **Shopping** lÃ  á»©ng dá»¥ng quáº£n lÃ½ bÃ¡
 
 ### 6.5 Xem khuyáº¿n mÃ£i (CHá»ˆ XEM)
 
-| Chá»©c nÄƒng                   | Endpoint                                        | Method |
-| --------------------------- | ----------------------------------------------- | ------ |
+| Chá»©c nÄƒng                      | Endpoint                                        | Method |
+| --------------------------------- | ----------------------------------------------- | ------ |
 | Xem khuyáº¿n mÃ£i theo hÃ³a Ä‘Æ¡n | `GET /api/v1/khuyen-mai-theo-hoa-don` + `/{id}` | GET    |
 | Xem khuyáº¿n mÃ£i theo Ä‘iá»ƒm    | `GET /api/v1/khuyen-mai-theo-diem` + `/{id}`    | GET    |
 
 ### 6.6 ÄÃ¡nh giÃ¡ sáº£n pháº©m
 
-| Chá»©c nÄƒng                              | Endpoint                                                             | Method |
-| -------------------------------------- | -------------------------------------------------------------------- | ------ |
-| Xem táº¥t cáº£ Ä‘Ã¡nh giÃ¡                    | `GET /api/v1/danh-gia-san-pham`                                      | GET    |
-| Xem Ä‘Ã¡nh giÃ¡ theo ID                   | `GET /api/v1/danh-gia-san-pham/{id}`                                 | GET    |
-| Xem Ä‘Ã¡nh giÃ¡ theo sáº£n pháº©m             | `GET /api/v1/danh-gia-san-pham/san-pham/{sanPhamId}`                 | GET    |
-| Xem Ä‘Ã¡nh giÃ¡ theo chi tiáº¿t Ä‘Æ¡n hÃ ng    | `GET /api/v1/danh-gia-san-pham/chi-tiet-don-hang/{chiTietDonHangId}` | GET    |
-| **Xem Ä‘Ã¡nh giÃ¡ cá»§a tÃ´i**               | `GET /api/v1/danh-gia-san-pham/cua-toi`                              | GET    |
+| Chá»©c nÄƒng                                | Endpoint                                                             | Method |
+| ------------------------------------------- | -------------------------------------------------------------------- | ------ |
+| Xem táº¥t cáº£ Ä‘Ã¡nh giÃ¡                  | `GET /api/v1/danh-gia-san-pham`                                      | GET    |
+| Xem Ä‘Ã¡nh giÃ¡ theo ID                     | `GET /api/v1/danh-gia-san-pham/{id}`                                 | GET    |
+| Xem Ä‘Ã¡nh giÃ¡ theo sáº£n pháº©m           | `GET /api/v1/danh-gia-san-pham/san-pham/{sanPhamId}`                 | GET    |
+| Xem Ä‘Ã¡nh giÃ¡ theo chi tiáº¿t Ä‘Æ¡n hÃ ng | `GET /api/v1/danh-gia-san-pham/chi-tiet-don-hang/{chiTietDonHangId}` | GET    |
+| **Xem Ä‘Ã¡nh giÃ¡ cá»§a tÃ´i**              | `GET /api/v1/danh-gia-san-pham/cua-toi`                              | GET    |
 | **Táº¡o Ä‘Ã¡nh giÃ¡** (multipart/form-data) | `POST /api/v1/danh-gia-san-pham`                                     | POST   |
-| **Cáº­p nháº­t Ä‘Ã¡nh giÃ¡** (cá»§a mÃ¬nh)       | `PUT /api/v1/danh-gia-san-pham/{id}`                                 | PUT    |
-| **XÃ³a Ä‘Ã¡nh giÃ¡** (cá»§a mÃ¬nh)            | `DELETE /api/v1/danh-gia-san-pham/{id}`                              | DELETE |
+| **Cáº­p nháº­t Ä‘Ã¡nh giÃ¡** (cá»§a mÃ¬nh)  | `PUT /api/v1/danh-gia-san-pham/{id}`                                 | PUT    |
+| **XÃ³a Ä‘Ã¡nh giÃ¡** (cá»§a mÃ¬nh)          | `DELETE /api/v1/danh-gia-san-pham/{id}`                              | DELETE |
 
 **Äiá»u kiá»‡n táº¡o Ä‘Ã¡nh giÃ¡:**
 
@@ -471,14 +473,14 @@ file             = (áº£nh Ä‘Ã¡nh giÃ¡, tÃ¹y chá»n)
 
 ## 7. Endpoint cÃ´ng khai (khÃ´ng cáº§n Ä‘Äƒng nháº­p)
 
-| Endpoint                     | Method | MÃ´ táº£                                     |
-| ---------------------------- | ------ | ----------------------------------------- |
-| `POST /api/v1/auth/login`    | POST   | ÄÄƒng nháº­p                                 |
-| `POST /api/v1/auth/register` | POST   | ÄÄƒng kÃ½ tÃ i khoáº£n khÃ¡ch hÃ ng              |
-| `GET /api/v1/auth/refresh`   | GET    | Gia háº¡n access token (cáº§n refresh cookie) |
-| `GET {secure_url_cloudinary}`    | GET    | Xem áº£nh sáº£n pháº©m (public, cache 1 ngÃ y)   |
-| `GET /v3/api-docs/**`        | GET    | Swagger API documentation                 |
-| `GET /swagger-ui/**`         | GET    | Swagger UI                                |
+| Endpoint                      | Method | MÃ´ táº£                                       |
+| ----------------------------- | ------ | ---------------------------------------------- |
+| `POST /api/v1/auth/login`     | POST   | ÄÄƒng nháº­p                                   |
+| `POST /api/v1/auth/register`  | POST   | ÄÄƒng kÃ½ tÃ i khoáº£n khÃ¡ch hÃ ng            |
+| `GET /api/v1/auth/refresh`    | GET    | Gia háº¡n access token (cáº§n refresh cookie)  |
+| `GET {secure_url_cloudinary}` | GET    | Xem áº£nh sáº£n pháº©m (public, cache 1 ngÃ y) |
+| `GET /v3/api-docs/**`         | GET    | Swagger API documentation                      |
+| `GET /swagger-ui/**`          | GET    | Swagger UI                                     |
 
 ---
 
@@ -486,121 +488,121 @@ file             = (áº£nh Ä‘Ã¡nh giÃ¡, tÃ¹y chá»n)
 
 ### 8.1 Sáº£n pháº©m & Danh má»¥c
 
-| Module      | Endpoint                     | Method | ADMIN | NHAN_VIEN | KHACH_HANG |
-| ----------- | ---------------------------- | ------ | ----- | --------- | ---------- |
-| Sáº£n pháº©m    | `/api/v1/san-pham`           | GET    | âœ…    | âœ…        | âœ…         |
-| Sáº£n pháº©m    | `/api/v1/san-pham/{id}`      | GET    | âœ…    | âœ…        | âœ…         |
-| Sáº£n pháº©m    | `/api/v1/san-pham`           | POST   | âœ…    | âŒ        | âŒ         |
-| Sáº£n pháº©m    | `/api/v1/san-pham`           | PUT    | âœ…    | âŒ        | âŒ         |
-| Sáº£n pháº©m    | `/api/v1/san-pham/{id}`      | DELETE | âœ…    | âŒ        | âŒ         |
-| Kiá»ƒu SP     | `/api/v1/kieu-san-pham`      | GET    | âœ…    | âœ…        | âœ…         |
-| Kiá»ƒu SP     | `/api/v1/kieu-san-pham`      | POST   | âœ…    | âŒ        | âŒ         |
-| Kiá»ƒu SP     | `/api/v1/kieu-san-pham`      | PUT    | âœ…    | âŒ        | âŒ         |
-| Kiá»ƒu SP     | `/api/v1/kieu-san-pham/{id}` | DELETE | âœ…    | âŒ        | âŒ         |
-| BST         | `/api/v1/bo-suu-tap`         | GET    | âœ…    | âœ…        | âœ…         |
-| BST         | `/api/v1/bo-suu-tap`         | POST   | âœ…    | âŒ        | âŒ         |
-| BST         | `/api/v1/bo-suu-tap`         | PUT    | âœ…    | âŒ        | âŒ         |
-| BST         | `/api/v1/bo-suu-tap/{id}`    | DELETE | âœ…    | âŒ        | âŒ         |
-| ThÆ°Æ¡ng hiá»‡u | `/api/v1/thuong-hieu`        | GET    | âœ…    | âœ…        | âœ…         |
-| ThÆ°Æ¡ng hiá»‡u | `/api/v1/thuong-hieu`        | CRUD   | âœ…    | âŒ        | âŒ         |
-| MÃ u sáº¯c     | `/api/v1/mau-sac`            | GET    | âœ…    | âœ…        | âœ…         |
-| MÃ u sáº¯c     | `/api/v1/mau-sac`            | CRUD   | âœ…    | âŒ        | âŒ         |
-| KÃ­ch thÆ°á»›c  | `/api/v1/kich-thuoc`         | GET    | âœ…    | âœ…        | âœ…         |
-| KÃ­ch thÆ°á»›c  | `/api/v1/kich-thuoc`         | CRUD   | âœ…    | âŒ        | âŒ         |
+| Module          | Endpoint                     | Method | ADMIN | NHAN_VIEN | KHACH_HANG |
+| --------------- | ---------------------------- | ------ | ----- | --------- | ---------- |
+| Sáº£n pháº©m    | `/api/v1/san-pham`           | GET    | âœ…   | âœ…       | âœ…        |
+| Sáº£n pháº©m    | `/api/v1/san-pham/{id}`      | GET    | âœ…   | âœ…       | âœ…        |
+| Sáº£n pháº©m    | `/api/v1/san-pham`           | POST   | âœ…   | âŒ        | âŒ         |
+| Sáº£n pháº©m    | `/api/v1/san-pham`           | PUT    | âœ…   | âŒ        | âŒ         |
+| Sáº£n pháº©m    | `/api/v1/san-pham/{id}`      | DELETE | âœ…   | âŒ        | âŒ         |
+| Kiá»ƒu SP       | `/api/v1/kieu-san-pham`      | GET    | âœ…   | âœ…       | âœ…        |
+| Kiá»ƒu SP       | `/api/v1/kieu-san-pham`      | POST   | âœ…   | âŒ        | âŒ         |
+| Kiá»ƒu SP       | `/api/v1/kieu-san-pham`      | PUT    | âœ…   | âŒ        | âŒ         |
+| Kiá»ƒu SP       | `/api/v1/kieu-san-pham/{id}` | DELETE | âœ…   | âŒ        | âŒ         |
+| BST             | `/api/v1/bo-suu-tap`         | GET    | âœ…   | âœ…       | âœ…        |
+| BST             | `/api/v1/bo-suu-tap`         | POST   | âœ…   | âŒ        | âŒ         |
+| BST             | `/api/v1/bo-suu-tap`         | PUT    | âœ…   | âŒ        | âŒ         |
+| BST             | `/api/v1/bo-suu-tap/{id}`    | DELETE | âœ…   | âŒ        | âŒ         |
+| ThÆ°Æ¡ng hiá»‡u | `/api/v1/thuong-hieu`        | GET    | âœ…   | âœ…       | âœ…        |
+| ThÆ°Æ¡ng hiá»‡u | `/api/v1/thuong-hieu`        | CRUD   | âœ…   | âŒ        | âŒ         |
+| MÃ u sáº¯c      | `/api/v1/mau-sac`            | GET    | âœ…   | âœ…       | âœ…        |
+| MÃ u sáº¯c      | `/api/v1/mau-sac`            | CRUD   | âœ…   | âŒ        | âŒ         |
+| KÃ­ch thÆ°á»›c  | `/api/v1/kich-thuoc`         | GET    | âœ…   | âœ…       | âœ…        |
+| KÃ­ch thÆ°á»›c  | `/api/v1/kich-thuoc`         | CRUD   | âœ…   | âŒ        | âŒ         |
 
 ### 8.2 Chi tiáº¿t SP & HÃ¬nh áº£nh
 
-| Module   | Endpoint                                         | Method | ADMIN | NHAN_VIEN | KHACH_HANG |
-| -------- | ------------------------------------------------ | ------ | ----- | --------- | ---------- |
-| CTSP     | `/api/v1/chi-tiet-san-pham`                      | GET    | âœ…    | âœ…        | âœ…         |
-| CTSP     | `/api/v1/chi-tiet-san-pham/{id}`                 | GET    | âœ…    | âœ…        | âœ…         |
-| CTSP     | `/api/v1/chi-tiet-san-pham/san-pham/{spId}`      | GET    | âœ…    | âœ…        | âœ…         |
-| CTSP     | `/api/v1/chi-tiet-san-pham`                      | POST   | âœ…    | âŒ        | âŒ         |
-| CTSP     | `/api/v1/chi-tiet-san-pham`                      | PUT    | âœ…    | âŒ        | âŒ         |
-| CTSP     | `/api/v1/chi-tiet-san-pham/{id}`                 | DELETE | âœ…    | âŒ        | âŒ         |
-| HÃ¬nh áº£nh | `/api/v1/hinh-anh`, `/{id}`, `/chi-tiet-sp/{id}` | GET    | âœ…    | âœ…        | âœ…         |
-| HÃ¬nh áº£nh | `/api/v1/hinh-anh` + upload                      | POST   | âœ…    | âŒ        | âŒ         |
-| HÃ¬nh áº£nh | `/api/v1/hinh-anh`                               | PUT    | âœ…    | âŒ        | âŒ         |
-| HÃ¬nh áº£nh | `/api/v1/hinh-anh/{id}`                          | DELETE | âœ…    | âŒ        | âŒ         |
+| Module      | Endpoint                                         | Method | ADMIN | NHAN_VIEN | KHACH_HANG |
+| ----------- | ------------------------------------------------ | ------ | ----- | --------- | ---------- |
+| CTSP        | `/api/v1/chi-tiet-san-pham`                      | GET    | âœ…   | âœ…       | âœ…        |
+| CTSP        | `/api/v1/chi-tiet-san-pham/{id}`                 | GET    | âœ…   | âœ…       | âœ…        |
+| CTSP        | `/api/v1/chi-tiet-san-pham/san-pham/{spId}`      | GET    | âœ…   | âœ…       | âœ…        |
+| CTSP        | `/api/v1/chi-tiet-san-pham`                      | POST   | âœ…   | âŒ        | âŒ         |
+| CTSP        | `/api/v1/chi-tiet-san-pham`                      | PUT    | âœ…   | âŒ        | âŒ         |
+| CTSP        | `/api/v1/chi-tiet-san-pham/{id}`                 | DELETE | âœ…   | âŒ        | âŒ         |
+| HÃ¬nh áº£nh | `/api/v1/hinh-anh`, `/{id}`, `/chi-tiet-sp/{id}` | GET    | âœ…   | âœ…       | âœ…        |
+| HÃ¬nh áº£nh | `/api/v1/hinh-anh` + upload                      | POST   | âœ…   | âŒ        | âŒ         |
+| HÃ¬nh áº£nh | `/api/v1/hinh-anh`                               | PUT    | âœ…   | âŒ        | âŒ         |
+| HÃ¬nh áº£nh | `/api/v1/hinh-anh/{id}`                          | DELETE | âœ…   | âŒ        | âŒ         |
 
 ### 8.3 Giá» hÃ ng
 
 | Endpoint                                   | Method | ADMIN | NHAN_VIEN | KHACH_HANG |
 | ------------------------------------------ | ------ | ----- | --------- | ---------- |
-| `POST /api/v1/gio-hang/them-san-pham`      | POST   | âœ…    | âŒ        | âœ…         |
-| `GET /api/v1/gio-hang/cua-toi`             | GET    | âœ…    | âŒ        | âœ…         |
-| `DELETE /api/v1/gio-hang/chi-tiet/{id}`    | DELETE | âœ…    | âŒ        | âœ…         |
-| `GET /api/v1/gio-hang/khuyen-mai-hop-le`   | GET    | âœ…    | âŒ        | âœ…         |
-| `POST /api/v1/gio-hang/ap-dung-khuyen-mai` | POST   | âœ…    | âŒ        | âœ…         |
+| `POST /api/v1/gio-hang/them-san-pham`      | POST   | âœ…   | âŒ        | âœ…        |
+| `GET /api/v1/gio-hang/cua-toi`             | GET    | âœ…   | âŒ        | âœ…        |
+| `DELETE /api/v1/gio-hang/chi-tiet/{id}`    | DELETE | âœ…   | âŒ        | âœ…        |
+| `GET /api/v1/gio-hang/khuyen-mai-hop-le`   | GET    | âœ…   | âŒ        | âœ…        |
+| `POST /api/v1/gio-hang/ap-dung-khuyen-mai` | POST   | âœ…   | âŒ        | âœ…        |
 
 ### 8.4 ÄÆ¡n hÃ ng
 
 | Endpoint                                      | Method | ADMIN | NHAN_VIEN | KHACH_HANG |
 | --------------------------------------------- | ------ | ----- | --------- | ---------- |
-| `GET /api/v1/don-hang`                        | GET    | âœ…    | âœ…        | âœ…         |
-| `GET /api/v1/don-hang/{id}`                   | GET    | âœ…    | âœ…        | âœ…         |
-| `POST /api/v1/don-hang/online`                | POST   | âœ…    | âŒ        | âœ…         |
-| `POST /api/v1/don-hang/tai-quay`              | POST   | âœ…    | âœ…        | âŒ         |
-| `PUT /api/v1/don-hang`                        | PUT    | âœ…    | âœ…        | âœ…         |
-| `DELETE /api/v1/don-hang/{id}`                | DELETE | âœ…    | âŒ        | âŒ         |
-| `GET /api/v1/chi-tiet-don-hang`               | GET    | âœ…    | âœ…        | âœ…         |
-| `GET /api/v1/chi-tiet-don-hang/don-hang/{id}` | GET    | âœ…    | âœ…        | âœ…         |
-| `GET /api/v1/chi-tiet-don-hang/{id}`          | GET    | âœ…    | âœ…        | âœ…         |
-| `POST /api/v1/chi-tiet-don-hang`              | POST   | âœ…    | âŒ        | âŒ         |
-| `PUT /api/v1/chi-tiet-don-hang`               | PUT    | âœ…    | âŒ        | âŒ         |
-| `DELETE /api/v1/chi-tiet-don-hang/{id}`       | DELETE | âœ…    | âŒ        | âŒ         |
+| `GET /api/v1/don-hang`                        | GET    | âœ…   | âœ…       | âœ…        |
+| `GET /api/v1/don-hang/{id}`                   | GET    | âœ…   | âœ…       | âœ…        |
+| `POST /api/v1/don-hang/online`                | POST   | âœ…   | âŒ        | âœ…        |
+| `POST /api/v1/don-hang/tai-quay`              | POST   | âœ…   | âœ…       | âŒ         |
+| `PUT /api/v1/don-hang`                        | PUT    | âœ…   | âœ…       | âœ…        |
+| `DELETE /api/v1/don-hang/{id}`                | DELETE | âœ…   | âŒ        | âŒ         |
+| `GET /api/v1/chi-tiet-don-hang`               | GET    | âœ…   | âœ…       | âœ…        |
+| `GET /api/v1/chi-tiet-don-hang/don-hang/{id}` | GET    | âœ…   | âœ…       | âœ…        |
+| `GET /api/v1/chi-tiet-don-hang/{id}`          | GET    | âœ…   | âœ…       | âœ…        |
+| `POST /api/v1/chi-tiet-don-hang`              | POST   | âœ…   | âŒ        | âŒ         |
+| `PUT /api/v1/chi-tiet-don-hang`               | PUT    | âœ…   | âŒ        | âŒ         |
+| `DELETE /api/v1/chi-tiet-don-hang/{id}`       | DELETE | âœ…   | âŒ        | âŒ         |
 
 ### 8.5 Phiáº¿u nháº­p
 
 | Endpoint                                                         | Method | ADMIN | NHAN_VIEN | KHACH_HANG |
 | ---------------------------------------------------------------- | ------ | ----- | --------- | ---------- |
-| `GET /api/v1/phieu-nhap`                                         | GET    | âœ…    | âœ…        | âŒ         |
-| `GET /api/v1/phieu-nhap/{id}`                                    | GET    | âœ…    | âœ…        | âŒ         |
-| `POST /api/v1/phieu-nhap`                                        | POST   | âœ…    | âœ…        | âŒ         |
-| `PUT /api/v1/phieu-nhap`                                         | PUT    | âœ…    | âœ…        | âŒ         |
-| `PUT /api/v1/phieu-nhap/kiem-ke/{id}`                            | PUT    | âœ…    | âœ…        | âŒ         |
-| `DELETE /api/v1/phieu-nhap/{id}`                                 | DELETE | âœ…    | âŒ        | âŒ         |
-| `GET /api/v1/chi-tiet-phieu-nhap` + `/{id}` + `/phieu-nhap/{id}` | GET    | âœ…    | âœ…        | âŒ         |
-| `POST /api/v1/chi-tiet-phieu-nhap`                               | POST   | âœ…    | âœ…        | âŒ         |
-| `PUT /api/v1/chi-tiet-phieu-nhap`                                | PUT    | âœ…    | âœ…        | âŒ         |
-| `DELETE /api/v1/chi-tiet-phieu-nhap/{id}`                        | DELETE | âœ…    | âŒ        | âŒ         |
+| `GET /api/v1/phieu-nhap`                                         | GET    | âœ…   | âœ…       | âŒ         |
+| `GET /api/v1/phieu-nhap/{id}`                                    | GET    | âœ…   | âœ…       | âŒ         |
+| `POST /api/v1/phieu-nhap`                                        | POST   | âœ…   | âœ…       | âŒ         |
+| `PUT /api/v1/phieu-nhap`                                         | PUT    | âœ…   | âœ…       | âŒ         |
+| `PUT /api/v1/phieu-nhap/kiem-ke/{id}`                            | PUT    | âœ…   | âœ…       | âŒ         |
+| `DELETE /api/v1/phieu-nhap/{id}`                                 | DELETE | âœ…   | âŒ        | âŒ         |
+| `GET /api/v1/chi-tiet-phieu-nhap` + `/{id}` + `/phieu-nhap/{id}` | GET    | âœ…   | âœ…       | âŒ         |
+| `POST /api/v1/chi-tiet-phieu-nhap`                               | POST   | âœ…   | âœ…       | âŒ         |
+| `PUT /api/v1/chi-tiet-phieu-nhap`                                | PUT    | âœ…   | âœ…       | âŒ         |
+| `DELETE /api/v1/chi-tiet-phieu-nhap/{id}`                        | DELETE | âœ…   | âŒ        | âŒ         |
 
 ### 8.6 Cá»­a hÃ ng & NhÃ  cung cáº¥p
 
 | Endpoint                               | Method | ADMIN | NHAN_VIEN | KHACH_HANG |
 | -------------------------------------- | ------ | ----- | --------- | ---------- |
-| `GET /api/v1/cua-hang` + `/{id}`       | GET    | âœ…    | âœ…        | âœ…         |
-| `POST/PUT/DELETE /api/v1/cua-hang`     | CRUD   | âœ…    | âŒ        | âŒ         |
-| `GET /api/v1/nha-cung-cap` + `/{id}`   | GET    | âœ…    | âŒ        | âŒ         |
-| `POST/PUT/DELETE /api/v1/nha-cung-cap` | CRUD   | âœ…    | âŒ        | âŒ         |
+| `GET /api/v1/cua-hang` + `/{id}`       | GET    | âœ…   | âœ…       | âœ…        |
+| `POST/PUT/DELETE /api/v1/cua-hang`     | CRUD   | âœ…   | âŒ        | âŒ         |
+| `GET /api/v1/nha-cung-cap` + `/{id}`   | GET    | âœ…   | âŒ        | âŒ         |
+| `POST/PUT/DELETE /api/v1/nha-cung-cap` | CRUD   | âœ…   | âŒ        | âŒ         |
 
 ### 8.7 Khuyáº¿n mÃ£i
 
 | Endpoint                                        | Method | ADMIN | NHAN_VIEN | KHACH_HANG |
 | ----------------------------------------------- | ------ | ----- | --------- | ---------- |
-| `GET /api/v1/khuyen-mai-theo-hoa-don` + `/{id}` | GET    | âœ…    | âœ…        | âœ…         |
-| `POST/PUT/DELETE khuyen-mai-theo-hoa-don`       | CRUD   | âœ…    | âŒ        | âŒ         |
-| `GET /api/v1/khuyen-mai-theo-diem` + `/{id}`    | GET    | âœ…    | âœ…        | âœ…         |
-| `POST/PUT/DELETE khuyen-mai-theo-diem`          | CRUD   | âœ…    | âŒ        | âŒ         |
+| `GET /api/v1/khuyen-mai-theo-hoa-don` + `/{id}` | GET    | âœ…   | âœ…       | âœ…        |
+| `POST/PUT/DELETE khuyen-mai-theo-hoa-don`       | CRUD   | âœ…   | âŒ        | âŒ         |
+| `GET /api/v1/khuyen-mai-theo-diem` + `/{id}`    | GET    | âœ…   | âœ…       | âœ…        |
+| `POST/PUT/DELETE khuyen-mai-theo-diem`          | CRUD   | âœ…   | âŒ        | âŒ         |
 
 ### 8.8 Vai trÃ² & Quyá»n háº¡n
 
 | Endpoint                                  | Method | ADMIN | NHAN_VIEN | KHACH_HANG |
 | ----------------------------------------- | ------ | ----- | --------- | ---------- |
-| `GET/POST/PUT/DELETE /api/v1/roles`       | CRUD   | âœ…    | âŒ        | âŒ         |
-| `GET/POST/PUT/DELETE /api/v1/permissions` | CRUD   | âœ…    | âŒ        | âŒ         |
+| `GET/POST/PUT/DELETE /api/v1/roles`       | CRUD   | âœ…   | âŒ        | âŒ         |
+| `GET/POST/PUT/DELETE /api/v1/permissions` | CRUD   | âœ…   | âŒ        | âŒ         |
 
 ### 8.9 ÄÃ¡nh giÃ¡ sáº£n pháº©m
 
-| Endpoint                                               | Method | ADMIN       | NHAN_VIEN | KHACH_HANG    |
-| ------------------------------------------------------ | ------ | ----------- | --------- | ------------- |
-| `GET /api/v1/danh-gia-san-pham`                        | GET    | âœ…          | âœ…        | âœ…            |
-| `GET /api/v1/danh-gia-san-pham/{id}`                   | GET    | âœ…          | âœ…        | âœ…            |
-| `GET /api/v1/danh-gia-san-pham/san-pham/{spId}`        | GET    | âœ…          | âœ…        | âœ…            |
-| `GET /api/v1/danh-gia-san-pham/chi-tiet-don-hang/{id}` | GET    | âœ…          | âœ…        | âœ…            |
-| `GET /api/v1/danh-gia-san-pham/cua-toi`                | GET    | âŒ          | âŒ        | âœ…            |
-| `POST /api/v1/danh-gia-san-pham`                       | POST   | âŒ          | âŒ        | âœ…            |
-| `PUT /api/v1/danh-gia-san-pham/{id}`                   | PUT    | âŒ          | âŒ        | âœ… (cá»§a mÃ¬nh) |
+| Endpoint                                               | Method | ADMIN            | NHAN_VIEN | KHACH_HANG        |
+| ------------------------------------------------------ | ------ | ---------------- | --------- | ----------------- |
+| `GET /api/v1/danh-gia-san-pham`                        | GET    | âœ…              | âœ…       | âœ…               |
+| `GET /api/v1/danh-gia-san-pham/{id}`                   | GET    | âœ…              | âœ…       | âœ…               |
+| `GET /api/v1/danh-gia-san-pham/san-pham/{spId}`        | GET    | âœ…              | âœ…       | âœ…               |
+| `GET /api/v1/danh-gia-san-pham/chi-tiet-don-hang/{id}` | GET    | âœ…              | âœ…       | âœ…               |
+| `GET /api/v1/danh-gia-san-pham/cua-toi`                | GET    | âŒ               | âŒ        | âœ…               |
+| `POST /api/v1/danh-gia-san-pham`                       | POST   | âŒ               | âŒ        | âœ…               |
+| `PUT /api/v1/danh-gia-san-pham/{id}`                   | PUT    | âŒ               | âŒ        | âœ… (cá»§a mÃ¬nh) |
 | `DELETE /api/v1/danh-gia-san-pham/{id}`                | DELETE | âœ… (táº¥t cáº£) | âŒ        | âœ… (cá»§a mÃ¬nh) |
 
 ---
@@ -742,12 +744,12 @@ if (hasPermission("/api/v1/san-pham", "POST")) {
 
 ### 9.5 Xá»­ lÃ½ lá»—i phÃ¢n quyá»n trÃªn FE
 
-| HTTP Status | Ã nghÄ©a                        | HÃ nh Ä‘á»™ng FE                                     |
-| ----------- | ------------------------------ | ------------------------------------------------ |
-| `401`       | ChÆ°a Ä‘Äƒng nháº­p / token háº¿t háº¡n | Redirect â†’ trang Ä‘Äƒng nháº­p hoáº·c tá»± refresh token |
-| `403`       | KhÃ´ng cÃ³ quyá»n                 | Hiá»ƒn thá»‹ thÃ´ng bÃ¡o "Báº¡n khÃ´ng cÃ³ quyá»n truy cáº­p" |
-| `400`       | Lá»—i nghiá»‡p vá»¥                  | Hiá»ƒn thá»‹ message lá»—i tá»« response                 |
-| `500`       | Lá»—i server                     | Hiá»ƒn thá»‹ thÃ´ng bÃ¡o lá»—i chung                     |
+| HTTP Status | Ã nghÄ©a                                | HÃ nh Ä‘á»™ng FE                                              |
+| ----------- | --------------------------------------- | ------------------------------------------------------------- |
+| `401`       | ChÆ°a Ä‘Äƒng nháº­p / token háº¿t háº¡n | Redirect â†’ trang Ä‘Äƒng nháº­p hoáº·c tá»± refresh token    |
+| `403`       | KhÃ´ng cÃ³ quyá»n                       | Hiá»ƒn thá»‹ thÃ´ng bÃ¡o "Báº¡n khÃ´ng cÃ³ quyá»n truy cáº­p" |
+| `400`       | Lá»—i nghiá»‡p vá»¥                     | Hiá»ƒn thá»‹ message lá»—i tá»« response                      |
+| `500`       | Lá»—i server                            | Hiá»ƒn thá»‹ thÃ´ng bÃ¡o lá»—i chung                          |
 
 **Cáº¥u trÃºc response lá»—i:**
 
@@ -762,5 +764,3 @@ if (hasPermission("/api/v1/san-pham", "POST")) {
 ---
 
 > **TÃ i liá»‡u chi tiáº¿t tá»«ng module:** Xem cÃ¡c file `01_Auth.md` â†’ `22_DanhGiaSanPham.md` trong thÆ° má»¥c `document/`.
-
-

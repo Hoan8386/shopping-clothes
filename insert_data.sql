@@ -16,7 +16,7 @@ INSERT INTO roles (name, description, active, createdAt) VALUES
     ('KHACH_HANG', 'Khách hàng mua sắm',        TRUE, NOW());
 
 -- ---------------------------------------------------------
--- 2. PERMISSIONS (113 quyền cho tất cả endpoint)
+-- 2. PERMISSIONS (119 quyền cho tất cả endpoint)
 -- ---------------------------------------------------------
 INSERT INTO permissions (name, apiPath, method, module, createdAt) VALUES
     -- === SAN_PHAM (1-5) ===
@@ -40,7 +40,7 @@ INSERT INTO permissions (name, apiPath, method, module, createdAt) VALUES
     ('Cập nhật kích thước',        '/api/v1/kich-thuoc',        'PUT',    'KICH_THUOC',  NOW()),
     ('Xóa kích thước',             '/api/v1/kich-thuoc/{id}',   'DELETE', 'KICH_THUOC',  NOW()),
 
-    -- === CHI_TIET_SP (16-21) ===
+    -- === CHI_TIET_SP (16-21,119) ===
     ('Xem tất cả CTSP',            '/api/v1/chi-tiet-san-pham',                          'GET',    'CHI_TIET_SP', NOW()),
     ('Xem CTSP theo id',           '/api/v1/chi-tiet-san-pham/{id}',                     'GET',    'CHI_TIET_SP', NOW()),
     ('Xem CTSP theo sản phẩm',     '/api/v1/chi-tiet-san-pham/san-pham/{sanPhamId}',     'GET',    'CHI_TIET_SP', NOW()),
@@ -185,13 +185,16 @@ INSERT INTO permissions (name, apiPath, method, module, createdAt) VALUES
     ('Xem tất cả phiếu trả hàng',      '/api/v1/tra-hang',                                      'GET',    'TRA_HANG',            NOW()),
     ('Xem phiếu trả hàng theo mã',     '/api/v1/tra-hang/{id}',                                 'GET',    'TRA_HANG',            NOW()),
     ('Xem phiếu trả theo đơn hàng',    '/api/v1/tra-hang/don-hang/{donHangId}',                 'GET',    'TRA_HANG',            NOW()),
-    ('Cập nhật trạng thái trả hàng',   '/api/v1/tra-hang/{id}/trang-thai',                      'PUT',    'TRA_HANG',            NOW());
+    ('Cập nhật trạng thái trả hàng',   '/api/v1/tra-hang/{id}/trang-thai',                      'PUT',    'TRA_HANG',            NOW()),
+
+    -- === CHI_TIET_SP_THEO_CUA_HANG (119) ===
+    ('Xem CTSP tại cửa hàng nhân viên', '/api/v1/chi-tiet-san-pham/san-pham-tai-cua-hang',      'GET',    'CHI_TIET_SP',         NOW());
 
 -- ---------------------------------------------------------
 -- 3. PERMISSION_ROLE
 -- ---------------------------------------------------------
 
--- ADMIN (role_id=1): TẤT CẢ QUYỀN (1-113)
+-- ADMIN (role_id=1): TẤT CẢ QUYỀN (1-119)
 INSERT INTO permission_role (role_id, permission_id) VALUES
     (1,1),(1,2),(1,3),(1,4),(1,5),
     (1,6),(1,7),(1,8),(1,9),(1,10),
@@ -215,14 +218,14 @@ INSERT INTO permission_role (role_id, permission_id) VALUES
     (1,99),(1,100),(1,101),(1,102),(1,103),(1,104),
     (1,105),(1,106),(1,107),(1,108),(1,109),
     (1,110),(1,111),(1,112),(1,113),
-    (1,114),(1,115),(1,116),(1,117),(1,118);
+    (1,114),(1,115),(1,116),(1,117),(1,118),(1,119);
 
 -- NHAN_VIEN (role_id=2): Xem tất cả danh mục, SP, CTSP, hình ảnh, cửa hàng (chỉ GET) + Phiếu nhập + Đơn hàng
 INSERT INTO permission_role (role_id, permission_id) VALUES
     (2,1),(2,2),           -- SAN_PHAM: xem all, xem id
     (2,6),(2,7),           -- MAU_SAC: xem all, xem id
     (2,11),(2,12),         -- KICH_THUOC: xem all, xem id
-    (2,16),(2,17),(2,18),  -- CHI_TIET_SP: xem all, xem id, xem theo SP
+    (2,16),(2,17),(2,18),(2,119),  -- CHI_TIET_SP: xem all, xem id, xem theo SP, xem theo cửa hàng đang đăng nhập
     (2,25),(2,26),         -- KIEU_SAN_PHAM: xem all, xem id
     (2,30),(2,31),         -- BO_SUU_TAP: xem all, xem id
     (2,35),(2,36),         -- THUONG_HIEU: xem all, xem id
