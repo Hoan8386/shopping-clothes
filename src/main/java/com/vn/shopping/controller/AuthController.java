@@ -33,9 +33,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.util.regex.Pattern;
+
 @RestController
 @RequestMapping("/api/v1")
 public class AuthController {
+    private static final Pattern VIETNAM_PHONE_PATTERN = Pattern.compile("^(0\\d{9}|\\+84\\d{9})$");
+
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final SecurityUtil securityUtil;
     private final KhachHangService khachHangService;
@@ -274,6 +278,15 @@ public class AuthController {
     @ApiMessage("Register a new user")
     public ResponseEntity<ResCreateUserDTO> register(@Valid @RequestBody KhachHang postManUser)
             throws IdInvalidException {
+        String phone = postManUser.getSdt() == null ? "" : postManUser.getSdt().trim();
+        if (phone.isEmpty()) {
+            throw new IdInvalidException("Số điện thoại không được để trống.");
+        }
+        if (!VIETNAM_PHONE_PATTERN.matcher(phone).matches()) {
+            throw new IdInvalidException("Số điện thoại không hợp lệ. Dùng định dạng 0xxxxxxxxx hoặc +84xxxxxxxxx.");
+        }
+        postManUser.setSdt(phone);
+
         boolean isEmailExist = this.khachHangService.isEmailExist(postManUser.getEmail());
         if (isEmailExist) {
             throw new IdInvalidException(

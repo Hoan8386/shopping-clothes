@@ -35,6 +35,9 @@ public class DanhGiaSanPham {
     @Column(name = "HinhAnh", length = 255)
     private String hinhAnh;
 
+    @Column(name = "LinkVideo", length = 500)
+    private String linkVideo;
+
     @Column(name = "NgayTao")
     private LocalDateTime ngayTao;
 

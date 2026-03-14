@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.vn.shopping.domain.*;
@@ -17,6 +18,8 @@ import com.vn.shopping.util.error.IdInvalidException;
 
 @Service
 public class DanhGiaSanPhamService {
+
+    private static final String REVIEW_FOLDER = "reviews";
 
     private final DanhGiaSanPhamRepository danhGiaSanPhamRepository;
     private final KhachHangRepository khachHangRepository;
@@ -42,7 +45,8 @@ public class DanhGiaSanPhamService {
      * - Mỗi chi tiết đơn hàng chỉ được đánh giá 1 lần duy nhất
      */
     @Transactional
-    public DanhGiaSanPham create(ReqDanhGiaSanPhamDTO req, MultipartFile file) throws IdInvalidException {
+    public DanhGiaSanPham create(ReqDanhGiaSanPhamDTO req, MultipartFile file, MultipartFile videoFile)
+            throws IdInvalidException {
         // 1. Lấy khách hàng từ token
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         KhachHang khachHang = khachHangRepository.findByEmail(email)
@@ -80,22 +84,32 @@ public class DanhGiaSanPhamService {
         // 7. Upload ảnh lên Cloudinary (nếu có)
         String hinhAnhUrl = null;
         if (file != null && !file.isEmpty()) {
-            hinhAnhUrl = storageService.uploadSingleFile(file);
+            validateImageFile(file);
+            hinhAnhUrl = storageService.uploadSingleFile(file, REVIEW_FOLDER);
         }
 
-        // 8. Tạo đánh giá
+        // 8. Upload video lên Cloudinary hoặc nhận link video trực tiếp
+        String linkVideo = normalizeNullableText(req.getLinkVideo());
+        if (videoFile != null && !videoFile.isEmpty()) {
+            validateVideoFile(videoFile);
+            linkVideo = storageService.uploadSingleFile(videoFile, REVIEW_FOLDER);
+        }
+
+        // 9. Tạo đánh giá
         DanhGiaSanPham danhGia = new DanhGiaSanPham();
         danhGia.setKhachHang(khachHang);
         danhGia.setChiTietDonHang(chiTietDonHang);
         danhGia.setSoSao(req.getSoSao());
         danhGia.setGhiTru(req.getGhiTru());
         danhGia.setHinhAnh(hinhAnhUrl);
+        danhGia.setLinkVideo(linkVideo);
 
         return danhGiaSanPhamRepository.save(danhGia);
     }
 
     @Transactional
-    public DanhGiaSanPham update(Long id, ReqDanhGiaSanPhamDTO req, MultipartFile file) throws IdInvalidException {
+    public DanhGiaSanPham update(Long id, ReqDanhGiaSanPhamDTO req, MultipartFile file, MultipartFile videoFile)
+            throws IdInvalidException {
         DanhGiaSanPham existing = danhGiaSanPhamRepository.findById(id)
                 .orElseThrow(() -> new IdInvalidException("Không tìm thấy đánh giá: " + id));
 
@@ -118,9 +132,20 @@ public class DanhGiaSanPhamService {
             existing.setGhiTru(req.getGhiTru());
         }
 
+        if (req.getLinkVideo() != null) {
+            existing.setLinkVideo(normalizeNullableText(req.getLinkVideo()));
+        }
+
         if (file != null && !file.isEmpty()) {
-            String hinhAnhUrl = storageService.uploadSingleFile(file);
+            validateImageFile(file);
+            String hinhAnhUrl = storageService.uploadSingleFile(file, REVIEW_FOLDER);
             existing.setHinhAnh(hinhAnhUrl);
+        }
+
+        if (videoFile != null && !videoFile.isEmpty()) {
+            validateVideoFile(videoFile);
+            String videoUrl = storageService.uploadSingleFile(videoFile, REVIEW_FOLDER);
+            existing.setLinkVideo(videoUrl);
         }
 
         return danhGiaSanPhamRepository.save(existing);
@@ -174,6 +199,7 @@ public class DanhGiaSanPhamService {
         dto.setSoSao(dg.getSoSao());
         dto.setGhiTru(dg.getGhiTru());
         dto.setHinhAnh(dg.getHinhAnh());
+        dto.setLinkVideo(dg.getLinkVideo());
         dto.setNgayTao(dg.getNgayTao());
         dto.setNgayCapNhat(dg.getNgayCapNhat());
 
@@ -196,5 +222,26 @@ public class DanhGiaSanPhamService {
         }
 
         return dto;
+    }
+
+    private void validateImageFile(MultipartFile file) throws IdInvalidException {
+        String contentType = file.getContentType();
+        if (!StringUtils.hasText(contentType) || !contentType.toLowerCase().startsWith("image/")) {
+            throw new IdInvalidException("File ảnh không hợp lệ");
+        }
+    }
+
+    private void validateVideoFile(MultipartFile file) throws IdInvalidException {
+        String contentType = file.getContentType();
+        if (!StringUtils.hasText(contentType) || !contentType.toLowerCase().startsWith("video/")) {
+            throw new IdInvalidException("File video không hợp lệ");
+        }
+    }
+
+    private String normalizeNullableText(String value) {
+        if (!StringUtils.hasText(value)) {
+            return null;
+        }
+        return value.trim();
     }
 }

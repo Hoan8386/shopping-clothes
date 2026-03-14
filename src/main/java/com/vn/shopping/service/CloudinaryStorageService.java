@@ -33,10 +33,15 @@ public class CloudinaryStorageService implements StorageService {
 
     @Override
     public String uploadSingleFile(MultipartFile file) {
+        return uploadSingleFile(file, uploadFolder);
+    }
+
+    @Override
+    public String uploadSingleFile(MultipartFile file, String folder) {
         try {
             String publicId = UUID.randomUUID().toString();
             Map<String, Object> options = new HashMap<>();
-            options.put("folder", uploadFolder);
+            options.put("folder", (folder == null || folder.isBlank()) ? uploadFolder : folder);
             options.put("public_id", publicId);
             options.put("resource_type", "auto");
             options.put("overwrite", false);

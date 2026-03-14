@@ -9,6 +9,10 @@ public interface StorageService {
 
     String uploadSingleFile(MultipartFile file);
 
+    default String uploadSingleFile(MultipartFile file, String folder) {
+        return uploadSingleFile(file);
+    }
+
     List<String> uploadMultipleFiles(List<MultipartFile> files);
 
     InputStream download(String fileName);

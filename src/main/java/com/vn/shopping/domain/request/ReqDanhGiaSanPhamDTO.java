@@ -9,4 +9,5 @@ public class ReqDanhGiaSanPhamDTO {
     private Long chiTietDonHangId;
     private Integer soSao;
     private String ghiTru;
+    private String linkVideo;
 }

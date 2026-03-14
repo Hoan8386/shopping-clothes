@@ -77,14 +77,17 @@ public class DanhGiaSanPhamController {
             @RequestParam("chiTietDonHangId") Long chiTietDonHangId,
             @RequestParam("soSao") Integer soSao,
             @RequestParam(value = "ghiTru", required = false) String ghiTru,
-            @RequestPart(value = "file", required = false) MultipartFile file) throws IdInvalidException {
+            @RequestParam(value = "linkVideo", required = false) String linkVideo,
+            @RequestPart(value = "file", required = false) MultipartFile file,
+            @RequestPart(value = "videoFile", required = false) MultipartFile videoFile) throws IdInvalidException {
 
         ReqDanhGiaSanPhamDTO req = new ReqDanhGiaSanPhamDTO();
         req.setChiTietDonHangId(chiTietDonHangId);
         req.setSoSao(soSao);
         req.setGhiTru(ghiTru);
+        req.setLinkVideo(linkVideo);
 
-        DanhGiaSanPham created = danhGiaSanPhamService.create(req, file);
+        DanhGiaSanPham created = danhGiaSanPhamService.create(req, file, videoFile);
         return ResponseEntity.status(HttpStatus.CREATED).body(danhGiaSanPhamService.convertToDTO(created));
     }
 
@@ -94,13 +97,16 @@ public class DanhGiaSanPhamController {
             @PathVariable("id") Long id,
             @RequestParam(value = "soSao", required = false) Integer soSao,
             @RequestParam(value = "ghiTru", required = false) String ghiTru,
-            @RequestPart(value = "file", required = false) MultipartFile file) throws IdInvalidException {
+            @RequestParam(value = "linkVideo", required = false) String linkVideo,
+            @RequestPart(value = "file", required = false) MultipartFile file,
+            @RequestPart(value = "videoFile", required = false) MultipartFile videoFile) throws IdInvalidException {
 
         ReqDanhGiaSanPhamDTO req = new ReqDanhGiaSanPhamDTO();
         req.setSoSao(soSao);
         req.setGhiTru(ghiTru);
+        req.setLinkVideo(linkVideo);
 
-        DanhGiaSanPham updated = danhGiaSanPhamService.update(id, req, file);
+        DanhGiaSanPham updated = danhGiaSanPhamService.update(id, req, file, videoFile);
         return ResponseEntity.ok(danhGiaSanPhamService.convertToDTO(updated));
     }
 

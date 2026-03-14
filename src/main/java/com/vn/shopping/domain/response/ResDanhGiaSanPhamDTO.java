@@ -22,6 +22,7 @@ public class ResDanhGiaSanPhamDTO {
     private Integer soSao;
     private String ghiTru;
     private String hinhAnh;
+    private String linkVideo;
     private LocalDateTime ngayTao;
     private LocalDateTime ngayCapNhat;
 }
