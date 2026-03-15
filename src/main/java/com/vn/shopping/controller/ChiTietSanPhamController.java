@@ -143,4 +143,5 @@ public class ChiTietSanPhamController {
         chiTietSanPhamService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
 }

@@ -188,7 +188,22 @@ INSERT INTO permissions (name, apiPath, method, module, createdAt) VALUES
     ('Cập nhật trạng thái trả hàng',   '/api/v1/tra-hang/{id}/trang-thai',                      'PUT',    'TRA_HANG',            NOW()),
 
     -- === CHI_TIET_SP_THEO_CUA_HANG (119) ===
-    ('Xem CTSP tại cửa hàng nhân viên', '/api/v1/chi-tiet-san-pham/san-pham-tai-cua-hang',      'GET',    'CHI_TIET_SP',         NOW());
+    ('Xem CTSP tại cửa hàng nhân viên', '/api/v1/chi-tiet-san-pham/san-pham-tai-cua-hang',      'GET',    'CHI_TIET_SP',         NOW()),
+
+    -- === LOAI_DON_LUAN_CHUYEN (120-124) ===
+    ('Xem tất cả loại đơn luân chuyển',   '/api/v1/loai-don-luan-chuyen',        'GET',    'LOAI_DON_LUAN_CHUYEN', NOW()),
+    ('Xem loại đơn luân chuyển theo id',   '/api/v1/loai-don-luan-chuyen/{id}',   'GET',    'LOAI_DON_LUAN_CHUYEN', NOW()),
+    ('Tạo loại đơn luân chuyển',           '/api/v1/loai-don-luan-chuyen',        'POST',   'LOAI_DON_LUAN_CHUYEN', NOW()),
+    ('Cập nhật loại đơn luân chuyển',      '/api/v1/loai-don-luan-chuyen',        'PUT',    'LOAI_DON_LUAN_CHUYEN', NOW()),
+    ('Xóa loại đơn luân chuyển',           '/api/v1/loai-don-luan-chuyen/{id}',   'DELETE', 'LOAI_DON_LUAN_CHUYEN', NOW()),
+
+    -- === DON_LUAN_CHUYEN (125-131) ===
+    ('Tạo đơn luân chuyển',                       '/api/v1/don-luan-chuyen',                          'POST',   'DON_LUAN_CHUYEN', NOW()),
+    ('Xem tất cả đơn luân chuyển',                '/api/v1/don-luan-chuyen',                          'GET',    'DON_LUAN_CHUYEN', NOW()),
+    ('Xem đơn luân chuyển theo mã',               '/api/v1/don-luan-chuyen/{id}',                     'GET',    'DON_LUAN_CHUYEN', NOW()),
+    ('Xem đơn luân chuyển theo cửa hàng đặt',     '/api/v1/don-luan-chuyen/cua-hang-dat/{cuaHangId}', 'GET',    'DON_LUAN_CHUYEN', NOW()),
+    ('Xem đơn luân chuyển theo cửa hàng gửi',     '/api/v1/don-luan-chuyen/cua-hang-gui/{cuaHangId}', 'GET',    'DON_LUAN_CHUYEN', NOW()),
+    ('Cập nhật trạng thái đơn luân chuyển',       '/api/v1/don-luan-chuyen/{id}/trang-thai',          'PUT',    'DON_LUAN_CHUYEN', NOW());
 
 -- ---------------------------------------------------------
 -- 3. PERMISSION_ROLE
@@ -218,7 +233,9 @@ INSERT INTO permission_role (role_id, permission_id) VALUES
     (1,99),(1,100),(1,101),(1,102),(1,103),(1,104),
     (1,105),(1,106),(1,107),(1,108),(1,109),
     (1,110),(1,111),(1,112),(1,113),
-    (1,114),(1,115),(1,116),(1,117),(1,118),(1,119);
+    (1,114),(1,115),(1,116),(1,117),(1,118),(1,119),
+    (1,120),(1,121),(1,122),(1,123),(1,124),
+    (1,125),(1,126),(1,127),(1,128),(1,129),(1,130),(1,131);
 
 -- NHAN_VIEN (role_id=2): Xem tất cả danh mục, SP, CTSP, hình ảnh, cửa hàng (chỉ GET) + Phiếu nhập + Đơn hàng
 INSERT INTO permission_role (role_id, permission_id) VALUES
@@ -240,7 +257,9 @@ INSERT INTO permission_role (role_id, permission_id) VALUES
     (2,94),(2,95),         -- KHUYEN_MAI_DIEM: xem all, xem id
     (2,99),(2,100),(2,101),(2,107), -- DANH_GIA_SP: xem all, xem id, xem theo SP, xem theo CTDH
     (2,110),          -- NHAN_VIEN: xem danh sách nhân viên (cùng cửa hàng)
-    (2,115),(2,116),(2,117),(2,118); -- TRA_HANG: xem all, xem mã, xem theo đơn, cập nhật trạng thái
+    (2,115),(2,116),(2,117),(2,118), -- TRA_HANG: xem all, xem mã, xem theo đơn, cập nhật trạng thái
+    (2,120),(2,121),                -- LOAI_DON_LUAN_CHUYEN: xem all, xem id
+    (2,125),(2,126),(2,127),(2,128),(2,129),(2,130),(2,131); -- DON_LUAN_CHUYEN: tạo, xem all, xem mã, xem theo ch đặt, xem theo ch gửi, cập nhật TT
 
 -- KHACH_HANG (role_id=3): Xem SP/danh mục + giỏ hàng (thêm/xem/xóa/khuyến mãi)
 INSERT INTO permission_role (role_id, permission_id) VALUES
@@ -469,3 +488,29 @@ INSERT INTO TraHang (MaDonHang, LyDoTraHang, TrangThai, TongTien, NgayTao) VALUE
 INSERT INTO ChiTietTraHang (MaTraHang, MaSanPhamTra, GhiTru, TrangThai, NgayTao) VALUES
     (1, 7, 'Màu đen nhưng nhận được màu xanh',   0, NOW()),   -- Trả Quần Jean M Đen x1 (CTDH 7 - đơn 5)
     (2, 4, 'Đường may bị lỗi ở phần eo',         1, NOW());   -- Trả Váy Hoa S Đỏ x1 (CTDH 4 - đơn 3), đã duyệt
+
+-- ---------------------------------------------------------
+-- 27. LOẠI ĐƠN LUÂN CHUYỂN
+-- ---------------------------------------------------------
+INSERT INTO LoaiDonLuanChuyen (TenLoai, MoTa, NgayTao) VALUES
+    ('Luân chuyển nội bộ',   'Chuyển hàng giữa các chi nhánh cùng hệ thống',   NOW()),   -- id=1
+    ('Điều phối bổ sung',    'Bổ sung hàng cho chi nhánh thiếu hàng',           NOW()),   -- id=2
+    ('Thu hồi hàng tồn',     'Thu hồi hàng tồn kho từ chi nhánh khác',          NOW());   -- id=3
+
+-- ---------------------------------------------------------
+-- 28. ĐƠN LUÂN CHUYỂN
+-- ---------------------------------------------------------
+INSERT INTO DonLuanChuyen (CuaHangDat, CuaHangGui, MaLoaiDonLuanChuyen, TenDon, TrangThai, NgayTao) VALUES
+    (1, 2, 1, 'Luân chuyển Áo Oxford từ Q.3 về Q.1',  0, NOW()),   -- id=1: CN Q.1 đặt, CN Q.3 gửi, chờ xử lý
+    (2, 1, 2, 'Bổ sung Quần Jean cho CN Q.3',          1, NOW()),   -- id=2: CN Q.3 đặt, CN Q.1 gửi, đang giao
+    (3, 1, 1, 'Luân chuyển Nịt Da về Gò Vấp',          2, NOW());   -- id=3: CN Gò Vấp đặt, CN Q.1 gửi, đã nhận
+
+-- ---------------------------------------------------------
+-- 29. CHI TIẾT ĐƠN LUÂN CHUYỂN
+-- ---------------------------------------------------------
+INSERT INTO ChiTietDonLuanChuyen (MaDonLuanChuyen, MaChiTietSanPham, SoLuong, TrangThai, NgayTao) VALUES
+    (1, 4, 5,  0, NOW()),   -- Đơn 1: Váy Hoa S Đỏ x5, chờ xử lý
+    (1, 5, 3,  0, NOW()),   -- Đơn 1: Nịt Da L Đen x3, chờ xử lý
+    (2, 3, 10, 1, NOW()),   -- Đơn 2: Quần Jean M Đen x10, đang giao
+    (3, 1, 8,  2, NOW()),   -- Đơn 3: Áo Oxford M Trắng x8, đã nhận
+    (3, 2, 5,  2, NOW());   -- Đơn 3: Áo Oxford L Trắng x5, đã nhận

@@ -1,4 +1,4 @@
-﻿{
+{
 	"info": {
 		"_postman_id": "shopping-api-collection",
 		"name": "Shopping API",
@@ -2549,6 +2549,212 @@
 							]
 						},
 						"description": "Từ chối phiếu trả hàng — trạng thái = 2"
+					}
+				}
+			]
+		},
+		{
+			"name": "Loại Đơn Luân Chuyển (🔒 Admin)",
+			"description": "Quản lý loại đơn luân chuyển — Chỉ Admin có permission mới được thao tác",
+			"item": [
+				{
+					"name": "Xem tất cả loại đơn luân chuyển (🔒 Admin)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/loai-don-luan-chuyen",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "loai-don-luan-chuyen"]
+						},
+						"description": "🔒 Admin — Xem danh sách tất cả loại đơn luân chuyển"
+					}
+				},
+				{
+					"name": "Xem loại đơn luân chuyển theo id (🔒 Admin)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/loai-don-luan-chuyen/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "loai-don-luan-chuyen", "1"]
+						},
+						"description": "🔒 Admin — Xem chi tiết 1 loại đơn luân chuyển"
+					}
+				},
+				{
+					"name": "Tạo loại đơn luân chuyển (🔒 Admin)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tenLoai\": \"Luân chuyển đặc biệt\",\n    \"moTa\": \"Dành cho các trường hợp luân chuyển đặc biệt\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/loai-don-luan-chuyen",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "loai-don-luan-chuyen"]
+						},
+						"description": "🔒 Admin — Tạo loại đơn luân chuyển mới"
+					}
+				},
+				{
+					"name": "Cập nhật loại đơn luân chuyển (🔒 Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"tenLoai\": \"Luân chuyển nội bộ (cập nhật)\",\n    \"moTa\": \"Chuyển hàng giữa các chi nhánh cùng hệ thống - đã cập nhật\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/loai-don-luan-chuyen",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "loai-don-luan-chuyen"]
+						},
+						"description": "🔒 Admin — Cập nhật loại đơn luân chuyển"
+					}
+				},
+				{
+					"name": "Xóa loại đơn luân chuyển (🔒 Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/loai-don-luan-chuyen/4",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "loai-don-luan-chuyen", "4"]
+						},
+						"description": "🔒 Admin — Xóa loại đơn luân chuyển"
+					}
+				}
+			]
+		},
+		{
+			"name": "Đơn Luân Chuyển (🔒 Admin/NV)",
+			"description": "Quản lý đơn luân chuyển hàng giữa các cửa hàng — Admin và Nhân viên",
+			"item": [
+				{
+					"name": "Tạo đơn luân chuyển (🔒 Admin/NV)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cuaHangDatId\": 1,\n    \"cuaHangGuiId\": 2,\n    \"loaiDonLuanChuyenId\": 1,\n    \"tenDon\": \"Luân chuyển Váy Hoa từ Q.3 về Q.1\",\n    \"ghiTru\": \"Cần gấp cho đợt sale\",\n    \"chiTietDonLuanChuyens\": [\n        {\n            \"chiTietSanPhamId\": 4,\n            \"soLuong\": 10,\n            \"ghiTru\": \"Váy Hoa S Đỏ\"\n        },\n        {\n            \"chiTietSanPhamId\": 5,\n            \"soLuong\": 5,\n            \"ghiTru\": \"Nịt Da L Đen\"\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/don-luan-chuyen",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "don-luan-chuyen"]
+						},
+						"description": "🔒 Admin/NV — Tạo đơn luân chuyển mới với danh sách chi tiết sản phẩm"
+					}
+				},
+				{
+					"name": "Xem tất cả đơn luân chuyển + Phân trang (🔒 Admin/NV)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/don-luan-chuyen?page=1&size=10",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "don-luan-chuyen"],
+							"query": [
+								{ "key": "page", "value": "1", "description": "Trang (bắt đầu từ 1)" },
+								{ "key": "size", "value": "10", "description": "Số bản ghi mỗi trang" }
+							]
+						},
+						"description": "🔒 Admin/NV — Xem danh sách tất cả đơn luân chuyển có phân trang"
+					}
+				},
+				{
+					"name": "Xem đơn luân chuyển theo mã (🔒 Admin/NV)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/don-luan-chuyen/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "don-luan-chuyen", "1"]
+						},
+						"description": "🔒 Admin/NV — Xem chi tiết 1 đơn luân chuyển theo ID"
+					}
+				},
+				{
+					"name": "Xem đơn luân chuyển theo cửa hàng đặt (🔒 Admin/NV)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/don-luan-chuyen/cua-hang-dat/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "don-luan-chuyen", "cua-hang-dat", "1"]
+						},
+						"description": "🔒 Admin/NV — Xem danh sách đơn luân chuyển mà cửa hàng (id=1) đã đặt"
+					}
+				},
+				{
+					"name": "Xem đơn luân chuyển theo cửa hàng gửi (🔒 Admin/NV)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/don-luan-chuyen/cua-hang-gui/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "don-luan-chuyen", "cua-hang-gui", "1"]
+						},
+						"description": "🔒 Admin/NV — Xem danh sách đơn luân chuyển mà cửa hàng (id=1) đã gửi"
+					}
+				},
+				{
+					"name": "Cập nhật trạng thái đơn luân chuyển — Đang giao (🔒 Admin/NV)",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/don-luan-chuyen/1/trang-thai?trangThai=1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "don-luan-chuyen", "1", "trang-thai"],
+							"query": [
+								{ "key": "trangThai", "value": "1" }
+							]
+						},
+						"description": "Cập nhật trạng thái đơn luân chuyển: 0=Chờ xử lý, 1=Đang giao, 2=Đã nhận, 3=Từ chối"
+					}
+				},
+				{
+					"name": "Cập nhật trạng thái đơn luân chuyển — Đã nhận (🔒 Admin/NV)",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/don-luan-chuyen/1/trang-thai?trangThai=2",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "don-luan-chuyen", "1", "trang-thai"],
+							"query": [
+								{ "key": "trangThai", "value": "2" }
+							]
+						},
+						"description": "Cập nhật trạng thái = 2 (Đã nhận) cho đơn luân chuyển"
+					}
+				},
+				{
+					"name": "Từ chối đơn luân chuyển (🔒 Admin/NV)",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/don-luan-chuyen/1/trang-thai?trangThai=3",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "don-luan-chuyen", "1", "trang-thai"],
+							"query": [
+								{ "key": "trangThai", "value": "3" }
+							]
+						},
+						"description": "Từ chối đơn luân chuyển — trạng thái = 3"
 					}
 				}
 			]

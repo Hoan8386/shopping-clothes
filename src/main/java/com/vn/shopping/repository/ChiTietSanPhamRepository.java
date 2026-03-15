@@ -1,6 +1,7 @@
 package com.vn.shopping.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -13,4 +14,10 @@ public interface ChiTietSanPhamRepository extends JpaRepository<ChiTietSanPham, 
         JpaSpecificationExecutor<ChiTietSanPham> {
 
     List<ChiTietSanPham> findBySanPhamId(long sanPhamId);
+
+    Optional<ChiTietSanPham> findFirstBySanPhamIdAndMauSacIdAndKichThuocIdAndMaCuaHang(
+            Long sanPhamId,
+            Long mauSacId,
+            Long kichThuocId,
+            Long maCuaHang);
 }

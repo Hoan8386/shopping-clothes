@@ -308,4 +308,25 @@ public class ChiTietSanPhamService {
     public List<ResChiTietSanPhamDTO> findBySanPhamIdDTO(long sanPhamId) {
         return convertToListDTO(chiTietSanPhamRepository.findBySanPhamId(sanPhamId));
     }
+
+    /**
+     * Lấy danh sách cửa hàng có tồn kho cho sản phẩm để nhập hàng
+     * Staff chỉ xem các cửa hàng khác ngoài cửa hàng của mình
+     */
+    @Transactional(readOnly = true)
+    public List<ResChiTietSanPhamDTO> findStoresWithInventoryForImport(long sanPhamId, Long excludeStoreId) {
+        List<ChiTietSanPham> allDetails = chiTietSanPhamRepository.findBySanPhamId(sanPhamId);
+
+        // Lọc những chi tiết sản phẩm:
+        // 1. Có tồn kho (soLuong > 0)
+        // 2. Không phải cửa hàng của staff hiện tại
+        // 3. Sắp xếp theo số lượng giảm dần (gần nhất)
+        List<ChiTietSanPham> withInventory = allDetails.stream()
+                .filter(ct -> ct.getSoLuong() != null && ct.getSoLuong() > 0)
+                .filter(ct -> excludeStoreId == null || !ct.getMaCuaHang().equals(excludeStoreId))
+                .sorted((ct1, ct2) -> Integer.compare(ct2.getSoLuong(), ct1.getSoLuong()))
+                .collect(Collectors.toList());
+
+        return convertToListDTO(withInventory);
+    }
 }
