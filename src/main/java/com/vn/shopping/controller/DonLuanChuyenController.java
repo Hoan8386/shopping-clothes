@@ -36,8 +36,11 @@ public class DonLuanChuyenController {
 
     @GetMapping
     @ApiMessage("Lấy danh sách đơn luân chuyển")
-    public ResponseEntity<ResultPaginationDTO> getAll(Pageable pageable) {
-        return ResponseEntity.ok(donLuanChuyenService.findAll(pageable));
+    public ResponseEntity<ResultPaginationDTO> getAll(
+            Pageable pageable,
+            @RequestParam(value = "cuaHangGuiId", required = false) Long cuaHangGuiId,
+            @RequestParam(value = "cuaHangDatId", required = false) Long cuaHangDatId) {
+        return ResponseEntity.ok(donLuanChuyenService.findAll(pageable, cuaHangGuiId, cuaHangDatId));
     }
 
     @GetMapping("/{id}")

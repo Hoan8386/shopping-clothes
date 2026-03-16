@@ -66,6 +66,9 @@ public class DonHang {
     @Column(name = "HinhThucDonHang")
     private Integer hinhThucDonHang;
 
+    @Column(name = "payment_ref", length = 100)
+    private String paymentRef;
+
     @Column(name = "NgayTao")
     private LocalDateTime ngayTao;
 

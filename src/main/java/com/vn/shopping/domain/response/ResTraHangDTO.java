@@ -19,6 +19,9 @@ public class ResTraHangDTO {
     private String linkAnh;
     private String trangThai;
     private Double tongTien;
+    private String phuongThucHoanTien;
+    private String thongTinChuyenKhoan;
+    private String paymentRef;
     private LocalDateTime ngayTao;
     private LocalDateTime ngayCapNhat;
     private List<ChiTietTraHangDTO> chiTietTraHangs;

@@ -1,79 +1,79 @@
-﻿# Chi Tiáº¿t Sáº£n Pháº©m Controller
+# Chi Tiết Sản Phẩm Controller
 
 > **Base Path:** `/api/v1/chi-tiet-san-pham`  
 > **File:** `ChiTietSanPhamController.java`  
-> Quáº£n lÃ½ chi tiáº¿t sáº£n pháº©m (biáº¿n thá»ƒ sáº£n pháº©m theo mÃ u sáº¯c, kÃ­ch thÆ°á»›c, cá»­a hÃ ng).
+> Quản lý chi tiết sản phẩm (biến thể sản phẩm theo màu sắc, kích thước, cửa hàng).
 
 ---
 
-## Tá»•ng quan
+## Tổng quan
 
-Má»—i sáº£n pháº©m (`SanPham`) cÃ³ thá»ƒ cÃ³ nhiá»u biáº¿n thá»ƒ (`ChiTietSanPham`) khÃ¡c nhau theo **mÃ u sáº¯c**, **kÃ­ch thÆ°á»›c**, vÃ  phÃ¢n bá»• theo **cá»­a hÃ ng**.
+Mỗi sản phẩm (`SanPham`) có thể có nhiều biến thể (`ChiTietSanPham`) khác nhau theo **màu sắc**, **kích thước**, và phân bổ theo **cửa hàng**.
 
-### Cáº¥u trÃºc dá»¯ liá»‡u `ChiTietSanPham`
+### Cấu trúc dữ liệu `ChiTietSanPham`
 
-| TrÆ°á»ng      | Kiá»ƒu        | MÃ´ táº£                                     |
+| Trường      | Kiểu        | Mô tả                                     |
 | ------------- | ------------- | -------------------------------------------- |
-| `id`          | Long          | MÃ£ chi tiáº¿t sáº£n pháº©m (auto-increment) |
-| `sanPham`     | SanPham       | Sáº£n pháº©m cha (FK)                        |
-| `maPhieuNhap` | Long          | MÃ£ phiáº¿u nháº­p liÃªn quan (nullable)     |
-| `mauSac`      | MauSac        | MÃ u sáº¯c (FK)                              |
-| `kichThuoc`   | KichThuoc     | KÃ­ch thÆ°á»›c (FK)                          |
-| `maCuaHang`   | Long          | MÃ£ cá»­a hÃ ng phÃ¢n bá»•                   |
-| `soLuong`     | Integer       | Sá»‘ lÆ°á»£ng tá»“n kho                      |
-| `trangThai`   | Integer       | Tráº¡ng thÃ¡i (0: áº©n, 1: hiá»ƒn thá»‹)     |
-| `moTa`        | String(255)   | MÃ´ táº£ chi tiáº¿t                          |
-| `ghiTru`      | String(255)   | Ghi chÃº trá»«                               |
-| `ngayTao`     | LocalDateTime | NgÃ y táº¡o (tá»± Ä‘á»™ng)                   |
-| `ngayCapNhat` | LocalDateTime | NgÃ y cáº­p nháº­t (tá»± Ä‘á»™ng)            |
+| `id`          | Long          | Mã chi tiết sản phẩm (auto-increment) |
+| `sanPham`     | SanPham       | Sản phẩm cha (FK)                        |
+| `maPhieuNhap` | Long          | Mã phiếu nhập liên quan (nullable)     |
+| `mauSac`      | MauSac        | Màu sắc (FK)                              |
+| `kichThuoc`   | KichThuoc     | Kích thước (FK)                          |
+| `maCuaHang`   | Long          | Mã cửa hàng phân bổ                   |
+| `soLuong`     | Integer       | Số lượng tồn kho                      |
+| `trangThai`   | Integer       | Trạng thái (0: ẩn, 1: hiển thị)     |
+| `moTa`        | String(255)   | Mô tả chi tiết                          |
+| `ghiTru`      | String(255)   | Ghi chú trừ                               |
+| `ngayTao`     | LocalDateTime | Ngày tạo (tự động)                   |
+| `ngayCapNhat` | LocalDateTime | Ngày cập nhật (tự động)            |
 
 ---
 
-## 1. Láº¥y táº¥t cáº£ chi tiáº¿t sáº£n pháº©m
+## 1. Lấy tất cả chi tiết sản phẩm
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t                      |
+| Thuộc tính   | Chi tiết                      |
 | --------------- | ------------------------------- |
 | **URL**         | `GET /api/v1/chi-tiet-san-pham` |
 | **Method**      | `GET`                           |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)              |
+| **Xác thực** | Bearer Token (JWT)              |
 
-**Query Parameters (lá»c tÃ¹y chá»n):**
+**Query Parameters (lọc tùy chọn):**
 
-| Tham sá»‘     | Kiá»ƒu  | Báº¯t buá»™c | MÃ´ táº£                                     |
+| Tham số     | Kiểu  | Bắt buộc | Mô tả                                     |
 | ------------- | ------- | ------------ | -------------------------------------------- |
-| `sanPhamId`   | Long    | KhÃ´ng       | Lá»c theo mÃ£ sáº£n pháº©m                   |
-| `mauSacId`    | Long    | KhÃ´ng       | Lá»c theo mÃ£ mÃ u sáº¯c                     |
-| `kichThuocId` | Long    | KhÃ´ng       | Lá»c theo mÃ£ kÃ­ch thÆ°á»›c                 |
-| `maCuaHang`   | Long    | KhÃ´ng       | Lá»c theo mÃ£ cá»­a hÃ ng                    |
-| `trangThai`   | Integer | KhÃ´ng       | Lá»c theo tráº¡ng thÃ¡i (0: áº©n, 1: hiá»ƒn) |
+| `sanPhamId`   | Long    | Không       | Lọc theo mã sản phẩm                   |
+| `mauSacId`    | Long    | Không       | Lọc theo mã màu sắc                     |
+| `kichThuocId` | Long    | Không       | Lọc theo mã kích thước                 |
+| `maCuaHang`   | Long    | Không       | Lọc theo mã cửa hàng                    |
+| `trangThai`   | Integer | Không       | Lọc theo trạng thái (0: ẩn, 1: hiển) |
 
-**VÃ­ dá»¥ request:**
+**Ví dụ request:**
 
 ```
 GET /api/v1/chi-tiet-san-pham?sanPhamId=1&mauSacId=2&kichThuocId=3&maCuaHang=1&trangThai=1
 ```
 
-**Response:** `200 OK` â€” Tráº£ vá» `List<ResChiTietSanPhamDTO>`
+**Response:** `200 OK` — Trả về `List<ResChiTietSanPhamDTO>`
 
 ```json
 [
   {
     "id": 1,
     "maPhieuNhap": null,
-    "tenCuaHang": "Chi nhÃ¡nh Quáº­n 1",
+    "tenCuaHang": "Chi nhánh Quận 1",
     "soLuong": 15,
     "trangThai": 1,
-    "moTa": "Ão polo Ä‘en size M",
+    "moTa": "Áo polo đen size M",
     "ghiTru": null,
-    "tenSanPham": "Ão Polo Classic",
-    "tenMauSac": "Äen",
+    "tenSanPham": "Áo Polo Classic",
+    "tenMauSac": "Đen",
     "tenKichThuoc": "M",
     "hinhAnhUrls": ["polo-den-m-1.jpg", "polo-den-m-2.jpg"]
   }
 ]
 ```
 
-**Kiá»ƒu dá»¯ liá»‡u:**
+**Kiểu dữ liệu:**
 
 ```json
 {
@@ -91,161 +91,161 @@ GET /api/v1/chi-tiet-san-pham?sanPhamId=1&mauSacId=2&kichThuocId=3&maCuaHang=1&t
 }
 ```
 
-> **LÆ°u Ã½:** Náº¿u khÃ´ng truyá»n báº¥t ká»³ tham sá»‘ lá»c nÃ o â†’ tráº£ vá» táº¥t cáº£ chi tiáº¿t sáº£n pháº©m.
+> **Lưu ý:** Nếu không truyền bất kỳ tham số lọc nào → trả về tất cả chi tiết sản phẩm.
 
 ---
 
-## 2. Láº¥y chi tiáº¿t sáº£n pháº©m theo ID
+## 2. Lấy chi tiết sản phẩm theo ID
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t                           |
+| Thuộc tính   | Chi tiết                           |
 | --------------- | ------------------------------------ |
 | **URL**         | `GET /api/v1/chi-tiet-san-pham/{id}` |
 | **Method**      | `GET`                                |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)                   |
+| **Xác thực** | Bearer Token (JWT)                   |
 
 **Path Parameters:**
 
-| Tham sá»‘ | Kiá»ƒu | MÃ´ táº£                    |
+| Tham số | Kiểu | Mô tả                    |
 | --------- | ------ | --------------------------- |
-| `id`      | Long   | MÃ£ chi tiáº¿t sáº£n pháº©m |
+| `id`      | Long   | Mã chi tiết sản phẩm |
 
-**Response:** `200 OK` â€” Tráº£ vá» `ResChiTietSanPhamDTO`
+**Response:** `200 OK` — Trả về `ResChiTietSanPhamDTO`
 
-**Lá»—i:**
+**Lỗi:**
 
-| HTTP Status | MÃ´ táº£                                   |
+| HTTP Status | Mô tả                                   |
 | ----------- | ------------------------------------------ |
-| `400`       | KhÃ´ng tÃ¬m tháº¥y chi tiáº¿t sáº£n pháº©m |
+| `400`       | Không tìm thấy chi tiết sản phẩm |
 
 ---
 
-## 3. Láº¥y chi tiáº¿t sáº£n pháº©m theo mÃ£ sáº£n pháº©m
+## 3. Lấy chi tiết sản phẩm theo mã sản phẩm
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t                                           |
+| Thuộc tính   | Chi tiết                                           |
 | --------------- | ---------------------------------------------------- |
 | **URL**         | `GET /api/v1/chi-tiet-san-pham/san-pham/{sanPhamId}` |
 | **Method**      | `GET`                                                |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)                                   |
+| **Xác thực** | Bearer Token (JWT)                                   |
 
 **Path Parameters:**
 
-| Tham sá»‘   | Kiá»ƒu | MÃ´ táº£             |
+| Tham số   | Kiểu | Mô tả             |
 | ----------- | ------ | -------------------- |
-| `sanPhamId` | Long   | MÃ£ sáº£n pháº©m cha |
+| `sanPhamId` | Long   | Mã sản phẩm cha |
 
-**Response:** `200 OK` â€” Tráº£ vá» `List<ResChiTietSanPhamDTO>`
+**Response:** `200 OK` — Trả về `List<ResChiTietSanPhamDTO>`
 
-> **LÆ°u Ã½:** Tráº£ vá» táº¥t cáº£ biáº¿n thá»ƒ (mÃ u sáº¯c, kÃ­ch thÆ°á»›c) cá»§a sáº£n pháº©m Ä‘Æ°á»£c chá»‰ Ä‘á»‹nh.
+> **Lưu ý:** Trả về tất cả biến thể (màu sắc, kích thước) của sản phẩm được chỉ định.
 
 ---
 
-## 3.1 Láº¥y chi tiáº¿t sáº£n pháº©m theo cá»­a hÃ ng cá»§a nhÃ¢n viÃªn Ä‘ang Ä‘Äƒng nháº­p
+## 3.1 Lấy chi tiết sản phẩm theo cửa hàng của nhân viên đang đăng nhập
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t                                            |
+| Thuộc tính   | Chi tiết                                            |
 | --------------- | ----------------------------------------------------- |
 | **URL**         | `GET /api/v1/chi-tiet-san-pham/san-pham-tai-cua-hang` |
 | **Method**      | `GET`                                                 |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)                                    |
+| **Xác thực** | Bearer Token (JWT)                                    |
 
-**MÃ´ táº£ nghiá»‡p vá»¥:**
+**Mô tả nghiệp vụ:**
 
-- Endpoint dÃ nh cho `NHAN_VIEN` (vÃ  `ADMIN`) Ä‘á»ƒ xem tá»“n kho theo Ä‘Ãºng cá»­a hÃ ng Ä‘Æ°á»£c gÃ¡n trong tÃ i khoáº£n nhÃ¢n viÃªn.
-- KhÃ´ng cáº§n truyá»n query/path param.
-- Há»‡ thá»‘ng tá»± láº¥y email tá»« token Ä‘á»ƒ xÃ¡c Ä‘á»‹nh nhÃ¢n viÃªn vÃ  cá»­a hÃ ng.
+- Endpoint dành cho `NHAN_VIEN` (và `ADMIN`) để xem tồn kho theo đúng cửa hàng được gán trong tài khoản nhân viên.
+- Không cần truyền query/path param.
+- Hệ thống tự lấy email từ token để xác định nhân viên và cửa hàng.
 
-**Response:** `200 OK` â€” Tráº£ vá» `List<ResChiTietSanPhamDTO>`
+**Response:** `200 OK` — Trả về `List<ResChiTietSanPhamDTO>`
 
-**Lá»—i:**
+**Lỗi:**
 
-| HTTP Status | MÃ´ táº£                                                |
+| HTTP Status | Mô tả                                                |
 | ----------- | ------------------------------------------------------- |
-| `400`       | KhÃ´ng tÃ¬m tháº¥y nhÃ¢n viÃªn / chÆ°a gÃ¡n cá»­a hÃ ng |
-| `403`       | KhÃ´ng cÃ³ quyá»n truy cáº­p endpoint nÃ y              |
+| `400`       | Không tìm thấy nhân viên / chưa gán cửa hàng |
+| `403`       | Không có quyền truy cập endpoint này              |
 
 ---
 
-## 4. Táº¡o chi tiáº¿t sáº£n pháº©m
+## 4. Tạo chi tiết sản phẩm
 
-| Thuá»™c tÃ­nh    | Chi tiáº¿t                       |
+| Thuộc tính    | Chi tiết                       |
 | ---------------- | -------------------------------- |
 | **URL**          | `POST /api/v1/chi-tiet-san-pham` |
 | **Method**       | `POST`                           |
 | **Content-Type** | `multipart/form-data`            |
-| **XÃ¡c thá»±c**  | Bearer Token (JWT)               |
+| **Xác thực**  | Bearer Token (JWT)               |
 
 **Form Data:**
 
-| Tham sá»‘     | Kiá»ƒu       | Báº¯t buá»™c | MÃ´ táº£                                        |
+| Tham số     | Kiểu       | Bắt buộc | Mô tả                                        |
 | ------------- | ------------ | ------------ | ----------------------------------------------- |
-| `sanPhamId`   | Long         | KhÃ´ng       | MÃ£ sáº£n pháº©m                                |
-| `maPhieuNhap` | Long         | KhÃ´ng       | MÃ£ phiáº¿u nháº­p                              |
-| `mauSacId`    | Long         | KhÃ´ng       | MÃ£ mÃ u sáº¯c                                  |
-| `kichThuocId` | Long         | KhÃ´ng       | MÃ£ kÃ­ch thÆ°á»›c                              |
-| `soLuong`     | Integer      | KhÃ´ng       | Sá»‘ lÆ°á»£ng                                   |
-| `trangThai`   | Integer      | KhÃ´ng       | Tráº¡ng thÃ¡i                                   |
-| `moTa`        | String       | KhÃ´ng       | MÃ´ táº£                                        |
-| `ghiTru`      | String       | KhÃ´ng       | Ghi chÃº trá»«                                  |
-| `files`       | List\<File\> | KhÃ´ng       | Danh sÃ¡ch hÃ¬nh áº£nh (upload lÃªn Cloudinary) |
+| `sanPhamId`   | Long         | Không       | Mã sản phẩm                                |
+| `maPhieuNhap` | Long         | Không       | Mã phiếu nhập                              |
+| `mauSacId`    | Long         | Không       | Mã màu sắc                                  |
+| `kichThuocId` | Long         | Không       | Mã kích thước                              |
+| `soLuong`     | Integer      | Không       | Số lượng                                   |
+| `trangThai`   | Integer      | Không       | Trạng thái                                   |
+| `moTa`        | String       | Không       | Mô tả                                        |
+| `ghiTru`      | String       | Không       | Ghi chú trừ                                  |
+| `files`       | List\<File\> | Không       | Danh sách hình ảnh (upload lên Cloudinary) |
 
-**Response:** `201 Created` â€” Tráº£ vá» `List<ResChiTietSanPhamDTO>`
+**Response:** `201 Created` — Trả về `List<ResChiTietSanPhamDTO>`
 
-> **LÆ°u Ã½:** Khi táº¡o chi tiáº¿t sáº£n pháº©m, há»‡ thá»‘ng tá»± Ä‘á»™ng táº¡o cho **Táº¤T Cáº¢ cá»­a hÃ ng** hiá»‡n cÃ³ vÃ  cáº­p nháº­t tá»•ng `soLuong` cá»§a sáº£n pháº©m cha.
+> **Lưu ý:** Khi tạo chi tiết sản phẩm, hệ thống tự động tạo cho **TẤT CẢ cửa hàng** hiện có và cập nhật tổng `soLuong` của sản phẩm cha.
 
 ---
 
-## 5. Cáº­p nháº­t chi tiáº¿t sáº£n pháº©m
+## 5. Cập nhật chi tiết sản phẩm
 
-| Thuá»™c tÃ­nh    | Chi tiáº¿t                      |
+| Thuộc tính    | Chi tiết                      |
 | ---------------- | ------------------------------- |
 | **URL**          | `PUT /api/v1/chi-tiet-san-pham` |
 | **Method**       | `PUT`                           |
 | **Content-Type** | `multipart/form-data`           |
-| **XÃ¡c thá»±c**  | Bearer Token (JWT)              |
+| **Xác thực**  | Bearer Token (JWT)              |
 
-**Form Data:** Giá»‘ng táº¡o má»›i, thÃªm trÆ°á»ng:
+**Form Data:** Giống tạo mới, thêm trường:
 
-| Tham sá»‘ | Kiá»ƒu | Báº¯t buá»™c | MÃ´ táº£                                       |
+| Tham số | Kiểu | Bắt buộc | Mô tả                                       |
 | --------- | ------ | ------------ | ---------------------------------------------- |
-| `id`      | Long   | **CÃ³**      | MÃ£ chi tiáº¿t sáº£n pháº©m cáº§n cáº­p nháº­t |
+| `id`      | Long   | **Có**      | Mã chi tiết sản phẩm cần cập nhật |
 
-**Response:** `200 OK` â€” Tráº£ vá» `ResChiTietSanPhamDTO`
+**Response:** `200 OK` — Trả về `ResChiTietSanPhamDTO`
 
-**Lá»—i:**
+**Lỗi:**
 
-| HTTP Status | MÃ´ táº£                                                  |
+| HTTP Status | Mô tả                                                  |
 | ----------- | --------------------------------------------------------- |
-| `400`       | MÃ£ chi tiáº¿t sáº£n pháº©m khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng |
+| `400`       | Mã chi tiết sản phẩm không được để trống |
 
 ---
 
-## 6. XÃ³a chi tiáº¿t sáº£n pháº©m
+## 6. Xóa chi tiết sản phẩm
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t                              |
+| Thuộc tính   | Chi tiết                              |
 | --------------- | --------------------------------------- |
 | **URL**         | `DELETE /api/v1/chi-tiet-san-pham/{id}` |
 | **Method**      | `DELETE`                                |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)                      |
+| **Xác thực** | Bearer Token (JWT)                      |
 
 **Path Parameters:**
 
-| Tham sá»‘ | Kiá»ƒu | MÃ´ táº£                    |
+| Tham số | Kiểu | Mô tả                    |
 | --------- | ------ | --------------------------- |
-| `id`      | Long   | MÃ£ chi tiáº¿t sáº£n pháº©m |
+| `id`      | Long   | Mã chi tiết sản phẩm |
 
 **Response:** `204 No Content`
 
-**Lá»—i:**
+**Lỗi:**
 
-| HTTP Status | MÃ´ táº£                                   |
+| HTTP Status | Mô tả                                   |
 | ----------- | ------------------------------------------ |
-| `400`       | KhÃ´ng tÃ¬m tháº¥y chi tiáº¿t sáº£n pháº©m |
+| `400`       | Không tìm thấy chi tiết sản phẩm |
 
 ---
 
-## PhÃ¢n quyá»n
+## Phân quyền
 
-| Vai trÃ²   | GET (Xem) | POST (Táº¡o) | PUT (Sá»­a) | DELETE (XÃ³a) |
+| Vai trò   | GET (Xem) | POST (Tạo) | PUT (Sửa) | DELETE (Xóa) |
 | ---------- | --------- | ------------ | ----------- | ------------- |
-| ADMIN      | âœ…       | âœ…          | âœ…         | âœ…           |
-| NHAN_VIEN  | âœ…       | âŒ           | âŒ          | âŒ            |
-| KHACH_HANG | âœ…       | âŒ           | âŒ          | âŒ            |
+| ADMIN      | ✅       | ✅          | ✅         | ✅           |
+| NHAN_VIEN  | ✅       | ❌           | ❌          | ❌            |
+| KHACH_HANG | ✅       | ❌           | ❌          | ❌            |

@@ -1,34 +1,34 @@
-﻿# NhÃ  Cung Cáº¥p Controller
+# Nhà Cung Cấp Controller
 
 > **Base Path:** `/api/v1/nha-cung-cap`  
 > **File:** `NhaCungCapController.java`  
-> Quáº£n lÃ½ danh sÃ¡ch nhÃ  cung cáº¥p hÃ ng hÃ³a.
+> Quản lý danh sách nhà cung cấp hàng hóa.
 
 ---
 
-## Cáº¥u trÃºc dá»¯ liá»‡u `NhaCungCap`
+## Cấu trúc dữ liệu `NhaCungCap`
 
-| TrÆ°á»ng          | Kiá»ƒu          | MÃ´ táº£                            |
+| Trường          | Kiểu          | Mô tả                            |
 | --------------- | ------------- | -------------------------------- |
-| `id`            | Long          | MÃ£ nhÃ  cung cáº¥p (auto-increment) |
-| `tenNhaCungCap` | String(255)   | TÃªn nhÃ  cung cáº¥p                 |
-| `soDienThoai`   | String(255)   | Sá»‘ Ä‘iá»‡n thoáº¡i                    |
-| `email`         | String(255)   | Email liÃªn há»‡                    |
-| `diaChi`        | String(255)   | Äá»‹a chá»‰                          |
-| `ghiTru`        | String(255)   | Ghi chÃº                          |
-| `trangThai`     | Integer       | Tráº¡ng thÃ¡i (0: ngá»«ng, 1: HÄ)     |
-| `ngayTao`       | LocalDateTime | NgÃ y táº¡o (tá»± Ä‘á»™ng)               |
-| `ngayCapNhat`   | LocalDateTime | NgÃ y cáº­p nháº­t (tá»± Ä‘á»™ng)          |
+| `id`            | Long          | Mã nhà cung cấp (auto-increment) |
+| `tenNhaCungCap` | String(255)   | Tên nhà cung cấp                 |
+| `soDienThoai`   | String(255)   | Số điện thoại                    |
+| `email`         | String(255)   | Email liên hệ                    |
+| `diaChi`        | String(255)   | Địa chỉ                          |
+| `ghiTru`        | String(255)   | Ghi chú                          |
+| `trangThai`     | Integer       | Trạng thái (0: ngừng, 1: HĐ)     |
+| `ngayTao`       | LocalDateTime | Ngày tạo (tự động)               |
+| `ngayCapNhat`   | LocalDateTime | Ngày cập nhật (tự động)          |
 
 ---
 
-## 1. Láº¥y danh sÃ¡ch nhÃ  cung cáº¥p
+## 1. Lấy danh sách nhà cung cấp
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t                   |
+| Thuộc tính   | Chi tiết                   |
 | ------------ | -------------------------- |
 | **URL**      | `GET /api/v1/nha-cung-cap` |
 | **Method**   | `GET`                      |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)         |
+| **Xác thực** | Bearer Token (JWT)         |
 
 **Response:** `200 OK`
 
@@ -36,16 +36,16 @@
 [
   {
     "id": 1,
-    "tenNhaCungCap": "CÃ´ng ty TNHH ABC",
+    "tenNhaCungCap": "Công ty TNHH ABC",
     "soDienThoai": "028-9876-5432",
     "email": "abc@supplier.vn",
-    "diaChi": "456 LÃª Lá»£i, Q.1, TP.HCM",
+    "diaChi": "456 Lê Lợi, Q.1, TP.HCM",
     "trangThai": 1
   }
 ]
 ```
 
-**Kiá»ƒu dá»¯ liá»‡u:**
+**Kiểu dữ liệu:**
 
 ```json
 {
@@ -60,30 +60,30 @@
 
 ---
 
-## 2-5. CRUD tiÃªu chuáº©n
+## 2-5. CRUD tiêu chuẩn
 
-| Endpoint                           | Method   | MÃ´ táº£           |
+| Endpoint                           | Method   | Mô tả           |
 | ---------------------------------- | -------- | --------------- |
-| `GET /api/v1/nha-cung-cap/{id}`    | `GET`    | Láº¥y NCC theo ID |
-| `POST /api/v1/nha-cung-cap`        | `POST`   | Táº¡o NCC má»›i     |
-| `PUT /api/v1/nha-cung-cap`         | `PUT`    | Cáº­p nháº­t NCC    |
-| `DELETE /api/v1/nha-cung-cap/{id}` | `DELETE` | XÃ³a NCC         |
+| `GET /api/v1/nha-cung-cap/{id}`    | `GET`    | Lấy NCC theo ID |
+| `POST /api/v1/nha-cung-cap`        | `POST`   | Tạo NCC mới     |
+| `PUT /api/v1/nha-cung-cap`         | `PUT`    | Cập nhật NCC    |
+| `DELETE /api/v1/nha-cung-cap/{id}` | `DELETE` | Xóa NCC         |
 
 **Request Body (POST/PUT):**
 
 ```json
 {
   "id": 1,
-  "tenNhaCungCap": "CÃ´ng ty TNHH ABC",
+  "tenNhaCungCap": "Công ty TNHH ABC",
   "soDienThoai": "028-9876-5432",
   "email": "abc@supplier.vn",
-  "diaChi": "456 LÃª Lá»£i, Q.1, TP.HCM",
-  "ghiTru": "NCC uy tÃ­n",
+  "diaChi": "456 Lê Lợi, Q.1, TP.HCM",
+  "ghiTru": "NCC uy tín",
   "trangThai": 1
 }
 ```
 
-**Kiá»ƒu dá»¯ liá»‡u:**
+**Kiểu dữ liệu:**
 
 ```json
 {
@@ -97,21 +97,21 @@
 }
 ```
 
-**Lá»—i:**
+**Lỗi:**
 
-| HTTP Status | MÃ´ táº£                               |
+| HTTP Status | Mô tả                               |
 | ----------- | ----------------------------------- |
-| `400`       | KhÃ´ng tÃ¬m tháº¥y nhÃ  cung cáº¥p         |
-| `400`       | MÃ£ nhÃ  cung cáº¥p khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng |
+| `400`       | Không tìm thấy nhà cung cấp         |
+| `400`       | Mã nhà cung cấp không được để trống |
 
 ---
 
-## PhÃ¢n quyá»n
+## Phân quyền
 
-| Vai trÃ²    | GET | POST | PUT | DELETE |
+| Vai trò    | GET | POST | PUT | DELETE |
 | ---------- | --- | ---- | --- | ------ |
-| ADMIN      | âœ…  | âœ…   | âœ…  | âœ…     |
-| NHAN_VIEN  | âœ…  | âŒ   | âŒ  | âŒ     |
-| KHACH_HANG | âŒ  | âŒ   | âŒ  | âŒ     |
+| ADMIN      | ✅  | ✅   | ✅  | ✅     |
+| NHAN_VIEN  | ✅  | ❌   | ❌  | ❌     |
+| KHACH_HANG | ❌  | ❌   | ❌  | ❌     |
 
 

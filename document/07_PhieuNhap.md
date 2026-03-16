@@ -1,55 +1,55 @@
-﻿# Phiáº¿u Nháº­p Controller
+# Phiếu Nhập Controller
 
 > **Base Path:** `/api/v1/phieu-nhap`  
 > **File:** `PhieuNhapController.java`  
-> Quáº£n lÃ½ phiáº¿u nháº­p hÃ ng tá»« nhÃ  cung cáº¥p.
+> Quản lý phiếu nhập hàng từ nhà cung cấp.
 
 ---
 
-## Tá»•ng quan
+## Tổng quan
 
-### Cáº¥u trÃºc dá»¯ liá»‡u `PhieuNhap`
+### Cấu trúc dữ liệu `PhieuNhap`
 
-| TrÆ°á»ng              | Kiá»ƒu          | MÃ´ táº£                          |
+| Trường              | Kiểu          | Mô tả                          |
 | ------------------- | ------------- | ------------------------------ |
-| `id`                | Long          | MÃ£ phiáº¿u nháº­p (auto-increment) |
-| `cuaHang`           | CuaHang       | Cá»­a hÃ ng nháº­p hÃ ng (FK)        |
-| `nhaCungCap`        | NhaCungCap    | NhÃ  cung cáº¥p (FK)              |
-| `tenPhieuNhap`      | String(255)   | TÃªn phiáº¿u nháº­p                 |
-| `trangThai`         | Integer       | Tráº¡ng thÃ¡i phiáº¿u nháº­p          |
-| `ngayDatHang`       | LocalDateTime | NgÃ y Ä‘áº·t hÃ ng                  |
-| `ngayNhanHang`      | LocalDateTime | NgÃ y thá»±c nháº­n hÃ ng            |
-| `chiTietPhieuNhaps` | List          | Danh sÃ¡ch chi tiáº¿t phiáº¿u nháº­p  |
-| `ngayTao`           | LocalDateTime | NgÃ y táº¡o (tá»± Ä‘á»™ng)             |
-| `ngayCapNhat`       | LocalDateTime | NgÃ y cáº­p nháº­t (tá»± Ä‘á»™ng)        |
+| `id`                | Long          | Mã phiếu nhập (auto-increment) |
+| `cuaHang`           | CuaHang       | Cửa hàng nhập hàng (FK)        |
+| `nhaCungCap`        | NhaCungCap    | Nhà cung cấp (FK)              |
+| `tenPhieuNhap`      | String(255)   | Tên phiếu nhập                 |
+| `trangThai`         | Integer       | Trạng thái phiếu nhập          |
+| `ngayDatHang`       | LocalDateTime | Ngày đặt hàng                  |
+| `ngayNhanHang`      | LocalDateTime | Ngày thực nhận hàng            |
+| `chiTietPhieuNhaps` | List          | Danh sách chi tiết phiếu nhập  |
+| `ngayTao`           | LocalDateTime | Ngày tạo (tự động)             |
+| `ngayCapNhat`       | LocalDateTime | Ngày cập nhật (tự động)        |
 
-### MÃ£ tráº¡ng thÃ¡i phiáº¿u nháº­p (`trangThai`)
+### Mã trạng thái phiếu nhập (`trangThai`)
 
-| GiÃ¡ trá»‹ | Ã nghÄ©a        | MÃ´ táº£                                          |
+| Giá trị | Ý nghĩa        | Mô tả                                          |
 | ------- | -------------- | ---------------------------------------------- |
-| `0`     | ÄÃ£ Ä‘áº·t         | Phiáº¿u nháº­p má»›i táº¡o, chá» nhÃ  cung cáº¥p giao hÃ ng |
-| `1`     | ÄÃ£ nháº­n        | HÃ ng Ä‘Ã£ Ä‘Æ°á»£c nháº­n, chá» kiá»ƒm kÃª                 |
-| `2`     | Cháº­m giao      | NhÃ  cung cáº¥p giao cháº­m                         |
-| `3`     | Há»§y            | Phiáº¿u nháº­p bá»‹ há»§y                              |
-| `4`     | Thiáº¿u hÃ ng     | Kiá»ƒm kÃª xong, cÃ³ Ã­t nháº¥t 1 chi tiáº¿t thiáº¿u hÃ ng |
-| `5`     | **HoÃ n thÃ nh** | Kiá»ƒm kÃª xong, táº¥t cáº£ chi tiáº¿t Ä‘áº§y Ä‘á»§           |
+| `0`     | Đã đặt         | Phiếu nhập mới tạo, chờ nhà cung cấp giao hàng |
+| `1`     | Đã nhận        | Hàng đã được nhận, chờ kiểm kê                 |
+| `2`     | Chậm giao      | Nhà cung cấp giao chậm                         |
+| `3`     | Hủy            | Phiếu nhập bị hủy                              |
+| `4`     | Thiếu hàng     | Kiểm kê xong, có ít nhất 1 chi tiết thiếu hàng |
+| `5`     | **Hoàn thành** | Kiểm kê xong, tất cả chi tiết đầy đủ           |
 
-### Luá»“ng tráº¡ng thÃ¡i
+### Luồng trạng thái
 
 ```
-Táº¡o phiáº¿u â†’ 0 (ÄÃ£ Ä‘áº·t)
-  â”œâ”€â”€ Cáº­p nháº­t â†’ 1 (ÄÃ£ nháº­n) â†’ Kiá»ƒm kÃª â†’ 4 (Thiáº¿u hÃ ng) hoáº·c 5 (HoÃ n thÃ nh)
-  â”‚                               â””â”€â”€ (Náº¿u 4) Cáº­p nháº­t chi tiáº¿t â†’ Kiá»ƒm kÃª láº¡i â†’ 5 (HoÃ n thÃ nh)
-  â”œâ”€â”€ Cáº­p nháº­t â†’ 2 (Cháº­m giao) â†’ 1 (ÄÃ£ nháº­n) â†’ Kiá»ƒm kÃª
-  â””â”€â”€ Cáº­p nháº­t â†’ 3 (Há»§y) â† KhÃ´ng thá»ƒ cáº­p nháº­t sau khi há»§y
+Tạo phiếu → 0 (Đã đặt)
+  ├── Cập nhật → 1 (Đã nhận) → Kiểm kê → 4 (Thiếu hàng) hoặc 5 (Hoàn thành)
+  │                               └── (Nếu 4) Cập nhật chi tiết → Kiểm kê lại → 5 (Hoàn thành)
+  ├── Cập nhật → 2 (Chậm giao) → 1 (Đã nhận) → Kiểm kê
+  └── Cập nhật → 3 (Hủy) ← Không thể cập nhật sau khi hủy
 ```
 
-**Quy táº¯c:**
+**Quy tắc:**
 
-- Phiáº¿u Ä‘Ã£ **há»§y** (3) â†’ khÃ´ng thá»ƒ cáº­p nháº­t
-- Phiáº¿u Ä‘Ã£ **hoÃ n thÃ nh** (5) â†’ khÃ´ng thá»ƒ cáº­p nháº­t
-- Phiáº¿u Ä‘ang **Ä‘Ã£ nháº­n** (1) hoáº·c **thiáº¿u hÃ ng** (4) â†’ cÃ³ thá»ƒ cáº­p nháº­t thÃ´ng tin (tÃªn, cá»­a hÃ ng, nhÃ  cung cáº¥p) nhÆ°ng **khÃ´ng thá»ƒ tá»± thay Ä‘á»•i tráº¡ng thÃ¡i thá»§ cÃ´ng** â€” tráº¡ng thÃ¡i chá»‰ thay Ä‘á»•i qua kiá»ƒm kÃª
-- Khi chuyá»ƒn sang **ÄÃ£ nháº­n** (1), `ngayNhanHang` tá»± Ä‘á»™ng Ä‘Æ°á»£c gÃ¡n
+- Phiếu đã **hủy** (3) → không thể cập nhật
+- Phiếu đã **hoàn thành** (5) → không thể cập nhật
+- Phiếu đang **đã nhận** (1) hoặc **thiếu hàng** (4) → có thể cập nhật thông tin (tên, cửa hàng, nhà cung cấp) nhưng **không thể tự thay đổi trạng thái thủ công** — trạng thái chỉ thay đổi qua kiểm kê
+- Khi chuyển sang **Đã nhận** (1), `ngayNhanHang` tự động được gán
 
 ---
 
@@ -58,22 +58,22 @@ Táº¡o phiáº¿u â†’ 0 (ÄÃ£ Ä‘áº·t)
 ```json
 {
   "id": 1,
-  "tenPhieuNhap": "Nháº­p hÃ ng Ä‘á»£t 1 - CN Q.1",
+  "tenPhieuNhap": "Nhập hàng đợt 1 - CN Q.1",
   "trangThai": 4,
-  "trangThaiText": "Thiáº¿u hÃ ng",
+  "trangThaiText": "Thiếu hàng",
   "ngayDatHang": "2026-03-01T10:00:00",
   "ngayNhanHang": "2026-03-03T10:00:00",
   "ngayTao": "2026-02-28T10:00:00",
   "ngayCapNhat": "2026-03-03T10:00:00",
   "cuaHang": {
     "id": 1,
-    "tenCuaHang": "Chi nhÃ¡nh Quáº­n 1",
-    "diaChi": "123 Nguyá»…n Huá»‡, Q.1, TP.HCM",
+    "tenCuaHang": "Chi nhánh Quận 1",
+    "diaChi": "123 Nguyễn Huệ, Q.1, TP.HCM",
     "soDienThoai": "02812345678"
   },
   "nhaCungCap": {
     "id": 1,
-    "tenNhaCungCap": "CÃ´ng ty TNHH Váº£i Viá»‡t",
+    "tenNhaCungCap": "Công ty TNHH Vải Việt",
     "soDienThoai": "02838001001",
     "email": "vaiviet@ncc.com"
   },
@@ -81,16 +81,16 @@ Táº¡o phiáº¿u â†’ 0 (ÄÃ£ Ä‘áº·t)
     {
       "id": 1,
       "chiTietSanPhamId": 1,
-      "tenSanPham": "Ão Oxford",
-      "tenMauSac": "Tráº¯ng",
+      "tenSanPham": "Áo Oxford",
+      "tenMauSac": "Trắng",
       "tenKichThuoc": "M",
       "soLuong": 10,
       "soLuongThieu": 3,
       "soLuongDaNhap": 7,
       "ghiTru": null,
-      "ghiTruKiemHang": "Thiáº¿u 3 cÃ¡i do hÆ° há»ng",
+      "ghiTruKiemHang": "Thiếu 3 cái do hư hỏng",
       "trangThai": 1,
-      "trangThaiText": "Thiáº¿u"
+      "trangThaiText": "Thiếu"
     }
   ]
 }
@@ -98,33 +98,33 @@ Táº¡o phiáº¿u â†’ 0 (ÄÃ£ Ä‘áº·t)
 
 ---
 
-## 1. Láº¥y danh sÃ¡ch phiáº¿u nháº­p (cÃ³ lá»c + phÃ¢n trang)
+## 1. Lấy danh sách phiếu nhập (có lọc + phân trang)
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t                 |
+| Thuộc tính   | Chi tiết                 |
 | ------------ | ------------------------ |
 | **URL**      | `GET /api/v1/phieu-nhap` |
 | **Method**   | `GET`                    |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)       |
+| **Xác thực** | Bearer Token (JWT)       |
 
 **Query Parameters:**
 
-| Tham sá»‘           | Kiá»ƒu          | Báº¯t buá»™c | MÃ´ táº£                        |
+| Tham số           | Kiểu          | Bắt buộc | Mô tả                        |
 | ----------------- | ------------- | -------- | ---------------------------- |
-| `tenPhieuNhap`    | String        | KhÃ´ng    | Lá»c theo tÃªn phiáº¿u nháº­p      |
-| `trangThai`       | Integer       | KhÃ´ng    | Lá»c theo tráº¡ng thÃ¡i (0-5)    |
-| `tenCuaHang`      | String        | KhÃ´ng    | Lá»c theo tÃªn cá»­a hÃ ng        |
-| `tenNhaCungCap`   | String        | KhÃ´ng    | Lá»c theo tÃªn nhÃ  cung cáº¥p    |
-| `ngayTaoTu`       | LocalDateTime | KhÃ´ng    | NgÃ y táº¡o tá»«                  |
-| `ngayTaoDen`      | LocalDateTime | KhÃ´ng    | NgÃ y táº¡o Ä‘áº¿n                 |
-| `ngayDatHangTu`   | LocalDateTime | KhÃ´ng    | NgÃ y Ä‘áº·t hÃ ng tá»«             |
-| `ngayDatHangDen`  | LocalDateTime | KhÃ´ng    | NgÃ y Ä‘áº·t hÃ ng Ä‘áº¿n            |
-| `ngayNhanHangTu`  | LocalDateTime | KhÃ´ng    | NgÃ y nháº­n hÃ ng tá»«            |
-| `ngayNhanHangDen` | LocalDateTime | KhÃ´ng    | NgÃ y nháº­n hÃ ng Ä‘áº¿n           |
-| `page`            | Integer       | KhÃ´ng    | Sá»‘ trang (máº·c Ä‘á»‹nh: 0)       |
-| `size`            | Integer       | KhÃ´ng    | KÃ­ch thÆ°á»›c trang             |
-| `sort`            | String        | KhÃ´ng    | Sáº¯p xáº¿p (vd: `ngayTao,desc`) |
+| `tenPhieuNhap`    | String        | Không    | Lọc theo tên phiếu nhập      |
+| `trangThai`       | Integer       | Không    | Lọc theo trạng thái (0-5)    |
+| `tenCuaHang`      | String        | Không    | Lọc theo tên cửa hàng        |
+| `tenNhaCungCap`   | String        | Không    | Lọc theo tên nhà cung cấp    |
+| `ngayTaoTu`       | LocalDateTime | Không    | Ngày tạo từ                  |
+| `ngayTaoDen`      | LocalDateTime | Không    | Ngày tạo đến                 |
+| `ngayDatHangTu`   | LocalDateTime | Không    | Ngày đặt hàng từ             |
+| `ngayDatHangDen`  | LocalDateTime | Không    | Ngày đặt hàng đến            |
+| `ngayNhanHangTu`  | LocalDateTime | Không    | Ngày nhận hàng từ            |
+| `ngayNhanHangDen` | LocalDateTime | Không    | Ngày nhận hàng đến           |
+| `page`            | Integer       | Không    | Số trang (mặc định: 0)       |
+| `size`            | Integer       | Không    | Kích thước trang             |
+| `sort`            | String        | Không    | Sắp xếp (vd: `ngayTao,desc`) |
 
-**Response:** `200 OK` â€” Tráº£ vá» `ResultPaginationDTO`
+**Response:** `200 OK` — Trả về `ResultPaginationDTO`
 
 ```json
 {
@@ -140,44 +140,44 @@ Táº¡o phiáº¿u â†’ 0 (ÄÃ£ Ä‘áº·t)
 
 ---
 
-## 2. Láº¥y phiáº¿u nháº­p theo ID
+## 2. Lấy phiếu nhập theo ID
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t                      |
+| Thuộc tính   | Chi tiết                      |
 | ------------ | ----------------------------- |
 | **URL**      | `GET /api/v1/phieu-nhap/{id}` |
 | **Method**   | `GET`                         |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)            |
+| **Xác thực** | Bearer Token (JWT)            |
 
-**Response:** `200 OK` â€” Tráº£ vá» `ResPhieuNhapDTO`
+**Response:** `200 OK` — Trả về `ResPhieuNhapDTO`
 
-**Lá»—i:**
+**Lỗi:**
 
-| HTTP Status | MÃ´ táº£                     |
+| HTTP Status | Mô tả                     |
 | ----------- | ------------------------- |
-| `400`       | KhÃ´ng tÃ¬m tháº¥y phiáº¿u nháº­p |
+| `400`       | Không tìm thấy phiếu nhập |
 
 ---
 
-## 3. Táº¡o phiáº¿u nháº­p
+## 3. Tạo phiếu nhập
 
-| Thuá»™c tÃ­nh       | Chi tiáº¿t                  |
+| Thuộc tính       | Chi tiết                  |
 | ---------------- | ------------------------- |
 | **URL**          | `POST /api/v1/phieu-nhap` |
 | **Method**       | `POST`                    |
 | **Content-Type** | `application/json`        |
-| **XÃ¡c thá»±c**     | Bearer Token (JWT)        |
+| **Xác thực**     | Bearer Token (JWT)        |
 
 **Request Body:** `ReqPhieuNhapDTO`
 
 ```json
 {
-  "tenPhieuNhap": "Nháº­p hÃ ng thÃ¡ng 3",
+  "tenPhieuNhap": "Nhập hàng tháng 3",
   "cuaHangId": 1,
   "nhaCungCapId": 1
 }
 ```
 
-**Kiá»ƒu dá»¯ liá»‡u:**
+**Kiểu dữ liệu:**
 
 ```json
 {
@@ -189,46 +189,46 @@ Táº¡o phiáº¿u â†’ 0 (ÄÃ£ Ä‘áº·t)
 
 **Logic:**
 
-- `trangThai` tá»± Ä‘á»™ng gÃ¡n = `0` (ÄÃ£ Ä‘áº·t)
-- `ngayDatHang` tá»± Ä‘á»™ng gÃ¡n = thá»i Ä‘iá»ƒm hiá»‡n táº¡i
+- `trangThai` tự động gán = `0` (Đã đặt)
+- `ngayDatHang` tự động gán = thời điểm hiện tại
 
-**Response:** `201 Created` â€” Tráº£ vá» `ResPhieuNhapDTO`
+**Response:** `201 Created` — Trả về `ResPhieuNhapDTO`
 
-**Lá»—i:**
+**Lỗi:**
 
-| HTTP Status | MÃ´ táº£                       |
+| HTTP Status | Mô tả                       |
 | ----------- | --------------------------- |
-| `400`       | KhÃ´ng tÃ¬m tháº¥y cá»­a hÃ ng     |
-| `400`       | KhÃ´ng tÃ¬m tháº¥y nhÃ  cung cáº¥p |
+| `400`       | Không tìm thấy cửa hàng     |
+| `400`       | Không tìm thấy nhà cung cấp |
 
 ---
 
-## 4. Cáº­p nháº­t phiáº¿u nháº­p
+## 4. Cập nhật phiếu nhập
 
-| Thuá»™c tÃ­nh       | Chi tiáº¿t                 |
+| Thuộc tính       | Chi tiết                 |
 | ---------------- | ------------------------ |
 | **URL**          | `PUT /api/v1/phieu-nhap` |
 | **Method**       | `PUT`                    |
 | **Content-Type** | `application/json`       |
-| **XÃ¡c thá»±c**     | Bearer Token (JWT)       |
+| **Xác thực**     | Bearer Token (JWT)       |
 
-**Request Body:** `ReqPhieuNhapDTO` (pháº£i cÃ³ `id`)
+**Request Body:** `ReqPhieuNhapDTO` (phải có `id`)
 
 ```json
 {
   "id": 1,
-  "tenPhieuNhap": "Nháº­p hÃ ng Ä‘á»£t 1 (cáº­p nháº­t)",
+  "tenPhieuNhap": "Nhập hàng đợt 1 (cập nhật)",
   "cuaHangId": 1,
   "nhaCungCapId": 1,
   "trangThai": 1
 }
 ```
 
-**Kiá»ƒu dá»¯ liá»‡u:**
+**Kiểu dữ liệu:**
 
 ```json
 {
-  "id": "Long (báº¯t buá»™c)",
+  "id": "Long (bắt buộc)",
   "tenPhieuNhap": "String",
   "cuaHangId": "Long",
   "nhaCungCapId": "Long",
@@ -238,107 +238,107 @@ Táº¡o phiáº¿u â†’ 0 (ÄÃ£ Ä‘áº·t)
 
 **Logic:**
 
-- Khi chuyá»ƒn sang **ÄÃ£ nháº­n** (1): `ngayNhanHang` tá»± Ä‘á»™ng gÃ¡n
-- KhÃ´ng cho cáº­p nháº­t phiáº¿u Ä‘Ã£ **Há»§y** (3) hoáº·c **HoÃ n thÃ nh** (5)
-- KhÃ´ng cho thay Ä‘á»•i tráº¡ng thÃ¡i thá»§ cÃ´ng khi Ä‘Ã£ **ÄÃ£ nháº­n** (1) hoáº·c **Thiáº¿u hÃ ng** (4) â€” tráº¡ng thÃ¡i chá»‰ thay Ä‘á»•i qua kiá»ƒm kÃª
-- Khi phiáº¿u Ä‘ang **Thiáº¿u hÃ ng** (4), váº«n cÃ³ thá»ƒ cáº­p nháº­t thÃ´ng tin (tÃªn, cá»­a hÃ ng, nhÃ  cung cáº¥p)
+- Khi chuyển sang **Đã nhận** (1): `ngayNhanHang` tự động gán
+- Không cho cập nhật phiếu đã **Hủy** (3) hoặc **Hoàn thành** (5)
+- Không cho thay đổi trạng thái thủ công khi đã **Đã nhận** (1) hoặc **Thiếu hàng** (4) — trạng thái chỉ thay đổi qua kiểm kê
+- Khi phiếu đang **Thiếu hàng** (4), vẫn có thể cập nhật thông tin (tên, cửa hàng, nhà cung cấp)
 
-**Response:** `200 OK` â€” Tráº£ vá» `ResPhieuNhapDTO`
+**Response:** `200 OK` — Trả về `ResPhieuNhapDTO`
 
-**Lá»—i:**
+**Lỗi:**
 
-| HTTP Status | MÃ´ táº£                                                         |
+| HTTP Status | Mô tả                                                         |
 | ----------- | ------------------------------------------------------------- |
-| `400`       | MÃ£ phiáº¿u nháº­p khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng                             |
-| `400`       | KhÃ´ng tÃ¬m tháº¥y phiáº¿u nháº­p                                     |
-| `400`       | Phiáº¿u nháº­p Ä‘Ã£ há»§y, khÃ´ng thá»ƒ cáº­p nháº­t                         |
-| `400`       | Phiáº¿u nháº­p Ä‘Ã£ hoÃ n thÃ nh, khÃ´ng thá»ƒ cáº­p nháº­t                  |
-| `400`       | KhÃ´ng thá»ƒ thay Ä‘á»•i tráº¡ng thÃ¡i thá»§ cÃ´ng khi phiáº¿u Ä‘Ã£ nháº­n hÃ ng |
-| `400`       | Tráº¡ng thÃ¡i khÃ´ng há»£p lá»‡                                       |
+| `400`       | Mã phiếu nhập không được để trống                             |
+| `400`       | Không tìm thấy phiếu nhập                                     |
+| `400`       | Phiếu nhập đã hủy, không thể cập nhật                         |
+| `400`       | Phiếu nhập đã hoàn thành, không thể cập nhật                  |
+| `400`       | Không thể thay đổi trạng thái thủ công khi phiếu đã nhận hàng |
+| `400`       | Trạng thái không hợp lệ                                       |
 
 ---
 
-## 5. Kiá»ƒm kÃª phiáº¿u nháº­p
+## 5. Kiểm kê phiếu nhập
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t                              |
+| Thuộc tính   | Chi tiết                              |
 | ------------ | ------------------------------------- |
 | **URL**      | `PUT /api/v1/phieu-nhap/kiem-ke/{id}` |
 | **Method**   | `PUT`                                 |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)                    |
+| **Xác thực** | Bearer Token (JWT)                    |
 
 **Path Parameters:**
 
-| Tham sá»‘ | Kiá»ƒu | MÃ´ táº£         |
+| Tham số | Kiểu | Mô tả         |
 | ------- | ---- | ------------- |
-| `id`    | Long | MÃ£ phiáº¿u nháº­p |
+| `id`    | Long | Mã phiếu nhập |
 
-**Äiá»u kiá»‡n:** Phiáº¿u nháº­p pháº£i á»Ÿ tráº¡ng thÃ¡i **ÄÃ£ nháº­n** (1) hoáº·c **Thiáº¿u hÃ ng** (4).
+**Điều kiện:** Phiếu nhập phải ở trạng thái **Đã nhận** (1) hoặc **Thiếu hàng** (4).
 
-**Logic kiá»ƒm kÃª (sá»­ dá»¥ng delta Ä‘á»ƒ trÃ¡nh cá»™ng trÃ¹ng):**
+**Logic kiểm kê (sử dụng delta để tránh cộng trùng):**
 
-1. Duyá»‡t tá»«ng chi tiáº¿t phiáº¿u nháº­p:
-   - `trangThai = 0` (Ä‘á»§ hÃ ng): sá»‘ lÆ°á»£ng cáº§n nháº­p (`soLuongCanNhap`) = `soLuong`
-   - `trangThai = 1` (thiáº¿u hÃ ng): `soLuongCanNhap` = `soLuong - soLuongThieu`
-2. TÃ­nh **delta** = `soLuongCanNhap - soLuongDaNhap` (sá»‘ lÆ°á»£ng Ä‘Ã£ nháº­p tá»« láº§n kiá»ƒm kÃª trÆ°á»›c)
-3. Cáº­p nháº­t `ChiTietSanPham.soLuong` += delta
-4. GÃ¡n `ChiTietSanPham.maPhieuNhap` vÃ  `ChiTietSanPham.maCuaHang`
-5. LÆ°u láº¡i `soLuongDaNhap = soLuongCanNhap` vÃ o chi tiáº¿t phiáº¿u nháº­p (dÃ¹ng cho láº§n kiá»ƒm kÃª tiáº¿p)
-6. TÃ­nh láº¡i tá»•ng `SanPham.soLuong` = tá»•ng soLuong cá»§a táº¥t cáº£ ChiTietSanPham
-7. Káº¿t quáº£:
-   - CÃ³ Ã­t nháº¥t 1 chi tiáº¿t thiáº¿u â†’ phiáº¿u nháº­p = **4 (Thiáº¿u hÃ ng)**
-   - Táº¥t cáº£ Ä‘á»§ â†’ phiáº¿u nháº­p = **5 (HoÃ n thÃ nh)**
+1. Duyệt từng chi tiết phiếu nhập:
+   - `trangThai = 0` (đủ hàng): số lượng cần nhập (`soLuongCanNhap`) = `soLuong`
+   - `trangThai = 1` (thiếu hàng): `soLuongCanNhap` = `soLuong - soLuongThieu`
+2. Tính **delta** = `soLuongCanNhap - soLuongDaNhap` (số lượng đã nhập từ lần kiểm kê trước)
+3. Cập nhật `ChiTietSanPham.soLuong` += delta
+4. Gán `ChiTietSanPham.maPhieuNhap` và `ChiTietSanPham.maCuaHang`
+5. Lưu lại `soLuongDaNhap = soLuongCanNhap` vào chi tiết phiếu nhập (dùng cho lần kiểm kê tiếp)
+6. Tính lại tổng `SanPham.soLuong` = tổng soLuong của tất cả ChiTietSanPham
+7. Kết quả:
+   - Có ít nhất 1 chi tiết thiếu → phiếu nhập = **4 (Thiếu hàng)**
+   - Tất cả đủ → phiếu nhập = **5 (Hoàn thành)**
 
-> **VÃ­ dá»¥ kiá»ƒm kÃª 2 láº§n:**
+> **Ví dụ kiểm kê 2 lần:**
 >
-> - Láº§n 1: `soLuong=10`, `soLuongThieu=3` â†’ `soLuongCanNhap=7`, `delta=7-0=7` â†’ kho +7, `soLuongDaNhap=7`, phiáº¿u = 4
-> - Cáº­p nháº­t chi tiáº¿t: `soLuongThieu=0`, `trangThai=0`
-> - Láº§n 2: `soLuongCanNhap=10`, `delta=10-7=3` â†’ kho +3, `soLuongDaNhap=10`, phiáº¿u = 5
-> - Tá»•ng kho = 10 âœ“
+> - Lần 1: `soLuong=10`, `soLuongThieu=3` → `soLuongCanNhap=7`, `delta=7-0=7` → kho +7, `soLuongDaNhap=7`, phiếu = 4
+> - Cập nhật chi tiết: `soLuongThieu=0`, `trangThai=0`
+> - Lần 2: `soLuongCanNhap=10`, `delta=10-7=3` → kho +3, `soLuongDaNhap=10`, phiếu = 5
+> - Tổng kho = 10 ✓
 
-**Response:** `200 OK` â€” Tráº£ vá» `ResPhieuNhapDTO`
+**Response:** `200 OK` — Trả về `ResPhieuNhapDTO`
 
-**Lá»—i:**
+**Lỗi:**
 
-| HTTP Status | MÃ´ táº£                                                                  |
+| HTTP Status | Mô tả                                                                  |
 | ----------- | ---------------------------------------------------------------------- |
-| `400`       | KhÃ´ng tÃ¬m tháº¥y phiáº¿u nháº­p                                              |
-| `400`       | Chá»‰ cÃ³ thá»ƒ kiá»ƒm kÃª phiáº¿u nháº­p á»Ÿ tráº¡ng thÃ¡i 'ÄÃ£ nháº­n' hoáº·c 'Thiáº¿u hÃ ng' |
+| `400`       | Không tìm thấy phiếu nhập                                              |
+| `400`       | Chỉ có thể kiểm kê phiếu nhập ở trạng thái 'Đã nhận' hoặc 'Thiếu hàng' |
 
 ---
 
-## 6. XÃ³a phiáº¿u nháº­p
+## 6. Xóa phiếu nhập
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t                         |
+| Thuộc tính   | Chi tiết                         |
 | ------------ | -------------------------------- |
 | **URL**      | `DELETE /api/v1/phieu-nhap/{id}` |
 | **Method**   | `DELETE`                         |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)               |
+| **Xác thực** | Bearer Token (JWT)               |
 
 **Response:** `204 No Content`
 
-**Lá»—i:**
+**Lỗi:**
 
-| HTTP Status | MÃ´ táº£                     |
+| HTTP Status | Mô tả                     |
 | ----------- | ------------------------- |
-| `400`       | KhÃ´ng tÃ¬m tháº¥y phiáº¿u nháº­p |
+| `400`       | Không tìm thấy phiếu nhập |
 
 ---
 
-## PhÃ¢n quyá»n
+## Phân quyền
 
-| Vai trÃ²    | GET (Xem) | POST (Táº¡o) | PUT (Sá»­a) | PUT (Kiá»ƒm kÃª) | DELETE (XÃ³a) |
+| Vai trò    | GET (Xem) | POST (Tạo) | PUT (Sửa) | PUT (Kiểm kê) | DELETE (Xóa) |
 | ---------- | --------- | ---------- | --------- | ------------- | ------------ |
-| ADMIN      | âœ…        | âœ…         | âœ…        | âœ…            | âœ…           |
-| NHAN_VIEN  | âœ…        | âœ…         | âœ…        | âœ…            | âŒ           |
-| KHACH_HANG | âŒ        | âŒ         | âŒ        | âŒ            | âŒ           |
+| ADMIN      | ✅        | ✅         | ✅        | ✅            | ✅           |
+| NHAN_VIEN  | ✅        | ✅         | ✅        | ✅            | ❌           |
+| KHACH_HANG | ❌        | ❌         | ❌        | ❌            | ❌           |
 
 ---
 
-## HÆ°á»›ng dáº«n test luá»“ng nháº­p hÃ ng
+## Hướng dẫn test luồng nhập hàng
 
-> **Äiá»u kiá»‡n tiÃªn quyáº¿t:** Äáº£m báº£o Ä‘Ã£ cÃ³ dá»¯ liá»‡u **Cá»­a hÃ ng**, **NhÃ  cung cáº¥p**, vÃ  **Chi tiáº¿t sáº£n pháº©m** trong DB (cÃ³ thá»ƒ cháº¡y file `insert_data.sql`).
+> **Điều kiện tiên quyết:** Đảm bảo đã có dữ liệu **Cửa hàng**, **Nhà cung cấp**, và **Chi tiết sản phẩm** trong DB (có thể chạy file `insert_data.sql`).
 
-### BÆ°á»›c 1: ÄÄƒng nháº­p láº¥y Token
+### Bước 1: Đăng nhập lấy Token
 
 ```
 POST /api/v1/auth/login
@@ -351,12 +351,12 @@ POST /api/v1/auth/login
 }
 ```
 
-â†’ Copy `access_token` tá»« response, dÃ¹ng cho táº¥t cáº£ request sau:  
+→ Copy `access_token` từ response, dùng cho tất cả request sau:  
 `Authorization: Bearer <access_token>`
 
 ---
 
-### BÆ°á»›c 2: Táº¡o phiáº¿u nháº­p
+### Bước 2: Tạo phiếu nhập
 
 ```
 POST /api/v1/phieu-nhap
@@ -364,18 +364,18 @@ POST /api/v1/phieu-nhap
 
 ```json
 {
-  "tenPhieuNhap": "Nháº­p hÃ ng thÃ¡ng 3",
+  "tenPhieuNhap": "Nhập hàng tháng 3",
   "cuaHangId": 1,
   "nhaCungCapId": 1
 }
 ```
 
-â†’ Há»‡ thá»‘ng tá»± gÃ¡n `trangThai = 0` (ÄÃ£ Ä‘áº·t) vÃ  `ngayDatHang` = thá»i Ä‘iá»ƒm hiá»‡n táº¡i.  
-â†’ Ghi nhá»› `id` phiáº¿u nháº­p tráº£ vá» (vÃ­ dá»¥: `id = 1`).
+→ Hệ thống tự gán `trangThai = 0` (Đã đặt) và `ngayDatHang` = thời điểm hiện tại.  
+→ Ghi nhớ `id` phiếu nhập trả về (ví dụ: `id = 1`).
 
 ---
 
-### BÆ°á»›c 3: ThÃªm chi tiáº¿t phiáº¿u nháº­p (tá»«ng dÃ²ng sáº£n pháº©m)
+### Bước 3: Thêm chi tiết phiếu nhập (từng dòng sản phẩm)
 
 ```
 POST /api/v1/chi-tiet-phieu-nhap
@@ -390,13 +390,13 @@ POST /api/v1/chi-tiet-phieu-nhap
 }
 ```
 
-- `chiTietSanPhamId`: ID biáº¿n thá»ƒ sáº£n pháº©m (vÃ­ dá»¥: Ão Oxford - Tráº¯ng - M)
-- `trangThai = 0`: Ä‘á»§ hÃ ng | `trangThai = 1`: thiáº¿u hÃ ng
-- Gá»i nhiá»u láº§n náº¿u phiáº¿u nháº­p cÃ³ nhiá»u sáº£n pháº©m
+- `chiTietSanPhamId`: ID biến thể sản phẩm (ví dụ: Áo Oxford - Trắng - M)
+- `trangThai = 0`: đủ hàng | `trangThai = 1`: thiếu hàng
+- Gọi nhiều lần nếu phiếu nhập có nhiều sản phẩm
 
 ---
 
-### BÆ°á»›c 4: Cáº­p nháº­t tráº¡ng thÃ¡i â†’ "ÄÃ£ nháº­n" (1)
+### Bước 4: Cập nhật trạng thái → "Đã nhận" (1)
 
 ```
 PUT /api/v1/phieu-nhap
@@ -405,18 +405,18 @@ PUT /api/v1/phieu-nhap
 ```json
 {
   "id": 1,
-  "tenPhieuNhap": "Nháº­p hÃ ng thÃ¡ng 3",
+  "tenPhieuNhap": "Nhập hàng tháng 3",
   "cuaHangId": 1,
   "nhaCungCapId": 1,
   "trangThai": 1
 }
 ```
 
-â†’ Há»‡ thá»‘ng tá»± gÃ¡n `ngayNhanHang`. Phiáº¿u chuyá»ƒn sang tráº¡ng thÃ¡i **ÄÃ£ nháº­n**.
+→ Hệ thống tự gán `ngayNhanHang`. Phiếu chuyển sang trạng thái **Đã nhận**.
 
 ---
 
-### BÆ°á»›c 5 (tuá»³ chá»n): Cáº­p nháº­t chi tiáº¿t náº¿u cÃ³ thiáº¿u hÃ ng
+### Bước 5 (tuỳ chọn): Cập nhật chi tiết nếu có thiếu hàng
 
 ```
 PUT /api/v1/chi-tiet-phieu-nhap
@@ -429,46 +429,46 @@ PUT /api/v1/chi-tiet-phieu-nhap
   "chiTietSanPhamId": 1,
   "soLuong": 50,
   "soLuongThieu": 5,
-  "ghiTruKiemHang": "Thiáº¿u 5 cÃ¡i do hÆ° há»ng",
+  "ghiTruKiemHang": "Thiếu 5 cái do hư hỏng",
   "trangThai": 1
 }
 ```
 
-> CÃ³ thá»ƒ cáº­p nháº­t chi tiáº¿t khi phiáº¿u Ä‘ang á»Ÿ tráº¡ng thÃ¡i **ÄÃ£ nháº­n** (1) hoáº·c **Thiáº¿u hÃ ng** (4).
+> Có thể cập nhật chi tiết khi phiếu đang ở trạng thái **Đã nhận** (1) hoặc **Thiếu hàng** (4).
 
 ---
 
-### BÆ°á»›c 6: Kiá»ƒm kÃª (nháº­p kho thá»±c táº¿)
+### Bước 6: Kiểm kê (nhập kho thực tế)
 
 ```
 PUT /api/v1/phieu-nhap/kiem-ke/1
 ```
 
-â†’ Há»‡ thá»‘ng sáº½:
+→ Hệ thống sẽ:
 
-1. TÃ­nh `delta = soLuongCanNhap - soLuongDaNhap` cho má»—i chi tiáº¿t
-2. Cá»™ng delta vÃ o tá»“n kho `ChiTietSanPham` (chá»‰ cá»™ng pháº§n chÃªnh lá»‡ch, khÃ´ng cá»™ng láº¡i tá»« Ä‘áº§u)
-3. GÃ¡n `maPhieuNhap` vÃ  `maCuaHang` cho `ChiTietSanPham`
-4. TÃ­nh láº¡i tá»•ng `SanPham.soLuong`
-5. LÆ°u `soLuongDaNhap` = sá»‘ lÆ°á»£ng Ä‘Ã£ thá»±c nháº­p Ä‘á»ƒ dÃ¹ng cho láº§n kiá»ƒm kÃª tiáº¿p theo
-6. Cáº­p nháº­t tráº¡ng thÃ¡i phiáº¿u:
-   - **5 (HoÃ n thÃ nh)** náº¿u táº¥t cáº£ chi tiáº¿t Ä‘á»§ hÃ ng
-   - **4 (Thiáº¿u hÃ ng)** náº¿u cÃ³ Ã­t nháº¥t 1 chi tiáº¿t thiáº¿u
+1. Tính `delta = soLuongCanNhap - soLuongDaNhap` cho mỗi chi tiết
+2. Cộng delta vào tồn kho `ChiTietSanPham` (chỉ cộng phần chênh lệch, không cộng lại từ đầu)
+3. Gán `maPhieuNhap` và `maCuaHang` cho `ChiTietSanPham`
+4. Tính lại tổng `SanPham.soLuong`
+5. Lưu `soLuongDaNhap` = số lượng đã thực nhập để dùng cho lần kiểm kê tiếp theo
+6. Cập nhật trạng thái phiếu:
+   - **5 (Hoàn thành)** nếu tất cả chi tiết đủ hàng
+   - **4 (Thiếu hàng)** nếu có ít nhất 1 chi tiết thiếu
 
-> CÃ³ thá»ƒ gá»i kiá»ƒm kÃª nhiá»u láº§n khi phiáº¿u Ä‘ang **Thiáº¿u hÃ ng** (4) sau khi cáº­p nháº­t láº¡i chi tiáº¿t.
+> Có thể gọi kiểm kê nhiều lần khi phiếu đang **Thiếu hàng** (4) sau khi cập nhật lại chi tiết.
 
 ---
 
-### TÃ³m táº¯t luá»“ng
+### Tóm tắt luồng
 
 ```
-Login â†’ Táº¡o phiáº¿u nháº­p (0-ÄÃ£ Ä‘áº·t)
-      â†’ ThÃªm chi tiáº¿t sáº£n pháº©m
-      â†’ Cáº­p nháº­t tráº¡ng thÃ¡i (1-ÄÃ£ nháº­n)
-      â†’ (Tuá»³ chá»n) Cáº­p nháº­t chi tiáº¿t náº¿u thiáº¿u hÃ ng
-      â†’ Kiá»ƒm kÃª â†’ (4-Thiáº¿u hÃ ng) hoáº·c (5-HoÃ n thÃ nh)
-                      â†‘
-      (Náº¿u 4) Cáº­p nháº­t chi tiáº¿t â†’ Kiá»ƒm kÃª láº¡i â†’ (5-HoÃ n thÃ nh)
+Login → Tạo phiếu nhập (0-Đã đặt)
+      → Thêm chi tiết sản phẩm
+      → Cập nhật trạng thái (1-Đã nhận)
+      → (Tuỳ chọn) Cập nhật chi tiết nếu thiếu hàng
+      → Kiểm kê → (4-Thiếu hàng) hoặc (5-Hoàn thành)
+                      ↑
+      (Nếu 4) Cập nhật chi tiết → Kiểm kê lại → (5-Hoàn thành)
 ```
 
 

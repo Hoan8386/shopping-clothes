@@ -98,6 +98,31 @@ public class NhanVienService {
         return nhanVienRepository.findByRefreshTokenAndEmail(refreshToken, email).orElse(null);
     }
 
+    public NhanVien updatePasswordByEmail(String email, String encodedPassword) throws IdInvalidException {
+        NhanVien nhanVien = nhanVienRepository.findByEmail(email)
+                .orElseThrow(() -> new IdInvalidException("Không tìm thấy nhân viên với email: " + email));
+        nhanVien.setMatKhau(encodedPassword);
+        return nhanVienRepository.save(nhanVien);
+    }
+
+    public NhanVien updateProfileByEmail(String email, String tenNhanVien, String soDienThoai, String avatarUrl)
+            throws IdInvalidException {
+        NhanVien nhanVien = nhanVienRepository.findByEmail(email)
+                .orElseThrow(() -> new IdInvalidException("Không tìm thấy nhân viên với email: " + email));
+
+        if (tenNhanVien != null && !tenNhanVien.isBlank()) {
+            nhanVien.setTenNhanVien(tenNhanVien.trim());
+        }
+        if (soDienThoai != null && !soDienThoai.isBlank()) {
+            nhanVien.setSoDienThoai(soDienThoai.trim());
+        }
+        if (avatarUrl != null && !avatarUrl.isBlank()) {
+            nhanVien.setAvatar(avatarUrl);
+        }
+
+        return nhanVienRepository.save(nhanVien);
+    }
+
     public ResNhanVienDTO toDTO(NhanVien nhanVien) {
         ResNhanVienDTO dto = new ResNhanVienDTO();
         dto.setId(nhanVien.getId());

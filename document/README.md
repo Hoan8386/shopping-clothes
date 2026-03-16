@@ -1,65 +1,324 @@
-﻿# Shopping API Documentation
+# Shopping API Documentation
 
-> TÃ i liá»‡u mÃ´ táº£ táº¥t cáº£ cÃ¡c API endpoints cá»§a há»‡ thá»‘ng Shopping.  
-> Base URL: `/api/v1`
+Tài liệu này đã được rà soát lại theo mã nguồn backend hiện tại trong thư mục `src/main/java/com/vn/shopping/controller`.
 
----
-
-## Má»¥c lá»¥c
-
-| #   | Controller                    | File tÃ i liá»‡u                                          | MÃ´ táº£                                                          |
-| --- | ----------------------------- | --------------------------------------------------------- | ----------------------------------------------------------------- |
-| 1   | AuthController                | [01_Auth.md](01_Auth.md)                                  | XÃ¡c thá»±c: ÄÄƒng nháº­p, ÄÄƒng kÃ½, Refresh Token, ÄÄƒng xuáº¥t |
-| 2   | SanPhamController             | [02_SanPham.md](02_SanPham.md)                            | Quáº£n lÃ½ sáº£n pháº©m                                           |
-| 3   | ChiTietSanPhamController      | [03_ChiTietSanPham.md](03_ChiTietSanPham.md)              | Quáº£n lÃ½ chi tiáº¿t sáº£n pháº©m (biáº¿n thá»ƒ)                 |
-| 4   | DonHangController             | [04_DonHang.md](04_DonHang.md)                            | Quáº£n lÃ½ Ä‘Æ¡n hÃ ng                                            |
-| 5   | ChiTietDonHangController      | [05_ChiTietDonHang.md](05_ChiTietDonHang.md)              | Quáº£n lÃ½ chi tiáº¿t Ä‘Æ¡n hÃ ng                                 |
-| 6   | GioHangController             | [06_GioHang.md](06_GioHang.md)                            | Quáº£n lÃ½ giá» hÃ ng                                             |
-| 7   | PhieuNhapController           | [07_PhieuNhap.md](07_PhieuNhap.md)                        | Quáº£n lÃ½ phiáº¿u nháº­p hÃ ng                                   |
-| 8   | ChiTietPhieuNhapController    | [08_ChiTietPhieuNhap.md](08_ChiTietPhieuNhap.md)          | Quáº£n lÃ½ chi tiáº¿t phiáº¿u nháº­p                              |
-| 9   | HinhAnhController             | [09_HinhAnh.md](09_HinhAnh.md)                            | Quáº£n lÃ½ hÃ¬nh áº£nh sáº£n pháº©m                               |
-| 10  | BoSuuTapController            | [10_BoSuuTap.md](10_BoSuuTap.md)                          | Quáº£n lÃ½ bá»™ sÆ°u táº­p                                        |
-| 11  | KieuSanPhamController         | [11_KieuSanPham.md](11_KieuSanPham.md)                    | Quáº£n lÃ½ kiá»ƒu sáº£n pháº©m                                    |
-| 12  | ThuongHieuController          | [12_ThuongHieu.md](12_ThuongHieu.md)                      | Quáº£n lÃ½ thÆ°Æ¡ng hiá»‡u                                        |
-| 13  | MauSacController              | [13_MauSac.md](13_MauSac.md)                              | Quáº£n lÃ½ mÃ u sáº¯c                                             |
-| 14  | KichThuocController           | [14_KichThuoc.md](14_KichThuoc.md)                        | Quáº£n lÃ½ kÃ­ch thÆ°á»›c                                         |
-| 15  | CuaHangController             | [15_CuaHang.md](15_CuaHang.md)                            | Quáº£n lÃ½ cá»­a hÃ ng                                            |
-| 16  | NhaCungCapController          | [16_NhaCungCap.md](16_NhaCungCap.md)                      | Quáº£n lÃ½ nhÃ  cung cáº¥p                                        |
-| 17  | RoleController                | [17_Role.md](17_Role.md)                                  | Quáº£n lÃ½ vai trÃ²                                               |
-| 18  | PermissionController          | [18_Permission.md](18_Permission.md)                      | Quáº£n lÃ½ quyá»n háº¡n                                           |
-| 20  | KhuyenMaiTheoHoaDonController | [Khuyáº¿n MÃ£i Theo HÃ³a ÄÆ¡n](20_KhuyenMaiTheoHoaDon.md) | Quáº£n lÃ½ khuyáº¿n mÃ£i theo hÃ³a Ä‘Æ¡n                          |
-| 21  | KhuyenMaiTheoDiemController   | [Khuyáº¿n MÃ£i Theo Äiá»ƒm](21_KhuyenMaiTheoDiem.md)      | Quáº£n lÃ½ khuyáº¿n mÃ£i theo Ä‘iá»ƒm tÃ­ch lÅ©y                  |
-| 22  | DanhGiaSanPhamController      | [22_DanhGiaSanPham.md](22_DanhGiaSanPham.md)              | Quáº£n lÃ½ Ä‘Ã¡nh giÃ¡ sáº£n pháº©m                               |
-| 23  | NhanVienController            | [23_NhanVien.md](23_NhanVien.md)                          | Quáº£n lÃ½ nhÃ¢n viÃªn                                            |
+- Base URL: `/api/v1`
+- Chuẩn mã hóa tài liệu: `UTF-8`
+- Cơ chế xác thực: `JWT + refresh token cookie`
 
 ---
 
-## XÃ¡c thá»±c
+## 1. Danh mục tài liệu chi tiết
 
-Há»‡ thá»‘ng sá»­ dá»¥ng **JWT (JSON Web Token)** Ä‘á»ƒ xÃ¡c thá»±c:
+| STT | Module                          | File tài liệu                                                        |
+| --- | ------------------------------- | -------------------------------------------------------------------- |
+| 00  | Tổng hợp chức năng theo vai trò | [00_TongHopChucNang_TheoVaiTro.md](00_TongHopChucNang_TheoVaiTro.md) |
+| 01  | Auth                            | [01_Auth.md](01_Auth.md)                                             |
+| 02  | Sản phẩm                        | [02_SanPham.md](02_SanPham.md)                                       |
+| 03  | Chi tiết sản phẩm               | [03_ChiTietSanPham.md](03_ChiTietSanPham.md)                         |
+| 04  | Đơn hàng                        | [04_DonHang.md](04_DonHang.md)                                       |
+| 05  | Chi tiết đơn hàng               | [05_ChiTietDonHang.md](05_ChiTietDonHang.md)                         |
+| 06  | Giỏ hàng                        | [06_GioHang.md](06_GioHang.md)                                       |
+| 07  | Phiếu nhập                      | [07_PhieuNhap.md](07_PhieuNhap.md)                                   |
+| 08  | Chi tiết phiếu nhập             | [08_ChiTietPhieuNhap.md](08_ChiTietPhieuNhap.md)                     |
+| 09  | Hình ảnh                        | [09_HinhAnh.md](09_HinhAnh.md)                                       |
+| 10  | Bộ sưu tập                      | [10_BoSuuTap.md](10_BoSuuTap.md)                                     |
+| 11  | Kiểu sản phẩm                   | [11_KieuSanPham.md](11_KieuSanPham.md)                               |
+| 12  | Thương hiệu                     | [12_ThuongHieu.md](12_ThuongHieu.md)                                 |
+| 13  | Màu sắc                         | [13_MauSac.md](13_MauSac.md)                                         |
+| 14  | Kích thước                      | [14_KichThuoc.md](14_KichThuoc.md)                                   |
+| 15  | Cửa hàng                        | [15_CuaHang.md](15_CuaHang.md)                                       |
+| 16  | Nhà cung cấp                    | [16_NhaCungCap.md](16_NhaCungCap.md)                                 |
+| 17  | Role                            | [17_Role.md](17_Role.md)                                             |
+| 18  | Permission                      | [18_Permission.md](18_Permission.md)                                 |
+| 19  | Đơn luân chuyển                 | [19_DonLuanChuyen.md](19_DonLuanChuyen.md)                           |
+| 20  | Khuyến mãi theo hóa đơn         | [20_KhuyenMaiTheoHoaDon.md](20_KhuyenMaiTheoHoaDon.md)               |
+| 21  | Khuyến mãi theo điểm            | [21_KhuyenMaiTheoDiem.md](21_KhuyenMaiTheoDiem.md)                   |
+| 22  | Đánh giá sản phẩm               | [22_DanhGiaSanPham.md](22_DanhGiaSanPham.md)                         |
+| 23  | Nhân viên                       | [23_NhanVien.md](23_NhanVien.md)                                     |
+| 24  | Trả hàng                        | [24_TraHang.md](24_TraHang.md)                                       |
+| 25  | Loại kiểm kê                    | [25_LoaiKiemKe.md](25_LoaiKiemKe.md)                                 |
+| 26  | Kiểm kê hàng hóa                | [26_KiemKeHangHoa.md](26_KiemKeHangHoa.md)                           |
+| 27  | Chi tiết kiểm kê                | [27_ChiTietKiemKe.md](27_ChiTietKiemKe.md)                           |
+| 28  | Đổi hàng                        | [28_DoiHang.md](28_DoiHang.md)                                       |
+| 29  | Loại đơn luân chuyển            | [29_LoaiDonLuanChuyen.md](29_LoaiDonLuanChuyen.md)                   |
+| 30  | Thanh toán VNPay                | [30_VNPay.md](30_VNPay.md)                                           |
 
-1. Gá»i `POST /api/v1/auth/login` Ä‘á»ƒ láº¥y `accessToken`
-2. ÄÃ­nh kÃ¨m token vÃ o header: `Authorization: Bearer <accessToken>`
-3. Khi token háº¿t háº¡n, gá»i `GET /api/v1/auth/refresh` (sá»­ dá»¥ng cookie `refresh_token`)
-4. ÄÄƒng xuáº¥t báº±ng `POST /api/v1/auth/logout`
+---
 
-**Endpoints khÃ´ng yÃªu cáº§u xÃ¡c thá»±c:**
+## 2. Xác thực và phân quyền
+
+- Access token được lấy từ `POST /api/v1/auth/login`.
+- Gắn token vào header: `Authorization: Bearer <accessToken>`.
+- Gia hạn bằng `GET /api/v1/auth/refresh` (sử dụng cookie refresh token).
+- Thu hồi phiên bằng `POST /api/v1/auth/logout`.
+
+Endpoint thường mở công khai:
 
 - `POST /api/v1/auth/login`
 - `POST /api/v1/auth/register`
 - `GET /api/v1/auth/refresh`
-- `GET {secure_url_cloudinary}`
+- URL ảnh Cloudinary (`secure_url`)
+
+Lưu ý: quyền truy cập thật sự phụ thuộc vào bảng `Permission (apiPath, method)` và role gán cho user.
 
 ---
 
-## MÃ£ lá»—i chung
+## 3. Danh sách endpoint backend hiện tại
 
-| HTTP Status        | MÃ´ táº£                                  |
-| ------------------ | ----------------------------------------- |
-| `200 OK`           | ThÃ nh cÃ´ng                              |
-| `201 Created`      | Táº¡o má»›i thÃ nh cÃ´ng                  |
-| `204 No Content`   | XÃ³a thÃ nh cÃ´ng                         |
-| `400 Bad Request`  | Dá»¯ liá»‡u Ä‘áº§u vÃ o khÃ´ng há»£p lá»‡ |
-| `401 Unauthorized` | ChÆ°a xÃ¡c thá»±c / Token háº¿t háº¡n     |
-| `403 Forbidden`    | KhÃ´ng cÃ³ quyá»n truy cáº­p              |
-| `404 Not Found`    | KhÃ´ng tÃ¬m tháº¥y tÃ i nguyÃªn           |
+### AuthController (`/api/v1`)
+
+- `POST /api/v1/auth/login`
+- `GET /api/v1/auth/account`
+- `GET /api/v1/auth/refresh`
+- `POST /api/v1/auth/logout`
+- `PUT /api/v1/auth/change-password`
+- `PUT /api/v1/auth/profile` (multipart/form-data)
+- `POST /api/v1/auth/register`
+
+### SanPhamController (`/api/v1/san-pham`)
+
+- `GET /api/v1/san-pham`
+- `GET /api/v1/san-pham/{id}`
+- `POST /api/v1/san-pham` (multipart/form-data)
+- `PUT /api/v1/san-pham` (multipart/form-data)
+- `DELETE /api/v1/san-pham/{id}`
+
+### ChiTietSanPhamController (`/api/v1/chi-tiet-san-pham`)
+
+- `GET /api/v1/chi-tiet-san-pham`
+- `GET /api/v1/chi-tiet-san-pham/{id}`
+- `GET /api/v1/chi-tiet-san-pham/san-pham/{sanPhamId}`
+- `GET /api/v1/chi-tiet-san-pham/san-pham-tai-cua-hang`
+- `POST /api/v1/chi-tiet-san-pham` (multipart/form-data)
+- `PUT /api/v1/chi-tiet-san-pham` (multipart/form-data)
+- `DELETE /api/v1/chi-tiet-san-pham/{id}`
+
+### DonHangController (`/api/v1/don-hang`)
+
+- `GET /api/v1/don-hang`
+- `GET /api/v1/don-hang/{id}`
+- `POST /api/v1/don-hang/online`
+- `POST /api/v1/don-hang/tai-quay`
+- `PUT /api/v1/don-hang`
+- `DELETE /api/v1/don-hang/{id}`
+
+### ChiTietDonHangController (`/api/v1/chi-tiet-don-hang`)
+
+- `GET /api/v1/chi-tiet-don-hang`
+- `GET /api/v1/chi-tiet-don-hang/{id}`
+- `GET /api/v1/chi-tiet-don-hang/don-hang/{donHangId}`
+- `POST /api/v1/chi-tiet-don-hang`
+- `PUT /api/v1/chi-tiet-don-hang`
+- `DELETE /api/v1/chi-tiet-don-hang/{id}`
+
+### GioHangController (`/api/v1/gio-hang`)
+
+- `POST /api/v1/gio-hang/them-san-pham`
+- `GET /api/v1/gio-hang/cua-toi`
+- `DELETE /api/v1/gio-hang/chi-tiet/{maChiTietGioHang}`
+- `GET /api/v1/gio-hang/khuyen-mai-hop-le`
+- `POST /api/v1/gio-hang/ap-dung-khuyen-mai`
+
+### PhieuNhapController (`/api/v1/phieu-nhap`)
+
+- `GET /api/v1/phieu-nhap`
+- `GET /api/v1/phieu-nhap/{id}`
+- `POST /api/v1/phieu-nhap`
+- `PUT /api/v1/phieu-nhap`
+- `PUT /api/v1/phieu-nhap/kiem-ke/{id}`
+- `DELETE /api/v1/phieu-nhap/{id}`
+
+### ChiTietPhieuNhapController (`/api/v1/chi-tiet-phieu-nhap`)
+
+- `GET /api/v1/chi-tiet-phieu-nhap`
+- `GET /api/v1/chi-tiet-phieu-nhap/{id}`
+- `GET /api/v1/chi-tiet-phieu-nhap/phieu-nhap/{phieuNhapId}`
+- `POST /api/v1/chi-tiet-phieu-nhap`
+- `PUT /api/v1/chi-tiet-phieu-nhap`
+- `DELETE /api/v1/chi-tiet-phieu-nhap/{id}`
+
+### HinhAnhController (`/api/v1/hinh-anh`)
+
+- `GET /api/v1/hinh-anh`
+- `GET /api/v1/hinh-anh/{id}`
+- `GET /api/v1/hinh-anh/chi-tiet-san-pham/{chiTietSanPhamId}`
+- `POST /api/v1/hinh-anh`
+- `POST /api/v1/hinh-anh/upload/{chiTietSanPhamId}` (multipart/form-data)
+- `PUT /api/v1/hinh-anh`
+- `DELETE /api/v1/hinh-anh/{id}`
+
+### BoSuuTapController (`/api/v1/bo-suu-tap`)
+
+- `GET /api/v1/bo-suu-tap`
+- `GET /api/v1/bo-suu-tap/{id}`
+- `POST /api/v1/bo-suu-tap`
+- `PUT /api/v1/bo-suu-tap`
+- `DELETE /api/v1/bo-suu-tap/{id}`
+
+### KieuSanPhamController (`/api/v1/kieu-san-pham`)
+
+- `GET /api/v1/kieu-san-pham`
+- `GET /api/v1/kieu-san-pham/{id}`
+- `POST /api/v1/kieu-san-pham`
+- `PUT /api/v1/kieu-san-pham`
+- `DELETE /api/v1/kieu-san-pham/{id}`
+
+### ThuongHieuController (`/api/v1/thuong-hieu`)
+
+- `GET /api/v1/thuong-hieu`
+- `GET /api/v1/thuong-hieu/{id}`
+- `POST /api/v1/thuong-hieu`
+- `PUT /api/v1/thuong-hieu`
+- `DELETE /api/v1/thuong-hieu/{id}`
+
+### MauSacController (`/api/v1/mau-sac`)
+
+- `GET /api/v1/mau-sac`
+- `GET /api/v1/mau-sac/{id}`
+- `POST /api/v1/mau-sac`
+- `PUT /api/v1/mau-sac`
+- `DELETE /api/v1/mau-sac/{id}`
+
+### KichThuocController (`/api/v1/kich-thuoc`)
+
+- `GET /api/v1/kich-thuoc`
+- `GET /api/v1/kich-thuoc/{id}`
+- `POST /api/v1/kich-thuoc`
+- `PUT /api/v1/kich-thuoc`
+- `DELETE /api/v1/kich-thuoc/{id}`
+
+### CuaHangController (`/api/v1/cua-hang`)
+
+- `GET /api/v1/cua-hang`
+- `GET /api/v1/cua-hang/{id}`
+- `POST /api/v1/cua-hang`
+- `PUT /api/v1/cua-hang`
+- `DELETE /api/v1/cua-hang/{id}`
+
+### NhaCungCapController (`/api/v1/nha-cung-cap`)
+
+- `GET /api/v1/nha-cung-cap`
+- `GET /api/v1/nha-cung-cap/{id}`
+- `POST /api/v1/nha-cung-cap`
+- `PUT /api/v1/nha-cung-cap`
+- `DELETE /api/v1/nha-cung-cap/{id}`
+
+### RoleController (`/api/v1/roles`)
+
+- `GET /api/v1/roles`
+- `GET /api/v1/roles/{id}`
+- `POST /api/v1/roles`
+- `PUT /api/v1/roles`
+- `DELETE /api/v1/roles/{id}`
+
+### PermissionController (`/api/v1/permissions`)
+
+- `GET /api/v1/permissions`
+- `GET /api/v1/permissions/{id}`
+- `POST /api/v1/permissions`
+- `PUT /api/v1/permissions`
+- `DELETE /api/v1/permissions/{id}`
+
+### KhuyenMaiTheoHoaDonController (`/api/v1/khuyen-mai-theo-hoa-don`)
+
+- `GET /api/v1/khuyen-mai-theo-hoa-don`
+- `GET /api/v1/khuyen-mai-theo-hoa-don/{id}`
+- `POST /api/v1/khuyen-mai-theo-hoa-don`
+- `PUT /api/v1/khuyen-mai-theo-hoa-don`
+- `DELETE /api/v1/khuyen-mai-theo-hoa-don/{id}`
+
+### KhuyenMaiTheoDiemController (`/api/v1/khuyen-mai-theo-diem`)
+
+- `GET /api/v1/khuyen-mai-theo-diem`
+- `GET /api/v1/khuyen-mai-theo-diem/{id}`
+- `POST /api/v1/khuyen-mai-theo-diem`
+- `PUT /api/v1/khuyen-mai-theo-diem`
+- `DELETE /api/v1/khuyen-mai-theo-diem/{id}`
+
+### DanhGiaSanPhamController (`/api/v1/danh-gia-san-pham`)
+
+- `GET /api/v1/danh-gia-san-pham`
+- `GET /api/v1/danh-gia-san-pham/{id}`
+- `GET /api/v1/danh-gia-san-pham/san-pham/{sanPhamId}`
+- `GET /api/v1/danh-gia-san-pham/chi-tiet-don-hang/{chiTietDonHangId}`
+- `GET /api/v1/danh-gia-san-pham/cua-toi`
+- `POST /api/v1/danh-gia-san-pham` (multipart/form-data)
+- `PUT /api/v1/danh-gia-san-pham/{id}` (multipart/form-data)
+- `DELETE /api/v1/danh-gia-san-pham/{id}`
+
+### NhanVienController (`/api/v1/nhan-vien`)
+
+- `GET /api/v1/nhan-vien`
+- `POST /api/v1/nhan-vien`
+- `PUT /api/v1/nhan-vien`
+- `DELETE /api/v1/nhan-vien/{id}`
+
+### TraHangController (`/api/v1/tra-hang`)
+
+- `GET /api/v1/tra-hang`
+- `GET /api/v1/tra-hang/{id}`
+- `GET /api/v1/tra-hang/don-hang/{donHangId}`
+- `POST /api/v1/tra-hang` (application/json)
+- `POST /api/v1/tra-hang` (multipart/form-data, part `data` + `file`)
+- `PUT /api/v1/tra-hang/{id}/trang-thai`
+
+### LoaiKiemKeController (`/api/v1/loai-kiem-ke`)
+
+- `GET /api/v1/loai-kiem-ke`
+- `GET /api/v1/loai-kiem-ke/{id}`
+- `POST /api/v1/loai-kiem-ke`
+- `PUT /api/v1/loai-kiem-ke`
+- `DELETE /api/v1/loai-kiem-ke/{id}`
+
+### KiemKeHangHoaController (`/api/v1/kiem-ke-hang-hoa`)
+
+- `GET /api/v1/kiem-ke-hang-hoa`
+- `GET /api/v1/kiem-ke-hang-hoa/{id}`
+- `POST /api/v1/kiem-ke-hang-hoa`
+- `PUT /api/v1/kiem-ke-hang-hoa`
+- `PUT /api/v1/kiem-ke-hang-hoa/{id}/gui-duyet`
+- `PUT /api/v1/kiem-ke-hang-hoa/{id}/duyet`
+
+### DonLuanChuyenController (`/api/v1/don-luan-chuyen`)
+
+- `GET /api/v1/don-luan-chuyen`
+- `GET /api/v1/don-luan-chuyen/{id}`
+- `GET /api/v1/don-luan-chuyen/cua-hang-dat/{cuaHangId}`
+- `GET /api/v1/don-luan-chuyen/cua-hang-gui/{cuaHangId}`
+- `POST /api/v1/don-luan-chuyen`
+- `PUT /api/v1/don-luan-chuyen/{id}/trang-thai`
+
+### LoaiDonLuanChuyenController (`/api/v1/loai-don-luan-chuyen`)
+
+- `GET /api/v1/loai-don-luan-chuyen`
+- `GET /api/v1/loai-don-luan-chuyen/{id}`
+- `POST /api/v1/loai-don-luan-chuyen`
+- `PUT /api/v1/loai-don-luan-chuyen`
+- `DELETE /api/v1/loai-don-luan-chuyen/{id}`
+
+### DoiHangController (`/api/v1/doi-hang`)
+
+- `GET /api/v1/doi-hang`
+- `GET /api/v1/doi-hang/{id}`
+- `GET /api/v1/doi-hang/don-hang/{donHangId}`
+- `POST /api/v1/doi-hang`
+- `PUT /api/v1/doi-hang/{id}/trang-thai`
+
+### VNPayController (`/api/v1/auth/vnpay`)
+
+- `POST /api/v1/auth/vnpay/create-payment-url`
+
+---
+
+## 4. Mã trạng thái HTTP thường gặp
+
+| Status             | Ý nghĩa                                               |
+| ------------------ | ----------------------------------------------------- |
+| `200 OK`           | Thành công                                            |
+| `201 Created`      | Tạo mới thành công                                    |
+| `204 No Content`   | Xóa thành công                                        |
+| `400 Bad Request`  | Dữ liệu đầu vào hoặc ràng buộc nghiệp vụ không hợp lệ |
+| `401 Unauthorized` | Chưa xác thực hoặc token không hợp lệ                 |
+| `403 Forbidden`    | Không có quyền truy cập endpoint                      |
+| `404 Not Found`    | Không tìm thấy dữ liệu                                |

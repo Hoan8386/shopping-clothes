@@ -7,6 +7,7 @@ import com.vn.shopping.domain.Role;
 import com.vn.shopping.domain.response.ResCreateUserDTO;
 import com.vn.shopping.repository.KhachHangRepository;
 import com.vn.shopping.repository.RoleRepository;
+import com.vn.shopping.util.error.IdInvalidException;
 
 @Service
 public class KhachHangService {
@@ -50,6 +51,31 @@ public class KhachHangService {
 
     public KhachHang getUserByRefreshTokenAndEmail(String refreshToken, String email) {
         return khachHangRepository.findByRefreshTokenAndEmail(refreshToken, email).orElse(null);
+    }
+
+    public KhachHang updatePasswordByEmail(String email, String encodedPassword) throws IdInvalidException {
+        KhachHang khachHang = khachHangRepository.findByEmail(email)
+                .orElseThrow(() -> new IdInvalidException("Không tìm thấy khách hàng với email: " + email));
+        khachHang.setPassword(encodedPassword);
+        return khachHangRepository.save(khachHang);
+    }
+
+    public KhachHang updateProfileByEmail(String email, String tenKhachHang, String sdt, String avatarUrl)
+            throws IdInvalidException {
+        KhachHang khachHang = khachHangRepository.findByEmail(email)
+                .orElseThrow(() -> new IdInvalidException("Không tìm thấy khách hàng với email: " + email));
+
+        if (tenKhachHang != null && !tenKhachHang.isBlank()) {
+            khachHang.setTenKhachHang(tenKhachHang.trim());
+        }
+        if (sdt != null && !sdt.isBlank()) {
+            khachHang.setSdt(sdt.trim());
+        }
+        if (avatarUrl != null && !avatarUrl.isBlank()) {
+            khachHang.setAvatar(avatarUrl);
+        }
+
+        return khachHangRepository.save(khachHang);
     }
 
     public ResCreateUserDTO convertToResCreateUserDTO(KhachHang khachHang) {

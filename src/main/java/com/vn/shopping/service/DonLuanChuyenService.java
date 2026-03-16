@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -240,13 +241,20 @@ public class DonLuanChuyenService {
         return donLuanChuyenRepository.findByCuaHangGuiId(cuaHangId);
     }
 
-    public ResultPaginationDTO findAll(Pageable pageable) {
+    public ResultPaginationDTO findAll(Pageable pageable, Long cuaHangGuiId, Long cuaHangDatId) {
         Optional<NhanVien> currentStaff = getCurrentNhanVien();
 
         Page<DonLuanChuyen> page;
         if (currentStaff.isPresent() && currentStaff.get().getCuaHang() != null
                 && currentStaff.get().getCuaHang().getId() != null) {
             Long storeId = currentStaff.get().getCuaHang().getId();
+
+            if (cuaHangGuiId != null && !storeId.equals(cuaHangGuiId)
+                    && cuaHangDatId != null && !storeId.equals(cuaHangDatId)) {
+                page = new PageImpl<>(List.of(), pageable, 0);
+                return toPaginationResult(pageable, page);
+            }
+
             List<DonLuanChuyen> received = donLuanChuyenRepository.findByCuaHangDatId(storeId);
             List<DonLuanChuyen> sent = donLuanChuyenRepository.findByCuaHangGuiId(storeId);
             List<DonLuanChuyen> allTransfers = new ArrayList<>(received);
@@ -256,15 +264,44 @@ public class DonLuanChuyenService {
                 }
             }
 
+            Predicate<DonLuanChuyen> filter = transfer -> true;
+            if (cuaHangGuiId != null) {
+                filter = filter.and(transfer -> transfer.getCuaHangGui() != null
+                        && cuaHangGuiId.equals(transfer.getCuaHangGui().getId()));
+            }
+            if (cuaHangDatId != null) {
+                filter = filter.and(transfer -> transfer.getCuaHangDat() != null
+                        && cuaHangDatId.equals(transfer.getCuaHangDat().getId()));
+            }
+            allTransfers = allTransfers.stream().filter(filter).collect(Collectors.toList());
+
             int fromIndex = (int) pageable.getOffset();
             int toIndex = Math.min(fromIndex + pageable.getPageSize(), allTransfers.size());
             List<DonLuanChuyen> content = fromIndex >= allTransfers.size() ? List.of()
                     : allTransfers.subList(fromIndex, toIndex);
             page = new PageImpl<>(content, pageable, allTransfers.size());
         } else {
-            page = donLuanChuyenRepository.findAll(pageable);
+            if (cuaHangGuiId != null || cuaHangDatId != null) {
+                List<DonLuanChuyen> filtered = donLuanChuyenRepository.findAll().stream()
+                        .filter(item -> cuaHangGuiId == null
+                                || (item.getCuaHangGui() != null && cuaHangGuiId.equals(item.getCuaHangGui().getId())))
+                        .filter(item -> cuaHangDatId == null
+                                || (item.getCuaHangDat() != null && cuaHangDatId.equals(item.getCuaHangDat().getId())))
+                        .collect(Collectors.toList());
+                int fromIndex = (int) pageable.getOffset();
+                int toIndex = Math.min(fromIndex + pageable.getPageSize(), filtered.size());
+                List<DonLuanChuyen> content = fromIndex >= filtered.size() ? List.of()
+                        : filtered.subList(fromIndex, toIndex);
+                page = new PageImpl<>(content, pageable, filtered.size());
+            } else {
+                page = donLuanChuyenRepository.findAll(pageable);
+            }
         }
 
+        return toPaginationResult(pageable, page);
+    }
+
+    private ResultPaginationDTO toPaginationResult(Pageable pageable, Page<DonLuanChuyen> page) {
         ResultPaginationDTO result = new ResultPaginationDTO();
         ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
         meta.setPage(pageable.getPageNumber() + 1);

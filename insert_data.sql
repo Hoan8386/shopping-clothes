@@ -16,7 +16,7 @@ INSERT INTO roles (name, description, active, createdAt) VALUES
     ('KHACH_HANG', 'Khách hàng mua sắm',        TRUE, NOW());
 
 -- ---------------------------------------------------------
--- 2. PERMISSIONS (119 quyền cho tất cả endpoint)
+-- 2. PERMISSIONS (141 quyền cho tất cả endpoint)
 -- ---------------------------------------------------------
 INSERT INTO permissions (name, apiPath, method, module, createdAt) VALUES
     -- === SAN_PHAM (1-5) ===
@@ -197,19 +197,34 @@ INSERT INTO permissions (name, apiPath, method, module, createdAt) VALUES
     ('Cập nhật loại đơn luân chuyển',      '/api/v1/loai-don-luan-chuyen',        'PUT',    'LOAI_DON_LUAN_CHUYEN', NOW()),
     ('Xóa loại đơn luân chuyển',           '/api/v1/loai-don-luan-chuyen/{id}',   'DELETE', 'LOAI_DON_LUAN_CHUYEN', NOW()),
 
-    -- === DON_LUAN_CHUYEN (125-131) ===
+    -- === DON_LUAN_CHUYEN (125-130) ===
     ('Tạo đơn luân chuyển',                       '/api/v1/don-luan-chuyen',                          'POST',   'DON_LUAN_CHUYEN', NOW()),
     ('Xem tất cả đơn luân chuyển',                '/api/v1/don-luan-chuyen',                          'GET',    'DON_LUAN_CHUYEN', NOW()),
     ('Xem đơn luân chuyển theo mã',               '/api/v1/don-luan-chuyen/{id}',                     'GET',    'DON_LUAN_CHUYEN', NOW()),
     ('Xem đơn luân chuyển theo cửa hàng đặt',     '/api/v1/don-luan-chuyen/cua-hang-dat/{cuaHangId}', 'GET',    'DON_LUAN_CHUYEN', NOW()),
     ('Xem đơn luân chuyển theo cửa hàng gửi',     '/api/v1/don-luan-chuyen/cua-hang-gui/{cuaHangId}', 'GET',    'DON_LUAN_CHUYEN', NOW()),
-    ('Cập nhật trạng thái đơn luân chuyển',       '/api/v1/don-luan-chuyen/{id}/trang-thai',          'PUT',    'DON_LUAN_CHUYEN', NOW());
+    ('Cập nhật trạng thái đơn luân chuyển',       '/api/v1/don-luan-chuyen/{id}/trang-thai',          'PUT',    'DON_LUAN_CHUYEN', NOW()),
+
+    -- === LOAI_KIEM_KE (131-135) ===
+    ('Xem tất cả loại kiểm kê',                   '/api/v1/loai-kiem-ke',                              'GET',    'LOAI_KIEM_KE',     NOW()),
+    ('Xem loại kiểm kê theo id',                  '/api/v1/loai-kiem-ke/{id}',                         'GET',    'LOAI_KIEM_KE',     NOW()),
+    ('Tạo loại kiểm kê',                          '/api/v1/loai-kiem-ke',                              'POST',   'LOAI_KIEM_KE',     NOW()),
+    ('Cập nhật loại kiểm kê',                     '/api/v1/loai-kiem-ke',                              'PUT',    'LOAI_KIEM_KE',     NOW()),
+    ('Xóa loại kiểm kê',                          '/api/v1/loai-kiem-ke/{id}',                         'DELETE', 'LOAI_KIEM_KE',     NOW()),
+
+    -- === KIEM_KE_HANG_HOA (136-141) ===
+    ('Xem danh sách phiếu kiểm kê',               '/api/v1/kiem-ke-hang-hoa',                          'GET',    'KIEM_KE_HANG_HOA', NOW()),
+    ('Xem phiếu kiểm kê theo id',                 '/api/v1/kiem-ke-hang-hoa/{id}',                     'GET',    'KIEM_KE_HANG_HOA', NOW()),
+    ('Tạo phiếu kiểm kê',                         '/api/v1/kiem-ke-hang-hoa',                          'POST',   'KIEM_KE_HANG_HOA', NOW()),
+    ('Cập nhật phiếu kiểm kê',                    '/api/v1/kiem-ke-hang-hoa',                          'PUT',    'KIEM_KE_HANG_HOA', NOW()),
+    ('Gửi duyệt phiếu kiểm kê',                   '/api/v1/kiem-ke-hang-hoa/{id}/gui-duyet',           'PUT',    'KIEM_KE_HANG_HOA', NOW()),
+    ('Duyệt phiếu kiểm kê',                       '/api/v1/kiem-ke-hang-hoa/{id}/duyet',               'PUT',    'KIEM_KE_HANG_HOA', NOW());
 
 -- ---------------------------------------------------------
 -- 3. PERMISSION_ROLE
 -- ---------------------------------------------------------
 
--- ADMIN (role_id=1): TẤT CẢ QUYỀN (1-119)
+-- ADMIN (role_id=1): TẤT CẢ QUYỀN (1-141)
 INSERT INTO permission_role (role_id, permission_id) VALUES
     (1,1),(1,2),(1,3),(1,4),(1,5),
     (1,6),(1,7),(1,8),(1,9),(1,10),
@@ -235,7 +250,9 @@ INSERT INTO permission_role (role_id, permission_id) VALUES
     (1,110),(1,111),(1,112),(1,113),
     (1,114),(1,115),(1,116),(1,117),(1,118),(1,119),
     (1,120),(1,121),(1,122),(1,123),(1,124),
-    (1,125),(1,126),(1,127),(1,128),(1,129),(1,130),(1,131);
+    (1,125),(1,126),(1,127),(1,128),(1,129),(1,130),(1,131),
+    (1,132),(1,133),(1,134),(1,135),(1,136),
+    (1,137),(1,138),(1,139),(1,140),(1,141);
 
 -- NHAN_VIEN (role_id=2): Xem tất cả danh mục, SP, CTSP, hình ảnh, cửa hàng (chỉ GET) + Phiếu nhập + Đơn hàng
 INSERT INTO permission_role (role_id, permission_id) VALUES
@@ -259,7 +276,9 @@ INSERT INTO permission_role (role_id, permission_id) VALUES
     (2,110),          -- NHAN_VIEN: xem danh sách nhân viên (cùng cửa hàng)
     (2,115),(2,116),(2,117),(2,118), -- TRA_HANG: xem all, xem mã, xem theo đơn, cập nhật trạng thái
     (2,120),(2,121),                -- LOAI_DON_LUAN_CHUYEN: xem all, xem id
-    (2,125),(2,126),(2,127),(2,128),(2,129),(2,130),(2,131); -- DON_LUAN_CHUYEN: tạo, xem all, xem mã, xem theo ch đặt, xem theo ch gửi, cập nhật TT
+    (2,125),(2,126),(2,127),(2,128),(2,129),(2,130), -- DON_LUAN_CHUYEN: tạo, xem all, xem mã, xem theo ch đặt, xem theo ch gửi, cập nhật TT
+    (2,131),(2,132),                -- LOAI_KIEM_KE: xem all, xem id
+    (2,136),(2,137),(2,138),(2,139),(2,140); -- KIEM_KE_HANG_HOA: xem all, xem id, tạo, cập nhật, gửi duyệt
 
 -- KHACH_HANG (role_id=3): Xem SP/danh mục + giỏ hàng (thêm/xem/xóa/khuyến mãi)
 INSERT INTO permission_role (role_id, permission_id) VALUES
@@ -337,11 +356,11 @@ INSERT INTO KichThuoc (TenKichThuoc, NgayTao) VALUES
 -- 10. SẢN PHẨM (có FK kiểu SP, BST, thương hiệu)
 -- ---------------------------------------------------------
 INSERT INTO SanPham (MaKieuSanPham, MaSuuTap, MaThuongHieu, TenSanPham, GiaVon, GiaBan, GiaGiam, TrangThai, NgayTao) VALUES
-    (1, 3, 1, 'Áo Oxford',     100, 200, 0,  1, NOW()),   -- id=1
-    (2, 3, 1, 'Quần Jean',     200, 400, 10, 1, NOW()),   -- id=2
-    (3, 1, 2, 'Váy Hoa',       150, 300, 5,  1, NOW()),   -- id=3
-    (4, 3, 1, 'Nịt Da',         50, 100, 0,  1, NOW()),   -- id=4
-    (1, 2, 2, 'Áo Phao',       300, 600, 15, 0, NOW());   -- id=5
+    (1, 3, 1, 'Áo Oxford',     100000, 200000, 0,  1, NOW()),   -- id=1
+    (2, 3, 1, 'Quần Jean',     200000, 400000, 10, 1, NOW()),   -- id=2
+    (3, 1, 2, 'Váy Hoa',       150000, 300000, 5,  1, NOW()),   -- id=3
+    (4, 3, 1, 'Nịt Da',         50000, 100000, 0,  1, NOW()),   -- id=4
+    (1, 2, 2, 'Áo Phao',       300000, 600000, 15, 0, NOW());   -- id=5
 
 -- ---------------------------------------------------------
 -- 11. CHI TIẾT SẢN PHẨM
@@ -514,3 +533,33 @@ INSERT INTO ChiTietDonLuanChuyen (MaDonLuanChuyen, MaChiTietSanPham, SoLuong, Tr
     (2, 3, 10, 1, NOW()),   -- Đơn 2: Quần Jean M Đen x10, đang giao
     (3, 1, 8,  2, NOW()),   -- Đơn 3: Áo Oxford M Trắng x8, đã nhận
     (3, 2, 5,  2, NOW());   -- Đơn 3: Áo Oxford L Trắng x5, đã nhận
+
+-- ---------------------------------------------------------
+-- 30. LOẠI KIỂM KÊ
+-- ---------------------------------------------------------
+INSERT INTO LoaiKiemKe (TenLoaiKiemKe, MoTa, TrangThai, NgayTao) VALUES
+    ('Kiểm kê định kỳ',     'Kiểm kê theo chu kỳ tháng/quý', 1, NOW()),
+    ('Kiểm kê đột xuất',    'Kiểm kê khi có chênh lệch bất thường', 1, NOW()),
+    ('Kiểm kê trước khuyến mãi', 'Đồng bộ tồn kho trước campaign', 1, NOW());
+
+-- ---------------------------------------------------------
+-- 31. KIỂM KÊ HÀNG HÓA
+-- ---------------------------------------------------------
+INSERT INTO KiemKeHangHoa
+    (MaLoaiKiemKe, MaCuaHang, MaNhanVienTao, MaNhanVienDuyet, TenPhieuKiemKe, TrangThai, GhiChu, NgayKiemKe, NgayXacNhan, NgayTao)
+VALUES
+    (1, 1, 1, 5, 'Kiểm kê cuối tháng CN Q.1', 3, 'Đã xác nhận và cập nhật tồn', '2026-03-10 08:00:00', '2026-03-10 16:00:00', NOW()),
+    (2, 2, 3, NULL, 'Kiểm kê đột xuất CN Q.3', 1, 'Chờ admin duyệt', '2026-03-12 09:00:00', NULL, NOW()),
+    (1, 1, 2, 5, 'Kiểm kê tuần 2 CN Q.1', 2, 'Cần kiểm lại khu A', '2026-03-13 09:00:00', NULL, NOW());
+
+-- ---------------------------------------------------------
+-- 32. CHI TIẾT KIỂM KÊ
+-- ---------------------------------------------------------
+INSERT INTO ChiTietKiemKe
+    (MaKiemKe, MaChiTietSanPham, SoLuongHeThong, SoLuongThucTe, ChenhLech, GhiChu, NgayTao)
+VALUES
+    (1, 1, 50, 48, -2, 'Thiếu do hư hỏng', NOW()),
+    (1, 2, 30, 30, 0,  'Đủ', NOW()),
+    (2, 4, 25, 24, -1, 'Thiếu 1 sản phẩm', NOW()),
+    (2, 5, 20, 22, 2,  'Dư 2 sản phẩm', NOW()),
+    (3, 1, 48, 47, -1, 'Đếm lại lần 1', NOW());

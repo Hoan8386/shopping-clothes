@@ -1,30 +1,30 @@
-﻿# Bá»™ SÆ°u Táº­p Controller
+# Bộ Sưu Tập Controller
 
 > **Base Path:** `/api/v1/bo-suu-tap`  
 > **File:** `BoSuuTapController.java`  
-> Quáº£n lÃ½ bá»™ sÆ°u táº­p sáº£n pháº©m (vÃ­ dá»¥: XuÃ¢n HÃ¨ 2025, Thu ÄÃ´ng 2025, ...).
+> Quản lý bộ sưu tập sản phẩm (ví dụ: Xuân Hè 2025, Thu Đông 2025, ...).
 
 ---
 
-## Cáº¥u trÃºc dá»¯ liá»‡u `BoSuuTap`
+## Cấu trúc dữ liệu `BoSuuTap`
 
-| TrÆ°á»ng        | Kiá»ƒu          | MÃ´ táº£                          |
+| Trường        | Kiểu          | Mô tả                          |
 | ------------- | ------------- | ------------------------------ |
-| `id`          | Long          | MÃ£ bá»™ sÆ°u táº­p (auto-increment) |
-| `tenSuuTap`   | String(255)   | TÃªn bá»™ sÆ°u táº­p                 |
-| `moTa`        | String(255)   | MÃ´ táº£                          |
-| `ngayTao`     | LocalDateTime | NgÃ y táº¡o (tá»± Ä‘á»™ng)             |
-| `ngayCapNhat` | LocalDateTime | NgÃ y cáº­p nháº­t (tá»± Ä‘á»™ng)        |
+| `id`          | Long          | Mã bộ sưu tập (auto-increment) |
+| `tenSuuTap`   | String(255)   | Tên bộ sưu tập                 |
+| `moTa`        | String(255)   | Mô tả                          |
+| `ngayTao`     | LocalDateTime | Ngày tạo (tự động)             |
+| `ngayCapNhat` | LocalDateTime | Ngày cập nhật (tự động)        |
 
 ---
 
-## 1. Láº¥y danh sÃ¡ch bá»™ sÆ°u táº­p
+## 1. Lấy danh sách bộ sưu tập
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t                 |
+| Thuộc tính   | Chi tiết                 |
 | ------------ | ------------------------ |
 | **URL**      | `GET /api/v1/bo-suu-tap` |
 | **Method**   | `GET`                    |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)       |
+| **Xác thực** | Bearer Token (JWT)       |
 
 **Response:** `200 OK`
 
@@ -32,20 +32,20 @@
 [
   {
     "id": 1,
-    "tenSuuTap": "XuÃ¢n HÃ¨ 2025",
-    "moTa": "BST mÃ¹a xuÃ¢n hÃ¨",
+    "tenSuuTap": "Xuân Hè 2025",
+    "moTa": "BST mùa xuân hè",
     "ngayTao": "2026-01-01T00:00:00"
   },
   {
     "id": 2,
-    "tenSuuTap": "Thu ÄÃ´ng 2025",
-    "moTa": "BST mÃ¹a thu Ä‘Ã´ng",
+    "tenSuuTap": "Thu Đông 2025",
+    "moTa": "BST mùa thu đông",
     "ngayTao": "2026-01-01T00:00:00"
   }
 ]
 ```
 
-**Kiá»ƒu dá»¯ liá»‡u:**
+**Kiểu dữ liệu:**
 
 ```json
 {
@@ -58,38 +58,38 @@
 
 ---
 
-## 2. Láº¥y bá»™ sÆ°u táº­p theo ID
+## 2. Lấy bộ sưu tập theo ID
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t                      |
+| Thuộc tính   | Chi tiết                      |
 | ------------ | ----------------------------- |
 | **URL**      | `GET /api/v1/bo-suu-tap/{id}` |
 | **Method**   | `GET`                         |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)            |
+| **Xác thực** | Bearer Token (JWT)            |
 
-**Lá»—i:**
+**Lỗi:**
 
-| HTTP Status | MÃ´ táº£                     |
+| HTTP Status | Mô tả                     |
 | ----------- | ------------------------- |
-| `400`       | KhÃ´ng tÃ¬m tháº¥y bá»™ sÆ°u táº­p |
+| `400`       | Không tìm thấy bộ sưu tập |
 
 ---
 
-## 3. Táº¡o bá»™ sÆ°u táº­p
+## 3. Tạo bộ sưu tập
 
-| Thuá»™c tÃ­nh       | Chi tiáº¿t                  |
+| Thuộc tính       | Chi tiết                  |
 | ---------------- | ------------------------- |
 | **URL**          | `POST /api/v1/bo-suu-tap` |
 | **Method**       | `POST`                    |
 | **Content-Type** | `application/json`        |
-| **XÃ¡c thá»±c**     | Bearer Token (JWT)        |
+| **Xác thực**     | Bearer Token (JWT)        |
 
 **Request Body:**
 
 ```json
-{ "tenSuuTap": "XuÃ¢n HÃ¨ 2026", "moTa": "Bá»™ sÆ°u táº­p má»›i" }
+{ "tenSuuTap": "Xuân Hè 2026", "moTa": "Bộ sưu tập mới" }
 ```
 
-**Kiá»ƒu dá»¯ liá»‡u:**
+**Kiểu dữ liệu:**
 
 ```json
 {
@@ -102,22 +102,22 @@
 
 ---
 
-## 4. Cáº­p nháº­t bá»™ sÆ°u táº­p
+## 4. Cập nhật bộ sưu tập
 
-| Thuá»™c tÃ­nh       | Chi tiáº¿t                 |
+| Thuộc tính       | Chi tiết                 |
 | ---------------- | ------------------------ |
 | **URL**          | `PUT /api/v1/bo-suu-tap` |
 | **Method**       | `PUT`                    |
 | **Content-Type** | `application/json`       |
-| **XÃ¡c thá»±c**     | Bearer Token (JWT)       |
+| **Xác thực**     | Bearer Token (JWT)       |
 
-**Request Body:** (pháº£i cÃ³ `id`)
+**Request Body:** (phải có `id`)
 
 ```json
-{ "id": 1, "tenSuuTap": "XuÃ¢n HÃ¨ 2025 - Updated", "moTa": "MÃ´ táº£ má»›i" }
+{ "id": 1, "tenSuuTap": "Xuân Hè 2025 - Updated", "moTa": "Mô tả mới" }
 ```
 
-**Kiá»ƒu dá»¯ liá»‡u:**
+**Kiểu dữ liệu:**
 
 ```json
 {
@@ -127,38 +127,38 @@
 }
 ```
 
-**Lá»—i:**
+**Lỗi:**
 
-| HTTP Status | MÃ´ táº£                             |
+| HTTP Status | Mô tả                             |
 | ----------- | --------------------------------- |
-| `400`       | MÃ£ bá»™ sÆ°u táº­p khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng |
+| `400`       | Mã bộ sưu tập không được để trống |
 
 ---
 
-## 5. XÃ³a bá»™ sÆ°u táº­p
+## 5. Xóa bộ sưu tập
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t                         |
+| Thuộc tính   | Chi tiết                         |
 | ------------ | -------------------------------- |
 | **URL**      | `DELETE /api/v1/bo-suu-tap/{id}` |
 | **Method**   | `DELETE`                         |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)               |
+| **Xác thực** | Bearer Token (JWT)               |
 
 **Response:** `204 No Content`
 
-**Lá»—i:**
+**Lỗi:**
 
-| HTTP Status | MÃ´ táº£                     |
+| HTTP Status | Mô tả                     |
 | ----------- | ------------------------- |
-| `400`       | KhÃ´ng tÃ¬m tháº¥y bá»™ sÆ°u táº­p |
+| `400`       | Không tìm thấy bộ sưu tập |
 
 ---
 
-## PhÃ¢n quyá»n
+## Phân quyền
 
-| Vai trÃ²    | GET | POST | PUT | DELETE |
+| Vai trò    | GET | POST | PUT | DELETE |
 | ---------- | --- | ---- | --- | ------ |
-| ADMIN      | âœ…  | âœ…   | âœ…  | âœ…     |
-| NHAN_VIEN  | âœ…  | âŒ   | âŒ  | âŒ     |
-| KHACH_HANG | âœ…  | âŒ   | âŒ  | âŒ     |
+| ADMIN      | ✅  | ✅   | ✅  | ✅     |
+| NHAN_VIEN  | ✅  | ❌   | ❌  | ❌     |
+| KHACH_HANG | ✅  | ❌   | ❌  | ❌     |
 
 

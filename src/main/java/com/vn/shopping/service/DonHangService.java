@@ -94,7 +94,9 @@ public class DonHangService {
         donHang.setSdt(req.getSdt());
         donHang.setMaKhuyenMaiHoaDon(req.getMaKhuyenMaiHoaDon());
         donHang.setMaKhuyenMaiDiem(req.getMaKhuyenMaiDiem());
-        donHang.setHinhThucDonHang(1); // 1 = online
+        // 0 = COD/Tiền mặt, 1 = VNPAY
+        Integer hinhThucThanhToan = req.getHinhThucDonHang() != null ? req.getHinhThucDonHang() : 0;
+        donHang.setHinhThucDonHang(hinhThucThanhToan);
         donHang.setTrangThai(0); // 0 = chờ xác nhận
         donHang.setTrangThaiThanhToan(0); // 0 = chưa thanh toán
 
@@ -105,6 +107,11 @@ public class DonHangService {
         }
 
         DonHang savedDonHang = donHangRepository.save(donHang);
+
+        if (savedDonHang.getHinhThucDonHang() != null && savedDonHang.getHinhThucDonHang() == 1) {
+            // Theo yêu cầu VNPAY: lưu lại id đơn hàng vào payment_ref làm mã tham chiếu.
+            savedDonHang.setPaymentRef(String.valueOf(savedDonHang.getId()));
+        }
 
         // 4. Tạo chi tiết đơn hàng từ giỏ hàng
         // Giá sản phẩm ở chi tiết đơn hàng là giá đã gồm giảm của sản phẩm (nếu có).
@@ -179,7 +186,7 @@ public class DonHangService {
                 .orElseThrow(() -> new IdInvalidException("Không tìm thấy nhân viên với email: " + email));
 
         donHang.setNhanVien(nhanVien);
-        donHang.setHinhThucDonHang(0); // 0 = tại quầy
+        donHang.setHinhThucDonHang(0); // 0 = COD/Tiền mặt
 
         // Nếu nhân viên thuộc cửa hàng nào thì gán cửa hàng đó
         if (nhanVien.getCuaHang() != null) {
@@ -231,6 +238,18 @@ public class DonHangService {
                 throw new IdInvalidException("Không thể cập nhật số điện thoại khi đơn hàng đã đóng gói hoặc đã gửi");
             }
             existing.setSdt(req.getSdt());
+        }
+
+        if (req.getTrangThaiThanhToan() != null) {
+            existing.setTrangThaiThanhToan(req.getTrangThaiThanhToan());
+        }
+
+        if (req.getHinhThucDonHang() != null) {
+            existing.setHinhThucDonHang(req.getHinhThucDonHang());
+        }
+
+        if (req.getPaymentRef() != null) {
+            existing.setPaymentRef(req.getPaymentRef());
         }
 
         // Cập nhật trạng thái
@@ -670,6 +689,7 @@ public class DonHangService {
         dto.setTienGiam(donHang.getTienGiam());
         dto.setTongTienGiam(donHang.getTongTienGiam());
         dto.setTongTienTra(donHang.getTongTienTra());
+        dto.setPaymentRef(donHang.getPaymentRef());
         dto.setTrangThai(mapTrangThai(donHang.getTrangThai()));
         dto.setTrangThaiThanhToan(mapTrangThaiThanhToan(donHang.getTrangThaiThanhToan()));
         dto.setHinhThucDonHang(mapHinhThucDonHang(donHang.getHinhThucDonHang()));
@@ -781,6 +801,7 @@ public class DonHangService {
         return switch (trangThai) {
             case 0 -> "Chưa thanh toán";
             case 1 -> "Đã thanh toán";
+            case 2 -> "Thanh toán thất bại";
             default -> "Không xác định";
         };
     }
@@ -789,8 +810,8 @@ public class DonHangService {
         if (hinhThuc == null)
             return null;
         return switch (hinhThuc) {
-            case 0 -> "Tại quầy";
-            case 1 -> "Online";
+            case 0 -> "COD/Tiền mặt";
+            case 1 -> "VNPAY";
             default -> "Không xác định";
         };
     }

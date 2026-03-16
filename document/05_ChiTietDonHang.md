@@ -1,39 +1,39 @@
-﻿# Chi Tiáº¿t ÄÆ¡n HÃ ng Controller
+# Chi Tiết Đơn Hàng Controller
 
 > **Base Path:** `/api/v1/chi-tiet-don-hang`  
 > **File:** `ChiTietDonHangController.java`  
-> Quáº£n lÃ½ chi tiáº¿t (dÃ²ng sáº£n pháº©m) cá»§a Ä‘Æ¡n hÃ ng.
+> Quản lý chi tiết (dòng sản phẩm) của đơn hàng.
 
 ---
 
-## Tá»•ng quan
+## Tổng quan
 
-### Cáº¥u trÃºc dá»¯ liá»‡u `ChiTietDonHang`
+### Cấu trúc dữ liệu `ChiTietDonHang`
 
-| TrÆ°á»ng           | Kiá»ƒu           | MÃ´ táº£                                     |
+| Trường           | Kiểu           | Mô tả                                     |
 | ---------------- | -------------- | ----------------------------------------- |
-| `id`             | Long           | MÃ£ chi tiáº¿t Ä‘Æ¡n hÃ ng (auto-increment)     |
-| `donHang`        | DonHang        | ÄÆ¡n hÃ ng cha (FK, áº©n trong JSON response) |
-| `chiTietSanPham` | ChiTietSanPham | Biáº¿n thá»ƒ sáº£n pháº©m (FK)                    |
-| `giaSanPham`     | Double         | GiÃ¡ sáº£n pháº©m táº¡i thá»i Ä‘iá»ƒm mua (VND)      |
-| `giamGia`        | Double         | Pháº§n trÄƒm giáº£m giÃ¡ (%)                    |
-| `giaGiam`        | Double         | Sá»‘ tiá»n giáº£m (VND)                        |
-| `soLuong`        | Integer        | Sá»‘ lÆ°á»£ng mua                              |
-| `thanhTien`      | Double         | ThÃ nh tiá»n (VND)                          |
-| `ngayTao`        | LocalDateTime  | NgÃ y táº¡o (tá»± Ä‘á»™ng)                        |
-| `ngayCapNhat`    | LocalDateTime  | NgÃ y cáº­p nháº­t (tá»± Ä‘á»™ng)                   |
+| `id`             | Long           | Mã chi tiết đơn hàng (auto-increment)     |
+| `donHang`        | DonHang        | Đơn hàng cha (FK, ẩn trong JSON response) |
+| `chiTietSanPham` | ChiTietSanPham | Biến thể sản phẩm (FK)                    |
+| `giaSanPham`     | Double         | Giá sản phẩm tại thời điểm mua (VND)      |
+| `giamGia`        | Double         | Phần trăm giảm giá (%)                    |
+| `giaGiam`        | Double         | Số tiền giảm (VND)                        |
+| `soLuong`        | Integer        | Số lượng mua                              |
+| `thanhTien`      | Double         | Thành tiền (VND)                          |
+| `ngayTao`        | LocalDateTime  | Ngày tạo (tự động)                        |
+| `ngayCapNhat`    | LocalDateTime  | Ngày cập nhật (tự động)                   |
 
 ---
 
-## 1. Láº¥y táº¥t cáº£ chi tiáº¿t Ä‘Æ¡n hÃ ng
+## 1. Lấy tất cả chi tiết đơn hàng
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t                        |
+| Thuộc tính   | Chi tiết                        |
 | ------------ | ------------------------------- |
 | **URL**      | `GET /api/v1/chi-tiet-don-hang` |
 | **Method**   | `GET`                           |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)              |
+| **Xác thực** | Bearer Token (JWT)              |
 
-**Response:** `200 OK` â€” Tráº£ vá» `List<ChiTietDonHang>`
+**Response:** `200 OK` — Trả về `List<ChiTietDonHang>`
 
 ```json
 [
@@ -42,7 +42,7 @@
     "chiTietSanPham": {
       "id": 1,
       "soLuong": 15,
-      "mauSac": { "tenMauSac": "Äen" },
+      "mauSac": { "tenMauSac": "Đen" },
       "kichThuoc": { "tenKichThuoc": "M" }
     },
     "giaSanPham": 250000,
@@ -55,7 +55,7 @@
 ]
 ```
 
-**Kiá»ƒu dá»¯ liá»‡u:**
+**Kiểu dữ liệu:**
 
 ```json
 {
@@ -81,56 +81,56 @@
 
 ---
 
-## 2. Láº¥y chi tiáº¿t Ä‘Æ¡n hÃ ng theo mÃ£ Ä‘Æ¡n
+## 2. Lấy chi tiết đơn hàng theo mã đơn
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t                                             |
+| Thuộc tính   | Chi tiết                                             |
 | ------------ | ---------------------------------------------------- |
 | **URL**      | `GET /api/v1/chi-tiet-don-hang/don-hang/{donHangId}` |
 | **Method**   | `GET`                                                |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)                                   |
+| **Xác thực** | Bearer Token (JWT)                                   |
 
 **Path Parameters:**
 
-| Tham sá»‘     | Kiá»ƒu | MÃ´ táº£       |
+| Tham số     | Kiểu | Mô tả       |
 | ----------- | ---- | ----------- |
-| `donHangId` | Long | MÃ£ Ä‘Æ¡n hÃ ng |
+| `donHangId` | Long | Mã đơn hàng |
 
-**Response:** `200 OK` â€” Tráº£ vá» `List<ChiTietDonHang>`
+**Response:** `200 OK` — Trả về `List<ChiTietDonHang>`
 
 ---
 
-## 3. Láº¥y chi tiáº¿t Ä‘Æ¡n hÃ ng theo ID
+## 3. Lấy chi tiết đơn hàng theo ID
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t                             |
+| Thuộc tính   | Chi tiết                             |
 | ------------ | ------------------------------------ |
 | **URL**      | `GET /api/v1/chi-tiet-don-hang/{id}` |
 | **Method**   | `GET`                                |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)                   |
+| **Xác thực** | Bearer Token (JWT)                   |
 
 **Path Parameters:**
 
-| Tham sá»‘ | Kiá»ƒu | MÃ´ táº£                |
+| Tham số | Kiểu | Mô tả                |
 | ------- | ---- | -------------------- |
-| `id`    | Long | MÃ£ chi tiáº¿t Ä‘Æ¡n hÃ ng |
+| `id`    | Long | Mã chi tiết đơn hàng |
 
-**Response:** `200 OK` â€” Tráº£ vá» `ChiTietDonHang`
+**Response:** `200 OK` — Trả về `ChiTietDonHang`
 
-**Lá»—i:**
+**Lỗi:**
 
-| HTTP Status | MÃ´ táº£                            |
+| HTTP Status | Mô tả                            |
 | ----------- | -------------------------------- |
-| `400`       | KhÃ´ng tÃ¬m tháº¥y chi tiáº¿t Ä‘Æ¡n hÃ ng |
+| `400`       | Không tìm thấy chi tiết đơn hàng |
 
 ---
 
-## 4. Táº¡o chi tiáº¿t Ä‘Æ¡n hÃ ng
+## 4. Tạo chi tiết đơn hàng
 
-| Thuá»™c tÃ­nh       | Chi tiáº¿t                         |
+| Thuộc tính       | Chi tiết                         |
 | ---------------- | -------------------------------- |
 | **URL**          | `POST /api/v1/chi-tiet-don-hang` |
 | **Method**       | `POST`                           |
 | **Content-Type** | `application/json`               |
-| **XÃ¡c thá»±c**     | Bearer Token (JWT)               |
+| **Xác thực**     | Bearer Token (JWT)               |
 
 **Request Body:**
 
@@ -146,7 +146,7 @@
 }
 ```
 
-**Kiá»ƒu dá»¯ liá»‡u:**
+**Kiểu dữ liệu:**
 
 ```json
 {
@@ -164,20 +164,20 @@
 }
 ```
 
-**Response:** `201 Created` â€” Tráº£ vá» `ChiTietDonHang`
+**Response:** `201 Created` — Trả về `ChiTietDonHang`
 
 ---
 
-## 5. Cáº­p nháº­t chi tiáº¿t Ä‘Æ¡n hÃ ng
+## 5. Cập nhật chi tiết đơn hàng
 
-| Thuá»™c tÃ­nh       | Chi tiáº¿t                        |
+| Thuộc tính       | Chi tiết                        |
 | ---------------- | ------------------------------- |
 | **URL**          | `PUT /api/v1/chi-tiet-don-hang` |
 | **Method**       | `PUT`                           |
 | **Content-Type** | `application/json`              |
-| **XÃ¡c thá»±c**     | Bearer Token (JWT)              |
+| **Xác thực**     | Bearer Token (JWT)              |
 
-**Request Body:** (pháº£i cÃ³ `id`)
+**Request Body:** (phải có `id`)
 
 ```json
 {
@@ -187,7 +187,7 @@
 }
 ```
 
-**Kiá»ƒu dá»¯ liá»‡u:**
+**Kiểu dữ liệu:**
 
 ```json
 {
@@ -197,40 +197,40 @@
 }
 ```
 
-**Response:** `200 OK` â€” Tráº£ vá» `ChiTietDonHang`
+**Response:** `200 OK` — Trả về `ChiTietDonHang`
 
-**Lá»—i:**
+**Lỗi:**
 
-| HTTP Status | MÃ´ táº£                                    |
+| HTTP Status | Mô tả                                    |
 | ----------- | ---------------------------------------- |
-| `400`       | MÃ£ chi tiáº¿t Ä‘Æ¡n hÃ ng khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng |
+| `400`       | Mã chi tiết đơn hàng không được để trống |
 
 ---
 
-## 6. XÃ³a chi tiáº¿t Ä‘Æ¡n hÃ ng
+## 6. Xóa chi tiết đơn hàng
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t                                |
+| Thuộc tính   | Chi tiết                                |
 | ------------ | --------------------------------------- |
 | **URL**      | `DELETE /api/v1/chi-tiet-don-hang/{id}` |
 | **Method**   | `DELETE`                                |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)                      |
+| **Xác thực** | Bearer Token (JWT)                      |
 
 **Response:** `204 No Content`
 
-**Lá»—i:**
+**Lỗi:**
 
-| HTTP Status | MÃ´ táº£                            |
+| HTTP Status | Mô tả                            |
 | ----------- | -------------------------------- |
-| `400`       | KhÃ´ng tÃ¬m tháº¥y chi tiáº¿t Ä‘Æ¡n hÃ ng |
+| `400`       | Không tìm thấy chi tiết đơn hàng |
 
 ---
 
-## PhÃ¢n quyá»n
+## Phân quyền
 
-| Vai trÃ²    | GET (Xem) | POST (Táº¡o) | PUT (Sá»­a) | DELETE (XÃ³a) |
+| Vai trò    | GET (Xem) | POST (Tạo) | PUT (Sửa) | DELETE (Xóa) |
 | ---------- | --------- | ---------- | --------- | ------------ |
-| ADMIN      | âœ…        | âœ…         | âœ…        | âœ…           |
-| NHAN_VIEN  | âœ…        | âœ…         | âŒ        | âŒ           |
-| KHACH_HANG | âœ…        | âŒ         | âŒ        | âŒ           |
+| ADMIN      | ✅        | ✅         | ✅        | ✅           |
+| NHAN_VIEN  | ✅        | ✅         | ❌        | ❌           |
+| KHACH_HANG | ✅        | ❌         | ❌        | ❌           |
 
 

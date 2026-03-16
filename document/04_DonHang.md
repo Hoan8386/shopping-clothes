@@ -1,107 +1,107 @@
-﻿# ÄÆ¡n HÃ ng Controller
+# Đơn Hàng Controller
 
 > **Base Path:** `/api/v1/don-hang`  
 > **File:** `DonHangController.java`  
-> Quáº£n lÃ½ Ä‘Æ¡n hÃ ng: táº¡o Ä‘Æ¡n online (khÃ¡ch hÃ ng), táº¡o Ä‘Æ¡n táº¡i quáº§y (nhÃ¢n viÃªn), lá»c + phÃ¢n trang, cáº­p nháº­t tráº¡ng thÃ¡i.
+> Quản lý đơn hàng: tạo đơn online (khách hàng), tạo đơn tại quầy (nhân viên), lọc + phân trang, cập nhật trạng thái.
 
 ---
 
-## Tá»•ng quan
+## Tổng quan
 
-### Cáº¥u trÃºc dá»¯ liá»‡u `DonHang`
+### Cấu trúc dữ liệu `DonHang`
 
-| TrÆ°á»ng               | Kiá»ƒu          | MÃ´ táº£                                     |
+| Trường               | Kiểu          | Mô tả                                     |
 | -------------------- | ------------- | ----------------------------------------- |
-| `id`                 | Long          | MÃ£ Ä‘Æ¡n hÃ ng (auto-increment)              |
-| `cuaHang`            | CuaHang       | Cá»­a hÃ ng xá»­ lÃ½ Ä‘Æ¡n                        |
-| `khachHang`          | KhachHang     | KhÃ¡ch hÃ ng Ä‘áº·t Ä‘Æ¡n                        |
-| `nhanVien`           | NhanVien      | NhÃ¢n viÃªn xá»­ lÃ½ Ä‘Æ¡n                       |
-| `maKhuyenMaiHoaDon`  | Long          | MÃ£ khuyáº¿n mÃ£i theo hÃ³a Ä‘Æ¡n (FK, nullable) |
-| `maKhuyenMaiDiem`    | Long          | MÃ£ khuyáº¿n mÃ£i theo Ä‘iá»ƒm (FK, nullable)    |
-| `diaChi`             | String(255)   | Äá»‹a chá»‰ giao hÃ ng                         |
-| `sdt`                | String(255)   | Sá»‘ Ä‘iá»‡n thoáº¡i nháº­n hÃ ng                   |
-| `tongTien`           | Integer       | Tá»•ng tiá»n trÆ°á»›c giáº£m (VND)                |
-| `tienGiam`           | Integer       | Sá»‘ tiá»n giáº£m (VND)                        |
-| `tongTienGiam`       | Integer       | Tá»•ng tiá»n giáº£m (VND)                      |
-| `tongTienTra`        | Integer       | Tá»•ng tiá»n pháº£i tráº£ sau giáº£m (VND)         |
-| `trangThai`          | Integer       | Tráº¡ng thÃ¡i Ä‘Æ¡n hÃ ng (xem báº£ng bÃªn dÆ°á»›i)   |
-| `trangThaiThanhToan` | Integer       | Tráº¡ng thÃ¡i thanh toÃ¡n (xem báº£ng bÃªn dÆ°á»›i) |
-| `hinhThucDonHang`    | Integer       | HÃ¬nh thá»©c Ä‘Æ¡n hÃ ng (xem báº£ng bÃªn dÆ°á»›i)    |
-| `chiTietDonHangs`    | List          | Danh sÃ¡ch chi tiáº¿t Ä‘Æ¡n hÃ ng               |
-| `ngayTao`            | LocalDateTime | NgÃ y táº¡o Ä‘Æ¡n (tá»± Ä‘á»™ng)                    |
-| `ngayCapNhat`        | LocalDateTime | NgÃ y cáº­p nháº­t (tá»± Ä‘á»™ng)                   |
+| `id`                 | Long          | Mã đơn hàng (auto-increment)              |
+| `cuaHang`            | CuaHang       | Cửa hàng xử lý đơn                        |
+| `khachHang`          | KhachHang     | Khách hàng đặt đơn                        |
+| `nhanVien`           | NhanVien      | Nhân viên xử lý đơn                       |
+| `maKhuyenMaiHoaDon`  | Long          | Mã khuyến mãi theo hóa đơn (FK, nullable) |
+| `maKhuyenMaiDiem`    | Long          | Mã khuyến mãi theo điểm (FK, nullable)    |
+| `diaChi`             | String(255)   | Địa chỉ giao hàng                         |
+| `sdt`                | String(255)   | Số điện thoại nhận hàng                   |
+| `tongTien`           | Integer       | Tổng tiền trước giảm (VND)                |
+| `tienGiam`           | Integer       | Số tiền giảm (VND)                        |
+| `tongTienGiam`       | Integer       | Tổng tiền giảm (VND)                      |
+| `tongTienTra`        | Integer       | Tổng tiền phải trả sau giảm (VND)         |
+| `trangThai`          | Integer       | Trạng thái đơn hàng (xem bảng bên dưới)   |
+| `trangThaiThanhToan` | Integer       | Trạng thái thanh toán (xem bảng bên dưới) |
+| `hinhThucDonHang`    | Integer       | Hình thức đơn hàng (xem bảng bên dưới)    |
+| `chiTietDonHangs`    | List          | Danh sách chi tiết đơn hàng               |
+| `ngayTao`            | LocalDateTime | Ngày tạo đơn (tự động)                    |
+| `ngayCapNhat`        | LocalDateTime | Ngày cập nhật (tự động)                   |
 
-### MÃ£ tráº¡ng thÃ¡i Ä‘Æ¡n hÃ ng (`trangThai`)
+### Mã trạng thái đơn hàng (`trangThai`)
 
-| GiÃ¡ trá»‹ | Ã nghÄ©a          | MÃ´ táº£                                                  |
+| Giá trị | Ý nghĩa          | Mô tả                                                  |
 | ------- | ---------------- | ------------------------------------------------------ |
-| `0`     | Chá» xÃ¡c nháº­n     | ÄÆ¡n má»›i táº¡o, chÆ°a Ä‘Æ°á»£c xá»­ lÃ½                           |
-| `1`     | ÄÃ£ xÃ¡c nháº­n      | ÄÆ¡n Ä‘Ã£ Ä‘Æ°á»£c nhÃ¢n viÃªn xÃ¡c nháº­n                         |
-| `2`     | Äang Ä‘Ã³ng gÃ³i    | ÄÆ¡n Ä‘ang Ä‘Æ°á»£c Ä‘Ã³ng gÃ³i                                 |
-| `3`     | Äang giao hÃ ng   | ÄÆ¡n Ä‘ang trong quÃ¡ trÃ¬nh giao                          |
-| `4`     | ÄÃ£ há»§y           | ÄÆ¡n bá»‹ há»§y                                             |
-| `5`     | **ÄÃ£ nháº­n hÃ ng** | KhÃ¡ch hÃ ng xÃ¡c nháº­n nháº­n hÃ ng â†’ **cá»™ng Ä‘iá»ƒm tÃ­ch lÅ©y** |
+| `0`     | Chờ xác nhận     | Đơn mới tạo, chưa được xử lý                           |
+| `1`     | Đã xác nhận      | Đơn đã được nhân viên xác nhận                         |
+| `2`     | Đang đóng gói    | Đơn đang được đóng gói                                 |
+| `3`     | Đang giao hàng   | Đơn đang trong quá trình giao                          |
+| `4`     | Đã hủy           | Đơn bị hủy                                             |
+| `5`     | **Đã nhận hàng** | Khách hàng xác nhận nhận hàng → **cộng điểm tích lũy** |
 
-### Tráº¡ng thÃ¡i thanh toÃ¡n (`trangThaiThanhToan`)
+### Trạng thái thanh toán (`trangThaiThanhToan`)
 
-| GiÃ¡ trá»‹ | Ã nghÄ©a         |
+| Giá trị | Ý nghĩa         |
 | ------- | --------------- |
-| `0`     | ChÆ°a thanh toÃ¡n |
-| `1`     | ÄÃ£ thanh toÃ¡n   |
+| `0`     | Chưa thanh toán |
+| `1`     | Đã thanh toán   |
 
-### HÃ¬nh thá»©c Ä‘Æ¡n hÃ ng (`hinhThucDonHang`)
+### Hình thức đơn hàng (`hinhThucDonHang`)
 
-| GiÃ¡ trá»‹ | Ã nghÄ©a  |
+| Giá trị | Ý nghĩa  |
 | ------- | -------- |
-| `0`     | Táº¡i quáº§y |
+| `0`     | Tại quầy |
 | `1`     | Online   |
 
-### Luá»“ng chuyá»ƒn tráº¡ng thÃ¡i
+### Luồng chuyển trạng thái
 
-- **NhÃ¢n viÃªn:** `0 â†’ 1 â†’ 2 â†’ 3` (xÃ¡c nháº­n â†’ Ä‘Ã³ng gÃ³i â†’ gá»­i hÃ ng)
-- **KhÃ¡ch hÃ ng:** `3 â†’ 5` (xÃ¡c nháº­n Ä‘Ã£ nháº­n hÃ ng)
-- **Há»§y Ä‘Æ¡n:** `0 â†’ 4` hoáº·c `1 â†’ 4` (chá»‰ khi chÆ°a Ä‘Ã³ng gÃ³i)
-- **Cáº­p nháº­t Ä‘á»‹a chá»‰/SÄT:** Chá»‰ cho phÃ©p khi `trangThai < 2` (chÆ°a Ä‘Ã³ng gÃ³i)
+- **Nhân viên:** `0 → 1 → 2 → 3` (xác nhận → đóng gói → gửi hàng)
+- **Khách hàng:** `3 → 5` (xác nhận đã nhận hàng)
+- **Hủy đơn:** `0 → 4` hoặc `1 → 4` (chỉ khi chưa đóng gói)
+- **Cập nhật địa chỉ/SĐT:** Chỉ cho phép khi `trangThai < 2` (chưa đóng gói)
 
-### Quy táº¯c cá»™ng Ä‘iá»ƒm tÃ­ch lÅ©y
+### Quy tắc cộng điểm tích lũy
 
-Khi cáº­p nháº­t Ä‘Æ¡n hÃ ng vÃ  `trangThai` chuyá»ƒn sang **5 (ÄÃ£ nháº­n hÃ ng)**:
+Khi cập nhật đơn hàng và `trangThai` chuyển sang **5 (Đã nhận hàng)**:
 
-- Há»‡ thá»‘ng tá»± Ä‘á»™ng cá»™ng Ä‘iá»ƒm tÃ­ch lÅ©y cho khÃ¡ch hÃ ng.
-- **CÃ´ng thá»©c:** `(tongTienTra / 100.000) Ã— 10 Ä‘iá»ƒm`
-- VÃ­ dá»¥: ÄÆ¡n 350.000Ä‘ â†’ 30 Ä‘iá»ƒm, Ä‘Æ¡n 1.200.000Ä‘ â†’ 120 Ä‘iá»ƒm.
-- Äiá»ƒm chá»‰ Ä‘Æ°á»£c cá»™ng **1 láº§n** khi chuyá»ƒn tráº¡ng thÃ¡i sang 5, khÃ´ng cá»™ng láº¡i náº¿u Ä‘Ã£ á»Ÿ tráº¡ng thÃ¡i 5.
+- Hệ thống tự động cộng điểm tích lũy cho khách hàng.
+- **Công thức:** `(tongTienTra / 100.000) × 10 điểm`
+- Ví dụ: Đơn 350.000đ → 30 điểm, đơn 1.200.000đ → 120 điểm.
+- Điểm chỉ được cộng **1 lần** khi chuyển trạng thái sang 5, không cộng lại nếu đã ở trạng thái 5.
 
 ---
 
-## 1. Láº¥y danh sÃ¡ch Ä‘Æ¡n hÃ ng (cÃ³ lá»c + phÃ¢n trang)
+## 1. Lấy danh sách đơn hàng (có lọc + phân trang)
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t               |
+| Thuộc tính   | Chi tiết               |
 | ------------ | ---------------------- |
 | **URL**      | `GET /api/v1/don-hang` |
 | **Method**   | `GET`                  |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)     |
+| **Xác thực** | Bearer Token (JWT)     |
 
 **Query Parameters:**
 
-| Tham sá»‘              | Kiá»ƒu    | Báº¯t buá»™c | MÃ´ táº£                                       |
+| Tham số              | Kiểu    | Bắt buộc | Mô tả                                       |
 | -------------------- | ------- | -------- | ------------------------------------------- |
-| `cuaHangId`          | Long    | KhÃ´ng    | Lá»c theo mÃ£ cá»­a hÃ ng                        |
-| `nhanVienId`         | Long    | KhÃ´ng    | Lá»c theo mÃ£ nhÃ¢n viÃªn                       |
-| `trangThai`          | Integer | KhÃ´ng    | Lá»c theo tráº¡ng thÃ¡i Ä‘Æ¡n (0-5)               |
-| `trangThaiThanhToan` | Integer | KhÃ´ng    | Lá»c theo tráº¡ng thÃ¡i thanh toÃ¡n (0-1)        |
-| `hinhThucDonHang`    | Integer | KhÃ´ng    | Lá»c theo hÃ¬nh thá»©c Ä‘Æ¡n (0: quáº§y, 1: online) |
-| `page`               | Integer | KhÃ´ng    | Sá»‘ trang (máº·c Ä‘á»‹nh: 0)                      |
-| `size`               | Integer | KhÃ´ng    | KÃ­ch thÆ°á»›c trang (máº·c Ä‘á»‹nh: 20)             |
-| `sort`               | String  | KhÃ´ng    | Sáº¯p xáº¿p (vd: `ngayTao,desc`)                |
+| `cuaHangId`          | Long    | Không    | Lọc theo mã cửa hàng                        |
+| `nhanVienId`         | Long    | Không    | Lọc theo mã nhân viên                       |
+| `trangThai`          | Integer | Không    | Lọc theo trạng thái đơn (0-5)               |
+| `trangThaiThanhToan` | Integer | Không    | Lọc theo trạng thái thanh toán (0-1)        |
+| `hinhThucDonHang`    | Integer | Không    | Lọc theo hình thức đơn (0: quầy, 1: online) |
+| `page`               | Integer | Không    | Số trang (mặc định: 0)                      |
+| `size`               | Integer | Không    | Kích thước trang (mặc định: 20)             |
+| `sort`               | String  | Không    | Sắp xếp (vd: `ngayTao,desc`)                |
 
-**VÃ­ dá»¥ request:**
+**Ví dụ request:**
 
 ```
 GET /api/v1/don-hang?trangThai=1&hinhThucDonHang=1&page=0&size=10&sort=ngayTao,desc
 ```
 
-**Response:** `200 OK` â€” Tráº£ vá» `ResultPaginationDTO`
+**Response:** `200 OK` — Trả về `ResultPaginationDTO`
 
 ```json
 {
@@ -114,7 +114,7 @@ GET /api/v1/don-hang?trangThai=1&hinhThucDonHang=1&page=0&size=10&sort=ngayTao,d
   "result": [
     {
       "id": 1,
-      "cuaHang": { "id": 1, "tenCuaHang": "Chi nhÃ¡nh Quáº­n 1" },
+      "cuaHang": { "id": 1, "tenCuaHang": "Chi nhánh Quận 1" },
       "khachHang": {
         "id": 1,
         "tenKhachHang": "Lan",
@@ -124,28 +124,28 @@ GET /api/v1/don-hang?trangThai=1&hinhThucDonHang=1&page=0&size=10&sort=ngayTao,d
       },
       "nhanVien": {
         "id": 5,
-        "tenNhanVien": "HÃ¹ng",
+        "tenNhanVien": "Hùng",
         "email": "h@s.com",
         "soDienThoai": "0901000005"
       },
       "khuyenMaiHoaDon": null,
       "khuyenMaiDiem": null,
-      "diaChi": "123 Nguyá»…n TrÃ£i, Q.1, TP.HCM",
+      "diaChi": "123 Nguyễn Trãi, Q.1, TP.HCM",
       "sdt": "0911000001",
       "tongTien": 600,
       "tienGiam": 0,
       "tongTienGiam": 0,
       "tongTienTra": 600,
-      "trangThai": "ÄÃ£ xÃ¡c nháº­n",
-      "trangThaiThanhToan": "ÄÃ£ thanh toÃ¡n",
+      "trangThai": "Đã xác nhận",
+      "trangThaiThanhToan": "Đã thanh toán",
       "hinhThucDonHang": "Online",
       "chiTietDonHangs": [
         {
           "id": 1,
           "chiTietSanPhamId": 1,
-          "tenSanPham": "Ão Oxford",
+          "tenSanPham": "Áo Oxford",
           "hinhAnhChinh": "ao-oxford.jpg",
-          "tenMauSac": "Tráº¯ng",
+          "tenMauSac": "Trắng",
           "tenKichThuoc": "M",
           "giaSanPham": 200,
           "giamGia": 0,
@@ -161,7 +161,7 @@ GET /api/v1/don-hang?trangThai=1&hinhThucDonHang=1&page=0&size=10&sort=ngayTao,d
 }
 ```
 
-**Kiá»ƒu dá»¯ liá»‡u:**
+**Kiểu dữ liệu:**
 
 ```json
 {
@@ -214,9 +214,9 @@ GET /api/v1/don-hang?trangThai=1&hinhThucDonHang=1&page=0&size=10&sort=ngayTao,d
       "tienGiam": "Integer",
       "tongTienGiam": "Integer",
       "tongTienTra": "Integer",
-      "trangThai": "String (text mÃ´ táº£)",
-      "trangThaiThanhToan": "String (text mÃ´ táº£)",
-      "hinhThucDonHang": "String (text mÃ´ táº£)",
+      "trangThai": "String (text mô tả)",
+      "trangThaiThanhToan": "String (text mô tả)",
+      "hinhThucDonHang": "String (text mô tả)",
       "chiTietDonHangs": [
         {
           "id": "Long",
@@ -226,8 +226,8 @@ GET /api/v1/don-hang?trangThai=1&hinhThucDonHang=1&page=0&size=10&sort=ngayTao,d
           "tenMauSac": "String",
           "tenKichThuoc": "String",
           "giaSanPham": "Double",
-          "giamGia": "Double (% giáº£m giÃ¡)",
-          "giaGiam": "Double (sá»‘ tiá»n giáº£m)",
+          "giamGia": "Double (% giảm giá)",
+          "giaGiam": "Double (số tiền giảm)",
           "soLuong": "Integer",
           "thanhTien": "Double"
         }
@@ -239,52 +239,52 @@ GET /api/v1/don-hang?trangThai=1&hinhThucDonHang=1&page=0&size=10&sort=ngayTao,d
 }
 ```
 
-> **LÆ°u Ã½ phÃ¢n quyá»n:**
+> **Lưu ý phân quyền:**
 >
-> - **KhÃ¡ch hÃ ng:** Chá»‰ xem Ä‘Æ°á»£c Ä‘Æ¡n hÃ ng cá»§a mÃ¬nh (há»‡ thá»‘ng tá»± lá»c theo `khachHangId`).
-> - **NhÃ¢n viÃªn / Admin:** Xem Ä‘Æ°á»£c táº¥t cáº£ Ä‘Æ¡n hÃ ng, cÃ³ thá»ƒ lá»c tÃ¹y Ã½.
+> - **Khách hàng:** Chỉ xem được đơn hàng của mình (hệ thống tự lọc theo `khachHangId`).
+> - **Nhân viên / Admin:** Xem được tất cả đơn hàng, có thể lọc tùy ý.
 
 ---
 
-## 2. Láº¥y Ä‘Æ¡n hÃ ng theo ID
+## 2. Lấy đơn hàng theo ID
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t                    |
+| Thuộc tính   | Chi tiết                    |
 | ------------ | --------------------------- |
 | **URL**      | `GET /api/v1/don-hang/{id}` |
 | **Method**   | `GET`                       |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)          |
+| **Xác thực** | Bearer Token (JWT)          |
 
 **Path Parameters:**
 
-| Tham sá»‘ | Kiá»ƒu | MÃ´ táº£       |
+| Tham số | Kiểu | Mô tả       |
 | ------- | ---- | ----------- |
-| `id`    | Long | MÃ£ Ä‘Æ¡n hÃ ng |
+| `id`    | Long | Mã đơn hàng |
 
-**Response:** `200 OK` â€” Tráº£ vá» `DonHang` (bao gá»“m `chiTietDonHangs`)
+**Response:** `200 OK` — Trả về `DonHang` (bao gồm `chiTietDonHangs`)
 
-**Lá»—i:**
+**Lỗi:**
 
-| HTTP Status | MÃ´ táº£                               |
+| HTTP Status | Mô tả                               |
 | ----------- | ----------------------------------- |
-| `400`       | KhÃ´ng tÃ¬m tháº¥y Ä‘Æ¡n hÃ ng             |
-| `400`       | Báº¡n khÃ´ng cÃ³ quyá»n xem Ä‘Æ¡n hÃ ng nÃ y |
+| `400`       | Không tìm thấy đơn hàng             |
+| `400`       | Bạn không có quyền xem đơn hàng này |
 
 ---
 
-## 3. Táº¡o Ä‘Æ¡n hÃ ng online (KhÃ¡ch hÃ ng)
+## 3. Tạo đơn hàng online (Khách hàng)
 
-| Thuá»™c tÃ­nh       | Chi tiáº¿t                                      |
+| Thuộc tính       | Chi tiết                                      |
 | ---------------- | --------------------------------------------- |
 | **URL**          | `POST /api/v1/don-hang/online`                |
 | **Method**       | `POST`                                        |
 | **Content-Type** | `application/json`                            |
-| **XÃ¡c thá»±c**     | Bearer Token (JWT) â€” YÃªu cáº§u quyá»n KHACH_HANG |
+| **Xác thực**     | Bearer Token (JWT) — Yêu cầu quyền KHACH_HANG |
 
 **Request Body:** `ReqTaoDonHangDTO`
 
 ```json
 {
-  "diaChi": "123 Nguyá»…n TrÃ£i, Q.1, TP.HCM",
+  "diaChi": "123 Nguyễn Trãi, Q.1, TP.HCM",
   "sdt": "0911000001",
   "cuaHangId": 1,
   "maKhuyenMaiHoaDon": null,
@@ -292,7 +292,7 @@ GET /api/v1/don-hang?trangThai=1&hinhThucDonHang=1&page=0&size=10&sort=ngayTao,d
 }
 ```
 
-**Kiá»ƒu dá»¯ liá»‡u:**
+**Kiểu dữ liệu:**
 
 ```json
 {
@@ -304,49 +304,49 @@ GET /api/v1/don-hang?trangThai=1&hinhThucDonHang=1&page=0&size=10&sort=ngayTao,d
 }
 ```
 
-| TrÆ°á»ng              | Kiá»ƒu   | Báº¯t buá»™c | MÃ´ táº£                            |
+| Trường              | Kiểu   | Bắt buộc | Mô tả                            |
 | ------------------- | ------ | -------- | -------------------------------- |
-| `diaChi`            | String | **CÃ³**   | Äá»‹a chá»‰ giao hÃ ng                |
-| `sdt`               | String | KhÃ´ng    | Sá»‘ Ä‘iá»‡n thoáº¡i nháº­n hÃ ng          |
-| `cuaHangId`         | Long   | KhÃ´ng    | MÃ£ cá»­a hÃ ng xá»­ lÃ½                |
-| `maKhuyenMaiHoaDon` | Long   | KhÃ´ng    | MÃ£ khuyáº¿n mÃ£i theo hÃ³a Ä‘Æ¡n       |
-| `maKhuyenMaiDiem`   | Long   | KhÃ´ng    | MÃ£ khuyáº¿n mÃ£i theo Ä‘iá»ƒm tÃ­ch lÅ©y |
+| `diaChi`            | String | **Có**   | Địa chỉ giao hàng                |
+| `sdt`               | String | Không    | Số điện thoại nhận hàng          |
+| `cuaHangId`         | Long   | Không    | Mã cửa hàng xử lý                |
+| `maKhuyenMaiHoaDon` | Long   | Không    | Mã khuyến mãi theo hóa đơn       |
+| `maKhuyenMaiDiem`   | Long   | Không    | Mã khuyến mãi theo điểm tích lũy |
 
-**Response:** `201 Created` â€” Tráº£ vá» `DonHang`
+**Response:** `201 Created` — Trả về `DonHang`
 
-**Logic xá»­ lÃ½:**
+**Logic xử lý:**
 
-1. Láº¥y thÃ´ng tin khÃ¡ch hÃ ng tá»« JWT token
-2. Láº¥y giá» hÃ ng â†’ táº¡o chi tiáº¿t Ä‘Æ¡n hÃ ng
-3. TÃ­nh giÃ¡ bÃ¡n, giáº£m giÃ¡, thÃ nh tiá»n
-4. Trá»« sá»‘ lÆ°á»£ng tá»“n kho (`ChiTietSanPham.soLuong`)
-5. XÃ³a giá» hÃ ng sau khi táº¡o Ä‘Æ¡n thÃ nh cÃ´ng
-6. GÃ¡n `hinhThucDonHang = 1`, `trangThai = 0`, `trangThaiThanhToan = 0`
+1. Lấy thông tin khách hàng từ JWT token
+2. Lấy giỏ hàng → tạo chi tiết đơn hàng
+3. Tính giá bán, giảm giá, thành tiền
+4. Trừ số lượng tồn kho (`ChiTietSanPham.soLuong`)
+5. Xóa giỏ hàng sau khi tạo đơn thành công
+6. Gán `hinhThucDonHang = 1`, `trangThai = 0`, `trangThaiThanhToan = 0`
 
-**Lá»—i:**
+**Lỗi:**
 
-| HTTP Status | MÃ´ táº£                     |
+| HTTP Status | Mô tả                     |
 | ----------- | ------------------------- |
-| `400`       | KhÃ´ng tÃ¬m tháº¥y khÃ¡ch hÃ ng |
-| `400`       | Giá» hÃ ng trá»‘ng            |
+| `400`       | Không tìm thấy khách hàng |
+| `400`       | Giỏ hàng trống            |
 
 ---
 
-## 4. Táº¡o Ä‘Æ¡n hÃ ng táº¡i quáº§y (NhÃ¢n viÃªn)
+## 4. Tạo đơn hàng tại quầy (Nhân viên)
 
-| Thuá»™c tÃ­nh       | Chi tiáº¿t                                     |
+| Thuộc tính       | Chi tiết                                     |
 | ---------------- | -------------------------------------------- |
 | **URL**          | `POST /api/v1/don-hang/tai-quay`             |
 | **Method**       | `POST`                                       |
 | **Content-Type** | `application/json`                           |
-| **XÃ¡c thá»±c**     | Bearer Token (JWT) â€” YÃªu cáº§u quyá»n NHAN_VIEN |
+| **Xác thực**     | Bearer Token (JWT) — Yêu cầu quyền NHAN_VIEN |
 
 **Request Body:**
 
 ```json
 {
   "khachHang": { "id": 1 },
-  "diaChi": "Mua táº¡i cá»­a hÃ ng",
+  "diaChi": "Mua tại cửa hàng",
   "tongTien": 500,
   "tienGiam": 0,
   "tongTienGiam": 0,
@@ -366,7 +366,7 @@ GET /api/v1/don-hang?trangThai=1&hinhThucDonHang=1&page=0&size=10&sort=ngayTao,d
 }
 ```
 
-**Kiá»ƒu dá»¯ liá»‡u:**
+**Kiểu dữ liệu:**
 
 ```json
 {
@@ -397,22 +397,22 @@ GET /api/v1/don-hang?trangThai=1&hinhThucDonHang=1&page=0&size=10&sort=ngayTao,d
 
 **Response:** `201 Created`
 
-**Lá»—i:**
+**Lỗi:**
 
-| HTTP Status | MÃ´ táº£                    |
+| HTTP Status | Mô tả                    |
 | ----------- | ------------------------ |
-| `400`       | KhÃ´ng tÃ¬m tháº¥y nhÃ¢n viÃªn |
+| `400`       | Không tìm thấy nhân viên |
 
 ---
 
-## 5. Cáº­p nháº­t Ä‘Æ¡n hÃ ng
+## 5. Cập nhật đơn hàng
 
-| Thuá»™c tÃ­nh       | Chi tiáº¿t               |
+| Thuộc tính       | Chi tiết               |
 | ---------------- | ---------------------- |
 | **URL**          | `PUT /api/v1/don-hang` |
 | **Method**       | `PUT`                  |
 | **Content-Type** | `application/json`     |
-| **XÃ¡c thá»±c**     | Bearer Token (JWT)     |
+| **Xác thực**     | Bearer Token (JWT)     |
 
 **Request Body:** `ReqCapNhatDonHangDTO`
 
@@ -420,12 +420,12 @@ GET /api/v1/don-hang?trangThai=1&hinhThucDonHang=1&page=0&size=10&sort=ngayTao,d
 {
   "id": 4,
   "trangThai": 1,
-  "diaChi": "789 Tráº§n HÆ°ng Äáº¡o, Q.5, TP.HCM",
+  "diaChi": "789 Trần Hưng Đạo, Q.5, TP.HCM",
   "sdt": "0944000004"
 }
 ```
 
-**Kiá»ƒu dá»¯ liá»‡u:**
+**Kiểu dữ liệu:**
 
 ```json
 {
@@ -436,65 +436,65 @@ GET /api/v1/don-hang?trangThai=1&hinhThucDonHang=1&page=0&size=10&sort=ngayTao,d
 }
 ```
 
-| TrÆ°á»ng      | Kiá»ƒu    | Báº¯t buá»™c | MÃ´ táº£                                              |
+| Trường      | Kiểu    | Bắt buộc | Mô tả                                              |
 | ----------- | ------- | -------- | -------------------------------------------------- |
-| `id`        | Long    | **CÃ³**   | MÃ£ Ä‘Æ¡n hÃ ng cáº§n cáº­p nháº­t                           |
-| `trangThai` | Integer | KhÃ´ng    | Tráº¡ng thÃ¡i má»›i (0-5, theo luá»“ng chuyá»ƒn tráº¡ng thÃ¡i) |
-| `diaChi`    | String  | KhÃ´ng    | Äá»‹a chá»‰ má»›i (chá»‰ cáº­p nháº­t khi trangThai < 2)       |
-| `sdt`       | String  | KhÃ´ng    | SÄT má»›i (chá»‰ cáº­p nháº­t khi trangThai < 2)           |
+| `id`        | Long    | **Có**   | Mã đơn hàng cần cập nhật                           |
+| `trangThai` | Integer | Không    | Trạng thái mới (0-5, theo luồng chuyển trạng thái) |
+| `diaChi`    | String  | Không    | Địa chỉ mới (chỉ cập nhật khi trangThai < 2)       |
+| `sdt`       | String  | Không    | SĐT mới (chỉ cập nhật khi trangThai < 2)           |
 
-**Response:** `200 OK` â€” Tráº£ vá» `ResDonHangDTO`
+**Response:** `200 OK` — Trả về `ResDonHangDTO`
 
-> **Quan trá»ng - Cá»™ng Ä‘iá»ƒm tÃ­ch lÅ©y:**
-> Khi `trangThai` Ä‘Æ°á»£c chuyá»ƒn sang **5 (ÄÃ£ nháº­n hÃ ng)** tá»« tráº¡ng thÃ¡i 3:
+> **Quan trọng - Cộng điểm tích lũy:**
+> Khi `trangThai` được chuyển sang **5 (Đã nhận hàng)** từ trạng thái 3:
 >
-> - Há»‡ thá»‘ng tá»± Ä‘á»™ng tÃ­nh Ä‘iá»ƒm: `(tongTienTra / 100.000) Ã— 10`
-> - Cá»™ng Ä‘iá»ƒm vÃ o `KhachHang.diemTichLuy`
+> - Hệ thống tự động tính điểm: `(tongTienTra / 100.000) × 10`
+> - Cộng điểm vào `KhachHang.diemTichLuy`
 
-> **GÃ¡n nhÃ¢n viÃªn tá»± Ä‘á»™ng:**
-> Khi nhÃ¢n viÃªn cáº­p nháº­t tráº¡ng thÃ¡i Ä‘Æ¡n hÃ ng online (1â†’2â†’3), há»‡ thá»‘ng tá»± Ä‘á»™ng gÃ¡n nhÃ¢n viÃªn Ä‘ang thao tÃ¡c vÃ o Ä‘Æ¡n hÃ ng.
+> **Gán nhân viên tự động:**
+> Khi nhân viên cập nhật trạng thái đơn hàng online (1→2→3), hệ thống tự động gán nhân viên đang thao tác vào đơn hàng.
 
-**Lá»—i:**
+**Lỗi:**
 
-| HTTP Status | MÃ´ táº£                                                           |
+| HTTP Status | Mô tả                                                           |
 | ----------- | --------------------------------------------------------------- |
-| `400`       | MÃ£ Ä‘Æ¡n hÃ ng khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng                                 |
-| `400`       | KhÃ´ng tÃ¬m tháº¥y Ä‘Æ¡n hÃ ng                                         |
-| `400`       | KhÃ´ng thá»ƒ chuyá»ƒn tráº¡ng thÃ¡i tá»« X sang Y                         |
-| `400`       | KhÃ´ng thá»ƒ cáº­p nháº­t Ä‘á»‹a chá»‰ khi Ä‘Æ¡n hÃ ng Ä‘Ã£ Ä‘Ã³ng gÃ³i hoáº·c Ä‘Ã£ gá»­i |
+| `400`       | Mã đơn hàng không được để trống                                 |
+| `400`       | Không tìm thấy đơn hàng                                         |
+| `400`       | Không thể chuyển trạng thái từ X sang Y                         |
+| `400`       | Không thể cập nhật địa chỉ khi đơn hàng đã đóng gói hoặc đã gửi |
 
 ---
 
-## 6. XÃ³a Ä‘Æ¡n hÃ ng
+## 6. Xóa đơn hàng
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t                       |
+| Thuộc tính   | Chi tiết                       |
 | ------------ | ------------------------------ |
 | **URL**      | `DELETE /api/v1/don-hang/{id}` |
 | **Method**   | `DELETE`                       |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)             |
+| **Xác thực** | Bearer Token (JWT)             |
 
 **Path Parameters:**
 
-| Tham sá»‘ | Kiá»ƒu | MÃ´ táº£       |
+| Tham số | Kiểu | Mô tả       |
 | ------- | ---- | ----------- |
-| `id`    | Long | MÃ£ Ä‘Æ¡n hÃ ng |
+| `id`    | Long | Mã đơn hàng |
 
 **Response:** `204 No Content`
 
-**Lá»—i:**
+**Lỗi:**
 
-| HTTP Status | MÃ´ táº£                   |
+| HTTP Status | Mô tả                   |
 | ----------- | ----------------------- |
-| `400`       | KhÃ´ng tÃ¬m tháº¥y Ä‘Æ¡n hÃ ng |
+| `400`       | Không tìm thấy đơn hàng |
 
 ---
 
-## PhÃ¢n quyá»n
+## Phân quyền
 
-| Vai trÃ²    | GET (Xem)       | POST Online | POST Táº¡i quáº§y | PUT (Sá»­a) | DELETE (XÃ³a) |
+| Vai trò    | GET (Xem)       | POST Online | POST Tại quầy | PUT (Sửa) | DELETE (Xóa) |
 | ---------- | --------------- | ----------- | ------------- | --------- | ------------ |
-| ADMIN      | âœ… Táº¥t cáº£       | âŒ          | âœ…            | âœ…        | âœ…           |
-| NHAN_VIEN  | âœ… Táº¥t cáº£       | âŒ          | âœ…            | âŒ        | âŒ           |
-| KHACH_HANG | âœ… Chá»‰ Ä‘Æ¡n mÃ¬nh | âœ…          | âŒ            | âŒ        | âŒ           |
+| ADMIN      | ✅ Tất cả       | ❌          | ✅            | ✅        | ✅           |
+| NHAN_VIEN  | ✅ Tất cả       | ❌          | ✅            | ❌        | ❌           |
+| KHACH_HANG | ✅ Chỉ đơn mình | ✅          | ❌            | ❌        | ❌           |
 
 

@@ -37,6 +37,9 @@ public class KhachHang {
     @Column(name = "RefreshToken", columnDefinition = "MEDIUMTEXT")
     private String refreshToken;
 
+    @Column(name = "Avatar", columnDefinition = "MEDIUMTEXT")
+    private String avatar;
+
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")

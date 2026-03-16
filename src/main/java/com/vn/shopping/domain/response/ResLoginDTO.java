@@ -26,6 +26,7 @@ public class ResLoginDTO {
         private String email;
         private String name;
         private String sdt;
+        private String avatar;
         @JsonIgnoreProperties("permissions")
         private Role role;
         private Integer diemTichLuy;

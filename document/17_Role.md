@@ -1,62 +1,62 @@
-﻿# Role Controller
+# Role Controller
 
 > **Base Path:** `/api/v1/roles`  
 > **File:** `RoleController.java`  
-> Quáº£n lÃ½ vai trÃ² (Role) trong há»‡ thá»‘ng phÃ¢n quyá»n.
+> Quản lý vai trò (Role) trong hệ thống phân quyền.
 
 ---
 
-## Tá»•ng quan
+## Tổng quan
 
-Há»‡ thá»‘ng sá»­ dá»¥ng **RBAC** (Role-Based Access Control). Má»—i vai trÃ² gáº¯n vá»›i cÃ¡c quyá»n (Permission) qua quan há»‡ **nhiá»u-nhiá»u**.
+Hệ thống sử dụng **RBAC** (Role-Based Access Control). Mỗi vai trò gắn với các quyền (Permission) qua quan hệ **nhiều-nhiều**.
 
-### Vai trÃ² máº·c Ä‘á»‹nh
+### Vai trò mặc định
 
-| ID  | Name       | MÃ´ táº£              |
+| ID  | Name       | Mô tả              |
 | --- | ---------- | ------------------ |
-| 1   | ADMIN      | Quáº£n trá»‹ há»‡ thá»‘ng  |
-| 2   | NHAN_VIEN  | NhÃ¢n viÃªn bÃ¡n hÃ ng |
-| 3   | KHACH_HANG | KhÃ¡ch hÃ ng         |
+| 1   | ADMIN      | Quản trị hệ thống  |
+| 2   | NHAN_VIEN  | Nhân viên bán hàng |
+| 3   | KHACH_HANG | Khách hàng         |
 
-### Cáº¥u trÃºc dá»¯ liá»‡u `Role`
+### Cấu trúc dữ liệu `Role`
 
-| TrÆ°á»ng        | Kiá»ƒu               | MÃ´ táº£                            |
+| Trường        | Kiểu               | Mô tả                            |
 | ------------- | ------------------ | -------------------------------- |
-| `id`          | Long               | MÃ£ vai trÃ² (auto-increment)      |
-| `name`        | String (NotBlank)  | TÃªn vai trÃ² (unique)             |
-| `description` | String             | MÃ´ táº£                            |
-| `active`      | boolean            | Tráº¡ng thÃ¡i kÃ­ch hoáº¡t             |
-| `permissions` | List\<Permission\> | Danh sÃ¡ch quyá»n (ManyToMany)     |
-| `createdAt`   | Instant            | NgÃ y táº¡o (tá»± Ä‘á»™ng â€” audit)       |
-| `updatedAt`   | Instant            | NgÃ y cáº­p nháº­t (tá»± Ä‘á»™ng â€” audit)  |
-| `createdBy`   | String             | NgÆ°á»i táº¡o (tá»± Ä‘á»™ng â€” audit)      |
-| `updatedBy`   | String             | NgÆ°á»i cáº­p nháº­t (tá»± Ä‘á»™ng â€” audit) |
+| `id`          | Long               | Mã vai trò (auto-increment)      |
+| `name`        | String (NotBlank)  | Tên vai trò (unique)             |
+| `description` | String             | Mô tả                            |
+| `active`      | boolean            | Trạng thái kích hoạt             |
+| `permissions` | List\<Permission\> | Danh sách quyền (ManyToMany)     |
+| `createdAt`   | Instant            | Ngày tạo (tự động — audit)       |
+| `updatedAt`   | Instant            | Ngày cập nhật (tự động — audit)  |
+| `createdBy`   | String             | Người tạo (tự động — audit)      |
+| `updatedBy`   | String             | Người cập nhật (tự động — audit) |
 
-> **LÆ°u Ã½:** TrÆ°á»ng `createdBy`/`updatedBy` tá»± Ä‘á»™ng láº¥y tá»« JWT token (SecurityContext) qua `SecurityUtil.getCurrentUserLogin()`.
+> **Lưu ý:** Trường `createdBy`/`updatedBy` tự động lấy từ JWT token (SecurityContext) qua `SecurityUtil.getCurrentUserLogin()`.
 
 ---
 
-## 1. Láº¥y danh sÃ¡ch vai trÃ²
+## 1. Lấy danh sách vai trò
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t            |
+| Thuộc tính   | Chi tiết            |
 | ------------ | ------------------- |
 | **URL**      | `GET /api/v1/roles` |
 | **Method**   | `GET`               |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)  |
+| **Xác thực** | Bearer Token (JWT)  |
 
-**Response:** `200 OK` â€” Tráº£ vá» `List<Role>`
+**Response:** `200 OK` — Trả về `List<Role>`
 
 ```json
 [
   {
     "id": 1,
     "name": "ADMIN",
-    "description": "Quáº£n trá»‹ há»‡ thá»‘ng",
+    "description": "Quản trị hệ thống",
     "active": true,
     "permissions": [
       {
         "id": 1,
-        "name": "Xem sáº£n pháº©m",
+        "name": "Xem sản phẩm",
         "apiPath": "/api/v1/san-pham",
         "method": "GET",
         "module": "SAN_PHAM"
@@ -68,7 +68,7 @@ Há»‡ thá»‘ng sá»­ dá»¥ng **RBAC** (Role-Based Access Control). Má
 ]
 ```
 
-**Kiá»ƒu dá»¯ liá»‡u:**
+**Kiểu dữ liệu:**
 
 ```json
 [
@@ -94,45 +94,45 @@ Há»‡ thá»‘ng sá»­ dá»¥ng **RBAC** (Role-Based Access Control). Má
 
 ---
 
-## 2. Láº¥y vai trÃ² theo ID
+## 2. Lấy vai trò theo ID
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t                 |
+| Thuộc tính   | Chi tiết                 |
 | ------------ | ------------------------ |
 | **URL**      | `GET /api/v1/roles/{id}` |
 | **Method**   | `GET`                    |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)       |
+| **Xác thực** | Bearer Token (JWT)       |
 
-**Response:** `200 OK` â€” Tráº£ vá» `Role`
+**Response:** `200 OK` — Trả về `Role`
 
-**Lá»—i:**
+**Lỗi:**
 
-| HTTP Status | MÃ´ táº£                  |
+| HTTP Status | Mô tả                  |
 | ----------- | ---------------------- |
-| `400`       | KhÃ´ng tÃ¬m tháº¥y vai trÃ² |
+| `400`       | Không tìm thấy vai trò |
 
 ---
 
-## 3. Táº¡o vai trÃ²
+## 3. Tạo vai trò
 
-| Thuá»™c tÃ­nh       | Chi tiáº¿t             |
+| Thuộc tính       | Chi tiết             |
 | ---------------- | -------------------- |
 | **URL**          | `POST /api/v1/roles` |
 | **Method**       | `POST`               |
 | **Content-Type** | `application/json`   |
-| **XÃ¡c thá»±c**     | Bearer Token (JWT)   |
+| **Xác thực**     | Bearer Token (JWT)   |
 
 **Request Body:**
 
 ```json
 {
   "name": "SUPERVISOR",
-  "description": "GiÃ¡m sÃ¡t viÃªn",
+  "description": "Giám sát viên",
   "active": true,
   "permissions": [{ "id": 1 }, { "id": 2 }, { "id": 3 }]
 }
 ```
 
-**Kiá»ƒu dá»¯ liá»‡u:**
+**Kiểu dữ liệu:**
 
 ```json
 {
@@ -147,45 +147,45 @@ Há»‡ thá»‘ng sá»­ dá»¥ng **RBAC** (Role-Based Access Control). Má
 }
 ```
 
-| TrÆ°á»ng        | Báº¯t buá»™c | MÃ´ táº£                   |
+| Trường        | Bắt buộc | Mô tả                   |
 | ------------- | -------- | ----------------------- |
-| `name`        | **CÃ³**   | TÃªn vai trÃ² (unique)    |
-| `description` | KhÃ´ng    | MÃ´ táº£                   |
-| `active`      | KhÃ´ng    | Tráº¡ng thÃ¡i              |
-| `permissions` | KhÃ´ng    | Ds quyá»n (chá»‰ cáº§n `id`) |
+| `name`        | **Có**   | Tên vai trò (unique)    |
+| `description` | Không    | Mô tả                   |
+| `active`      | Không    | Trạng thái              |
+| `permissions` | Không    | Ds quyền (chỉ cần `id`) |
 
-**Response:** `201 Created` â€” Tráº£ vá» `Role`
+**Response:** `201 Created` — Trả về `Role`
 
-**Lá»—i:**
+**Lỗi:**
 
-| HTTP Status | MÃ´ táº£                  |
+| HTTP Status | Mô tả                  |
 | ----------- | ---------------------- |
-| `400`       | TÃªn vai trÃ² Ä‘Ã£ tá»“n táº¡i |
+| `400`       | Tên vai trò đã tồn tại |
 
 ---
 
-## 4. Cáº­p nháº­t vai trÃ²
+## 4. Cập nhật vai trò
 
-| Thuá»™c tÃ­nh       | Chi tiáº¿t            |
+| Thuộc tính       | Chi tiết            |
 | ---------------- | ------------------- |
 | **URL**          | `PUT /api/v1/roles` |
 | **Method**       | `PUT`               |
 | **Content-Type** | `application/json`  |
-| **XÃ¡c thá»±c**     | Bearer Token (JWT)  |
+| **Xác thực**     | Bearer Token (JWT)  |
 
-**Request Body:** (pháº£i cÃ³ `id`)
+**Request Body:** (phải có `id`)
 
 ```json
 {
   "id": 5,
   "name": "SUPERVISOR",
-  "description": "GiÃ¡m sÃ¡t viÃªn â€” cáº­p nháº­t",
+  "description": "Giám sát viên — cập nhật",
   "active": true,
   "permissions": [{ "id": 1 }, { "id": 2 }]
 }
 ```
 
-**Kiá»ƒu dá»¯ liá»‡u:**
+**Kiểu dữ liệu:**
 
 ```json
 {
@@ -201,40 +201,40 @@ Há»‡ thá»‘ng sá»­ dá»¥ng **RBAC** (Role-Based Access Control). Má
 }
 ```
 
-**Response:** `200 OK` â€” Tráº£ vá» `Role`
+**Response:** `200 OK` — Trả về `Role`
 
-**Lá»—i:**
+**Lỗi:**
 
-| HTTP Status | MÃ´ táº£                  |
+| HTTP Status | Mô tả                  |
 | ----------- | ---------------------- |
-| `400`       | KhÃ´ng tÃ¬m tháº¥y vai trÃ² |
+| `400`       | Không tìm thấy vai trò |
 
 ---
 
-## 5. XÃ³a vai trÃ²
+## 5. Xóa vai trò
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t                    |
+| Thuộc tính   | Chi tiết                    |
 | ------------ | --------------------------- |
 | **URL**      | `DELETE /api/v1/roles/{id}` |
 | **Method**   | `DELETE`                    |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)          |
+| **Xác thực** | Bearer Token (JWT)          |
 
 **Response:** `204 No Content`
 
-**Lá»—i:**
+**Lỗi:**
 
-| HTTP Status | MÃ´ táº£                  |
+| HTTP Status | Mô tả                  |
 | ----------- | ---------------------- |
-| `400`       | KhÃ´ng tÃ¬m tháº¥y vai trÃ² |
+| `400`       | Không tìm thấy vai trò |
 
 ---
 
-## PhÃ¢n quyá»n
+## Phân quyền
 
-| Vai trÃ²    | GET | POST | PUT | DELETE |
+| Vai trò    | GET | POST | PUT | DELETE |
 | ---------- | --- | ---- | --- | ------ |
-| ADMIN      | âœ…  | âœ…   | âœ…  | âœ…     |
-| NHAN_VIEN  | âŒ  | âŒ   | âŒ  | âŒ     |
-| KHACH_HANG | âŒ  | âŒ   | âŒ  | âŒ     |
+| ADMIN      | ✅  | ✅   | ✅  | ✅     |
+| NHAN_VIEN  | ❌  | ❌   | ❌  | ❌     |
+| KHACH_HANG | ❌  | ❌   | ❌  | ❌     |
 
 

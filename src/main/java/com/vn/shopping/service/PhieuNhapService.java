@@ -24,8 +24,10 @@ import com.vn.shopping.repository.ChiTietPhieuNhapRepository;
 import com.vn.shopping.repository.ChiTietSanPhamRepository;
 import com.vn.shopping.repository.CuaHangRepository;
 import com.vn.shopping.repository.NhaCungCapRepository;
+import com.vn.shopping.repository.NhanVienRepository;
 import com.vn.shopping.repository.PhieuNhapRepository;
 import com.vn.shopping.repository.SanPhamRepository;
+import com.vn.shopping.util.SecurityUtil;
 import com.vn.shopping.util.error.IdInvalidException;
 
 @Service
@@ -44,19 +46,22 @@ public class PhieuNhapService {
     private final SanPhamRepository sanPhamRepository;
     private final CuaHangRepository cuaHangRepository;
     private final NhaCungCapRepository nhaCungCapRepository;
+    private final NhanVienRepository nhanVienRepository;
 
     public PhieuNhapService(PhieuNhapRepository phieuNhapRepository,
             ChiTietPhieuNhapRepository chiTietPhieuNhapRepository,
             ChiTietSanPhamRepository chiTietSanPhamRepository,
             SanPhamRepository sanPhamRepository,
             CuaHangRepository cuaHangRepository,
-            NhaCungCapRepository nhaCungCapRepository) {
+            NhaCungCapRepository nhaCungCapRepository,
+            NhanVienRepository nhanVienRepository) {
         this.phieuNhapRepository = phieuNhapRepository;
         this.chiTietPhieuNhapRepository = chiTietPhieuNhapRepository;
         this.chiTietSanPhamRepository = chiTietSanPhamRepository;
         this.sanPhamRepository = sanPhamRepository;
         this.cuaHangRepository = cuaHangRepository;
         this.nhaCungCapRepository = nhaCungCapRepository;
+        this.nhanVienRepository = nhanVienRepository;
     }
 
     public PhieuNhap create(ReqPhieuNhapDTO dto) throws IdInvalidException {
@@ -86,6 +91,10 @@ public class PhieuNhapService {
 
         Integer oldTrangThai = existing.getTrangThai();
         Integer newTrangThai = dto.getTrangThai();
+        boolean allowCompleteFromThieu = oldTrangThai != null
+                && oldTrangThai == TRANG_THAI_THIEU_HANG
+                && newTrangThai != null
+                && newTrangThai == TRANG_THAI_HOAN_THANH;
 
         // Không cho phép cập nhật đơn đã hủy
         if (oldTrangThai != null && oldTrangThai == TRANG_THAI_HUY) {
@@ -101,9 +110,19 @@ public class PhieuNhapService {
         // thủ công
         if (oldTrangThai != null
                 && (oldTrangThai == TRANG_THAI_DA_NHAN || oldTrangThai == TRANG_THAI_THIEU_HANG)
-                && newTrangThai != null && newTrangThai != oldTrangThai) {
+                && newTrangThai != null && newTrangThai != oldTrangThai
+                && !allowCompleteFromThieu) {
             throw new IdInvalidException(
                     "Không thể thay đổi trạng thái thủ công khi phiếu đã nhận hàng. Hãy dùng chức năng kiểm kê.");
+        }
+
+        if (allowCompleteFromThieu) {
+            if (!isCurrentUserAdmin()) {
+                throw new IdInvalidException("Chỉ ADMIN mới có quyền hoàn thành phiếu nhập thiếu hàng");
+            }
+            // Đồng bộ lại số lượng tồn kho theo số lượng thực nhập (trừ thiếu) trước khi
+            // hoàn thành.
+            capNhatSoLuongSauNhapHang(existing.getId());
         }
 
         // Validate trạng thái hợp lệ (0, 1, 2, 3, 4, 5)
@@ -140,6 +159,18 @@ public class PhieuNhapService {
         }
 
         return saved;
+    }
+
+    private boolean isCurrentUserAdmin() {
+        String email = SecurityUtil.getCurrentUserLogin().orElse("");
+        if (email.isBlank()) {
+            return false;
+        }
+        return nhanVienRepository.findByEmail(email)
+                .map(nv -> nv.getRole() != null
+                        && nv.getRole().getName() != null
+                        && "ADMIN".equalsIgnoreCase(nv.getRole().getName().trim()))
+                .orElse(false);
     }
 
     /**

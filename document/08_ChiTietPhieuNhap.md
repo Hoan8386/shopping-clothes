@@ -1,68 +1,68 @@
-﻿# Chi Tiáº¿t Phiáº¿u Nháº­p Controller
+# Chi Tiết Phiếu Nhập Controller
 
 > **Base Path:** `/api/v1/chi-tiet-phieu-nhap`  
 > **File:** `ChiTietPhieuNhapController.java`  
-> Quáº£n lÃ½ chi tiáº¿t phiáº¿u nháº­p hÃ ng (tá»«ng dÃ²ng sáº£n pháº©m trong phiáº¿u nháº­p).
+> Quản lý chi tiết phiếu nhập hàng (từng dòng sản phẩm trong phiếu nhập).
 
 ---
 
-## Tá»•ng quan
+## Tổng quan
 
-### Cáº¥u trÃºc dá»¯ liá»‡u `ChiTietPhieuNhap`
+### Cấu trúc dữ liệu `ChiTietPhieuNhap`
 
-| TrÆ°á»ng           | Kiá»ƒu           | MÃ´ táº£                                            |
+| Trường           | Kiểu           | Mô tả                                            |
 | ---------------- | -------------- | ------------------------------------------------ |
-| `id`             | Long           | MÃ£ chi tiáº¿t phiáº¿u nháº­p (auto-increment)          |
-| `phieuNhap`      | PhieuNhap      | Phiáº¿u nháº­p cha (FK, áº©n trong JSON)               |
-| `chiTietSanPham` | ChiTietSanPham | Biáº¿n thá»ƒ sáº£n pháº©m Ä‘Æ°á»£c nháº­p (FK)                 |
-| `soLuong`        | Integer        | Sá»‘ lÆ°á»£ng nháº­p theo phiáº¿u                         |
-| `soLuongThieu`   | Integer        | Sá»‘ lÆ°á»£ng thiáº¿u (dÃ¹ng khi kiá»ƒm kÃª)                |
-| `soLuongDaNhap`  | Integer        | Sá»‘ lÆ°á»£ng Ä‘Ã£ thá»±c nháº­p vÃ o kho (tÃ­nh sau kiá»ƒm kÃª) |
-| `ghiTru`         | String(255)    | Ghi chÃº trá»«                                      |
-| `ghiTruKiemHang` | String(255)    | Ghi chÃº kiá»ƒm hÃ ng                                |
-| `trangThai`      | Integer        | Tráº¡ng thÃ¡i (0: Äá»§, 1: Thiáº¿u)                     |
-| `ngayTao`        | LocalDateTime  | NgÃ y táº¡o (tá»± Ä‘á»™ng)                               |
-| `ngayCapNhat`    | LocalDateTime  | NgÃ y cáº­p nháº­t (tá»± Ä‘á»™ng)                          |
+| `id`             | Long           | Mã chi tiết phiếu nhập (auto-increment)          |
+| `phieuNhap`      | PhieuNhap      | Phiếu nhập cha (FK, ẩn trong JSON)               |
+| `chiTietSanPham` | ChiTietSanPham | Biến thể sản phẩm được nhập (FK)                 |
+| `soLuong`        | Integer        | Số lượng nhập theo phiếu                         |
+| `soLuongThieu`   | Integer        | Số lượng thiếu (dùng khi kiểm kê)                |
+| `soLuongDaNhap`  | Integer        | Số lượng đã thực nhập vào kho (tính sau kiểm kê) |
+| `ghiTru`         | String(255)    | Ghi chú trừ                                      |
+| `ghiTruKiemHang` | String(255)    | Ghi chú kiểm hàng                                |
+| `trangThai`      | Integer        | Trạng thái (0: Đủ, 1: Thiếu)                     |
+| `ngayTao`        | LocalDateTime  | Ngày tạo (tự động)                               |
+| `ngayCapNhat`    | LocalDateTime  | Ngày cập nhật (tự động)                          |
 
-### MÃ£ tráº¡ng thÃ¡i chi tiáº¿t phiáº¿u nháº­p (`trangThai`)
+### Mã trạng thái chi tiết phiếu nhập (`trangThai`)
 
-| GiÃ¡ trá»‹ | Ã nghÄ©a | `trangThaiText` |
+| Giá trị | Ý nghĩa | `trangThaiText` |
 | ------- | ------- | --------------- |
-| `0`     | Äá»§      | "Äá»§"            |
-| `1`     | Thiáº¿u   | "Thiáº¿u"         |
+| `0`     | Đủ      | "Đủ"            |
+| `1`     | Thiếu   | "Thiếu"         |
 
 ---
 
-## 1. Láº¥y danh sÃ¡ch chi tiáº¿t phiáº¿u nháº­p
+## 1. Lấy danh sách chi tiết phiếu nhập
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t                          |
+| Thuộc tính   | Chi tiết                          |
 | ------------ | --------------------------------- |
 | **URL**      | `GET /api/v1/chi-tiet-phieu-nhap` |
 | **Method**   | `GET`                             |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)                |
+| **Xác thực** | Bearer Token (JWT)                |
 
-**Response:** `200 OK` â€” Tráº£ vá» `List<ResChiTietPhieuNhapDTO>`
+**Response:** `200 OK` — Trả về `List<ResChiTietPhieuNhapDTO>`
 
 ```json
 [
   {
     "id": 1,
     "phieuNhapId": 1,
-    "tenPhieuNhap": "Nháº­p hÃ ng Ä‘á»£t 1 - CN Q.1",
+    "tenPhieuNhap": "Nhập hàng đợt 1 - CN Q.1",
     "chiTietSanPham": {
       "id": 1,
       "soLuong": 7,
-      "tenSanPham": "Ão Oxford",
-      "tenMauSac": "Tráº¯ng",
+      "tenSanPham": "Áo Oxford",
+      "tenMauSac": "Trắng",
       "tenKichThuoc": "M"
     },
     "soLuong": 10,
     "soLuongThieu": 3,
     "soLuongDaNhap": 7,
     "ghiTru": null,
-    "ghiTruKiemHang": "Thiáº¿u 3 cÃ¡i do hÆ° há»ng",
+    "ghiTruKiemHang": "Thiếu 3 cái do hư hỏng",
     "trangThai": 1,
-    "trangThaiText": "Thiáº¿u",
+    "trangThaiText": "Thiếu",
     "ngayTao": "2026-03-01T10:00:00",
     "ngayCapNhat": "2026-03-03T10:00:00"
   }
@@ -71,50 +71,50 @@
 
 ---
 
-## 2. Láº¥y chi tiáº¿t phiáº¿u nháº­p theo ID
+## 2. Lấy chi tiết phiếu nhập theo ID
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t                               |
+| Thuộc tính   | Chi tiết                               |
 | ------------ | -------------------------------------- |
 | **URL**      | `GET /api/v1/chi-tiet-phieu-nhap/{id}` |
 | **Method**   | `GET`                                  |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)                     |
+| **Xác thực** | Bearer Token (JWT)                     |
 
-**Response:** `200 OK` â€” Tráº£ vá» `ResChiTietPhieuNhapDTO`
+**Response:** `200 OK` — Trả về `ResChiTietPhieuNhapDTO`
 
-**Lá»—i:**
+**Lỗi:**
 
-| HTTP Status | MÃ´ táº£                              |
+| HTTP Status | Mô tả                              |
 | ----------- | ---------------------------------- |
-| `400`       | KhÃ´ng tÃ¬m tháº¥y chi tiáº¿t phiáº¿u nháº­p |
+| `400`       | Không tìm thấy chi tiết phiếu nhập |
 
 ---
 
-## 3. Láº¥y chi tiáº¿t theo mÃ£ phiáº¿u nháº­p
+## 3. Lấy chi tiết theo mã phiếu nhập
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t                                                   |
+| Thuộc tính   | Chi tiết                                                   |
 | ------------ | ---------------------------------------------------------- |
 | **URL**      | `GET /api/v1/chi-tiet-phieu-nhap/phieu-nhap/{phieuNhapId}` |
 | **Method**   | `GET`                                                      |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)                                         |
+| **Xác thực** | Bearer Token (JWT)                                         |
 
 **Path Parameters:**
 
-| Tham sá»‘       | Kiá»ƒu | MÃ´ táº£         |
+| Tham số       | Kiểu | Mô tả         |
 | ------------- | ---- | ------------- |
-| `phieuNhapId` | Long | MÃ£ phiáº¿u nháº­p |
+| `phieuNhapId` | Long | Mã phiếu nhập |
 
-**Response:** `200 OK` â€” Tráº£ vá» `List<ResChiTietPhieuNhapDTO>`
+**Response:** `200 OK` — Trả về `List<ResChiTietPhieuNhapDTO>`
 
 ---
 
-## 4. Táº¡o chi tiáº¿t phiáº¿u nháº­p
+## 4. Tạo chi tiết phiếu nhập
 
-| Thuá»™c tÃ­nh       | Chi tiáº¿t                           |
+| Thuộc tính       | Chi tiết                           |
 | ---------------- | ---------------------------------- |
 | **URL**          | `POST /api/v1/chi-tiet-phieu-nhap` |
 | **Method**       | `POST`                             |
 | **Content-Type** | `application/json`                 |
-| **XÃ¡c thá»±c**     | Bearer Token (JWT)                 |
+| **Xác thực**     | Bearer Token (JWT)                 |
 
 **Request Body:** `ReqChiTietPhieuNhapDTO`
 
@@ -130,7 +130,7 @@
 }
 ```
 
-**Kiá»ƒu dá»¯ liá»‡u:**
+**Kiểu dữ liệu:**
 
 ```json
 {
@@ -144,33 +144,33 @@
 }
 ```
 
-**Response:** `201 Created` â€” Tráº£ vá» `ResChiTietPhieuNhapDTO`
+**Response:** `201 Created` — Trả về `ResChiTietPhieuNhapDTO`
 
-**Quy táº¯c:**
+**Quy tắc:**
 
-- Chá»‰ Ä‘Æ°á»£c thÃªm chi tiáº¿t khi phiáº¿u nháº­p Ä‘ang á»Ÿ tráº¡ng thÃ¡i **ÄÃ£ Ä‘áº·t** (0) hoáº·c **Cháº­m giao** (2)
-- KhÃ´ng Ä‘Æ°á»£c thÃªm chi tiáº¿t khi phiáº¿u Ä‘Ã£ á»Ÿ tráº¡ng thÃ¡i **ÄÃ£ nháº­n** (1), **Thiáº¿u hÃ ng** (4), **HoÃ n thÃ nh** (5) hoáº·c **Há»§y** (3)
+- Chỉ được thêm chi tiết khi phiếu nhập đang ở trạng thái **Đã đặt** (0) hoặc **Chậm giao** (2)
+- Không được thêm chi tiết khi phiếu đã ở trạng thái **Đã nhận** (1), **Thiếu hàng** (4), **Hoàn thành** (5) hoặc **Hủy** (3)
 
-**Lá»—i:**
+**Lỗi:**
 
-| HTTP Status | MÃ´ táº£                                                        |
+| HTTP Status | Mô tả                                                        |
 | ----------- | ------------------------------------------------------------ |
-| `400`       | KhÃ´ng tÃ¬m tháº¥y phiáº¿u nháº­p                                    |
-| `400`       | KhÃ´ng thá»ƒ thÃªm chi tiáº¿t cho phiáº¿u nháº­p á»Ÿ tráº¡ng thÃ¡i hiá»‡n táº¡i |
-| `400`       | KhÃ´ng tÃ¬m tháº¥y chi tiáº¿t sáº£n pháº©m                             |
+| `400`       | Không tìm thấy phiếu nhập                                    |
+| `400`       | Không thể thêm chi tiết cho phiếu nhập ở trạng thái hiện tại |
+| `400`       | Không tìm thấy chi tiết sản phẩm                             |
 
 ---
 
-## 5. Cáº­p nháº­t chi tiáº¿t phiáº¿u nháº­p
+## 5. Cập nhật chi tiết phiếu nhập
 
-| Thuá»™c tÃ­nh       | Chi tiáº¿t                          |
+| Thuộc tính       | Chi tiết                          |
 | ---------------- | --------------------------------- |
 | **URL**          | `PUT /api/v1/chi-tiet-phieu-nhap` |
 | **Method**       | `PUT`                             |
 | **Content-Type** | `application/json`                |
-| **XÃ¡c thá»±c**     | Bearer Token (JWT)                |
+| **Xác thực**     | Bearer Token (JWT)                |
 
-**Request Body:** `ReqChiTietPhieuNhapDTO` (pháº£i cÃ³ `id`)
+**Request Body:** `ReqChiTietPhieuNhapDTO` (phải có `id`)
 
 ```json
 {
@@ -180,16 +180,16 @@
   "soLuong": 50,
   "soLuongThieu": 0,
   "ghiTru": null,
-  "ghiTruKiemHang": "ÄÃ£ kiá»ƒm tra Ä‘á»§",
+  "ghiTruKiemHang": "Đã kiểm tra đủ",
   "trangThai": 0
 }
 ```
 
-**Kiá»ƒu dá»¯ liá»‡u:**
+**Kiểu dữ liệu:**
 
 ```json
 {
-  "id": "Long (báº¯t buá»™c)",
+  "id": "Long (bắt buộc)",
   "phieuNhapId": "Long",
   "chiTietSanPhamId": "Long",
   "soLuong": "Integer",
@@ -200,50 +200,50 @@
 }
 ```
 
-**Response:** `200 OK` â€” Tráº£ vá» `ResChiTietPhieuNhapDTO`
+**Response:** `200 OK` — Trả về `ResChiTietPhieuNhapDTO`
 
-**Quy táº¯c:**
+**Quy tắc:**
 
-- Chá»‰ Ä‘Æ°á»£c cáº­p nháº­t khi phiáº¿u nháº­p cha Ä‘ang á»Ÿ tráº¡ng thÃ¡i **ÄÃ£ Ä‘áº·t** (0), **ÄÃ£ nháº­n** (1), **Cháº­m giao** (2) hoáº·c **Thiáº¿u hÃ ng** (4)
-- KhÃ´ng Ä‘Æ°á»£c cáº­p nháº­t khi phiáº¿u Ä‘Ã£ **HoÃ n thÃ nh** (5) hoáº·c **Há»§y** (3)
-- Sau khi cáº­p nháº­t chi tiáº¿t á»Ÿ phiáº¿u **Thiáº¿u hÃ ng** (4), gá»i kiá»ƒm kÃª láº¡i Ä‘á»ƒ cáº­p nháº­t tá»“n kho
+- Chỉ được cập nhật khi phiếu nhập cha đang ở trạng thái **Đã đặt** (0), **Đã nhận** (1), **Chậm giao** (2) hoặc **Thiếu hàng** (4)
+- Không được cập nhật khi phiếu đã **Hoàn thành** (5) hoặc **Hủy** (3)
+- Sau khi cập nhật chi tiết ở phiếu **Thiếu hàng** (4), gọi kiểm kê lại để cập nhật tồn kho
 
-**Lá»—i:**
+**Lỗi:**
 
-| HTTP Status | MÃ´ táº£                                                                   |
+| HTTP Status | Mô tả                                                                   |
 | ----------- | ----------------------------------------------------------------------- |
-| `400`       | MÃ£ chi tiáº¿t phiáº¿u nháº­p khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng                              |
-| `400`       | KhÃ´ng tÃ¬m tháº¥y chi tiáº¿t phiáº¿u nháº­p                                      |
-| `400`       | KhÃ´ng thá»ƒ cáº­p nháº­t chi tiáº¿t phiáº¿u nháº­p khi phiáº¿u Ä‘Ã£ HoÃ n thÃ nh hoáº·c Há»§y |
-| `400`       | KhÃ´ng tÃ¬m tháº¥y phiáº¿u nháº­p                                               |
-| `400`       | KhÃ´ng tÃ¬m tháº¥y chi tiáº¿t sáº£n pháº©m                                        |
+| `400`       | Mã chi tiết phiếu nhập không được để trống                              |
+| `400`       | Không tìm thấy chi tiết phiếu nhập                                      |
+| `400`       | Không thể cập nhật chi tiết phiếu nhập khi phiếu đã Hoàn thành hoặc Hủy |
+| `400`       | Không tìm thấy phiếu nhập                                               |
+| `400`       | Không tìm thấy chi tiết sản phẩm                                        |
 
 ---
 
-## 6. XÃ³a chi tiáº¿t phiáº¿u nháº­p
+## 6. Xóa chi tiết phiếu nhập
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t                                  |
+| Thuộc tính   | Chi tiết                                  |
 | ------------ | ----------------------------------------- |
 | **URL**      | `DELETE /api/v1/chi-tiet-phieu-nhap/{id}` |
 | **Method**   | `DELETE`                                  |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)                        |
+| **Xác thực** | Bearer Token (JWT)                        |
 
 **Response:** `204 No Content`
 
-**Lá»—i:**
+**Lỗi:**
 
-| HTTP Status | MÃ´ táº£                              |
+| HTTP Status | Mô tả                              |
 | ----------- | ---------------------------------- |
-| `400`       | KhÃ´ng tÃ¬m tháº¥y chi tiáº¿t phiáº¿u nháº­p |
+| `400`       | Không tìm thấy chi tiết phiếu nhập |
 
 ---
 
-## PhÃ¢n quyá»n
+## Phân quyền
 
-| Vai trÃ²    | GET (Xem) | POST (Táº¡o) | PUT (Sá»­a) | DELETE (XÃ³a) |
+| Vai trò    | GET (Xem) | POST (Tạo) | PUT (Sửa) | DELETE (Xóa) |
 | ---------- | --------- | ---------- | --------- | ------------ |
-| ADMIN      | âœ…        | âœ…         | âœ…        | âœ…           |
-| NHAN_VIEN  | âœ…        | âœ…         | âœ…        | âŒ           |
-| KHACH_HANG | âŒ        | âŒ         | âŒ        | âŒ           |
+| ADMIN      | ✅        | ✅         | ✅        | ✅           |
+| NHAN_VIEN  | ✅        | ✅         | ✅        | ❌           |
+| KHACH_HANG | ❌        | ❌         | ❌        | ❌           |
 
 

@@ -37,6 +37,15 @@ public class TraHang {
     @Column(name = "TongTien")
     private Double tongTien;
 
+    @Column(name = "PhuongThucHoanTien")
+    private Integer phuongThucHoanTien;
+
+    @Column(name = "ThongTinChuyenKhoan", length = 500)
+    private String thongTinChuyenKhoan;
+
+    @Column(name = "payment_ref", length = 100)
+    private String paymentRef;
+
     @Column(name = "NgayTao")
     private LocalDateTime ngayTao;
 

@@ -14,6 +14,10 @@ import java.util.List;
 public class ReqTraHangDTO {
     private Long donHangId;
     private String lyDoTraHang;
+    // 0 = Tiền mặt, 1 = Chuyển khoản
+    private Integer phuongThucHoanTien;
+    private String thongTinChuyenKhoan;
+    private String paymentRef;
     private List<ChiTietTraHangItem> chiTietTraHangs;
 
     @Getter

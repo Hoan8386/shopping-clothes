@@ -20,6 +20,7 @@ public class ResDonHangDTO {
     private Integer tienGiam;
     private Integer tongTienGiam;
     private Integer tongTienTra;
+    private String paymentRef;
     private String trangThai;
     private String trangThaiThanhToan;
     private String hinhThucDonHang;

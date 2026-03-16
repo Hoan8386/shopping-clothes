@@ -1,29 +1,29 @@
-﻿# KÃ­ch ThÆ°á»›c Controller
+# Kích Thước Controller
 
 > **Base Path:** `/api/v1/kich-thuoc`  
 > **File:** `KichThuocController.java`  
-> Quáº£n lÃ½ danh sÃ¡ch kÃ­ch thÆ°á»›c sáº£n pháº©m (vÃ­ dá»¥: S, M, L, XL, XXL, ...).
+> Quản lý danh sách kích thước sản phẩm (ví dụ: S, M, L, XL, XXL, ...).
 
 ---
 
-## Cáº¥u trÃºc dá»¯ liá»‡u `KichThuoc`
+## Cấu trúc dữ liệu `KichThuoc`
 
-| TrÆ°á»ng         | Kiá»ƒu          | MÃ´ táº£                          |
+| Trường         | Kiểu          | Mô tả                          |
 | -------------- | ------------- | ------------------------------ |
-| `id`           | Long          | MÃ£ kÃ­ch thÆ°á»›c (auto-increment) |
-| `tenKichThuoc` | String(255)   | TÃªn kÃ­ch thÆ°á»›c                 |
-| `ngayTao`      | LocalDateTime | NgÃ y táº¡o (tá»± Ä‘á»™ng)             |
-| `ngayCapNhat`  | LocalDateTime | NgÃ y cáº­p nháº­t (tá»± Ä‘á»™ng)        |
+| `id`           | Long          | Mã kích thước (auto-increment) |
+| `tenKichThuoc` | String(255)   | Tên kích thước                 |
+| `ngayTao`      | LocalDateTime | Ngày tạo (tự động)             |
+| `ngayCapNhat`  | LocalDateTime | Ngày cập nhật (tự động)        |
 
 ---
 
-## 1. Láº¥y danh sÃ¡ch kÃ­ch thÆ°á»›c
+## 1. Lấy danh sách kích thước
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t                 |
+| Thuộc tính   | Chi tiết                 |
 | ------------ | ------------------------ |
 | **URL**      | `GET /api/v1/kich-thuoc` |
 | **Method**   | `GET`                    |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)       |
+| **Xác thực** | Bearer Token (JWT)       |
 
 **Response:** `200 OK`
 
@@ -35,7 +35,7 @@
 ]
 ```
 
-**Kiá»ƒu dá»¯ liá»‡u:**
+**Kiểu dữ liệu:**
 
 ```json
 {
@@ -47,14 +47,14 @@
 
 ---
 
-## 2-5. CRUD tiÃªu chuáº©n
+## 2-5. CRUD tiêu chuẩn
 
-| Endpoint                         | Method   | MÃ´ táº£                  |
+| Endpoint                         | Method   | Mô tả                  |
 | -------------------------------- | -------- | ---------------------- |
-| `GET /api/v1/kich-thuoc/{id}`    | `GET`    | Láº¥y kÃ­ch thÆ°á»›c theo ID |
-| `POST /api/v1/kich-thuoc`        | `POST`   | Táº¡o kÃ­ch thÆ°á»›c má»›i     |
-| `PUT /api/v1/kich-thuoc`         | `PUT`    | Cáº­p nháº­t kÃ­ch thÆ°á»›c    |
-| `DELETE /api/v1/kich-thuoc/{id}` | `DELETE` | XÃ³a kÃ­ch thÆ°á»›c         |
+| `GET /api/v1/kich-thuoc/{id}`    | `GET`    | Lấy kích thước theo ID |
+| `POST /api/v1/kich-thuoc`        | `POST`   | Tạo kích thước mới     |
+| `PUT /api/v1/kich-thuoc`         | `PUT`    | Cập nhật kích thước    |
+| `DELETE /api/v1/kich-thuoc/{id}` | `DELETE` | Xóa kích thước         |
 
 **Request Body (POST/PUT):**
 
@@ -62,7 +62,7 @@
 { "id": 1, "tenKichThuoc": "XS" }
 ```
 
-**Kiá»ƒu dá»¯ liá»‡u:**
+**Kiểu dữ liệu:**
 
 ```json
 {
@@ -71,21 +71,21 @@
 }
 ```
 
-**Lá»—i:**
+**Lỗi:**
 
-| HTTP Status | MÃ´ táº£                             |
+| HTTP Status | Mô tả                             |
 | ----------- | --------------------------------- |
-| `400`       | KhÃ´ng tÃ¬m tháº¥y kÃ­ch thÆ°á»›c         |
-| `400`       | MÃ£ kÃ­ch thÆ°á»›c khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng |
+| `400`       | Không tìm thấy kích thước         |
+| `400`       | Mã kích thước không được để trống |
 
 ---
 
-## PhÃ¢n quyá»n
+## Phân quyền
 
-| Vai trÃ²    | GET | POST | PUT | DELETE |
+| Vai trò    | GET | POST | PUT | DELETE |
 | ---------- | --- | ---- | --- | ------ |
-| ADMIN      | âœ…  | âœ…   | âœ…  | âœ…     |
-| NHAN_VIEN  | âœ…  | âŒ   | âŒ  | âŒ     |
-| KHACH_HANG | âœ…  | âŒ   | âŒ  | âŒ     |
+| ADMIN      | ✅  | ✅   | ✅  | ✅     |
+| NHAN_VIEN  | ✅  | ❌   | ❌  | ❌     |
+| KHACH_HANG | ✅  | ❌   | ❌  | ❌     |
 
 

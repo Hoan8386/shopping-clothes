@@ -1,332 +1,335 @@
-﻿# Tá»”NG Há»¢P CHá»¨C NÄ‚NG THEO VAI TRÃ’ â€” Há»† THá»NG SHOPPING
+# TỔNG HỢP CHỨC NĂNG THEO VAI TRÒ — HỆ THỐNG SHOPPING
 
-> **Má»¥c Ä‘Ã­ch:** TÃ i liá»‡u tá»•ng há»£p toÃ n bá»™ chá»©c nÄƒng cá»§a tá»«ng vai trÃ² trong há»‡ thá»‘ng, giÃºp láº­p trÃ¬nh viÃªn Frontend hiá»ƒu rÃµ pháº¡m vi quyá»n háº¡n Ä‘á»ƒ xÃ¢y dá»±ng giao diá»‡n phÃ¹ há»£p.
+> **Mục đích:** Tài liệu tổng hợp toàn bộ chức năng của từng vai trò trong hệ thống, giúp lập trình viên Frontend hiểu rõ phạm vi quyền hạn để xây dựng giao diện phù hợp.
 >
-> **NgÃ y táº¡o:** 2026-03-09
+> **Ngày tạo:** 2026-03-09
 
 ---
 
-## Má»¤C Lá»¤C
+## MỤC LỤC
 
-1. [Tá»•ng quan há»‡ thá»‘ng](#1-tá»•ng-quan-há»‡-thá»‘ng)
-2. [XÃ¡c thá»±c & PhÃ¢n quyá»n](#2-xÃ¡c-thá»±c--phÃ¢n-quyá»n)
-3. [CÃ¡c vai trÃ² trong há»‡ thá»‘ng](#3-cÃ¡c-vai-trÃ²-trong-há»‡-thá»‘ng)
-4. [ADMIN â€” Quáº£n trá»‹ viÃªn toÃ n quyá»n](#4-admin--quáº£n-trá»‹-viÃªn-toÃ n-quyá»n)
-5. [NHAN_VIEN â€” NhÃ¢n viÃªn bÃ¡n hÃ ng](#5-nhan_vien--nhÃ¢n-viÃªn-bÃ¡n-hÃ ng)
-6. [KHACH_HANG â€” KhÃ¡ch hÃ ng](#6-khach_hang--khÃ¡ch-hÃ ng)
-7. [Endpoint cÃ´ng khai (khÃ´ng cáº§n Ä‘Äƒng nháº­p)](#7-endpoint-cÃ´ng-khai-khÃ´ng-cáº§n-Ä‘Äƒng-nháº­p)
-8. [Báº£ng ma tráº­n phÃ¢n quyá»n chi tiáº¿t](#8-báº£ng-ma-tráº­n-phÃ¢n-quyá»n-chi-tiáº¿t)
-9. [Gá»£i Ã½ xÃ¢y dá»±ng Frontend theo vai trÃ²](#9-gá»£i-Ã½-xÃ¢y-dá»±ng-frontend-theo-vai-trÃ²)
+1. [Tổng quan hệ thống](#1-tổng-quan-hệ-thống)
+2. [Xác thực & Phân quyền](#2-xác-thực--phân-quyền)
+3. [Các vai trò trong hệ thống](#3-các-vai-trò-trong-hệ-thống)
+4. [ADMIN — Quản trị viên toàn quyền](#4-admin--quản-trị-viên-toàn-quyền)
+5. [NHAN_VIEN — Nhân viên bán hàng](#5-nhan_vien--nhân-viên-bán-hàng)
+6. [KHACH_HANG — Khách hàng](#6-khach_hang--khách-hàng)
+7. [Endpoint công khai (không cần đăng nhập)](#7-endpoint-công-khai-không-cần-đăng-nhập)
+8. [Bảng ma trận phân quyền chi tiết](#8-bảng-ma-trận-phân-quyền-chi-tiết)
+9. [Gợi ý xây dựng Frontend theo vai trò](#9-gợi-ý-xây-dựng-frontend-theo-vai-trò)
 
 ---
 
-## 1. Tá»•ng quan há»‡ thá»‘ng
+## 1. Tổng quan hệ thống
 
-Há»‡ thá»‘ng **Shopping** lÃ  á»©ng dá»¥ng quáº£n lÃ½ bÃ¡n hÃ ng thá»i trang vá»›i cÃ¡c module:
+Hệ thống **Shopping** là ứng dụng quản lý bán hàng thời trang với các module:
 
-| STT | Module                    | Base Path API                     | MÃ´ táº£                                     |
+| STT | Module                    | Base Path API                     | Mô tả                                     |
 | --- | ------------------------- | --------------------------------- | -------------------------------------------- |
-| 1   | XÃ¡c thá»±c               | `/api/v1/auth`                    | ÄÄƒng nháº­p, Ä‘Äƒng kÃ½, refresh token      |
-| 2   | Sáº£n pháº©m              | `/api/v1/san-pham`                | Quáº£n lÃ½ sáº£n pháº©m                      |
-| 3   | Chi tiáº¿t sáº£n pháº©m   | `/api/v1/chi-tiet-san-pham`       | Biáº¿n thá»ƒ SP (mÃ u, size, cá»­a hÃ ng)    |
-| 4   | ÄÆ¡n hÃ ng                | `/api/v1/don-hang`                | Quáº£n lÃ½ Ä‘Æ¡n hÃ ng online & táº¡i quáº§y |
-| 5   | Chi tiáº¿t Ä‘Æ¡n hÃ ng    | `/api/v1/chi-tiet-don-hang`       | DÃ²ng sáº£n pháº©m trong Ä‘Æ¡n hÃ ng         |
-| 6   | Giá» hÃ ng                | `/api/v1/gio-hang`                | Giá» hÃ ng khÃ¡ch hÃ ng                      |
-| 7   | Phiáº¿u nháº­p            | `/api/v1/phieu-nhap`              | Nháº­p hÃ ng tá»« nhÃ  cung cáº¥p            |
-| 8   | Chi tiáº¿t phiáº¿u nháº­p | `/api/v1/chi-tiet-phieu-nhap`     | DÃ²ng SP trong phiáº¿u nháº­p                |
-| 9   | HÃ¬nh áº£nh               | `/api/v1/hinh-anh`                | Quáº£n lÃ½ áº£nh SP (Cloudinary)             |
-| 10  | Bá»™ sÆ°u táº­p           | `/api/v1/bo-suu-tap`              | BST theo mÃ¹a                                |
-| 11  | Kiá»ƒu sáº£n pháº©m       | `/api/v1/kieu-san-pham`           | Loáº¡i SP: Ão, Quáº§n, VÃ¡y, ...             |
-| 12  | ThÆ°Æ¡ng hiá»‡u           | `/api/v1/thuong-hieu`             | Nike, Adidas, Uniqlo, ...                    |
-| 13  | MÃ u sáº¯c                | `/api/v1/mau-sac`                 | Äen, Tráº¯ng, Äá», ...                       |
-| 14  | KÃ­ch thÆ°á»›c            | `/api/v1/kich-thuoc`              | S, M, L, XL, ...                             |
-| 15  | Cá»­a hÃ ng               | `/api/v1/cua-hang`                | Chi nhÃ¡nh cá»­a hÃ ng                       |
-| 16  | NhÃ  cung cáº¥p           | `/api/v1/nha-cung-cap`            | NhÃ  cung cáº¥p hÃ ng hÃ³a                   |
-| 17  | Vai trÃ²                  | `/api/v1/roles`                   | Quáº£n lÃ½ Role (RBAC)                       |
-| 18  | Quyá»n háº¡n              | `/api/v1/permissions`             | Quáº£n lÃ½ Permission                        |
-| 19  | KM theo hÃ³a Ä‘Æ¡n        | `/api/v1/khuyen-mai-theo-hoa-don` | Giáº£m giÃ¡ theo tá»•ng Ä‘Æ¡n hÃ ng          |
-| 20  | KM theo Ä‘iá»ƒm           | `/api/v1/khuyen-mai-theo-diem`    | Äá»•i Ä‘iá»ƒm tÃ­ch lÅ©y láº¥y mÃ£ giáº£m    |
-| 21  | ÄÃ¡nh giÃ¡ sáº£n pháº©m   | `/api/v1/danh-gia-san-pham`       | ÄÃ¡nh giÃ¡ & bÃ¬nh luáº­n SP                 |
-| 22  | Storage (Public)          | `{secure_url_cloudinary}`         | Truy cáº­p áº£nh (khÃ´ng cáº§n auth)         |
-| 23  | NhÃ¢n viÃªn               | `/api/v1/nhan-vien`               | Quáº£n lÃ½ thÃ´ng tin nhÃ¢n viÃªn            |
-| 24  | Tráº£ hÃ ng               | `/api/v1/tra-hang`                | Phiáº¿u tráº£ hÃ ng & hoÃ n tiá»n            |
+| 1   | Xác thực               | `/api/v1/auth`                    | Đăng nhập, đăng ký, refresh token      |
+| 2   | Sản phẩm              | `/api/v1/san-pham`                | Quản lý sản phẩm                      |
+| 3   | Chi tiết sản phẩm   | `/api/v1/chi-tiet-san-pham`       | Biến thể SP (màu, size, cửa hàng)    |
+| 4   | Đơn hàng                | `/api/v1/don-hang`                | Quản lý đơn hàng online & tại quầy |
+| 5   | Chi tiết đơn hàng    | `/api/v1/chi-tiet-don-hang`       | Dòng sản phẩm trong đơn hàng         |
+| 6   | Giỏ hàng                | `/api/v1/gio-hang`                | Giỏ hàng khách hàng                      |
+| 7   | Phiếu nhập            | `/api/v1/phieu-nhap`              | Nhập hàng từ nhà cung cấp            |
+| 8   | Chi tiết phiếu nhập | `/api/v1/chi-tiet-phieu-nhap`     | Dòng SP trong phiếu nhập                |
+| 9   | Hình ảnh               | `/api/v1/hinh-anh`                | Quản lý ảnh SP (Cloudinary)             |
+| 10  | Bộ sưu tập           | `/api/v1/bo-suu-tap`              | BST theo mùa                                |
+| 11  | Kiểu sản phẩm       | `/api/v1/kieu-san-pham`           | Loại SP: Áo, Quần, Váy, ...             |
+| 12  | Thương hiệu           | `/api/v1/thuong-hieu`             | Nike, Adidas, Uniqlo, ...                    |
+| 13  | Màu sắc                | `/api/v1/mau-sac`                 | Đen, Trắng, Đỏ, ...                       |
+| 14  | Kích thước            | `/api/v1/kich-thuoc`              | S, M, L, XL, ...                             |
+| 15  | Cửa hàng               | `/api/v1/cua-hang`                | Chi nhánh cửa hàng                       |
+| 16  | Nhà cung cấp           | `/api/v1/nha-cung-cap`            | Nhà cung cấp hàng hóa                   |
+| 17  | Vai trò                  | `/api/v1/roles`                   | Quản lý Role (RBAC)                       |
+| 18  | Quyền hạn              | `/api/v1/permissions`             | Quản lý Permission                        |
+| 19  | KM theo hóa đơn        | `/api/v1/khuyen-mai-theo-hoa-don` | Giảm giá theo tổng đơn hàng          |
+| 20  | KM theo điểm           | `/api/v1/khuyen-mai-theo-diem`    | Đổi điểm tích lũy lấy mã giảm    |
+| 21  | Đánh giá sản phẩm   | `/api/v1/danh-gia-san-pham`       | Đánh giá & bình luận SP                 |
+| 22  | Storage (Public)          | `{secure_url_cloudinary}`         | Truy cập ảnh (không cần auth)         |
+| 23  | Nhân viên               | `/api/v1/nhan-vien`               | Quản lý thông tin nhân viên            |
+| 24  | Trả hàng               | `/api/v1/tra-hang`                | Phiếu trả hàng & hoàn tiền            |
+| 25  | Loại kiểm kê         | `/api/v1/loai-kiem-ke`            | Danh mục loại phiếu kiểm kê         |
+| 26  | Kiểm kê hàng hóa     | `/api/v1/kiem-ke-hang-hoa`        | Nhân viên lập phiếu, admin duyệt     |
+| 27  | Chi tiết kiểm kê     | Thuộc module kiểm kê         | Dòng kiểm kê gắn `ChiTietSanPham`      |
 
 ---
 
-## 2. XÃ¡c thá»±c & PhÃ¢n quyá»n
+## 2. Xác thực & Phân quyền
 
-### 2.1 CÆ¡ cháº¿ xÃ¡c thá»±c â€” JWT
+### 2.1 Cơ chế xác thực — JWT
 
-- **Access Token**: gá»­i qua header `Authorization: Bearer <token>`, thá»i gian sá»‘ng ngáº¯n
-- **Refresh Token**: lÆ°u trong cookie `HttpOnly`, dÃ¹ng Ä‘á»ƒ gia háº¡n access token
-- Há»‡ thá»‘ng há»— trá»£ 2 loáº¡i user: **NhanVien** (nhÃ¢n viÃªn) vÃ  **KhachHang** (khÃ¡ch hÃ ng)
+- **Access Token**: gửi qua header `Authorization: Bearer <token>`, thời gian sống ngắn
+- **Refresh Token**: lưu trong cookie `HttpOnly`, dùng để gia hạn access token
+- Hệ thống hỗ trợ 2 loại user: **NhanVien** (nhân viên) và **KhachHang** (khách hàng)
 
-### 2.2 CÆ¡ cháº¿ phÃ¢n quyá»n â€” RBAC
+### 2.2 Cơ chế phân quyền — RBAC
 
-- Má»—i user Ä‘Æ°á»£c gÃ¡n 1 **Role** (vai trÃ²)
-- Má»—i Role chá»©a danh sÃ¡ch **Permission** (nhiá»u-nhiá»u)
-- Má»—i Permission = 1 cáº·p `(apiPath, method)` â†’ tÆ°Æ¡ng á»©ng 1 endpoint cá»¥ thá»ƒ
-- Khi gá»i API, **PermissionInterceptor** kiá»ƒm tra:
-  1. Láº¥y email user tá»« JWT
-  2. TÃ¬m user trong báº£ng `NhanVien` hoáº·c `KhachHang`
-  3. Láº¥y Role â†’ danh sÃ¡ch Permission
-  4. So khá»›p `(apiPath, method)` vá»›i request â†’ cho phÃ©p hoáº·c tráº£ vá» `403 Forbidden`
+- Mỗi user được gán 1 **Role** (vai trò)
+- Mỗi Role chứa danh sách **Permission** (nhiều-nhiều)
+- Mỗi Permission = 1 cặp `(apiPath, method)` → tương ứng 1 endpoint cụ thể
+- Khi gọi API, **PermissionInterceptor** kiểm tra:
+  1. Lấy email user từ JWT
+  2. Tìm user trong bảng `NhanVien` hoặc `KhachHang`
+  3. Lấy Role → danh sách Permission
+  4. So khớp `(apiPath, method)` với request → cho phép hoặc trả về `403 Forbidden`
 
-### 2.3 CÃ¡c endpoint Ä‘Äƒng nháº­p / Ä‘Äƒng kÃ½ (Whitelist â€” khÃ´ng cáº§n token)
+### 2.3 Các endpoint đăng nhập / đăng ký (Whitelist — không cần token)
 
-| Endpoint                  | Method | MÃ´ táº£                                      |
+| Endpoint                  | Method | Mô tả                                      |
 | ------------------------- | ------ | --------------------------------------------- |
-| `/api/v1/auth/login`      | POST   | ÄÄƒng nháº­p (email + password)               |
-| `/api/v1/auth/register`   | POST   | ÄÄƒng kÃ½ tÃ i khoáº£n khÃ¡ch hÃ ng má»›i     |
-| `/api/v1/auth/refresh`    | GET    | Gia háº¡n access token (dÃ¹ng refresh cookie) |
-| `{secure_url_cloudinary}` | GET    | Xem áº£nh sáº£n pháº©m (public)               |
+| `/api/v1/auth/login`      | POST   | Đăng nhập (email + password)               |
+| `/api/v1/auth/register`   | POST   | Đăng ký tài khoản khách hàng mới     |
+| `/api/v1/auth/refresh`    | GET    | Gia hạn access token (dùng refresh cookie) |
+| `{secure_url_cloudinary}` | GET    | Xem ảnh sản phẩm (public)               |
 | `/v3/api-docs/**`         | GET    | Swagger API docs                              |
 | `/swagger-ui/**`          | GET    | Swagger UI                                    |
 
 ---
 
-## 3. CÃ¡c vai trÃ² trong há»‡ thá»‘ng
+## 3. Các vai trò trong hệ thống
 
-| ID  | TÃªn vai trÃ² | Loáº¡i user | MÃ´ táº£                                                                         |
+| ID  | Tên vai trò | Loại user | Mô tả                                                                         |
 | --- | ------------- | ----------- | -------------------------------------------------------------------------------- |
-| 1   | `ADMIN`       | NhanVien    | Quáº£n trá»‹ viÃªn toÃ n quyá»n â€” truy cáº­p má»i chá»©c nÄƒng                 |
-| 2   | `NHAN_VIEN`   | NhanVien    | NhÃ¢n viÃªn bÃ¡n hÃ ng â€” xem danh má»¥c, xá»­ lÃ½ Ä‘Æ¡n hÃ ng & phiáº¿u nháº­p |
-| 3   | `KHACH_HANG`  | KhachHang   | KhÃ¡ch hÃ ng â€” mua sáº¯m, giá» hÃ ng, Ä‘áº·t hÃ ng, Ä‘Ã¡nh giÃ¡ sáº£n pháº©m   |
+| 1   | `ADMIN`       | NhanVien    | Quản trị viên toàn quyền — truy cập mọi chức năng                 |
+| 2   | `NHAN_VIEN`   | NhanVien    | Nhân viên bán hàng — xem danh mục, xử lý đơn hàng & phiếu nhập |
+| 3   | `KHACH_HANG`  | KhachHang   | Khách hàng — mua sắm, giỏ hàng, đặt hàng, đánh giá sản phẩm   |
 
 ---
 
-## 4. ADMIN â€” Quáº£n trá»‹ viÃªn toÃ n quyá»n
+## 4. ADMIN — Quản trị viên toàn quyền
 
-> **Pháº¡m vi:** ToÃ n bá»™ 113 permission â€” truy cáº­p má»i API endpoint.
+> **Phạm vi:** Toàn bộ 113 permission — truy cập mọi API endpoint.
 
-### 4.1 Quáº£n lÃ½ sáº£n pháº©m & danh má»¥c
+### 4.1 Quản lý sản phẩm & danh mục
 
-| Chá»©c nÄƒng                                    | Endpoint                                                                                                           | Method |
+| Chức năng                                    | Endpoint                                                                                                           | Method |
 | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | ------ |
-| Xem danh sÃ¡ch sáº£n pháº©m (lá»c, phÃ¢n trang) | `GET /api/v1/san-pham?tenSanPham=&kieuSanPhamId=&boSuuTapId=&thuongHieuId=&trangThai=&giaMin=&giaMax=&page=&size=` | GET    |
-| Xem chi tiáº¿t sáº£n pháº©m                     | `GET /api/v1/san-pham/{id}`                                                                                        | GET    |
-| Táº¡o sáº£n pháº©m (upload áº£nh)               | `POST /api/v1/san-pham` (multipart/form-data)                                                                      | POST   |
-| Cáº­p nháº­t sáº£n pháº©m                       | `PUT /api/v1/san-pham`                                                                                             | PUT    |
-| XÃ³a sáº£n pháº©m                               | `DELETE /api/v1/san-pham/{id}`                                                                                     | DELETE |
-| CRUD Kiá»ƒu sáº£n pháº©m                        | `/api/v1/kieu-san-pham` + `/{id}`                                                                                  | CRUD   |
-| CRUD Bá»™ sÆ°u táº­p                            | `/api/v1/bo-suu-tap` + `/{id}`                                                                                     | CRUD   |
-| CRUD ThÆ°Æ¡ng hiá»‡u                            | `/api/v1/thuong-hieu` + `/{id}`                                                                                    | CRUD   |
-| CRUD MÃ u sáº¯c                                 | `/api/v1/mau-sac` + `/{id}`                                                                                        | CRUD   |
-| CRUD KÃ­ch thÆ°á»›c                             | `/api/v1/kich-thuoc` + `/{id}`                                                                                     | CRUD   |
+| Xem danh sách sản phẩm (lọc, phân trang) | `GET /api/v1/san-pham?tenSanPham=&kieuSanPhamId=&boSuuTapId=&thuongHieuId=&trangThai=&giaMin=&giaMax=&page=&size=` | GET    |
+| Xem chi tiết sản phẩm                     | `GET /api/v1/san-pham/{id}`                                                                                        | GET    |
+| Tạo sản phẩm (upload ảnh)               | `POST /api/v1/san-pham` (multipart/form-data)                                                                      | POST   |
+| Cập nhật sản phẩm                       | `PUT /api/v1/san-pham`                                                                                             | PUT    |
+| Xóa sản phẩm                               | `DELETE /api/v1/san-pham/{id}`                                                                                     | DELETE |
+| CRUD Kiểu sản phẩm                        | `/api/v1/kieu-san-pham` + `/{id}`                                                                                  | CRUD   |
+| CRUD Bộ sưu tập                            | `/api/v1/bo-suu-tap` + `/{id}`                                                                                     | CRUD   |
+| CRUD Thương hiệu                            | `/api/v1/thuong-hieu` + `/{id}`                                                                                    | CRUD   |
+| CRUD Màu sắc                                 | `/api/v1/mau-sac` + `/{id}`                                                                                        | CRUD   |
+| CRUD Kích thước                             | `/api/v1/kich-thuoc` + `/{id}`                                                                                     | CRUD   |
 
-### 4.2 Quáº£n lÃ½ chi tiáº¿t sáº£n pháº©m & hÃ¬nh áº£nh
+### 4.2 Quản lý chi tiết sản phẩm & hình ảnh
 
-| Chá»©c nÄƒng                                          | Endpoint                                                      | Method |
+| Chức năng                                          | Endpoint                                                      | Method |
 | ----------------------------------------------------- | ------------------------------------------------------------- | ------ |
-| Xem táº¥t cáº£ biáº¿n thá»ƒ SP                        | `GET /api/v1/chi-tiet-san-pham`                               | GET    |
-| Xem biáº¿n thá»ƒ theo ID                              | `GET /api/v1/chi-tiet-san-pham/{id}`                          | GET    |
-| Xem biáº¿n thá»ƒ theo sáº£n pháº©m                    | `GET /api/v1/chi-tiet-san-pham/san-pham/{sanPhamId}`          | GET    |
-| Xem biáº¿n thá»ƒ theo cá»­a hÃ ng Ä‘ang Ä‘Äƒng nháº­p | `GET /api/v1/chi-tiet-san-pham/san-pham-tai-cua-hang`         | GET    |
-| Táº¡o biáº¿n thá»ƒ SP (upload áº£nh)                  | `POST /api/v1/chi-tiet-san-pham` (multipart)                  | POST   |
-| Cáº­p nháº­t biáº¿n thá»ƒ                             | `PUT /api/v1/chi-tiet-san-pham`                               | PUT    |
-| XÃ³a biáº¿n thá»ƒ                                     | `DELETE /api/v1/chi-tiet-san-pham/{id}`                       | DELETE |
-| Xem hÃ¬nh áº£nh theo CTSP                             | `GET /api/v1/hinh-anh/chi-tiet-san-pham/{chiTietSanPhamId}`   | GET    |
-| Upload hÃ¬nh áº£nh cho CTSP                           | `POST /api/v1/hinh-anh/upload/{chiTietSanPhamId}` (multipart) | POST   |
-| Táº¡o/Cáº­p nháº­t/XÃ³a hÃ¬nh áº£nh                   | `/api/v1/hinh-anh` + `/{id}`                                  | CRUD   |
+| Xem tất cả biến thể SP                        | `GET /api/v1/chi-tiet-san-pham`                               | GET    |
+| Xem biến thể theo ID                              | `GET /api/v1/chi-tiet-san-pham/{id}`                          | GET    |
+| Xem biến thể theo sản phẩm                    | `GET /api/v1/chi-tiet-san-pham/san-pham/{sanPhamId}`          | GET    |
+| Xem biến thể theo cửa hàng đang đăng nhập | `GET /api/v1/chi-tiet-san-pham/san-pham-tai-cua-hang`         | GET    |
+| Tạo biến thể SP (upload ảnh)                  | `POST /api/v1/chi-tiet-san-pham` (multipart)                  | POST   |
+| Cập nhật biến thể                             | `PUT /api/v1/chi-tiet-san-pham`                               | PUT    |
+| Xóa biến thể                                     | `DELETE /api/v1/chi-tiet-san-pham/{id}`                       | DELETE |
+| Xem hình ảnh theo CTSP                             | `GET /api/v1/hinh-anh/chi-tiet-san-pham/{chiTietSanPhamId}`   | GET    |
+| Upload hình ảnh cho CTSP                           | `POST /api/v1/hinh-anh/upload/{chiTietSanPhamId}` (multipart) | POST   |
+| Tạo/Cập nhật/Xóa hình ảnh                   | `/api/v1/hinh-anh` + `/{id}`                                  | CRUD   |
 
-### 4.3 Quáº£n lÃ½ Ä‘Æ¡n hÃ ng
+### 4.3 Quản lý đơn hàng
 
-| Chá»©c nÄƒng                                   | Endpoint                                                                                                  | Method |
+| Chức năng                                   | Endpoint                                                                                                  | Method |
 | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ------ |
-| Xem danh sÃ¡ch Ä‘Æ¡n hÃ ng (lá»c, phÃ¢n trang) | `GET /api/v1/don-hang?cuaHangId=&nhanVienId=&trangThai=&trangThaiThanhToan=&hinhThucDonHang=&page=&size=` | GET    |
-| Xem chi tiáº¿t Ä‘Æ¡n hÃ ng                     | `GET /api/v1/don-hang/{id}`                                                                               | GET    |
-| Táº¡o Ä‘Æ¡n hÃ ng online                       | `POST /api/v1/don-hang/online`                                                                            | POST   |
-| Táº¡o Ä‘Æ¡n hÃ ng táº¡i quáº§y                 | `POST /api/v1/don-hang/tai-quay`                                                                          | POST   |
-| Cáº­p nháº­t tráº¡ng thÃ¡i Ä‘Æ¡n hÃ ng         | `PUT /api/v1/don-hang`                                                                                    | PUT    |
-| XÃ³a Ä‘Æ¡n hÃ ng                               | `DELETE /api/v1/don-hang/{id}`                                                                            | DELETE |
-| Xem chi tiáº¿t dÃ²ng sáº£n pháº©m trong Ä‘Æ¡n  | `GET /api/v1/chi-tiet-don-hang/don-hang/{donHangId}`                                                      | GET    |
-| CRUD chi tiáº¿t Ä‘Æ¡n hÃ ng                    | `/api/v1/chi-tiet-don-hang` + `/{id}`                                                                     | CRUD   |
+| Xem danh sách đơn hàng (lọc, phân trang) | `GET /api/v1/don-hang?cuaHangId=&nhanVienId=&trangThai=&trangThaiThanhToan=&hinhThucDonHang=&page=&size=` | GET    |
+| Xem chi tiết đơn hàng                     | `GET /api/v1/don-hang/{id}`                                                                               | GET    |
+| Tạo đơn hàng online                       | `POST /api/v1/don-hang/online`                                                                            | POST   |
+| Tạo đơn hàng tại quầy                 | `POST /api/v1/don-hang/tai-quay`                                                                          | POST   |
+| Cập nhật trạng thái đơn hàng         | `PUT /api/v1/don-hang`                                                                                    | PUT    |
+| Xóa đơn hàng                               | `DELETE /api/v1/don-hang/{id}`                                                                            | DELETE |
+| Xem chi tiết dòng sản phẩm trong đơn  | `GET /api/v1/chi-tiet-don-hang/don-hang/{donHangId}`                                                      | GET    |
+| CRUD chi tiết đơn hàng                    | `/api/v1/chi-tiet-don-hang` + `/{id}`                                                                     | CRUD   |
 
-**Tráº¡ng thÃ¡i Ä‘Æ¡n hÃ ng (trangThai):**
+**Trạng thái đơn hàng (trangThai):**
 
-| GiÃ¡ trá»‹ | Ã nghÄ©a             | Ghi chÃº                                                     |
+| Giá trị | Ý nghĩa             | Ghi chú                                                     |
 | ---------- | -------------------- | ------------------------------------------------------------ |
-| 0          | Chá» xÃ¡c nháº­n     | Máº·c Ä‘á»‹nh khi táº¡o Ä‘Æ¡n online                         |
-| 1          | ÄÃ£ xÃ¡c nháº­n      | NV/Admin xÃ¡c nháº­n                                         |
-| 2          | Äang Ä‘Ã³ng gÃ³i     | Äang chuáº©n bá»‹ hÃ ng                                      |
-| 3          | Äang giao hÃ ng      | ÄÃ£ gá»­i cho váº­n chuyá»ƒn                                 |
-| 4          | ÄÃ£ há»§y            | Há»§y Ä‘Æ¡n hÃ ng                                            |
-| 5          | ÄÃ£ nháº­n hÃ ng âœ… | Giao thÃ nh cÃ´ng â†’ tá»± Ä‘á»™ng cá»™ng Ä‘iá»ƒm tÃ­ch lÅ©y |
+| 0          | Chờ xác nhận     | Mặc định khi tạo đơn online                         |
+| 1          | Đã xác nhận      | NV/Admin xác nhận                                         |
+| 2          | Đang đóng gói     | Đang chuẩn bị hàng                                      |
+| 3          | Đang giao hàng      | Đã gửi cho vận chuyển                                 |
+| 4          | Đã hủy            | Hủy đơn hàng                                            |
+| 5          | Đã nhận hàng ✅ | Giao thành công → tự động cộng điểm tích lũy |
 
-**Tráº¡ng thÃ¡i thanh toÃ¡n (trangThaiThanhToan):** `0` = ChÆ°a thanh toÃ¡n, `1` = ÄÃ£ thanh toÃ¡n
+**Trạng thái thanh toán (trangThaiThanhToan):** `0` = Chưa thanh toán, `1` = Đã thanh toán
 
-**HÃ¬nh thá»©c Ä‘Æ¡n hÃ ng (hinhThucDonHang):** `0` = Táº¡i quáº§y, `1` = Online
+**Hình thức đơn hàng (hinhThucDonHang):** `0` = Tại quầy, `1` = Online
 
-### 4.4 Quáº£n lÃ½ nháº­p hÃ ng
+### 4.4 Quản lý nhập hàng
 
-| Chá»©c nÄƒng                         | Endpoint                                                                                        | Method |
+| Chức năng                         | Endpoint                                                                                        | Method |
 | ------------------------------------ | ----------------------------------------------------------------------------------------------- | ------ |
-| Xem danh sÃ¡ch phiáº¿u nháº­p (lá»c) | `GET /api/v1/phieu-nhap?tenPhieuNhap=&trangThai=&cuaHang=&nhaCungCap=&ngayBatDau=&ngayKetThuc=` | GET    |
-| Xem chi tiáº¿t phiáº¿u nháº­p        | `GET /api/v1/phieu-nhap/{id}`                                                                   | GET    |
-| Táº¡o phiáº¿u nháº­p                 | `POST /api/v1/phieu-nhap`                                                                       | POST   |
-| Cáº­p nháº­t phiáº¿u nháº­p          | `PUT /api/v1/phieu-nhap`                                                                        | PUT    |
-| **Kiá»ƒm kÃª phiáº¿u nháº­p**        | `PUT /api/v1/phieu-nhap/kiem-ke/{id}`                                                           | PUT    |
-| XÃ³a phiáº¿u nháº­p                  | `DELETE /api/v1/phieu-nhap/{id}`                                                                | DELETE |
-| CRUD chi tiáº¿t phiáº¿u nháº­p       | `/api/v1/chi-tiet-phieu-nhap` + `/{id}` + `/phieu-nhap/{phieuNhapId}`                           | CRUD   |
+| Xem danh sách phiếu nhập (lọc) | `GET /api/v1/phieu-nhap?tenPhieuNhap=&trangThai=&cuaHang=&nhaCungCap=&ngayBatDau=&ngayKetThuc=` | GET    |
+| Xem chi tiết phiếu nhập        | `GET /api/v1/phieu-nhap/{id}`                                                                   | GET    |
+| Tạo phiếu nhập                 | `POST /api/v1/phieu-nhap`                                                                       | POST   |
+| Cập nhật phiếu nhập          | `PUT /api/v1/phieu-nhap`                                                                        | PUT    |
+| **Kiểm kê phiếu nhập**        | `PUT /api/v1/phieu-nhap/kiem-ke/{id}`                                                           | PUT    |
+| Xóa phiếu nhập                  | `DELETE /api/v1/phieu-nhap/{id}`                                                                | DELETE |
+| CRUD chi tiết phiếu nhập       | `/api/v1/chi-tiet-phieu-nhap` + `/{id}` + `/phieu-nhap/{phieuNhapId}`                           | CRUD   |
 
-**Tráº¡ng thÃ¡i phiáº¿u nháº­p:**
+**Trạng thái phiếu nhập:**
 
-| GiÃ¡ trá»‹ | Ã nghÄ©a         |
+| Giá trị | Ý nghĩa         |
 | ---------- | ---------------- |
-| 0          | ÄÃ£ Ä‘áº·t hÃ ng |
-| 1          | ÄÃ£ nháº­n hÃ ng |
-| 2          | Cháº­m giao      |
-| 3          | ÄÃ£ há»§y        |
-| 4          | Thiáº¿u hÃ ng    |
-| 5          | HoÃ n thÃ nh âœ… |
+| 0          | Đã đặt hàng |
+| 1          | Đã nhận hàng |
+| 2          | Chậm giao      |
+| 3          | Đã hủy        |
+| 4          | Thiếu hàng    |
+| 5          | Hoàn thành ✅ |
 
-### 4.5 Quáº£n lÃ½ khuyáº¿n mÃ£i
+### 4.5 Quản lý khuyến mãi
 
-| Chá»©c nÄƒng                       | Endpoint                                    | Method |
+| Chức năng                       | Endpoint                                    | Method |
 | ---------------------------------- | ------------------------------------------- | ------ |
-| CRUD Khuyáº¿n mÃ£i theo hÃ³a Ä‘Æ¡n | `/api/v1/khuyen-mai-theo-hoa-don` + `/{id}` | CRUD   |
-| CRUD Khuyáº¿n mÃ£i theo Ä‘iá»ƒm    | `/api/v1/khuyen-mai-theo-diem` + `/{id}`    | CRUD   |
+| CRUD Khuyến mãi theo hóa đơn | `/api/v1/khuyen-mai-theo-hoa-don` + `/{id}` | CRUD   |
+| CRUD Khuyến mãi theo điểm    | `/api/v1/khuyen-mai-theo-diem` + `/{id}`    | CRUD   |
 
-### 4.6 Quáº£n lÃ½ cá»­a hÃ ng & nhÃ  cung cáº¥p
+### 4.6 Quản lý cửa hàng & nhà cung cấp
 
-| Chá»©c nÄƒng         | Endpoint                         | Method |
+| Chức năng         | Endpoint                         | Method |
 | -------------------- | -------------------------------- | ------ |
-| CRUD Cá»­a hÃ ng     | `/api/v1/cua-hang` + `/{id}`     | CRUD   |
-| CRUD NhÃ  cung cáº¥p | `/api/v1/nha-cung-cap` + `/{id}` | CRUD   |
-| CRUD NhÃ¢n viÃªn     | `/api/v1/nhan-vien` + `/{id}`    | CRUD   |
+| CRUD Cửa hàng     | `/api/v1/cua-hang` + `/{id}`     | CRUD   |
+| CRUD Nhà cung cấp | `/api/v1/nha-cung-cap` + `/{id}` | CRUD   |
+| CRUD Nhân viên     | `/api/v1/nhan-vien` + `/{id}`    | CRUD   |
 
-### 4.7 Quáº£n lÃ½ phÃ¢n quyá»n (RBAC)
+### 4.7 Quản lý phân quyền (RBAC)
 
-| Chá»©c nÄƒng      | Endpoint                        | Method |
+| Chức năng      | Endpoint                        | Method |
 | ----------------- | ------------------------------- | ------ |
-| CRUD Vai trÃ²     | `/api/v1/roles` + `/{id}`       | CRUD   |
-| CRUD Quyá»n háº¡n | `/api/v1/permissions` + `/{id}` | CRUD   |
+| CRUD Vai trò     | `/api/v1/roles` + `/{id}`       | CRUD   |
+| CRUD Quyền hạn | `/api/v1/permissions` + `/{id}` | CRUD   |
 
-### 4.8 Quáº£n lÃ½ Ä‘Ã¡nh giÃ¡ sáº£n pháº©m
+### 4.8 Quản lý đánh giá sản phẩm
 
-| Chá»©c nÄƒng                                | Endpoint                                                             | Method |
+| Chức năng                                | Endpoint                                                             | Method |
 | ------------------------------------------- | -------------------------------------------------------------------- | ------ |
-| Xem táº¥t cáº£ Ä‘Ã¡nh giÃ¡                  | `GET /api/v1/danh-gia-san-pham`                                      | GET    |
-| Xem Ä‘Ã¡nh giÃ¡ theo ID                     | `GET /api/v1/danh-gia-san-pham/{id}`                                 | GET    |
-| Xem Ä‘Ã¡nh giÃ¡ theo sáº£n pháº©m           | `GET /api/v1/danh-gia-san-pham/san-pham/{sanPhamId}`                 | GET    |
-| Xem Ä‘Ã¡nh giÃ¡ theo chi tiáº¿t Ä‘Æ¡n hÃ ng | `GET /api/v1/danh-gia-san-pham/chi-tiet-don-hang/{chiTietDonHangId}` | GET    |
-| **XÃ³a báº¥t ká»³ Ä‘Ã¡nh giÃ¡ nÃ o**        | `DELETE /api/v1/danh-gia-san-pham/{id}`                              | DELETE |
+| Xem tất cả đánh giá                  | `GET /api/v1/danh-gia-san-pham`                                      | GET    |
+| Xem đánh giá theo ID                     | `GET /api/v1/danh-gia-san-pham/{id}`                                 | GET    |
+| Xem đánh giá theo sản phẩm           | `GET /api/v1/danh-gia-san-pham/san-pham/{sanPhamId}`                 | GET    |
+| Xem đánh giá theo chi tiết đơn hàng | `GET /api/v1/danh-gia-san-pham/chi-tiet-don-hang/{chiTietDonHangId}` | GET    |
+| **Xóa bất kỳ đánh giá nào**        | `DELETE /api/v1/danh-gia-san-pham/{id}`                              | DELETE |
 
-> **LÆ°u Ã½:** Admin KHÃ”NG táº¡o/sá»­a Ä‘Ã¡nh giÃ¡, chá»‰ cÃ³ thá»ƒ xÃ³a báº¥t ká»³ Ä‘Ã¡nh giÃ¡ nÃ o (kiá»ƒm duyá»‡t).
+> **Lưu ý:** Admin KHÔNG tạo/sửa đánh giá, chỉ có thể xóa bất kỳ đánh giá nào (kiểm duyệt).
 
-### 4.9 XÃ¡c thá»±c
+### 4.9 Xác thực
 
-| Chá»©c nÄƒng                | Endpoint                   | Method |
+| Chức năng                | Endpoint                   | Method |
 | --------------------------- | -------------------------- | ------ |
-| ÄÄƒng nháº­p                | `POST /api/v1/auth/login`  | POST   |
-| Xem thÃ´ng tin tÃ i khoáº£n | `GET /api/v1/auth/account` | GET    |
-| Gia háº¡n token             | `GET /api/v1/auth/refresh` | GET    |
-| ÄÄƒng xuáº¥t                | `POST /api/v1/auth/logout` | POST   |
+| Đăng nhập                | `POST /api/v1/auth/login`  | POST   |
+| Xem thông tin tài khoản | `GET /api/v1/auth/account` | GET    |
+| Gia hạn token             | `GET /api/v1/auth/refresh` | GET    |
+| Đăng xuất                | `POST /api/v1/auth/logout` | POST   |
 
 ---
 
-## 5. NHAN_VIEN â€” NhÃ¢n viÃªn bÃ¡n hÃ ng
+## 5. NHAN_VIEN — Nhân viên bán hàng
 
-> **Pháº¡m vi:** Xem danh má»¥c & sáº£n pháº©m (chá»‰ GET), xá»­ lÃ½ Ä‘Æ¡n hÃ ng táº¡i quáº§y, quáº£n lÃ½ phiáº¿u nháº­p.
+> **Phạm vi:** Xem danh mục & sản phẩm (chỉ GET), xử lý đơn hàng tại quầy, quản lý phiếu nhập.
 >
-> **Tá»•ng:** 47 permission
+> **Tổng:** 47 permission
 
-### 5.1 Xem sáº£n pháº©m & danh má»¥c (CHá»ˆ XEM â€” khÃ´ng táº¡o/sá»­a/xÃ³a)
+### 5.1 Xem sản phẩm & danh mục (CHỈ XEM — không tạo/sửa/xóa)
 
-| Chá»©c nÄƒng                                          | Endpoint                                                         | Method |
+| Chức năng                                          | Endpoint                                                         | Method |
 | ----------------------------------------------------- | ---------------------------------------------------------------- | ------ |
-| Xem danh sÃ¡ch sáº£n pháº©m                           | `GET /api/v1/san-pham`                                           | GET    |
-| Xem chi tiáº¿t sáº£n pháº©m                           | `GET /api/v1/san-pham/{id}`                                      | GET    |
-| Xem táº¥t cáº£ biáº¿n thá»ƒ SP                        | `GET /api/v1/chi-tiet-san-pham`                                  | GET    |
-| Xem biáº¿n thá»ƒ theo ID                              | `GET /api/v1/chi-tiet-san-pham/{id}`                             | GET    |
-| Xem biáº¿n thá»ƒ theo sáº£n pháº©m                    | `GET /api/v1/chi-tiet-san-pham/san-pham/{sanPhamId}`             | GET    |
-| Xem biáº¿n thá»ƒ theo cá»­a hÃ ng Ä‘ang Ä‘Äƒng nháº­p | `GET /api/v1/chi-tiet-san-pham/san-pham-tai-cua-hang`            | GET    |
-| Xem danh sÃ¡ch mÃ u sáº¯c                             | `GET /api/v1/mau-sac` + `/{id}`                                  | GET    |
-| Xem danh sÃ¡ch kÃ­ch thÆ°á»›c                         | `GET /api/v1/kich-thuoc` + `/{id}`                               | GET    |
-| Xem danh sÃ¡ch kiá»ƒu sáº£n pháº©m                    | `GET /api/v1/kieu-san-pham` + `/{id}`                            | GET    |
-| Xem danh sÃ¡ch bá»™ sÆ°u táº­p                        | `GET /api/v1/bo-suu-tap` + `/{id}`                               | GET    |
-| Xem danh sÃ¡ch thÆ°Æ¡ng hiá»‡u                        | `GET /api/v1/thuong-hieu` + `/{id}`                              | GET    |
-| Xem hÃ¬nh áº£nh SP                                    | `GET /api/v1/hinh-anh` + `/{id}` + `/chi-tiet-san-pham/{ctspId}` | GET    |
-| Xem danh sÃ¡ch cá»­a hÃ ng                            | `GET /api/v1/cua-hang` + `/{id}`                                 | GET    |
-| Xem danh sÃ¡ch nhÃ¢n viÃªn                            | `GET /api/v1/nhan-vien`                                          | GET    |
+| Xem danh sách sản phẩm                           | `GET /api/v1/san-pham`                                           | GET    |
+| Xem chi tiết sản phẩm                           | `GET /api/v1/san-pham/{id}`                                      | GET    |
+| Xem tất cả biến thể SP                        | `GET /api/v1/chi-tiet-san-pham`                                  | GET    |
+| Xem biến thể theo ID                              | `GET /api/v1/chi-tiet-san-pham/{id}`                             | GET    |
+| Xem biến thể theo sản phẩm                    | `GET /api/v1/chi-tiet-san-pham/san-pham/{sanPhamId}`             | GET    |
+| Xem biến thể theo cửa hàng đang đăng nhập | `GET /api/v1/chi-tiet-san-pham/san-pham-tai-cua-hang`            | GET    |
+| Xem danh sách màu sắc                             | `GET /api/v1/mau-sac` + `/{id}`                                  | GET    |
+| Xem danh sách kích thước                         | `GET /api/v1/kich-thuoc` + `/{id}`                               | GET    |
+| Xem danh sách kiểu sản phẩm                    | `GET /api/v1/kieu-san-pham` + `/{id}`                            | GET    |
+| Xem danh sách bộ sưu tập                        | `GET /api/v1/bo-suu-tap` + `/{id}`                               | GET    |
+| Xem danh sách thương hiệu                        | `GET /api/v1/thuong-hieu` + `/{id}`                              | GET    |
+| Xem hình ảnh SP                                    | `GET /api/v1/hinh-anh` + `/{id}` + `/chi-tiet-san-pham/{ctspId}` | GET    |
+| Xem danh sách cửa hàng                            | `GET /api/v1/cua-hang` + `/{id}`                                 | GET    |
+| Xem danh sách nhân viên                            | `GET /api/v1/nhan-vien`                                          | GET    |
 
-> Vá»›i endpoint `GET /api/v1/nhan-vien`: nhÃ¢n viÃªn chá»‰ xem danh sÃ¡ch nhÃ¢n viÃªn cÃ¹ng cá»­a hÃ ng vá»›i tÃ i khoáº£n Ä‘ang Ä‘Äƒng nháº­p.
+> Với endpoint `GET /api/v1/nhan-vien`: nhân viên chỉ xem danh sách nhân viên cùng cửa hàng với tài khoản đang đăng nhập.
 
-### 5.2 Quáº£n lÃ½ Ä‘Æ¡n hÃ ng (XEM + Táº O Táº I QUáº¦Y + Cáº¬P NHáº¬T)
+### 5.2 Quản lý đơn hàng (XEM + TẠO TẠI QUẦY + CẬP NHẬT)
 
-| Chá»©c nÄƒng                               | Endpoint                                           | Method |
+| Chức năng                               | Endpoint                                           | Method |
 | ------------------------------------------ | -------------------------------------------------- | ------ |
-| Xem danh sÃ¡ch Ä‘Æ¡n hÃ ng                 | `GET /api/v1/don-hang`                             | GET    |
-| Xem chi tiáº¿t Ä‘Æ¡n hÃ ng                 | `GET /api/v1/don-hang/{id}`                        | GET    |
-| **Táº¡o Ä‘Æ¡n hÃ ng táº¡i quáº§y**         | `POST /api/v1/don-hang/tai-quay`                   | POST   |
-| **Cáº­p nháº­t tráº¡ng thÃ¡i Ä‘Æ¡n hÃ ng** | `PUT /api/v1/don-hang`                             | PUT    |
-| Xem chi tiáº¿t sáº£n pháº©m trong Ä‘Æ¡n    | `GET /api/v1/chi-tiet-don-hang` + `/don-hang/{id}` | GET    |
-| Xem chi tiáº¿t Ä‘Æ¡n hÃ ng theo ID         | `GET /api/v1/chi-tiet-don-hang/{id}`               | GET    |
+| Xem danh sách đơn hàng                 | `GET /api/v1/don-hang`                             | GET    |
+| Xem chi tiết đơn hàng                 | `GET /api/v1/don-hang/{id}`                        | GET    |
+| **Tạo đơn hàng tại quầy**         | `POST /api/v1/don-hang/tai-quay`                   | POST   |
+| **Cập nhật trạng thái đơn hàng** | `PUT /api/v1/don-hang`                             | PUT    |
+| Xem chi tiết sản phẩm trong đơn    | `GET /api/v1/chi-tiet-don-hang` + `/don-hang/{id}` | GET    |
+| Xem chi tiết đơn hàng theo ID         | `GET /api/v1/chi-tiet-don-hang/{id}`               | GET    |
 
-> **NhÃ¢n viÃªn KHÃ”NG thá»ƒ:** Táº¡o Ä‘Æ¡n hÃ ng online, xÃ³a Ä‘Æ¡n hÃ ng, táº¡o/sá»­a/xÃ³a chi tiáº¿t Ä‘Æ¡n hÃ ng.
+> **Nhân viên KHÔNG thể:** Tạo đơn hàng online, xóa đơn hàng, tạo/sửa/xóa chi tiết đơn hàng.
 
-### 5.3 Quáº£n lÃ½ nháº­p hÃ ng (PHIáº¾U NHáº¬P â€” gáº§n nhÆ° toÃ n quyá»n)
+### 5.3 Quản lý nhập hàng (PHIẾU NHẬP — gần như toàn quyền)
 
-| Chá»©c nÄƒng                               | Endpoint                                                                  | Method |
+| Chức năng                               | Endpoint                                                                  | Method |
 | ------------------------------------------ | ------------------------------------------------------------------------- | ------ |
-| Xem danh sÃ¡ch phiáº¿u nháº­p              | `GET /api/v1/phieu-nhap`                                                  | GET    |
-| Xem chi tiáº¿t phiáº¿u nháº­p              | `GET /api/v1/phieu-nhap/{id}`                                             | GET    |
-| **Táº¡o phiáº¿u nháº­p**                   | `POST /api/v1/phieu-nhap`                                                 | POST   |
-| **Cáº­p nháº­t phiáº¿u nháº­p**            | `PUT /api/v1/phieu-nhap`                                                  | PUT    |
-| **Kiá»ƒm kÃª phiáº¿u nháº­p**              | `PUT /api/v1/phieu-nhap/kiem-ke/{id}`                                     | PUT    |
-| Xem chi tiáº¿t phiáº¿u nháº­p (dÃ²ng)      | `GET /api/v1/chi-tiet-phieu-nhap` + `/{id}` + `/phieu-nhap/{phieuNhapId}` | GET    |
-| **Táº¡o chi tiáº¿t phiáº¿u nháº­p**        | `POST /api/v1/chi-tiet-phieu-nhap`                                        | POST   |
-| **Cáº­p nháº­t chi tiáº¿t phiáº¿u nháº­p** | `PUT /api/v1/chi-tiet-phieu-nhap`                                         | PUT    |
+| Xem danh sách phiếu nhập              | `GET /api/v1/phieu-nhap`                                                  | GET    |
+| Xem chi tiết phiếu nhập              | `GET /api/v1/phieu-nhap/{id}`                                             | GET    |
+| **Tạo phiếu nhập**                   | `POST /api/v1/phieu-nhap`                                                 | POST   |
+| **Cập nhật phiếu nhập**            | `PUT /api/v1/phieu-nhap`                                                  | PUT    |
+| **Kiểm kê phiếu nhập**              | `PUT /api/v1/phieu-nhap/kiem-ke/{id}`                                     | PUT    |
+| Xem chi tiết phiếu nhập (dòng)      | `GET /api/v1/chi-tiet-phieu-nhap` + `/{id}` + `/phieu-nhap/{phieuNhapId}` | GET    |
+| **Tạo chi tiết phiếu nhập**        | `POST /api/v1/chi-tiet-phieu-nhap`                                        | POST   |
+| **Cập nhật chi tiết phiếu nhập** | `PUT /api/v1/chi-tiet-phieu-nhap`                                         | PUT    |
 
-> **NhÃ¢n viÃªn KHÃ”NG thá»ƒ:** XÃ³a phiáº¿u nháº­p, xÃ³a chi tiáº¿t phiáº¿u nháº­p.
+> **Nhân viên KHÔNG thể:** Xóa phiếu nhập, xóa chi tiết phiếu nhập.
 
-### 5.4 Xem khuyáº¿n mÃ£i (CHá»ˆ XEM)
+### 5.4 Xem khuyến mãi (CHỈ XEM)
 
-| Chá»©c nÄƒng                      | Endpoint                                        | Method |
+| Chức năng                      | Endpoint                                        | Method |
 | --------------------------------- | ----------------------------------------------- | ------ |
-| Xem khuyáº¿n mÃ£i theo hÃ³a Ä‘Æ¡n | `GET /api/v1/khuyen-mai-theo-hoa-don` + `/{id}` | GET    |
-| Xem khuyáº¿n mÃ£i theo Ä‘iá»ƒm    | `GET /api/v1/khuyen-mai-theo-diem` + `/{id}`    | GET    |
+| Xem khuyến mãi theo hóa đơn | `GET /api/v1/khuyen-mai-theo-hoa-don` + `/{id}` | GET    |
+| Xem khuyến mãi theo điểm    | `GET /api/v1/khuyen-mai-theo-diem` + `/{id}`    | GET    |
 
-### 5.5 Xem Ä‘Ã¡nh giÃ¡ sáº£n pháº©m (CHá»ˆ XEM)
+### 5.5 Xem đánh giá sản phẩm (CHỈ XEM)
 
-| Chá»©c nÄƒng                                | Endpoint                                                             | Method |
+| Chức năng                                | Endpoint                                                             | Method |
 | ------------------------------------------- | -------------------------------------------------------------------- | ------ |
-| Xem táº¥t cáº£ Ä‘Ã¡nh giÃ¡                  | `GET /api/v1/danh-gia-san-pham`                                      | GET    |
-| Xem Ä‘Ã¡nh giÃ¡ theo ID                     | `GET /api/v1/danh-gia-san-pham/{id}`                                 | GET    |
-| Xem Ä‘Ã¡nh giÃ¡ theo sáº£n pháº©m           | `GET /api/v1/danh-gia-san-pham/san-pham/{sanPhamId}`                 | GET    |
-| Xem Ä‘Ã¡nh giÃ¡ theo chi tiáº¿t Ä‘Æ¡n hÃ ng | `GET /api/v1/danh-gia-san-pham/chi-tiet-don-hang/{chiTietDonHangId}` | GET    |
+| Xem tất cả đánh giá                  | `GET /api/v1/danh-gia-san-pham`                                      | GET    |
+| Xem đánh giá theo ID                     | `GET /api/v1/danh-gia-san-pham/{id}`                                 | GET    |
+| Xem đánh giá theo sản phẩm           | `GET /api/v1/danh-gia-san-pham/san-pham/{sanPhamId}`                 | GET    |
+| Xem đánh giá theo chi tiết đơn hàng | `GET /api/v1/danh-gia-san-pham/chi-tiet-don-hang/{chiTietDonHangId}` | GET    |
 
-### 5.6 NhÃ¢n viÃªn KHÃ”NG CÃ“ quyá»n
+### 5.6 Nhân viên KHÔNG CÓ quyền
 
-- âŒ Táº¡o/Sá»­a/XÃ³a sáº£n pháº©m, danh má»¥c (kiá»ƒu SP, BST, thÆ°Æ¡ng hiá»‡u, mÃ u sáº¯c, kÃ­ch thÆ°á»›c)
-- âŒ Táº¡o/Sá»­a/XÃ³a hÃ¬nh áº£nh, cá»­a hÃ ng, nhÃ  cung cáº¥p
-- âŒ Táº¡o/Sá»­a/XÃ³a nhÃ¢n viÃªn
-- âŒ Quáº£n lÃ½ vai trÃ², quyá»n háº¡n
-- âŒ Táº¡o/Sá»­a/XÃ³a khuyáº¿n mÃ£i
-- âŒ Táº¡o Ä‘Æ¡n hÃ ng online
-- âŒ XÃ³a Ä‘Æ¡n hÃ ng, phiáº¿u nháº­p
-- âŒ Giá» hÃ ng (chá»‰ dÃ nh cho khÃ¡ch hÃ ng)
-- âŒ Táº¡o/Sá»­a/XÃ³a Ä‘Ã¡nh giÃ¡ sáº£n pháº©m
+- ❌ Tạo/Sửa/Xóa sản phẩm, danh mục (kiểu SP, BST, thương hiệu, màu sắc, kích thước)
+- ❌ Tạo/Sửa/Xóa hình ảnh, cửa hàng, nhà cung cấp
+- ❌ Tạo/Sửa/Xóa nhân viên
+- ❌ Quản lý vai trò, quyền hạn
+- ❌ Tạo/Sửa/Xóa khuyến mãi
+- ❌ Tạo đơn hàng online
+- ❌ Xóa đơn hàng, phiếu nhập
+- ❌ Giỏ hàng (chỉ dành cho khách hàng)
+- ❌ Tạo/Sửa/Xóa đánh giá sản phẩm
 
 ---
 
-## 6. KHACH_HANG â€” KhÃ¡ch hÃ ng
+## 6. KHACH_HANG — Khách hàng
 
-> **Pháº¡m vi:** Xem sáº£n pháº©m, giá» hÃ ng, Ä‘áº·t hÃ ng online, Ä‘Ã¡nh giÃ¡ sáº£n pháº©m, sá»­ dá»¥ng khuyáº¿n mÃ£i.
+> **Phạm vi:** Xem sản phẩm, giỏ hàng, đặt hàng online, đánh giá sản phẩm, sử dụng khuyến mãi.
 >
-> **Tá»•ng:** 40+ permission
+> **Tổng:** 40+ permission
 
-### 6.1 ÄÄƒng kÃ½ & ÄÄƒng nháº­p
+### 6.1 Đăng ký & Đăng nhập
 
-| Chá»©c nÄƒng                | Endpoint                     | Method | Ghi chÃº                   |
+| Chức năng                | Endpoint                     | Method | Ghi chú                   |
 | --------------------------- | ---------------------------- | ------ | -------------------------- |
-| ÄÄƒng kÃ½ tÃ i khoáº£n      | `POST /api/v1/auth/register` | POST   | Public, khÃ´ng cáº§n token |
-| ÄÄƒng nháº­p                | `POST /api/v1/auth/login`    | POST   | Email + Password           |
-| Xem thÃ´ng tin tÃ i khoáº£n | `GET /api/v1/auth/account`   | GET    | Bao gá»“m `diemTichLuy`    |
-| Gia háº¡n token             | `GET /api/v1/auth/refresh`   | GET    | DÃ¹ng refresh cookie       |
-| ÄÄƒng xuáº¥t                | `POST /api/v1/auth/logout`   | POST   | XÃ³a refresh token         |
+| Đăng ký tài khoản      | `POST /api/v1/auth/register` | POST   | Public, không cần token |
+| Đăng nhập                | `POST /api/v1/auth/login`    | POST   | Email + Password           |
+| Xem thông tin tài khoản | `GET /api/v1/auth/account`   | GET    | Bao gồm `diemTichLuy`    |
+| Gia hạn token             | `GET /api/v1/auth/refresh`   | GET    | Dùng refresh cookie       |
+| Đăng xuất                | `POST /api/v1/auth/logout`   | POST   | Xóa refresh token         |
 
-**Response Ä‘Äƒng nháº­p chá»©a:**
+**Response đăng nhập chứa:**
 
 ```json
 {
@@ -334,7 +337,7 @@ Há»‡ thá»‘ng **Shopping** lÃ  á»©ng dá»¥ng quáº£n lÃ½ bÃ¡
   "user": {
     "id": 1,
     "email": "customer@example.com",
-    "tenKhachHang": "Nguyá»…n VÄƒn A",
+    "tenKhachHang": "Nguyễn Văn A",
     "diemTichLuy": 150,
     "role": {
       "id": 4,
@@ -344,35 +347,35 @@ Há»‡ thá»‘ng **Shopping** lÃ  á»©ng dá»¥ng quáº£n lÃ½ bÃ¡
 }
 ```
 
-### 6.2 Duyá»‡t sáº£n pháº©m (CHá»ˆ XEM)
+### 6.2 Duyệt sản phẩm (CHỈ XEM)
 
-| Chá»©c nÄƒng                                          | Endpoint                                                                                               | Method |
+| Chức năng                                          | Endpoint                                                                                               | Method |
 | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | ------ |
-| Xem danh sÃ¡ch sáº£n pháº©m (lá»c, tÃ¬m kiáº¿m)       | `GET /api/v1/san-pham?tenSanPham=&kieuSanPhamId=&boSuuTapId=&thuongHieuId=&trangThai=&giaMin=&giaMax=` | GET    |
-| Xem chi tiáº¿t sáº£n pháº©m                           | `GET /api/v1/san-pham/{id}`                                                                            | GET    |
-| Xem biáº¿n thá»ƒ sáº£n pháº©m (mÃ u, size, tá»“n kho) | `GET /api/v1/chi-tiet-san-pham/san-pham/{sanPhamId}`                                                   | GET    |
-| Xem biáº¿n thá»ƒ theo ID                              | `GET /api/v1/chi-tiet-san-pham/{id}`                                                                   | GET    |
-| Xem táº¥t cáº£ biáº¿n thá»ƒ                           | `GET /api/v1/chi-tiet-san-pham`                                                                        | GET    |
-| Xem hÃ¬nh áº£nh sáº£n pháº©m                          | `GET /api/v1/hinh-anh/chi-tiet-san-pham/{ctspId}`                                                      | GET    |
-| Xem danh sÃ¡ch danh má»¥c                             | `GET /api/v1/kieu-san-pham` + `/{id}`                                                                  | GET    |
-| Xem danh sÃ¡ch bá»™ sÆ°u táº­p                        | `GET /api/v1/bo-suu-tap` + `/{id}`                                                                     | GET    |
-| Xem danh sÃ¡ch thÆ°Æ¡ng hiá»‡u                        | `GET /api/v1/thuong-hieu` + `/{id}`                                                                    | GET    |
-| Xem danh sÃ¡ch mÃ u sáº¯c                             | `GET /api/v1/mau-sac` + `/{id}`                                                                        | GET    |
-| Xem danh sÃ¡ch kÃ­ch thÆ°á»›c                         | `GET /api/v1/kich-thuoc` + `/{id}`                                                                     | GET    |
-| Xem danh sÃ¡ch cá»­a hÃ ng                            | `GET /api/v1/cua-hang` + `/{id}`                                                                       | GET    |
-| Xem áº£nh sáº£n pháº©m (public)                       | `GET {secure_url_cloudinary}`                                                                          | GET    |
+| Xem danh sách sản phẩm (lọc, tìm kiếm)       | `GET /api/v1/san-pham?tenSanPham=&kieuSanPhamId=&boSuuTapId=&thuongHieuId=&trangThai=&giaMin=&giaMax=` | GET    |
+| Xem chi tiết sản phẩm                           | `GET /api/v1/san-pham/{id}`                                                                            | GET    |
+| Xem biến thể sản phẩm (màu, size, tồn kho) | `GET /api/v1/chi-tiet-san-pham/san-pham/{sanPhamId}`                                                   | GET    |
+| Xem biến thể theo ID                              | `GET /api/v1/chi-tiet-san-pham/{id}`                                                                   | GET    |
+| Xem tất cả biến thể                           | `GET /api/v1/chi-tiet-san-pham`                                                                        | GET    |
+| Xem hình ảnh sản phẩm                          | `GET /api/v1/hinh-anh/chi-tiet-san-pham/{ctspId}`                                                      | GET    |
+| Xem danh sách danh mục                             | `GET /api/v1/kieu-san-pham` + `/{id}`                                                                  | GET    |
+| Xem danh sách bộ sưu tập                        | `GET /api/v1/bo-suu-tap` + `/{id}`                                                                     | GET    |
+| Xem danh sách thương hiệu                        | `GET /api/v1/thuong-hieu` + `/{id}`                                                                    | GET    |
+| Xem danh sách màu sắc                             | `GET /api/v1/mau-sac` + `/{id}`                                                                        | GET    |
+| Xem danh sách kích thước                         | `GET /api/v1/kich-thuoc` + `/{id}`                                                                     | GET    |
+| Xem danh sách cửa hàng                            | `GET /api/v1/cua-hang` + `/{id}`                                                                       | GET    |
+| Xem ảnh sản phẩm (public)                       | `GET {secure_url_cloudinary}`                                                                          | GET    |
 
-### 6.3 Giá» hÃ ng (CHá»ˆ KHÃCH HÃ€NG)
+### 6.3 Giỏ hàng (CHỈ KHÁCH HÀNG)
 
-| Chá»©c nÄƒng                     | Endpoint                                              | Method |
+| Chức năng                     | Endpoint                                              | Method |
 | -------------------------------- | ----------------------------------------------------- | ------ |
-| **ThÃªm sáº£n pháº©m vÃ o giá»** | `POST /api/v1/gio-hang/them-san-pham`                 | POST   |
-| **Xem giá» hÃ ng cá»§a tÃ´i**    | `GET /api/v1/gio-hang/cua-toi`                        | GET    |
-| **XÃ³a sáº£n pháº©m khá»i giá»** | `DELETE /api/v1/gio-hang/chi-tiet/{maChiTietGioHang}` | DELETE |
-| **Xem khuyáº¿n mÃ£i há»£p lá»‡** | `GET /api/v1/gio-hang/khuyen-mai-hop-le`              | GET    |
-| **Xem trÆ°á»›c giáº£m giÃ¡**     | `POST /api/v1/gio-hang/ap-dung-khuyen-mai`            | POST   |
+| **Thêm sản phẩm vào giỏ** | `POST /api/v1/gio-hang/them-san-pham`                 | POST   |
+| **Xem giỏ hàng của tôi**    | `GET /api/v1/gio-hang/cua-toi`                        | GET    |
+| **Xóa sản phẩm khỏi giỏ** | `DELETE /api/v1/gio-hang/chi-tiet/{maChiTietGioHang}` | DELETE |
+| **Xem khuyến mãi hợp lệ** | `GET /api/v1/gio-hang/khuyen-mai-hop-le`              | GET    |
+| **Xem trước giảm giá**     | `POST /api/v1/gio-hang/ap-dung-khuyen-mai`            | POST   |
 
-**Request thÃªm SP vÃ o giá»:**
+**Request thêm SP vào giỏ:**
 
 ```json
 {
@@ -381,25 +384,25 @@ Há»‡ thá»‘ng **Shopping** lÃ  á»©ng dá»¥ng quáº£n lÃ½ bÃ¡
 }
 ```
 
-**Logic Ä‘áº·c biá»‡t:** Náº¿u sáº£n pháº©m Ä‘Ã£ tá»“n táº¡i trong giá» â†’ tá»± Ä‘á»™ng cá»™ng thÃªm sá»‘ lÆ°á»£ng.
+**Logic đặc biệt:** Nếu sản phẩm đã tồn tại trong giỏ → tự động cộng thêm số lượng.
 
-### 6.4 Äáº·t hÃ ng online
+### 6.4 Đặt hàng online
 
-| Chá»©c nÄƒng                                                          | Endpoint                                             | Method |
+| Chức năng                                                          | Endpoint                                             | Method |
 | --------------------------------------------------------------------- | ---------------------------------------------------- | ------ |
-| **Táº¡o Ä‘Æ¡n hÃ ng online**                                          | `POST /api/v1/don-hang/online`                       | POST   |
-| Xem danh sÃ¡ch Ä‘Æ¡n hÃ ng cá»§a tÃ´i                                 | `GET /api/v1/don-hang`                               | GET    |
-| Xem chi tiáº¿t Ä‘Æ¡n hÃ ng                                            | `GET /api/v1/don-hang/{id}`                          | GET    |
-| **Cáº­p nháº­t Ä‘Æ¡n hÃ ng** (há»§y Ä‘Æ¡n, cáº­p nháº­t Ä‘á»‹a chá»‰) | `PUT /api/v1/don-hang`                               | PUT    |
-| Xem sáº£n pháº©m trong Ä‘Æ¡n hÃ ng                                    | `GET /api/v1/chi-tiet-don-hang/don-hang/{donHangId}` | GET    |
-| Xem chi tiáº¿t dÃ²ng sáº£n pháº©m                                     | `GET /api/v1/chi-tiet-don-hang/{id}`                 | GET    |
-| Xem táº¥t cáº£ chi tiáº¿t Ä‘Æ¡n hÃ ng                                 | `GET /api/v1/chi-tiet-don-hang`                      | GET    |
+| **Tạo đơn hàng online**                                          | `POST /api/v1/don-hang/online`                       | POST   |
+| Xem danh sách đơn hàng của tôi                                 | `GET /api/v1/don-hang`                               | GET    |
+| Xem chi tiết đơn hàng                                            | `GET /api/v1/don-hang/{id}`                          | GET    |
+| **Cập nhật đơn hàng** (hủy đơn, cập nhật địa chỉ) | `PUT /api/v1/don-hang`                               | PUT    |
+| Xem sản phẩm trong đơn hàng                                    | `GET /api/v1/chi-tiet-don-hang/don-hang/{donHangId}` | GET    |
+| Xem chi tiết dòng sản phẩm                                     | `GET /api/v1/chi-tiet-don-hang/{id}`                 | GET    |
+| Xem tất cả chi tiết đơn hàng                                 | `GET /api/v1/chi-tiet-don-hang`                      | GET    |
 
-**Request táº¡o Ä‘Æ¡n hÃ ng online:**
+**Request tạo đơn hàng online:**
 
 ```json
 {
-  "diaChi": "123 Nguyá»…n TrÃ£i, Q.1, TP.HCM",
+  "diaChi": "123 Nguyễn Trãi, Q.1, TP.HCM",
   "sdt": "0901234567",
   "cuaHangId": 1,
   "maKhuyenMaiHoaDon": 1,
@@ -407,360 +410,367 @@ Há»‡ thá»‘ng **Shopping** lÃ  á»©ng dá»¥ng quáº£n lÃ½ bÃ¡
 }
 ```
 
-**Luá»“ng Ä‘áº·t hÃ ng online:**
+**Luồng đặt hàng online:**
 
-1. KH thÃªm SP vÃ o giá» hÃ ng â†’ `POST /api/v1/gio-hang/them-san-pham`
-2. KH xem giá» hÃ ng â†’ `GET /api/v1/gio-hang/cua-toi`
-3. KH xem khuyáº¿n mÃ£i há»£p lá»‡ â†’ `GET /api/v1/gio-hang/khuyen-mai-hop-le`
-4. KH Ã¡p dá»¥ng khuyáº¿n mÃ£i (xem trÆ°á»›c giáº£m giÃ¡) â†’ `POST /api/v1/gio-hang/ap-dung-khuyen-mai`
-5. KH Ä‘áº·t hÃ ng â†’ `POST /api/v1/don-hang/online`
-6. Há»‡ thá»‘ng tá»± Ä‘á»™ng: táº¡o Ä‘Æ¡n + chi tiáº¿t Ä‘Æ¡n â†’ giáº£m tá»“n kho â†’ xÃ³a giá» hÃ ng
-7. KH theo dÃµi Ä‘Æ¡n â†’ `GET /api/v1/don-hang/{id}`
-8. Khi Ä‘Æ¡n hoÃ n thÃ nh (trangThai=5) â†’ há»‡ thá»‘ng tá»± cá»™ng Ä‘iá»ƒm tÃ­ch lÅ©y
+1. KH thêm SP vào giỏ hàng → `POST /api/v1/gio-hang/them-san-pham`
+2. KH xem giỏ hàng → `GET /api/v1/gio-hang/cua-toi`
+3. KH xem khuyến mãi hợp lệ → `GET /api/v1/gio-hang/khuyen-mai-hop-le`
+4. KH áp dụng khuyến mãi (xem trước giảm giá) → `POST /api/v1/gio-hang/ap-dung-khuyen-mai`
+5. KH đặt hàng → `POST /api/v1/don-hang/online`
+6. Hệ thống tự động: tạo đơn + chi tiết đơn → giảm tồn kho → xóa giỏ hàng
+7. KH theo dõi đơn → `GET /api/v1/don-hang/{id}`
+8. Khi đơn hoàn thành (trangThai=5) → hệ thống tự cộng điểm tích lũy
 
-**Quy táº¯c tÃ­ch Ä‘iá»ƒm:** Má»—i 100.000 VND â†’ 10 Ä‘iá»ƒm. VÃ­ dá»¥: Ä‘Æ¡n 350.000Ä‘ â†’ 30 Ä‘iá»ƒm.
+**Quy tắc tích điểm:** Mỗi 100.000 VND → 10 điểm. Ví dụ: đơn 350.000đ → 30 điểm.
 
-### 6.5 Xem khuyáº¿n mÃ£i (CHá»ˆ XEM)
+### 6.5 Xem khuyến mãi (CHỈ XEM)
 
-| Chá»©c nÄƒng                      | Endpoint                                        | Method |
+| Chức năng                      | Endpoint                                        | Method |
 | --------------------------------- | ----------------------------------------------- | ------ |
-| Xem khuyáº¿n mÃ£i theo hÃ³a Ä‘Æ¡n | `GET /api/v1/khuyen-mai-theo-hoa-don` + `/{id}` | GET    |
-| Xem khuyáº¿n mÃ£i theo Ä‘iá»ƒm    | `GET /api/v1/khuyen-mai-theo-diem` + `/{id}`    | GET    |
+| Xem khuyến mãi theo hóa đơn | `GET /api/v1/khuyen-mai-theo-hoa-don` + `/{id}` | GET    |
+| Xem khuyến mãi theo điểm    | `GET /api/v1/khuyen-mai-theo-diem` + `/{id}`    | GET    |
 
-### 6.6 ÄÃ¡nh giÃ¡ sáº£n pháº©m
+### 6.6 Đánh giá sản phẩm
 
-| Chá»©c nÄƒng                                | Endpoint                                                             | Method |
+| Chức năng                                | Endpoint                                                             | Method |
 | ------------------------------------------- | -------------------------------------------------------------------- | ------ |
-| Xem táº¥t cáº£ Ä‘Ã¡nh giÃ¡                  | `GET /api/v1/danh-gia-san-pham`                                      | GET    |
-| Xem Ä‘Ã¡nh giÃ¡ theo ID                     | `GET /api/v1/danh-gia-san-pham/{id}`                                 | GET    |
-| Xem Ä‘Ã¡nh giÃ¡ theo sáº£n pháº©m           | `GET /api/v1/danh-gia-san-pham/san-pham/{sanPhamId}`                 | GET    |
-| Xem Ä‘Ã¡nh giÃ¡ theo chi tiáº¿t Ä‘Æ¡n hÃ ng | `GET /api/v1/danh-gia-san-pham/chi-tiet-don-hang/{chiTietDonHangId}` | GET    |
-| **Xem Ä‘Ã¡nh giÃ¡ cá»§a tÃ´i**              | `GET /api/v1/danh-gia-san-pham/cua-toi`                              | GET    |
-| **Táº¡o Ä‘Ã¡nh giÃ¡** (multipart/form-data) | `POST /api/v1/danh-gia-san-pham`                                     | POST   |
-| **Cáº­p nháº­t Ä‘Ã¡nh giÃ¡** (cá»§a mÃ¬nh)  | `PUT /api/v1/danh-gia-san-pham/{id}`                                 | PUT    |
-| **XÃ³a Ä‘Ã¡nh giÃ¡** (cá»§a mÃ¬nh)          | `DELETE /api/v1/danh-gia-san-pham/{id}`                              | DELETE |
+| Xem tất cả đánh giá                  | `GET /api/v1/danh-gia-san-pham`                                      | GET    |
+| Xem đánh giá theo ID                     | `GET /api/v1/danh-gia-san-pham/{id}`                                 | GET    |
+| Xem đánh giá theo sản phẩm           | `GET /api/v1/danh-gia-san-pham/san-pham/{sanPhamId}`                 | GET    |
+| Xem đánh giá theo chi tiết đơn hàng | `GET /api/v1/danh-gia-san-pham/chi-tiet-don-hang/{chiTietDonHangId}` | GET    |
+| **Xem đánh giá của tôi**              | `GET /api/v1/danh-gia-san-pham/cua-toi`                              | GET    |
+| **Tạo đánh giá** (multipart/form-data) | `POST /api/v1/danh-gia-san-pham`                                     | POST   |
+| **Cập nhật đánh giá** (của mình)  | `PUT /api/v1/danh-gia-san-pham/{id}`                                 | PUT    |
+| **Xóa đánh giá** (của mình)          | `DELETE /api/v1/danh-gia-san-pham/{id}`                              | DELETE |
 
-**Äiá»u kiá»‡n táº¡o Ä‘Ã¡nh giÃ¡:**
+**Điều kiện tạo đánh giá:**
 
-- âœ… ÄÃ£ Ä‘Äƒng nháº­p báº±ng tÃ i khoáº£n khÃ¡ch hÃ ng
-- âœ… Chi tiáº¿t Ä‘Æ¡n hÃ ng thuá»™c Ä‘Æ¡n hÃ ng **cá»§a mÃ¬nh**
-- âœ… ÄÆ¡n hÃ ng á»Ÿ tráº¡ng thÃ¡i **5 (ÄÃ£ nháº­n hÃ ng)**
-- âœ… ChÆ°a Ä‘Ã¡nh giÃ¡ dÃ²ng sáº£n pháº©m nÃ y (má»—i dÃ²ng chá»‰ Ä‘Ã¡nh giÃ¡ 1 láº§n)
+- ✅ Đã đăng nhập bằng tài khoản khách hàng
+- ✅ Chi tiết đơn hàng thuộc đơn hàng **của mình**
+- ✅ Đơn hàng ở trạng thái **5 (Đã nhận hàng)**
+- ✅ Chưa đánh giá dòng sản phẩm này (mỗi dòng chỉ đánh giá 1 lần)
 
-**Request táº¡o Ä‘Ã¡nh giÃ¡ (multipart/form-data):**
+**Request tạo đánh giá (multipart/form-data):**
 
 ```
 chiTietDonHangId = 7
 soSao            = 5      (1-5 sao)
-ghiTru           = "Sáº£n pháº©m ráº¥t Ä‘áº¹p!"
-file             = (áº£nh Ä‘Ã¡nh giÃ¡, tÃ¹y chá»n)
+ghiTru           = "Sản phẩm rất đẹp!"
+file             = (ảnh đánh giá, tùy chọn)
 ```
 
-### 6.7 KhÃ¡ch hÃ ng KHÃ”NG CÃ“ quyá»n
+### 6.7 Khách hàng KHÔNG CÓ quyền
 
-- âŒ Táº¡o/Sá»­a/XÃ³a sáº£n pháº©m, danh má»¥c, hÃ¬nh áº£nh
-- âŒ Quáº£n lÃ½ cá»­a hÃ ng, nhÃ  cung cáº¥p
-- âŒ Quáº£n lÃ½ vai trÃ², quyá»n háº¡n
-- âŒ Quáº£n lÃ½ phiáº¿u nháº­p
-- âŒ Táº¡o/Sá»­a/XÃ³a khuyáº¿n mÃ£i
-- âŒ Táº¡o Ä‘Æ¡n hÃ ng táº¡i quáº§y
-- âŒ XÃ³a Ä‘Æ¡n hÃ ng
-- âŒ Táº¡o/Sá»­a/XÃ³a chi tiáº¿t Ä‘Æ¡n hÃ ng
-- âŒ Xem nhÃ  cung cáº¥p
-- âŒ ÄÃ¡nh giÃ¡ sáº£n pháº©m cá»§a ngÆ°á»i khÃ¡c
+- ❌ Tạo/Sửa/Xóa sản phẩm, danh mục, hình ảnh
+- ❌ Quản lý cửa hàng, nhà cung cấp
+- ❌ Quản lý vai trò, quyền hạn
+- ❌ Quản lý phiếu nhập
+- ❌ Tạo/Sửa/Xóa khuyến mãi
+- ❌ Tạo đơn hàng tại quầy
+- ❌ Xóa đơn hàng
+- ❌ Tạo/Sửa/Xóa chi tiết đơn hàng
+- ❌ Xem nhà cung cấp
+- ❌ Đánh giá sản phẩm của người khác
 
 ---
 
-## 7. Endpoint cÃ´ng khai (khÃ´ng cáº§n Ä‘Äƒng nháº­p)
+## 7. Endpoint công khai (không cần đăng nhập)
 
-| Endpoint                      | Method | MÃ´ táº£                                       |
+| Endpoint                      | Method | Mô tả                                       |
 | ----------------------------- | ------ | ---------------------------------------------- |
-| `POST /api/v1/auth/login`     | POST   | ÄÄƒng nháº­p                                   |
-| `POST /api/v1/auth/register`  | POST   | ÄÄƒng kÃ½ tÃ i khoáº£n khÃ¡ch hÃ ng            |
-| `GET /api/v1/auth/refresh`    | GET    | Gia háº¡n access token (cáº§n refresh cookie)  |
-| `GET {secure_url_cloudinary}` | GET    | Xem áº£nh sáº£n pháº©m (public, cache 1 ngÃ y) |
+| `POST /api/v1/auth/login`     | POST   | Đăng nhập                                   |
+| `POST /api/v1/auth/register`  | POST   | Đăng ký tài khoản khách hàng            |
+| `GET /api/v1/auth/refresh`    | GET    | Gia hạn access token (cần refresh cookie)  |
+| `GET {secure_url_cloudinary}` | GET    | Xem ảnh sản phẩm (public, cache 1 ngày) |
 | `GET /v3/api-docs/**`         | GET    | Swagger API documentation                      |
 | `GET /swagger-ui/**`          | GET    | Swagger UI                                     |
 
 ---
 
-## 8. Báº£ng ma tráº­n phÃ¢n quyá»n chi tiáº¿t
+## 8. Bảng ma trận phân quyền chi tiết
 
-### 8.1 Sáº£n pháº©m & Danh má»¥c
+### 8.1 Sản phẩm & Danh mục
 
 | Module          | Endpoint                     | Method | ADMIN | NHAN_VIEN | KHACH_HANG |
 | --------------- | ---------------------------- | ------ | ----- | --------- | ---------- |
-| Sáº£n pháº©m    | `/api/v1/san-pham`           | GET    | âœ…   | âœ…       | âœ…        |
-| Sáº£n pháº©m    | `/api/v1/san-pham/{id}`      | GET    | âœ…   | âœ…       | âœ…        |
-| Sáº£n pháº©m    | `/api/v1/san-pham`           | POST   | âœ…   | âŒ        | âŒ         |
-| Sáº£n pháº©m    | `/api/v1/san-pham`           | PUT    | âœ…   | âŒ        | âŒ         |
-| Sáº£n pháº©m    | `/api/v1/san-pham/{id}`      | DELETE | âœ…   | âŒ        | âŒ         |
-| Kiá»ƒu SP       | `/api/v1/kieu-san-pham`      | GET    | âœ…   | âœ…       | âœ…        |
-| Kiá»ƒu SP       | `/api/v1/kieu-san-pham`      | POST   | âœ…   | âŒ        | âŒ         |
-| Kiá»ƒu SP       | `/api/v1/kieu-san-pham`      | PUT    | âœ…   | âŒ        | âŒ         |
-| Kiá»ƒu SP       | `/api/v1/kieu-san-pham/{id}` | DELETE | âœ…   | âŒ        | âŒ         |
-| BST             | `/api/v1/bo-suu-tap`         | GET    | âœ…   | âœ…       | âœ…        |
-| BST             | `/api/v1/bo-suu-tap`         | POST   | âœ…   | âŒ        | âŒ         |
-| BST             | `/api/v1/bo-suu-tap`         | PUT    | âœ…   | âŒ        | âŒ         |
-| BST             | `/api/v1/bo-suu-tap/{id}`    | DELETE | âœ…   | âŒ        | âŒ         |
-| ThÆ°Æ¡ng hiá»‡u | `/api/v1/thuong-hieu`        | GET    | âœ…   | âœ…       | âœ…        |
-| ThÆ°Æ¡ng hiá»‡u | `/api/v1/thuong-hieu`        | CRUD   | âœ…   | âŒ        | âŒ         |
-| MÃ u sáº¯c      | `/api/v1/mau-sac`            | GET    | âœ…   | âœ…       | âœ…        |
-| MÃ u sáº¯c      | `/api/v1/mau-sac`            | CRUD   | âœ…   | âŒ        | âŒ         |
-| KÃ­ch thÆ°á»›c  | `/api/v1/kich-thuoc`         | GET    | âœ…   | âœ…       | âœ…        |
-| KÃ­ch thÆ°á»›c  | `/api/v1/kich-thuoc`         | CRUD   | âœ…   | âŒ        | âŒ         |
+| Sản phẩm    | `/api/v1/san-pham`           | GET    | ✅   | ✅       | ✅        |
+| Sản phẩm    | `/api/v1/san-pham/{id}`      | GET    | ✅   | ✅       | ✅        |
+| Sản phẩm    | `/api/v1/san-pham`           | POST   | ✅   | ❌        | ❌         |
+| Sản phẩm    | `/api/v1/san-pham`           | PUT    | ✅   | ❌        | ❌         |
+| Sản phẩm    | `/api/v1/san-pham/{id}`      | DELETE | ✅   | ❌        | ❌         |
+| Kiểu SP       | `/api/v1/kieu-san-pham`      | GET    | ✅   | ✅       | ✅        |
+| Kiểu SP       | `/api/v1/kieu-san-pham`      | POST   | ✅   | ❌        | ❌         |
+| Kiểu SP       | `/api/v1/kieu-san-pham`      | PUT    | ✅   | ❌        | ❌         |
+| Kiểu SP       | `/api/v1/kieu-san-pham/{id}` | DELETE | ✅   | ❌        | ❌         |
+| BST             | `/api/v1/bo-suu-tap`         | GET    | ✅   | ✅       | ✅        |
+| BST             | `/api/v1/bo-suu-tap`         | POST   | ✅   | ❌        | ❌         |
+| BST             | `/api/v1/bo-suu-tap`         | PUT    | ✅   | ❌        | ❌         |
+| BST             | `/api/v1/bo-suu-tap/{id}`    | DELETE | ✅   | ❌        | ❌         |
+| Thương hiệu | `/api/v1/thuong-hieu`        | GET    | ✅   | ✅       | ✅        |
+| Thương hiệu | `/api/v1/thuong-hieu`        | CRUD   | ✅   | ❌        | ❌         |
+| Màu sắc      | `/api/v1/mau-sac`            | GET    | ✅   | ✅       | ✅        |
+| Màu sắc      | `/api/v1/mau-sac`            | CRUD   | ✅   | ❌        | ❌         |
+| Kích thước  | `/api/v1/kich-thuoc`         | GET    | ✅   | ✅       | ✅        |
+| Kích thước  | `/api/v1/kich-thuoc`         | CRUD   | ✅   | ❌        | ❌         |
 
-### 8.2 Chi tiáº¿t SP & HÃ¬nh áº£nh
+### 8.2 Chi tiết SP & Hình ảnh
 
 | Module      | Endpoint                                         | Method | ADMIN | NHAN_VIEN | KHACH_HANG |
 | ----------- | ------------------------------------------------ | ------ | ----- | --------- | ---------- |
-| CTSP        | `/api/v1/chi-tiet-san-pham`                      | GET    | âœ…   | âœ…       | âœ…        |
-| CTSP        | `/api/v1/chi-tiet-san-pham/{id}`                 | GET    | âœ…   | âœ…       | âœ…        |
-| CTSP        | `/api/v1/chi-tiet-san-pham/san-pham/{spId}`      | GET    | âœ…   | âœ…       | âœ…        |
-| CTSP        | `/api/v1/chi-tiet-san-pham`                      | POST   | âœ…   | âŒ        | âŒ         |
-| CTSP        | `/api/v1/chi-tiet-san-pham`                      | PUT    | âœ…   | âŒ        | âŒ         |
-| CTSP        | `/api/v1/chi-tiet-san-pham/{id}`                 | DELETE | âœ…   | âŒ        | âŒ         |
-| HÃ¬nh áº£nh | `/api/v1/hinh-anh`, `/{id}`, `/chi-tiet-sp/{id}` | GET    | âœ…   | âœ…       | âœ…        |
-| HÃ¬nh áº£nh | `/api/v1/hinh-anh` + upload                      | POST   | âœ…   | âŒ        | âŒ         |
-| HÃ¬nh áº£nh | `/api/v1/hinh-anh`                               | PUT    | âœ…   | âŒ        | âŒ         |
-| HÃ¬nh áº£nh | `/api/v1/hinh-anh/{id}`                          | DELETE | âœ…   | âŒ        | âŒ         |
+| CTSP        | `/api/v1/chi-tiet-san-pham`                      | GET    | ✅   | ✅       | ✅        |
+| CTSP        | `/api/v1/chi-tiet-san-pham/{id}`                 | GET    | ✅   | ✅       | ✅        |
+| CTSP        | `/api/v1/chi-tiet-san-pham/san-pham/{spId}`      | GET    | ✅   | ✅       | ✅        |
+| CTSP        | `/api/v1/chi-tiet-san-pham`                      | POST   | ✅   | ❌        | ❌         |
+| CTSP        | `/api/v1/chi-tiet-san-pham`                      | PUT    | ✅   | ❌        | ❌         |
+| CTSP        | `/api/v1/chi-tiet-san-pham/{id}`                 | DELETE | ✅   | ❌        | ❌         |
+| Hình ảnh | `/api/v1/hinh-anh`, `/{id}`, `/chi-tiet-sp/{id}` | GET    | ✅   | ✅       | ✅        |
+| Hình ảnh | `/api/v1/hinh-anh` + upload                      | POST   | ✅   | ❌        | ❌         |
+| Hình ảnh | `/api/v1/hinh-anh`                               | PUT    | ✅   | ❌        | ❌         |
+| Hình ảnh | `/api/v1/hinh-anh/{id}`                          | DELETE | ✅   | ❌        | ❌         |
 
-### 8.3 Giá» hÃ ng
+### 8.3 Giỏ hàng
 
 | Endpoint                                   | Method | ADMIN | NHAN_VIEN | KHACH_HANG |
 | ------------------------------------------ | ------ | ----- | --------- | ---------- |
-| `POST /api/v1/gio-hang/them-san-pham`      | POST   | âœ…   | âŒ        | âœ…        |
-| `GET /api/v1/gio-hang/cua-toi`             | GET    | âœ…   | âŒ        | âœ…        |
-| `DELETE /api/v1/gio-hang/chi-tiet/{id}`    | DELETE | âœ…   | âŒ        | âœ…        |
-| `GET /api/v1/gio-hang/khuyen-mai-hop-le`   | GET    | âœ…   | âŒ        | âœ…        |
-| `POST /api/v1/gio-hang/ap-dung-khuyen-mai` | POST   | âœ…   | âŒ        | âœ…        |
+| `POST /api/v1/gio-hang/them-san-pham`      | POST   | ✅   | ❌        | ✅        |
+| `GET /api/v1/gio-hang/cua-toi`             | GET    | ✅   | ❌        | ✅        |
+| `DELETE /api/v1/gio-hang/chi-tiet/{id}`    | DELETE | ✅   | ❌        | ✅        |
+| `GET /api/v1/gio-hang/khuyen-mai-hop-le`   | GET    | ✅   | ❌        | ✅        |
+| `POST /api/v1/gio-hang/ap-dung-khuyen-mai` | POST   | ✅   | ❌        | ✅        |
 
-### 8.4 ÄÆ¡n hÃ ng
+### 8.4 Đơn hàng
 
 | Endpoint                                      | Method | ADMIN | NHAN_VIEN | KHACH_HANG |
 | --------------------------------------------- | ------ | ----- | --------- | ---------- |
-| `GET /api/v1/don-hang`                        | GET    | âœ…   | âœ…       | âœ…        |
-| `GET /api/v1/don-hang/{id}`                   | GET    | âœ…   | âœ…       | âœ…        |
-| `POST /api/v1/don-hang/online`                | POST   | âœ…   | âŒ        | âœ…        |
-| `POST /api/v1/don-hang/tai-quay`              | POST   | âœ…   | âœ…       | âŒ         |
-| `PUT /api/v1/don-hang`                        | PUT    | âœ…   | âœ…       | âœ…        |
-| `DELETE /api/v1/don-hang/{id}`                | DELETE | âœ…   | âŒ        | âŒ         |
-| `GET /api/v1/chi-tiet-don-hang`               | GET    | âœ…   | âœ…       | âœ…        |
-| `GET /api/v1/chi-tiet-don-hang/don-hang/{id}` | GET    | âœ…   | âœ…       | âœ…        |
-| `GET /api/v1/chi-tiet-don-hang/{id}`          | GET    | âœ…   | âœ…       | âœ…        |
-| `POST /api/v1/chi-tiet-don-hang`              | POST   | âœ…   | âŒ        | âŒ         |
-| `PUT /api/v1/chi-tiet-don-hang`               | PUT    | âœ…   | âŒ        | âŒ         |
-| `DELETE /api/v1/chi-tiet-don-hang/{id}`       | DELETE | âœ…   | âŒ        | âŒ         |
+| `GET /api/v1/don-hang`                        | GET    | ✅   | ✅       | ✅        |
+| `GET /api/v1/don-hang/{id}`                   | GET    | ✅   | ✅       | ✅        |
+| `POST /api/v1/don-hang/online`                | POST   | ✅   | ❌        | ✅        |
+| `POST /api/v1/don-hang/tai-quay`              | POST   | ✅   | ✅       | ❌         |
+| `PUT /api/v1/don-hang`                        | PUT    | ✅   | ✅       | ✅        |
+| `DELETE /api/v1/don-hang/{id}`                | DELETE | ✅   | ❌        | ❌         |
+| `GET /api/v1/chi-tiet-don-hang`               | GET    | ✅   | ✅       | ✅        |
+| `GET /api/v1/chi-tiet-don-hang/don-hang/{id}` | GET    | ✅   | ✅       | ✅        |
+| `GET /api/v1/chi-tiet-don-hang/{id}`          | GET    | ✅   | ✅       | ✅        |
+| `POST /api/v1/chi-tiet-don-hang`              | POST   | ✅   | ❌        | ❌         |
+| `PUT /api/v1/chi-tiet-don-hang`               | PUT    | ✅   | ❌        | ❌         |
+| `DELETE /api/v1/chi-tiet-don-hang/{id}`       | DELETE | ✅   | ❌        | ❌         |
 
-### 8.5 Phiáº¿u nháº­p
+### 8.5 Phiếu nhập
 
 | Endpoint                                                         | Method | ADMIN | NHAN_VIEN | KHACH_HANG |
 | ---------------------------------------------------------------- | ------ | ----- | --------- | ---------- |
-| `GET /api/v1/phieu-nhap`                                         | GET    | âœ…   | âœ…       | âŒ         |
-| `GET /api/v1/phieu-nhap/{id}`                                    | GET    | âœ…   | âœ…       | âŒ         |
-| `POST /api/v1/phieu-nhap`                                        | POST   | âœ…   | âœ…       | âŒ         |
-| `PUT /api/v1/phieu-nhap`                                         | PUT    | âœ…   | âœ…       | âŒ         |
-| `PUT /api/v1/phieu-nhap/kiem-ke/{id}`                            | PUT    | âœ…   | âœ…       | âŒ         |
-| `DELETE /api/v1/phieu-nhap/{id}`                                 | DELETE | âœ…   | âŒ        | âŒ         |
-| `GET /api/v1/chi-tiet-phieu-nhap` + `/{id}` + `/phieu-nhap/{id}` | GET    | âœ…   | âœ…       | âŒ         |
-| `POST /api/v1/chi-tiet-phieu-nhap`                               | POST   | âœ…   | âœ…       | âŒ         |
-| `PUT /api/v1/chi-tiet-phieu-nhap`                                | PUT    | âœ…   | âœ…       | âŒ         |
-| `DELETE /api/v1/chi-tiet-phieu-nhap/{id}`                        | DELETE | âœ…   | âŒ        | âŒ         |
+| `GET /api/v1/phieu-nhap`                                         | GET    | ✅   | ✅       | ❌         |
+| `GET /api/v1/phieu-nhap/{id}`                                    | GET    | ✅   | ✅       | ❌         |
+| `POST /api/v1/phieu-nhap`                                        | POST   | ✅   | ✅       | ❌         |
+| `PUT /api/v1/phieu-nhap`                                         | PUT    | ✅   | ✅       | ❌         |
+| `PUT /api/v1/phieu-nhap/kiem-ke/{id}`                            | PUT    | ✅   | ✅       | ❌         |
+| `DELETE /api/v1/phieu-nhap/{id}`                                 | DELETE | ✅   | ❌        | ❌         |
+| `GET /api/v1/chi-tiet-phieu-nhap` + `/{id}` + `/phieu-nhap/{id}` | GET    | ✅   | ✅       | ❌         |
+| `POST /api/v1/chi-tiet-phieu-nhap`                               | POST   | ✅   | ✅       | ❌         |
+| `PUT /api/v1/chi-tiet-phieu-nhap`                                | PUT    | ✅   | ✅       | ❌         |
+| `DELETE /api/v1/chi-tiet-phieu-nhap/{id}`                        | DELETE | ✅   | ❌        | ❌         |
+| `GET /api/v1/loai-kiem-ke` + `/{id}`                             | GET    | ✅   | ✅       | ❌         |
+| `POST/PUT/DELETE /api/v1/loai-kiem-ke`                           | CRUD   | ✅   | ❌        | ❌         |
+| `GET /api/v1/kiem-ke-hang-hoa` + `/{id}`                         | GET    | ✅   | ✅       | ❌         |
+| `POST /api/v1/kiem-ke-hang-hoa`                                  | POST   | ✅   | ✅       | ❌         |
+| `PUT /api/v1/kiem-ke-hang-hoa`                                   | PUT    | ✅   | ✅       | ❌         |
+| `PUT /api/v1/kiem-ke-hang-hoa/{id}/gui-duyet`                    | PUT    | ✅   | ✅       | ❌         |
+| `PUT /api/v1/kiem-ke-hang-hoa/{id}/duyet`                        | PUT    | ✅   | ❌        | ❌         |
 
-### 8.6 Cá»­a hÃ ng & NhÃ  cung cáº¥p
+### 8.6 Cửa hàng & Nhà cung cấp
 
 | Endpoint                               | Method | ADMIN | NHAN_VIEN | KHACH_HANG |
 | -------------------------------------- | ------ | ----- | --------- | ---------- |
-| `GET /api/v1/cua-hang` + `/{id}`       | GET    | âœ…   | âœ…       | âœ…        |
-| `POST/PUT/DELETE /api/v1/cua-hang`     | CRUD   | âœ…   | âŒ        | âŒ         |
-| `GET /api/v1/nha-cung-cap` + `/{id}`   | GET    | âœ…   | âŒ        | âŒ         |
-| `POST/PUT/DELETE /api/v1/nha-cung-cap` | CRUD   | âœ…   | âŒ        | âŒ         |
+| `GET /api/v1/cua-hang` + `/{id}`       | GET    | ✅   | ✅       | ✅        |
+| `POST/PUT/DELETE /api/v1/cua-hang`     | CRUD   | ✅   | ❌        | ❌         |
+| `GET /api/v1/nha-cung-cap` + `/{id}`   | GET    | ✅   | ❌        | ❌         |
+| `POST/PUT/DELETE /api/v1/nha-cung-cap` | CRUD   | ✅   | ❌        | ❌         |
 
-### 8.7 Khuyáº¿n mÃ£i
+### 8.7 Khuyến mãi
 
 | Endpoint                                        | Method | ADMIN | NHAN_VIEN | KHACH_HANG |
 | ----------------------------------------------- | ------ | ----- | --------- | ---------- |
-| `GET /api/v1/khuyen-mai-theo-hoa-don` + `/{id}` | GET    | âœ…   | âœ…       | âœ…        |
-| `POST/PUT/DELETE khuyen-mai-theo-hoa-don`       | CRUD   | âœ…   | âŒ        | âŒ         |
-| `GET /api/v1/khuyen-mai-theo-diem` + `/{id}`    | GET    | âœ…   | âœ…       | âœ…        |
-| `POST/PUT/DELETE khuyen-mai-theo-diem`          | CRUD   | âœ…   | âŒ        | âŒ         |
+| `GET /api/v1/khuyen-mai-theo-hoa-don` + `/{id}` | GET    | ✅   | ✅       | ✅        |
+| `POST/PUT/DELETE khuyen-mai-theo-hoa-don`       | CRUD   | ✅   | ❌        | ❌         |
+| `GET /api/v1/khuyen-mai-theo-diem` + `/{id}`    | GET    | ✅   | ✅       | ✅        |
+| `POST/PUT/DELETE khuyen-mai-theo-diem`          | CRUD   | ✅   | ❌        | ❌         |
 
-### 8.8 Vai trÃ² & Quyá»n háº¡n
+### 8.8 Vai trò & Quyền hạn
 
 | Endpoint                                  | Method | ADMIN | NHAN_VIEN | KHACH_HANG |
 | ----------------------------------------- | ------ | ----- | --------- | ---------- |
-| `GET/POST/PUT/DELETE /api/v1/roles`       | CRUD   | âœ…   | âŒ        | âŒ         |
-| `GET/POST/PUT/DELETE /api/v1/permissions` | CRUD   | âœ…   | âŒ        | âŒ         |
+| `GET/POST/PUT/DELETE /api/v1/roles`       | CRUD   | ✅   | ❌        | ❌         |
+| `GET/POST/PUT/DELETE /api/v1/permissions` | CRUD   | ✅   | ❌        | ❌         |
 
-### 8.9 ÄÃ¡nh giÃ¡ sáº£n pháº©m
+### 8.9 Đánh giá sản phẩm
 
 | Endpoint                                               | Method | ADMIN            | NHAN_VIEN | KHACH_HANG        |
 | ------------------------------------------------------ | ------ | ---------------- | --------- | ----------------- |
-| `GET /api/v1/danh-gia-san-pham`                        | GET    | âœ…              | âœ…       | âœ…               |
-| `GET /api/v1/danh-gia-san-pham/{id}`                   | GET    | âœ…              | âœ…       | âœ…               |
-| `GET /api/v1/danh-gia-san-pham/san-pham/{spId}`        | GET    | âœ…              | âœ…       | âœ…               |
-| `GET /api/v1/danh-gia-san-pham/chi-tiet-don-hang/{id}` | GET    | âœ…              | âœ…       | âœ…               |
-| `GET /api/v1/danh-gia-san-pham/cua-toi`                | GET    | âŒ               | âŒ        | âœ…               |
-| `POST /api/v1/danh-gia-san-pham`                       | POST   | âŒ               | âŒ        | âœ…               |
-| `PUT /api/v1/danh-gia-san-pham/{id}`                   | PUT    | âŒ               | âŒ        | âœ… (cá»§a mÃ¬nh) |
-| `DELETE /api/v1/danh-gia-san-pham/{id}`                | DELETE | âœ… (táº¥t cáº£) | âŒ        | âœ… (cá»§a mÃ¬nh) |
+| `GET /api/v1/danh-gia-san-pham`                        | GET    | ✅              | ✅       | ✅               |
+| `GET /api/v1/danh-gia-san-pham/{id}`                   | GET    | ✅              | ✅       | ✅               |
+| `GET /api/v1/danh-gia-san-pham/san-pham/{spId}`        | GET    | ✅              | ✅       | ✅               |
+| `GET /api/v1/danh-gia-san-pham/chi-tiet-don-hang/{id}` | GET    | ✅              | ✅       | ✅               |
+| `GET /api/v1/danh-gia-san-pham/cua-toi`                | GET    | ❌               | ❌        | ✅               |
+| `POST /api/v1/danh-gia-san-pham`                       | POST   | ❌               | ❌        | ✅               |
+| `PUT /api/v1/danh-gia-san-pham/{id}`                   | PUT    | ❌               | ❌        | ✅ (của mình) |
+| `DELETE /api/v1/danh-gia-san-pham/{id}`                | DELETE | ✅ (tất cả) | ❌        | ✅ (của mình) |
 
 ---
 
-## 9. Gá»£i Ã½ xÃ¢y dá»±ng Frontend theo vai trÃ²
+## 9. Gợi ý xây dựng Frontend theo vai trò
 
-### 9.1 Trang ADMIN (Dashboard quáº£n trá»‹)
+### 9.1 Trang ADMIN (Dashboard quản trị)
 
-**Sidebar Menu gá»£i Ã½:**
-
-```
-ðŸ“Š Dashboard
-ðŸ“¦ Quáº£n lÃ½ sáº£n pháº©m
-   â”œâ”€â”€ Sáº£n pháº©m
-   â”œâ”€â”€ Chi tiáº¿t sáº£n pháº©m (biáº¿n thá»ƒ)
-   â”œâ”€â”€ HÃ¬nh áº£nh sáº£n pháº©m
-   â”œâ”€â”€ Kiá»ƒu sáº£n pháº©m
-   â”œâ”€â”€ Bá»™ sÆ°u táº­p
-   â”œâ”€â”€ ThÆ°Æ¡ng hiá»‡u
-   â”œâ”€â”€ MÃ u sáº¯c
-   â””â”€â”€ KÃ­ch thÆ°á»›c
-ðŸ›’ Quáº£n lÃ½ Ä‘Æ¡n hÃ ng
-   â”œâ”€â”€ Danh sÃ¡ch Ä‘Æ¡n hÃ ng
-   â”œâ”€â”€ Táº¡o Ä‘Æ¡n táº¡i quáº§y
-   â””â”€â”€ Chi tiáº¿t Ä‘Æ¡n hÃ ng
-ðŸ“¥ Quáº£n lÃ½ nháº­p hÃ ng
-   â”œâ”€â”€ Phiáº¿u nháº­p
-   â”œâ”€â”€ Chi tiáº¿t phiáº¿u nháº­p
-   â””â”€â”€ Kiá»ƒm kÃª
-ðŸª Há»‡ thá»‘ng
-   â”œâ”€â”€ Cá»­a hÃ ng
-   â”œâ”€â”€ NhÃ  cung cáº¥p
-   â””â”€â”€ NhÃ¢n viÃªn (*)
-ðŸŽ Khuyáº¿n mÃ£i
-   â”œâ”€â”€ KM theo hÃ³a Ä‘Æ¡n
-   â””â”€â”€ KM theo Ä‘iá»ƒm
-â­ ÄÃ¡nh giÃ¡ sáº£n pháº©m
-ðŸ” PhÃ¢n quyá»n
-   â”œâ”€â”€ Vai trÃ²
-   â””â”€â”€ Quyá»n háº¡n
-ðŸ‘¤ TÃ i khoáº£n
-```
-
-### 9.2 Trang NHAN_VIEN (NhÃ¢n viÃªn bÃ¡n hÃ ng)
-
-**Sidebar Menu gá»£i Ã½:**
+**Sidebar Menu gợi ý:**
 
 ```
-ðŸ“Š Dashboard
-ðŸ“¦ Sáº£n pháº©m (chá»‰ xem)
-   â”œâ”€â”€ Danh sÃ¡ch sáº£n pháº©m
-   â””â”€â”€ Chi tiáº¿t sáº£n pháº©m
-ðŸ›’ ÄÆ¡n hÃ ng
-   â”œâ”€â”€ Danh sÃ¡ch Ä‘Æ¡n hÃ ng
-   â”œâ”€â”€ Táº¡o Ä‘Æ¡n táº¡i quáº§y
-   â””â”€â”€ Cáº­p nháº­t tráº¡ng thÃ¡i
-ðŸ“¥ Nháº­p hÃ ng
-   â”œâ”€â”€ Phiáº¿u nháº­p (táº¡o/sá»­a)
-   â”œâ”€â”€ Chi tiáº¿t phiáº¿u nháº­p (táº¡o/sá»­a)
-   â””â”€â”€ Kiá»ƒm kÃª
-ðŸŽ Khuyáº¿n mÃ£i (chá»‰ xem)
-â­ ÄÃ¡nh giÃ¡ sáº£n pháº©m (chá»‰ xem)
-ðŸ‘¤ TÃ i khoáº£n
+📊 Dashboard
+📦 Quản lý sản phẩm
+   ├── Sản phẩm
+   ├── Chi tiết sản phẩm (biến thể)
+   ├── Hình ảnh sản phẩm
+   ├── Kiểu sản phẩm
+   ├── Bộ sưu tập
+   ├── Thương hiệu
+   ├── Màu sắc
+   └── Kích thước
+🛒 Quản lý đơn hàng
+   ├── Danh sách đơn hàng
+   ├── Tạo đơn tại quầy
+   └── Chi tiết đơn hàng
+📥 Quản lý nhập hàng
+   ├── Phiếu nhập
+   ├── Chi tiết phiếu nhập
+   └── Kiểm kê
+🏪 Hệ thống
+   ├── Cửa hàng
+   ├── Nhà cung cấp
+   └── Nhân viên (*)
+🎁 Khuyến mãi
+   ├── KM theo hóa đơn
+   └── KM theo điểm
+⭐ Đánh giá sản phẩm
+🔐 Phân quyền
+   ├── Vai trò
+   └── Quyền hạn
+👤 Tài khoản
 ```
 
-### 9.3 Trang KHACH_HANG (Giao diá»‡n mua sáº¯m)
+### 9.2 Trang NHAN_VIEN (Nhân viên bán hàng)
 
-**Navigation gá»£i Ã½:**
+**Sidebar Menu gợi ý:**
 
 ```
-ðŸ  Trang chá»§
-ðŸ” TÃ¬m kiáº¿m / Lá»c sáº£n pháº©m
-   â”œâ”€â”€ Theo danh má»¥c (kiá»ƒu SP)
-   â”œâ”€â”€ Theo thÆ°Æ¡ng hiá»‡u
-   â”œâ”€â”€ Theo bá»™ sÆ°u táº­p
-   â”œâ”€â”€ Theo khoáº£ng giÃ¡
-   â””â”€â”€ Theo mÃ u sáº¯c / kÃ­ch thÆ°á»›c
-ðŸ“„ Chi tiáº¿t sáº£n pháº©m
-   â”œâ”€â”€ Chá»n mÃ u sáº¯c / kÃ­ch thÆ°á»›c
-   â”œâ”€â”€ Xem Ä‘Ã¡nh giÃ¡
-   â””â”€â”€ ThÃªm vÃ o giá»
-ðŸ›’ Giá» hÃ ng
-   â”œâ”€â”€ Xem giá» hÃ ng
-   â”œâ”€â”€ Cáº­p nháº­t sá»‘ lÆ°á»£ng
-   â””â”€â”€ XÃ³a sáº£n pháº©m
-ðŸ’³ Äáº·t hÃ ng (checkout)
-   â”œâ”€â”€ Chá»n khuyáº¿n mÃ£i hÃ³a Ä‘Æ¡n
-   â”œâ”€â”€ Äá»•i Ä‘iá»ƒm láº¥y KM
-   â””â”€â”€ XÃ¡c nháº­n Ä‘Æ¡n hÃ ng
-ðŸ“‹ ÄÆ¡n hÃ ng cá»§a tÃ´i
-   â”œâ”€â”€ Theo dÃµi tráº¡ng thÃ¡i
-   â”œâ”€â”€ Há»§y Ä‘Æ¡n (khi chá» xÃ¡c nháº­n)
-   â””â”€â”€ ÄÃ¡nh giÃ¡ sáº£n pháº©m (khi Ä‘Ã£ nháº­n)
-â­ ÄÃ¡nh giÃ¡ cá»§a tÃ´i
-   â”œâ”€â”€ Xem danh sÃ¡ch Ä‘Ã¡nh giÃ¡
-   â”œâ”€â”€ Sá»­a Ä‘Ã¡nh giÃ¡
-   â””â”€â”€ XÃ³a Ä‘Ã¡nh giÃ¡
-ðŸ‘¤ TÃ i khoáº£n
-   â”œâ”€â”€ ThÃ´ng tin cÃ¡ nhÃ¢n
-   â”œâ”€â”€ Äiá»ƒm tÃ­ch lÅ©y
-   â””â”€â”€ ÄÄƒng xuáº¥t
+📊 Dashboard
+📦 Sản phẩm (chỉ xem)
+   ├── Danh sách sản phẩm
+   └── Chi tiết sản phẩm
+🛒 Đơn hàng
+   ├── Danh sách đơn hàng
+   ├── Tạo đơn tại quầy
+   └── Cập nhật trạng thái
+📥 Nhập hàng
+   ├── Phiếu nhập (tạo/sửa)
+   ├── Chi tiết phiếu nhập (tạo/sửa)
+   └── Kiểm kê
+🎁 Khuyến mãi (chỉ xem)
+⭐ Đánh giá sản phẩm (chỉ xem)
+👤 Tài khoản
 ```
 
-### 9.4 CÃ¡ch xá»­ lÃ½ phÃ¢n quyá»n Ä‘á»™ng trÃªn FE
+### 9.3 Trang KHACH_HANG (Giao diện mua sắm)
 
-Khi Ä‘Äƒng nháº­p thÃ nh cÃ´ng, FE nháº­n Ä‘Æ°á»£c thÃ´ng tin user bao gá»“m `role`. Äá»ƒ render menu/chá»©c nÄƒng:
+**Navigation gợi ý:**
 
-**CÃ¡ch 1: Hardcode theo tÃªn role**
+```
+🏠 Trang chủ
+🔍 Tìm kiếm / Lọc sản phẩm
+   ├── Theo danh mục (kiểu SP)
+   ├── Theo thương hiệu
+   ├── Theo bộ sưu tập
+   ├── Theo khoảng giá
+   └── Theo màu sắc / kích thước
+📄 Chi tiết sản phẩm
+   ├── Chọn màu sắc / kích thước
+   ├── Xem đánh giá
+   └── Thêm vào giỏ
+🛒 Giỏ hàng
+   ├── Xem giỏ hàng
+   ├── Cập nhật số lượng
+   └── Xóa sản phẩm
+💳 Đặt hàng (checkout)
+   ├── Chọn khuyến mãi hóa đơn
+   ├── Đổi điểm lấy KM
+   └── Xác nhận đơn hàng
+📋 Đơn hàng của tôi
+   ├── Theo dõi trạng thái
+   ├── Hủy đơn (khi chờ xác nhận)
+   └── Đánh giá sản phẩm (khi đã nhận)
+⭐ Đánh giá của tôi
+   ├── Xem danh sách đánh giá
+   ├── Sửa đánh giá
+   └── Xóa đánh giá
+👤 Tài khoản
+   ├── Thông tin cá nhân
+   ├── Điểm tích lũy
+   └── Đăng xuất
+```
+
+### 9.4 Cách xử lý phân quyền động trên FE
+
+Khi đăng nhập thành công, FE nhận được thông tin user bao gồm `role`. Để render menu/chức năng:
+
+**Cách 1: Hardcode theo tên role**
 
 ```javascript
 const role = user.role.name; // "ADMIN" | "NHAN_VIEN" | "KHACH_HANG"
 
 if (role === "ADMIN") {
-  // Hiá»‡n táº¥t cáº£ menu
+  // Hiện tất cả menu
 } else if (role === "NHAN_VIEN") {
-  // Hiá»‡n menu nhÃ¢n viÃªn
+  // Hiện menu nhân viên
 } else if (role === "KHACH_HANG") {
-  // Hiá»‡n menu khÃ¡ch hÃ ng
+  // Hiện menu khách hàng
 }
 ```
 
-**CÃ¡ch 2: Dá»±a trÃªn danh sÃ¡ch permissions (linh hoáº¡t hÆ¡n)**
+**Cách 2: Dựa trên danh sách permissions (linh hoạt hơn)**
 
 ```javascript
-// Láº¥y thÃ´ng tin tÃ i khoáº£n + permissions
+// Lấy thông tin tài khoản + permissions
 const account = await fetch("/api/v1/auth/account");
 const permissions = account.role.permissions;
 
-// Kiá»ƒm tra quyá»n trÆ°á»›c khi hiá»‡n nÃºt/menu
+// Kiểm tra quyền trước khi hiện nút/menu
 function hasPermission(apiPath, method) {
   return permissions.some((p) => p.apiPath === apiPath && p.method === method);
 }
 
-// VÃ­ dá»¥: chá»‰ hiá»‡n nÃºt "Táº¡o sáº£n pháº©m" náº¿u cÃ³ quyá»n
+// Ví dụ: chỉ hiện nút "Tạo sản phẩm" nếu có quyền
 if (hasPermission("/api/v1/san-pham", "POST")) {
-  showButton("Táº¡o sáº£n pháº©m");
+  showButton("Tạo sản phẩm");
 }
 ```
 
-### 9.5 Xá»­ lÃ½ lá»—i phÃ¢n quyá»n trÃªn FE
+### 9.5 Xử lý lỗi phân quyền trên FE
 
-| HTTP Status | Ã nghÄ©a                                | HÃ nh Ä‘á»™ng FE                                              |
+| HTTP Status | Ý nghĩa                                | Hành động FE                                              |
 | ----------- | --------------------------------------- | ------------------------------------------------------------- |
-| `401`       | ChÆ°a Ä‘Äƒng nháº­p / token háº¿t háº¡n | Redirect â†’ trang Ä‘Äƒng nháº­p hoáº·c tá»± refresh token    |
-| `403`       | KhÃ´ng cÃ³ quyá»n                       | Hiá»ƒn thá»‹ thÃ´ng bÃ¡o "Báº¡n khÃ´ng cÃ³ quyá»n truy cáº­p" |
-| `400`       | Lá»—i nghiá»‡p vá»¥                     | Hiá»ƒn thá»‹ message lá»—i tá»« response                      |
-| `500`       | Lá»—i server                            | Hiá»ƒn thá»‹ thÃ´ng bÃ¡o lá»—i chung                          |
+| `401`       | Chưa đăng nhập / token hết hạn | Redirect → trang đăng nhập hoặc tự refresh token    |
+| `403`       | Không có quyền                       | Hiển thị thông báo "Bạn không có quyền truy cập" |
+| `400`       | Lỗi nghiệp vụ                     | Hiển thị message lỗi từ response                      |
+| `500`       | Lỗi server                            | Hiển thị thông báo lỗi chung                          |
 
-**Cáº¥u trÃºc response lá»—i:**
+**Cấu trúc response lỗi:**
 
 ```json
 {
   "statusCode": 400,
   "error": "Bad Request",
-  "message": "KhÃ´ng tÃ¬m tháº¥y sáº£n pháº©m"
+  "message": "Không tìm thấy sản phẩm"
 }
 ```
 
 ---
 
-> **TÃ i liá»‡u chi tiáº¿t tá»«ng module:** Xem cÃ¡c file `01_Auth.md` â†’ `22_DanhGiaSanPham.md` trong thÆ° má»¥c `document/`.
+> **Tài liệu chi tiết từng module:** Xem các file `01_Auth.md` → `22_DanhGiaSanPham.md` trong thư mục `document/`.

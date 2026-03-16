@@ -83,6 +83,15 @@ public class TraHangService {
             throw new IdInvalidException("Phải chọn ít nhất một sản phẩm để trả");
         }
 
+        Integer phuongThucHoanTien = req.getPhuongThucHoanTien() != null ? req.getPhuongThucHoanTien() : 0;
+        if (phuongThucHoanTien != 0 && phuongThucHoanTien != 1) {
+            throw new IdInvalidException("Phương thức hoàn tiền không hợp lệ. 0 = Tiền mặt, 1 = Chuyển khoản");
+        }
+        if (phuongThucHoanTien == 1
+                && (req.getThongTinChuyenKhoan() == null || req.getThongTinChuyenKhoan().isBlank())) {
+            throw new IdInvalidException("Vui lòng nhập thông tin chuyển khoản để hoàn tiền");
+        }
+
         // 4. Tạo phiếu trả hàng
         TraHang traHang = new TraHang();
         traHang.setDonHang(donHang);
@@ -96,6 +105,13 @@ public class TraHangService {
             traHang.setLinkAnh(linkAnh);
         }
         traHang.setTrangThai(0); // 0 = Chờ xử lý
+        traHang.setPhuongThucHoanTien(phuongThucHoanTien);
+        traHang.setThongTinChuyenKhoan(phuongThucHoanTien == 1 ? req.getThongTinChuyenKhoan() : null);
+        String paymentRef = req.getPaymentRef();
+        if (paymentRef == null || paymentRef.isBlank()) {
+            paymentRef = donHang.getPaymentRef();
+        }
+        traHang.setPaymentRef(paymentRef);
 
         // 5. Tạo chi tiết trả hàng và tính tổng tiền sản phẩm trả theo giá thực thu
         List<ChiTietTraHang> chiTietList = new ArrayList<>();
@@ -210,6 +226,9 @@ public class TraHangService {
         dto.setLinkAnh(traHang.getLinkAnh());
         dto.setTrangThai(mapTrangThai(traHang.getTrangThai()));
         dto.setTongTien(traHang.getTongTien());
+        dto.setPhuongThucHoanTien(mapPhuongThucHoanTien(traHang.getPhuongThucHoanTien()));
+        dto.setThongTinChuyenKhoan(traHang.getThongTinChuyenKhoan());
+        dto.setPaymentRef(traHang.getPaymentRef());
         dto.setNgayTao(traHang.getNgayTao());
         dto.setNgayCapNhat(traHang.getNgayCapNhat());
 
@@ -258,6 +277,16 @@ public class TraHangService {
             case 0 -> "Chờ xử lý";
             case 1 -> "Đã duyệt";
             case 2 -> "Từ chối";
+            default -> "Không xác định";
+        };
+    }
+
+    private String mapPhuongThucHoanTien(Integer phuongThuc) {
+        if (phuongThuc == null)
+            return "Tiền mặt";
+        return switch (phuongThuc) {
+            case 0 -> "Tiền mặt";
+            case 1 -> "Chuyển khoản";
             default -> "Không xác định";
         };
     }

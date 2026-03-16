@@ -18,9 +18,11 @@ import com.vn.shopping.domain.NhanVien;
 import com.vn.shopping.domain.Role;
 import com.vn.shopping.domain.response.ResCreateUserDTO;
 import com.vn.shopping.domain.response.ResLoginDTO;
+import com.vn.shopping.domain.request.ReqChangePasswordDTO;
 import com.vn.shopping.domain.request.ReqLoginDTO;
 import com.vn.shopping.service.KhachHangService;
 import com.vn.shopping.service.NhanVienService;
+import com.vn.shopping.service.StorageService;
 import com.vn.shopping.util.SecurityUtil;
 import com.vn.shopping.util.anotation.ApiMessage;
 import com.vn.shopping.util.error.IdInvalidException;
@@ -32,6 +34,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.http.MediaType;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.regex.Pattern;
 
@@ -44,6 +51,7 @@ public class AuthController {
     private final SecurityUtil securityUtil;
     private final KhachHangService khachHangService;
     private final NhanVienService nhanVienService;
+    private final StorageService storageService;
     private final PasswordEncoder passwordEncoder;
 
     @Value("${shopping.jwt.refresh-token-validity-in-seconds}")
@@ -54,11 +62,13 @@ public class AuthController {
             SecurityUtil securityUtil,
             KhachHangService khachHangService,
             NhanVienService nhanVienService,
+            StorageService storageService,
             PasswordEncoder passwordEncoder) {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.securityUtil = securityUtil;
         this.khachHangService = khachHangService;
         this.nhanVienService = nhanVienService;
+        this.storageService = storageService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -90,6 +100,7 @@ public class AuthController {
                     nhanVien.getEmail(),
                     nhanVien.getTenNhanVien(),
                     nhanVien.getSoDienThoai(),
+                    nhanVien.getAvatar(),
                     role,
                     null);
             res.setUser(userLogin);
@@ -107,6 +118,7 @@ public class AuthController {
                         currentUserDB.getEmail(),
                         currentUserDB.getTenKhachHang(),
                         currentUserDB.getSdt(),
+                        currentUserDB.getAvatar(),
                         role,
                         currentUserDB.getDiemTichLuy());
                 res.setUser(userLogin);
@@ -159,6 +171,7 @@ public class AuthController {
             userLogin.setEmail(nhanVienDB.getEmail());
             userLogin.setName(nhanVienDB.getTenNhanVien());
             userLogin.setSdt(nhanVienDB.getSoDienThoai());
+            userLogin.setAvatar(nhanVienDB.getAvatar());
             userLogin.setRole(role);
             userLogin.setDiemTichLuy(null);
             userGetAccount.setUser(userLogin);
@@ -174,6 +187,7 @@ public class AuthController {
                 userLogin.setEmail(currentUserDB.getEmail());
                 userLogin.setName(currentUserDB.getTenKhachHang());
                 userLogin.setSdt(currentUserDB.getSdt());
+                userLogin.setAvatar(currentUserDB.getAvatar());
                 userLogin.setRole(role);
                 userLogin.setDiemTichLuy(currentUserDB.getDiemTichLuy());
                 userGetAccount.setUser(userLogin);
@@ -212,6 +226,7 @@ public class AuthController {
                     nhanVien.getEmail(),
                     nhanVien.getTenNhanVien(),
                     nhanVien.getSoDienThoai(),
+                    nhanVien.getAvatar(),
                     role,
                     null);
             res.setUser(userLogin);
@@ -226,6 +241,7 @@ public class AuthController {
                     khachHang.getEmail(),
                     khachHang.getTenKhachHang(),
                     khachHang.getSdt(),
+                    khachHang.getAvatar(),
                     role,
                     khachHang.getDiemTichLuy());
             res.setUser(userLogin);
@@ -280,6 +296,85 @@ public class AuthController {
                 .body(null);
     }
 
+    @PutMapping("/auth/change-password")
+    @ApiMessage("Đổi mật khẩu thành công")
+    public ResponseEntity<Void> changePassword(@RequestBody ReqChangePasswordDTO req) throws IdInvalidException {
+        String email = SecurityUtil.getCurrentUserLogin().orElse("");
+        if (email.isBlank()) {
+            throw new IdInvalidException("Không xác định được người dùng hiện tại");
+        }
+
+        if (req.getCurrentPassword() == null || req.getCurrentPassword().isBlank()) {
+            throw new IdInvalidException("Mật khẩu hiện tại không được để trống");
+        }
+        if (req.getNewPassword() == null || req.getNewPassword().isBlank()) {
+            throw new IdInvalidException("Mật khẩu mới không được để trống");
+        }
+        if (req.getNewPassword().trim().length() < 6) {
+            throw new IdInvalidException("Mật khẩu mới phải có ít nhất 6 ký tự");
+        }
+        if (req.getConfirmPassword() == null || !req.getNewPassword().equals(req.getConfirmPassword())) {
+            throw new IdInvalidException("Xác nhận mật khẩu không khớp");
+        }
+
+        NhanVien nhanVien = nhanVienService.findByEmail(email);
+        if (nhanVien != null) {
+            if (!passwordEncoder.matches(req.getCurrentPassword(), nhanVien.getMatKhau())) {
+                throw new IdInvalidException("Mật khẩu hiện tại không đúng");
+            }
+            nhanVienService.updatePasswordByEmail(email, passwordEncoder.encode(req.getNewPassword()));
+            return ResponseEntity.ok().build();
+        }
+
+        KhachHang khachHang = khachHangService.findByEmail(email);
+        if (khachHang != null) {
+            if (!passwordEncoder.matches(req.getCurrentPassword(), khachHang.getPassword())) {
+                throw new IdInvalidException("Mật khẩu hiện tại không đúng");
+            }
+            khachHangService.updatePasswordByEmail(email, passwordEncoder.encode(req.getNewPassword()));
+            return ResponseEntity.ok().build();
+        }
+
+        throw new IdInvalidException("Không tìm thấy người dùng để đổi mật khẩu");
+    }
+
+    @PutMapping(value = "/auth/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ApiMessage("Cập nhật thông tin người dùng thành công")
+    public ResponseEntity<ResLoginDTO.UserGetAccount> updateProfile(
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "sdt", required = false) String sdt,
+            @RequestPart(value = "avatar", required = false) MultipartFile avatar)
+            throws IdInvalidException {
+        String email = SecurityUtil.getCurrentUserLogin().orElse("");
+        if (email.isBlank()) {
+            throw new IdInvalidException("Không xác định được người dùng hiện tại");
+        }
+
+        String phone = sdt == null ? null : sdt.trim();
+        if (phone != null && !phone.isBlank() && !VIETNAM_PHONE_PATTERN.matcher(phone).matches()) {
+            throw new IdInvalidException("Số điện thoại không hợp lệ. Dùng định dạng 0xxxxxxxxx hoặc +84xxxxxxxxx.");
+        }
+
+        String avatarUrl = null;
+        if (avatar != null && !avatar.isEmpty()) {
+            avatarUrl = storageService.uploadSingleFile(avatar, "avatar");
+        }
+
+        NhanVien nhanVien = nhanVienService.findByEmail(email);
+        if (nhanVien != null) {
+            nhanVienService.updateProfileByEmail(email, name, phone, avatarUrl);
+            return ResponseEntity.ok(new ResLoginDTO.UserGetAccount(buildUserLogin(email)));
+        }
+
+        KhachHang khachHang = khachHangService.findByEmail(email);
+        if (khachHang != null) {
+            khachHangService.updateProfileByEmail(email, name, phone, avatarUrl);
+            return ResponseEntity.ok(new ResLoginDTO.UserGetAccount(buildUserLogin(email)));
+        }
+
+        throw new IdInvalidException("Không tìm thấy người dùng để cập nhật thông tin");
+    }
+
     @PostMapping("/auth/register")
     @ApiMessage("Register a new user")
     public ResponseEntity<ResCreateUserDTO> register(@Valid @RequestBody KhachHang postManUser)
@@ -308,5 +403,41 @@ public class AuthController {
         KhachHang savedUser = this.khachHangService.handleCreateUser(postManUser);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(this.khachHangService.convertToResCreateUserDTO(savedUser));
+    }
+
+    private ResLoginDTO.UserLogin buildUserLogin(String email) {
+        NhanVien nhanVienDB = this.nhanVienService.findByEmail(email);
+        if (nhanVienDB != null) {
+            Role role = nhanVienDB.getRole();
+            if (role != null) {
+                role.getName();
+            }
+            return new ResLoginDTO.UserLogin(
+                    nhanVienDB.getId(),
+                    nhanVienDB.getEmail(),
+                    nhanVienDB.getTenNhanVien(),
+                    nhanVienDB.getSoDienThoai(),
+                    nhanVienDB.getAvatar(),
+                    role,
+                    null);
+        }
+
+        KhachHang currentUserDB = this.khachHangService.findByEmail(email);
+        if (currentUserDB != null) {
+            Role role = currentUserDB.getRole();
+            if (role != null) {
+                role.getName();
+            }
+            return new ResLoginDTO.UserLogin(
+                    currentUserDB.getId(),
+                    currentUserDB.getEmail(),
+                    currentUserDB.getTenKhachHang(),
+                    currentUserDB.getSdt(),
+                    currentUserDB.getAvatar(),
+                    role,
+                    currentUserDB.getDiemTichLuy());
+        }
+
+        return null;
     }
 }

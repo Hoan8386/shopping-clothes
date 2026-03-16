@@ -1,114 +1,114 @@
-﻿# Tráº£ HÃ ng Controller
+# Trả Hàng Controller
 
 > **Base Path:** `/api/v1/tra-hang`  
 > **File:** `TraHangController.java`  
-> Quáº£n lÃ½ phiáº¿u tráº£ hÃ ng â€” KhÃ¡ch hÃ ng táº¡o yÃªu cáº§u tráº£ hÃ ng sau khi Ä‘Æ¡n hÃ ng Ä‘Ã£ nháº­n (tráº¡ng thÃ¡i 5), nhÃ¢n viÃªn/admin duyá»‡t hoáº·c tá»« chá»‘i.
+> Quản lý phiếu trả hàng — Khách hàng tạo yêu cầu trả hàng sau khi đơn hàng đã nhận (trạng thái 5), nhân viên/admin duyệt hoặc từ chối.
 
 ---
 
-## Tá»•ng quan
+## Tổng quan
 
-### Cáº¥u trÃºc dá»¯ liá»‡u `TraHang`
+### Cấu trúc dữ liệu `TraHang`
 
-| TrÆ°á»ng            | Kiá»ƒu          | MÃ´ táº£                                          |
+| Trường            | Kiểu          | Mô tả                                          |
 | ----------------- | ------------- | ---------------------------------------------- |
-| `id`              | Long          | MÃ£ phiáº¿u tráº£ (PK, auto-increment)              |
-| `donHang`         | DonHang       | ÄÆ¡n hÃ ng gá»‘c (FK)                              |
-| `lyDoTraHang`     | String(255)   | LÃ½ do tráº£ hÃ ng                                 |
-| `trangThai`       | Integer       | Tráº¡ng thÃ¡i phiáº¿u tráº£ (xem báº£ng bÃªn dÆ°á»›i)       |
-| `tongTien`        | Double        | Tá»•ng tiá»n tráº£ (= tongTienTra âˆ’ giÃ¡ gá»‘c SP tráº£) |
-| `lyDoTuChoi`      | String(255)   | LÃ½ do tá»« chá»‘i (náº¿u cÃ³)                         |
-| `chiTietTraHangs` | List          | Danh sÃ¡ch chi tiáº¿t sáº£n pháº©m tráº£                |
-| `ngayTao`         | LocalDateTime | NgÃ y táº¡o (tá»± Ä‘á»™ng)                             |
-| `ngayCapNhat`     | LocalDateTime | NgÃ y cáº­p nháº­t (tá»± Ä‘á»™ng)                        |
+| `id`              | Long          | Mã phiếu trả (PK, auto-increment)              |
+| `donHang`         | DonHang       | Đơn hàng gốc (FK)                              |
+| `lyDoTraHang`     | String(255)   | Lý do trả hàng                                 |
+| `trangThai`       | Integer       | Trạng thái phiếu trả (xem bảng bên dưới)       |
+| `tongTien`        | Double        | Tổng tiền trả (= tongTienTra − giá gốc SP trả) |
+| `lyDoTuChoi`      | String(255)   | Lý do từ chối (nếu có)                         |
+| `chiTietTraHangs` | List          | Danh sách chi tiết sản phẩm trả                |
+| `ngayTao`         | LocalDateTime | Ngày tạo (tự động)                             |
+| `ngayCapNhat`     | LocalDateTime | Ngày cập nhật (tự động)                        |
 
-### Cáº¥u trÃºc dá»¯ liá»‡u `ChiTietTraHang`
+### Cấu trúc dữ liệu `ChiTietTraHang`
 
-| TrÆ°á»ng        | Kiá»ƒu           | MÃ´ táº£                                 |
+| Trường        | Kiểu           | Mô tả                                 |
 | ------------- | -------------- | ------------------------------------- |
-| `id`          | Long           | MÃ£ chi tiáº¿t tráº£ hÃ ng (auto-increment) |
-| `traHang`     | TraHang        | Phiáº¿u tráº£ hÃ ng (FK)                   |
-| `sanPhamTra`  | ChiTietDonHang | Chi tiáº¿t Ä‘Æ¡n hÃ ng Ä‘Æ°á»£c tráº£ (FK)       |
-| `ghiTru`      | String(255)    | Ghi chÃº cho sáº£n pháº©m tráº£              |
-| `trangThai`   | Integer        | Tráº¡ng thÃ¡i (Ä‘á»“ng bá»™ vá»›i phiáº¿u tráº£)    |
-| `ngayTao`     | LocalDateTime  | NgÃ y táº¡o (tá»± Ä‘á»™ng)                    |
-| `ngayCapNhat` | LocalDateTime  | NgÃ y cáº­p nháº­t (tá»± Ä‘á»™ng)               |
+| `id`          | Long           | Mã chi tiết trả hàng (auto-increment) |
+| `traHang`     | TraHang        | Phiếu trả hàng (FK)                   |
+| `sanPhamTra`  | ChiTietDonHang | Chi tiết đơn hàng được trả (FK)       |
+| `ghiTru`      | String(255)    | Ghi chú cho sản phẩm trả              |
+| `trangThai`   | Integer        | Trạng thái (đồng bộ với phiếu trả)    |
+| `ngayTao`     | LocalDateTime  | Ngày tạo (tự động)                    |
+| `ngayCapNhat` | LocalDateTime  | Ngày cập nhật (tự động)               |
 
-### MÃ£ tráº¡ng thÃ¡i phiáº¿u tráº£ hÃ ng (`trangThai`)
+### Mã trạng thái phiếu trả hàng (`trangThai`)
 
-| GiÃ¡ trá»‹ | Ã nghÄ©a   | MÃ´ táº£                                              |
+| Giá trị | Ý nghĩa   | Mô tả                                              |
 | ------- | --------- | -------------------------------------------------- |
-| `0`     | Chá» xá»­ lÃ½ | Phiáº¿u tráº£ má»›i táº¡o, chá» nhÃ¢n viÃªn/admin duyá»‡t       |
-| `1`     | ÄÃ£ duyá»‡t  | Phiáº¿u tráº£ Ä‘Æ°á»£c cháº¥p nháº­n, hoÃ n tiá»n cho khÃ¡ch hÃ ng |
-| `2`     | Tá»« chá»‘i   | Phiáº¿u tráº£ bá»‹ tá»« chá»‘i                               |
+| `0`     | Chờ xử lý | Phiếu trả mới tạo, chờ nhân viên/admin duyệt       |
+| `1`     | Đã duyệt  | Phiếu trả được chấp nhận, hoàn tiền cho khách hàng |
+| `2`     | Từ chối   | Phiếu trả bị từ chối                               |
 
-### Luá»“ng chuyá»ƒn tráº¡ng thÃ¡i
+### Luồng chuyển trạng thái
 
-- **KhÃ¡ch hÃ ng** táº¡o phiáº¿u: ÄÆ¡n hÃ ng (tráº¡ng thÃ¡i 5) â†’ Táº¡o phiáº¿u tráº£ (tráº¡ng thÃ¡i 0)
-- **NhÃ¢n viÃªn/Admin** duyá»‡t: `0 â†’ 1` (ÄÃ£ duyá»‡t) hoáº·c `0 â†’ 2` (Tá»« chá»‘i)
-- Chá»‰ cáº­p nháº­t Ä‘Æ°á»£c khi phiáº¿u Ä‘ang á»Ÿ tráº¡ng thÃ¡i `0` (Chá» xá»­ lÃ½)
+- **Khách hàng** tạo phiếu: Đơn hàng (trạng thái 5) → Tạo phiếu trả (trạng thái 0)
+- **Nhân viên/Admin** duyệt: `0 → 1` (Đã duyệt) hoặc `0 → 2` (Từ chối)
+- Chỉ cập nhật được khi phiếu đang ở trạng thái `0` (Chờ xử lý)
 
-### CÃ´ng thá»©c tÃ­nh tá»•ng tiá»n tráº£
-
-```
-tongTien = tongTienTra (Ä‘Æ¡n hÃ ng) âˆ’ Î£(giaSanPham Ã— soLuong) cá»§a cÃ¡c sáº£n pháº©m tráº£
-```
-
-- `tongTienTra`: Tá»•ng tiá»n khÃ¡ch hÃ ng Ä‘Ã£ thanh toÃ¡n cho Ä‘Æ¡n hÃ ng
-- `giaSanPham Ã— soLuong`: GiÃ¡ gá»‘c (chÆ°a giáº£m) Ã— sá»‘ lÆ°á»£ng cá»§a tá»«ng sáº£n pháº©m tráº£
-
-**VÃ­ dá»¥:** ÄÆ¡n hÃ ng cÃ³ tongTienTra = 900.000Ä‘. KhÃ¡ch tráº£ 1 sáº£n pháº©m (giaSanPham = 200.000Ä‘, soLuong = 3):
+### Công thức tính tổng tiền trả
 
 ```
-tongTien = 900.000 âˆ’ (200.000 Ã— 3) = 900.000 âˆ’ 600.000 = 300.000Ä‘
+tongTien = tongTienTra (đơn hàng) − Σ(giaSanPham × soLuong) của các sản phẩm trả
 ```
 
-### Äiá»u kiá»‡n táº¡o phiáº¿u tráº£ hÃ ng
+- `tongTienTra`: Tổng tiền khách hàng đã thanh toán cho đơn hàng
+- `giaSanPham × soLuong`: Giá gốc (chưa giảm) × số lượng của từng sản phẩm trả
 
-| Äiá»u kiá»‡n                                        | MÃ´ táº£                                       |
+**Ví dụ:** Đơn hàng có tongTienTra = 900.000đ. Khách trả 1 sản phẩm (giaSanPham = 200.000đ, soLuong = 3):
+
+```
+tongTien = 900.000 − (200.000 × 3) = 900.000 − 600.000 = 300.000đ
+```
+
+### Điều kiện tạo phiếu trả hàng
+
+| Điều kiện                                        | Mô tả                                       |
 | ------------------------------------------------ | ------------------------------------------- |
-| âœ… ÄÃ£ Ä‘Äƒng nháº­p                                  | Láº¥y thÃ´ng tin KH tá»« JWT token               |
-| âœ… ÄÆ¡n hÃ ng **tráº¡ng thÃ¡i = 5** (ÄÃ£ nháº­n hÃ ng)    | Chá»‰ tráº£ Ä‘Æ°á»£c Ä‘Æ¡n Ä‘Ã£ nháº­n                    |
-| âœ… KhÃ¡ch hÃ ng lÃ  **chá»§ Ä‘Æ¡n hÃ ng**                | KhÃ´ng Ä‘Æ°á»£c phÃ©p tráº£ Ä‘Æ¡n hÃ ng cá»§a ngÆ°á»i khÃ¡c |
-| âœ… Chá»n **Ã­t nháº¥t 1 sáº£n pháº©m** Ä‘á»ƒ tráº£            | Pháº£i chá»n sáº£n pháº©m cáº§n tráº£                  |
-| âœ… Chi tiáº¿t Ä‘Æ¡n hÃ ng **thuá»™c Ä‘Æ¡n hÃ ng Ä‘ang tráº£** | KhÃ´ng trá»™n sáº£n pháº©m tá»« Ä‘Æ¡n khÃ¡c             |
+| ✅ Đã đăng nhập                                  | Lấy thông tin KH từ JWT token               |
+| ✅ Đơn hàng **trạng thái = 5** (Đã nhận hàng)    | Chỉ trả được đơn đã nhận                    |
+| ✅ Khách hàng là **chủ đơn hàng**                | Không được phép trả đơn hàng của người khác |
+| ✅ Chọn **ít nhất 1 sản phẩm** để trả            | Phải chọn sản phẩm cần trả                  |
+| ✅ Chi tiết đơn hàng **thuộc đơn hàng đang trả** | Không trộn sản phẩm từ đơn khác             |
 
 ---
 
-## 1. Táº¡o phiáº¿u tráº£ hÃ ng
+## 1. Tạo phiếu trả hàng
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t                |
+| Thuộc tính   | Chi tiết                |
 | ------------ | ----------------------- |
 | **URL**      | `POST /api/v1/tra-hang` |
 | **Method**   | `POST`                  |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)      |
+| **Xác thực** | Bearer Token (JWT)      |
 
 **Request Body:**
 
 ```json
 {
   "donHangId": 5,
-  "lyDoTraHang": "Sáº£n pháº©m bá»‹ lá»—i, khÃ´ng Ä‘Ãºng mÃ´ táº£",
+  "lyDoTraHang": "Sản phẩm bị lỗi, không đúng mô tả",
   "chiTietTraHangs": [
     {
       "chiTietDonHangId": 6,
-      "ghiTru": "Ão bá»‹ rÃ¡ch á»Ÿ tay"
+      "ghiTru": "Áo bị rách ở tay"
     },
     {
       "chiTietDonHangId": 7,
-      "ghiTru": "Quáº§n khÃ´ng Ä‘Ãºng mÃ u"
+      "ghiTru": "Quần không đúng màu"
     }
   ]
 }
 ```
 
-| TrÆ°á»ng                               | Kiá»ƒu   | Báº¯t buá»™c | MÃ´ táº£                        |
+| Trường                               | Kiểu   | Bắt buộc | Mô tả                        |
 | ------------------------------------ | ------ | -------- | ---------------------------- |
-| `donHangId`                          | Long   | CÃ³       | MÃ£ Ä‘Æ¡n hÃ ng cáº§n tráº£          |
-| `lyDoTraHang`                        | String | CÃ³       | LÃ½ do tráº£ hÃ ng               |
-| `chiTietTraHangs`                    | Array  | CÃ³       | Danh sÃ¡ch sáº£n pháº©m tráº£       |
-| `chiTietTraHangs[].chiTietDonHangId` | Long   | CÃ³       | MÃ£ chi tiáº¿t Ä‘Æ¡n hÃ ng cáº§n tráº£ |
-| `chiTietTraHangs[].ghiTru`           | String | KhÃ´ng    | Ghi chÃº cho sáº£n pháº©m tráº£     |
+| `donHangId`                          | Long   | Có       | Mã đơn hàng cần trả          |
+| `lyDoTraHang`                        | String | Có       | Lý do trả hàng               |
+| `chiTietTraHangs`                    | Array  | Có       | Danh sách sản phẩm trả       |
+| `chiTietTraHangs[].chiTietDonHangId` | Long   | Có       | Mã chi tiết đơn hàng cần trả |
+| `chiTietTraHangs[].ghiTru`           | String | Không    | Ghi chú cho sản phẩm trả     |
 
 **Response:** `201 Created`
 
@@ -116,12 +116,12 @@ tongTien = 900.000 âˆ’ (200.000 Ã— 3) = 900.000 âˆ’ 600.000 = 300.000
 {
   "statusCode": 201,
   "error": null,
-  "message": "Táº¡o phiáº¿u tráº£ hÃ ng",
+  "message": "Tạo phiếu trả hàng",
   "data": {
     "id": 1,
     "donHangId": 5,
-    "lyDoTraHang": "Sáº£n pháº©m bá»‹ lá»—i, khÃ´ng Ä‘Ãºng mÃ´ táº£",
-    "trangThai": "Chá» xá»­ lÃ½",
+    "lyDoTraHang": "Sản phẩm bị lỗi, không đúng mô tả",
+    "trangThai": "Chờ xử lý",
     "tongTien": 0.0,
     "ngayTao": "2026-03-12T10:30:00",
     "ngayCapNhat": null,
@@ -129,75 +129,75 @@ tongTien = 900.000 âˆ’ (200.000 Ã— 3) = 900.000 âˆ’ 600.000 = 300.000
       {
         "id": 1,
         "chiTietDonHangId": 6,
-        "tenSanPham": "Ão Oxford",
+        "tenSanPham": "Áo Oxford",
         "hinhAnhChinh": "ao-oxford.jpg",
-        "tenMauSac": "Tráº¯ng",
+        "tenMauSac": "Trắng",
         "tenKichThuoc": "M",
         "giaSanPham": 200.0,
         "soLuong": 3,
         "thanhTien": 600.0,
-        "ghiTru": "Ão bá»‹ rÃ¡ch á»Ÿ tay",
-        "trangThai": "Chá» xá»­ lÃ½"
+        "ghiTru": "Áo bị rách ở tay",
+        "trangThai": "Chờ xử lý"
       },
       {
         "id": 2,
         "chiTietDonHangId": 7,
-        "tenSanPham": "Quáº§n Jean",
+        "tenSanPham": "Quần Jean",
         "hinhAnhChinh": null,
-        "tenMauSac": "Äen",
+        "tenMauSac": "Đen",
         "tenKichThuoc": "M",
         "giaSanPham": 400.0,
         "soLuong": 1,
         "thanhTien": 400.0,
-        "ghiTru": "Quáº§n khÃ´ng Ä‘Ãºng mÃ u",
-        "trangThai": "Chá» xá»­ lÃ½"
+        "ghiTru": "Quần không đúng màu",
+        "trangThai": "Chờ xử lý"
       }
     ]
   }
 }
 ```
 
-**Lá»—i thÆ°á»ng gáº·p:**
+**Lỗi thường gặp:**
 
-| MÃ£ lá»—i | NguyÃªn nhÃ¢n                                     |
+| Mã lỗi | Nguyên nhân                                     |
 | ------ | ----------------------------------------------- |
-| `400`  | ÄÆ¡n hÃ ng khÃ´ng á»Ÿ tráº¡ng thÃ¡i "ÄÃ£ nháº­n hÃ ng"      |
-| `400`  | KhÃ´ng tÃ¬m tháº¥y Ä‘Æ¡n hÃ ng                         |
-| `400`  | KhÃ´ng cÃ³ quyá»n tráº£ Ä‘Æ¡n hÃ ng nÃ y                 |
-| `400`  | KhÃ´ng chá»n sáº£n pháº©m Ä‘á»ƒ tráº£                      |
-| `400`  | Chi tiáº¿t Ä‘Æ¡n hÃ ng khÃ´ng thuá»™c Ä‘Æ¡n hÃ ng Ä‘ang tráº£ |
+| `400`  | Đơn hàng không ở trạng thái "Đã nhận hàng"      |
+| `400`  | Không tìm thấy đơn hàng                         |
+| `400`  | Không có quyền trả đơn hàng này                 |
+| `400`  | Không chọn sản phẩm để trả                      |
+| `400`  | Chi tiết đơn hàng không thuộc đơn hàng đang trả |
 
 ---
 
-## 2. Láº¥y danh sÃ¡ch phiáº¿u tráº£ hÃ ng (phÃ¢n trang)
+## 2. Lấy danh sách phiếu trả hàng (phân trang)
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t               |
+| Thuộc tính   | Chi tiết               |
 | ------------ | ---------------------- |
 | **URL**      | `GET /api/v1/tra-hang` |
 | **Method**   | `GET`                  |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)     |
+| **Xác thực** | Bearer Token (JWT)     |
 
 **Query Parameters:**
 
-| Tham sá»‘ | Kiá»ƒu    | Báº¯t buá»™c | MÃ´ táº£                           |
+| Tham số | Kiểu    | Bắt buộc | Mô tả                           |
 | ------- | ------- | -------- | ------------------------------- |
-| `page`  | Integer | KhÃ´ng    | Sá»‘ trang (máº·c Ä‘á»‹nh: 0)          |
-| `size`  | Integer | KhÃ´ng    | KÃ­ch thÆ°á»›c trang (máº·c Ä‘á»‹nh: 20) |
-| `sort`  | String  | KhÃ´ng    | Sáº¯p xáº¿p (vd: `ngayTao,desc`)    |
+| `page`  | Integer | Không    | Số trang (mặc định: 0)          |
+| `size`  | Integer | Không    | Kích thước trang (mặc định: 20) |
+| `sort`  | String  | Không    | Sắp xếp (vd: `ngayTao,desc`)    |
 
-**VÃ­ dá»¥ request:**
+**Ví dụ request:**
 
 ```
 GET /api/v1/tra-hang?page=0&size=10&sort=ngayTao,desc
 ```
 
-**Response:** `200 OK` â€” Tráº£ vá» `ResultPaginationDTO`
+**Response:** `200 OK` — Trả về `ResultPaginationDTO`
 
 ```json
 {
     "statusCode": 200,
     "error": null,
-    "message": "Láº¥y danh sÃ¡ch phiáº¿u tráº£ hÃ ng",
+    "message": "Lấy danh sách phiếu trả hàng",
     "data": {
         "meta": {
             "page": 1,
@@ -209,8 +209,8 @@ GET /api/v1/tra-hang?page=0&size=10&sort=ngayTao,desc
             {
                 "id": 1,
                 "donHangId": 5,
-                "lyDoTraHang": "Sáº£n pháº©m bá»‹ lá»—i",
-                "trangThai": "Chá» xá»­ lÃ½",
+                "lyDoTraHang": "Sản phẩm bị lỗi",
+                "trangThai": "Chờ xử lý",
                 "tongTien": 0.0,
                 "ngayTao": "2026-03-12T10:30:00",
                 "ngayCapNhat": null,
@@ -223,63 +223,63 @@ GET /api/v1/tra-hang?page=0&size=10&sort=ngayTao,desc
 
 ---
 
-## 3. Láº¥y phiáº¿u tráº£ hÃ ng theo mÃ£
+## 3. Lấy phiếu trả hàng theo mã
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t                    |
+| Thuộc tính   | Chi tiết                    |
 | ------------ | --------------------------- |
 | **URL**      | `GET /api/v1/tra-hang/{id}` |
 | **Method**   | `GET`                       |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)          |
+| **Xác thực** | Bearer Token (JWT)          |
 
 **Path Parameters:**
 
-| Tham sá»‘ | Kiá»ƒu | Báº¯t buá»™c | MÃ´ táº£             |
+| Tham số | Kiểu | Bắt buộc | Mô tả             |
 | ------- | ---- | -------- | ----------------- |
-| `id`    | Long | CÃ³       | MÃ£ phiáº¿u tráº£ hÃ ng |
+| `id`    | Long | Có       | Mã phiếu trả hàng |
 
-**VÃ­ dá»¥ request:**
+**Ví dụ request:**
 
 ```
 GET /api/v1/tra-hang/1
 ```
 
-**Response:** `200 OK` â€” Tráº£ vá» `ResTraHangDTO` (cáº¥u trÃºc giá»‘ng response táº¡o phiáº¿u)
+**Response:** `200 OK` — Trả về `ResTraHangDTO` (cấu trúc giống response tạo phiếu)
 
 ---
 
-## 4. Láº¥y danh sÃ¡ch phiáº¿u tráº£ theo Ä‘Æ¡n hÃ ng
+## 4. Lấy danh sách phiếu trả theo đơn hàng
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t                                    |
+| Thuộc tính   | Chi tiết                                    |
 | ------------ | ------------------------------------------- |
 | **URL**      | `GET /api/v1/tra-hang/don-hang/{donHangId}` |
 | **Method**   | `GET`                                       |
-| **XÃ¡c thá»±c** | Bearer Token (JWT)                          |
+| **Xác thực** | Bearer Token (JWT)                          |
 
 **Path Parameters:**
 
-| Tham sá»‘     | Kiá»ƒu | Báº¯t buá»™c | MÃ´ táº£       |
+| Tham số     | Kiểu | Bắt buộc | Mô tả       |
 | ----------- | ---- | -------- | ----------- |
-| `donHangId` | Long | CÃ³       | MÃ£ Ä‘Æ¡n hÃ ng |
+| `donHangId` | Long | Có       | Mã đơn hàng |
 
-**VÃ­ dá»¥ request:**
+**Ví dụ request:**
 
 ```
 GET /api/v1/tra-hang/don-hang/5
 ```
 
-**Response:** `200 OK` â€” Tráº£ vá» `List<ResTraHangDTO>`
+**Response:** `200 OK` — Trả về `List<ResTraHangDTO>`
 
 ```json
 {
     "statusCode": 200,
     "error": null,
-    "message": "Láº¥y danh sÃ¡ch phiáº¿u tráº£ hÃ ng theo Ä‘Æ¡n hÃ ng",
+    "message": "Lấy danh sách phiếu trả hàng theo đơn hàng",
     "data": [
         {
             "id": 1,
             "donHangId": 5,
-            "lyDoTraHang": "Sáº£n pháº©m bá»‹ lá»—i",
-            "trangThai": "Chá» xá»­ lÃ½",
+            "lyDoTraHang": "Sản phẩm bị lỗi",
+            "trangThai": "Chờ xử lý",
             "tongTien": 0.0,
             "ngayTao": "2026-03-12T10:30:00",
             "ngayCapNhat": null,
@@ -291,27 +291,27 @@ GET /api/v1/tra-hang/don-hang/5
 
 ---
 
-## 5. Cáº­p nháº­t tráº¡ng thÃ¡i phiáº¿u tráº£ hÃ ng
+## 5. Cập nhật trạng thái phiếu trả hàng
 
-| Thuá»™c tÃ­nh   | Chi tiáº¿t                               |
+| Thuộc tính   | Chi tiết                               |
 | ------------ | -------------------------------------- |
 | **URL**      | `PUT /api/v1/tra-hang/{id}/trang-thai` |
 | **Method**   | `PUT`                                  |
-| **XÃ¡c thá»±c** | Bearer Token (JWT) â€” Admin/NhÃ¢n viÃªn   |
+| **Xác thực** | Bearer Token (JWT) — Admin/Nhân viên   |
 
 **Path Parameters:**
 
-| Tham sá»‘ | Kiá»ƒu | Báº¯t buá»™c | MÃ´ táº£             |
+| Tham số | Kiểu | Bắt buộc | Mô tả             |
 | ------- | ---- | -------- | ----------------- |
-| `id`    | Long | CÃ³       | MÃ£ phiáº¿u tráº£ hÃ ng |
+| `id`    | Long | Có       | Mã phiếu trả hàng |
 
 **Query Parameters:**
 
-| Tham sá»‘     | Kiá»ƒu    | Báº¯t buá»™c | MÃ´ táº£                                   |
+| Tham số     | Kiểu    | Bắt buộc | Mô tả                                   |
 | ----------- | ------- | -------- | --------------------------------------- |
-| `trangThai` | Integer | CÃ³       | Tráº¡ng thÃ¡i má»›i (1 = Duyá»‡t, 2 = Tá»« chá»‘i) |
+| `trangThai` | Integer | Có       | Trạng thái mới (1 = Duyệt, 2 = Từ chối) |
 
-**VÃ­ dá»¥ request:**
+**Ví dụ request:**
 
 ```
 PUT /api/v1/tra-hang/1/trang-thai?trangThai=1
@@ -323,12 +323,12 @@ PUT /api/v1/tra-hang/1/trang-thai?trangThai=1
 {
     "statusCode": 200,
     "error": null,
-    "message": "Cáº­p nháº­t tráº¡ng thÃ¡i phiáº¿u tráº£ hÃ ng",
+    "message": "Cập nhật trạng thái phiếu trả hàng",
     "data": {
         "id": 1,
         "donHangId": 5,
-        "lyDoTraHang": "Sáº£n pháº©m bá»‹ lá»—i",
-        "trangThai": "ÄÃ£ duyá»‡t",
+        "lyDoTraHang": "Sản phẩm bị lỗi",
+        "trangThai": "Đã duyệt",
         "tongTien": 0.0,
         "ngayTao": "2026-03-12T10:30:00",
         "ngayCapNhat": "2026-03-12T14:00:00",
@@ -337,12 +337,12 @@ PUT /api/v1/tra-hang/1/trang-thai?trangThai=1
 }
 ```
 
-**Lá»—i thÆ°á»ng gáº·p:**
+**Lỗi thường gặp:**
 
-| MÃ£ lá»—i | NguyÃªn nhÃ¢n                                      |
+| Mã lỗi | Nguyên nhân                                      |
 | ------ | ------------------------------------------------ |
-| `400`  | KhÃ´ng tÃ¬m tháº¥y phiáº¿u tráº£ hÃ ng                    |
-| `400`  | Phiáº¿u khÃ´ng á»Ÿ tráº¡ng thÃ¡i "Chá» xá»­ lÃ½"             |
-| `400`  | Tráº¡ng thÃ¡i khÃ´ng há»£p lá»‡ (chá»‰ cháº¥p nháº­n 1 hoáº·c 2) |
+| `400`  | Không tìm thấy phiếu trả hàng                    |
+| `400`  | Phiếu không ở trạng thái "Chờ xử lý"             |
+| `400`  | Trạng thái không hợp lệ (chỉ chấp nhận 1 hoặc 2) |
 
 

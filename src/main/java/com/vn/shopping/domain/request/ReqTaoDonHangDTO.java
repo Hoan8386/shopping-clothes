@@ -19,4 +19,7 @@ public class ReqTaoDonHangDTO {
     // Mã khuyến mãi (tùy chọn)
     private Long maKhuyenMaiHoaDon;
     private Long maKhuyenMaiDiem;
+
+    // Hình thức thanh toán: 0 = COD/Tiền mặt, 1 = VNPAY
+    private Integer hinhThucDonHang;
 }
