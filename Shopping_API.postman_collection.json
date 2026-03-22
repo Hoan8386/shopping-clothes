@@ -2758,6 +2758,216 @@
 					}
 				}
 			]
+		},
+		{
+			"name": "Ca Làm Việc (🔒 Admin/NV)",
+			"description": "Quản lý ca làm việc — Admin toàn quyền, Nhân viên chỉ xem",
+			"item": [
+				{
+					"name": "Xem tất cả ca làm việc",
+					"request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/api/v1/ca-lam-viec", "host": ["{{base_url}}"], "path": ["api","v1","ca-lam-viec"] }, "description": "Admin/NV — Xem danh sách tất cả ca làm việc" }
+				},
+				{
+					"name": "Xem ca làm việc theo id",
+					"request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/api/v1/ca-lam-viec/1", "host": ["{{base_url}}"], "path": ["api","v1","ca-lam-viec","1"] }, "description": "Admin/NV — Xem chi tiết 1 ca làm việc" }
+				},
+				{
+					"name": "Tạo ca làm việc (🔒 Admin)",
+					"request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n    \"tenCaLam\": \"Ca Sáng\",\n    \"gioBatDau\": \"07:00:00\",\n    \"gioKetThuc\": \"11:30:00\",\n    \"trangThai\": 1\n}" }, "url": { "raw": "{{base_url}}/api/v1/ca-lam-viec", "host": ["{{base_url}}"], "path": ["api","v1","ca-lam-viec"] }, "description": "Chỉ Admin — Tạo ca làm việc mới" }
+				},
+				{
+					"name": "Cập nhật ca làm việc (🔒 Admin)",
+					"request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n    \"id\": 1,\n    \"tenCaLam\": \"Ca Sáng V2\",\n    \"gioBatDau\": \"06:30:00\",\n    \"gioKetThuc\": \"11:00:00\",\n    \"trangThai\": 1\n}" }, "url": { "raw": "{{base_url}}/api/v1/ca-lam-viec", "host": ["{{base_url}}"], "path": ["api","v1","ca-lam-viec"] }, "description": "Chỉ Admin — Cập nhật ca làm việc" }
+				},
+				{
+					"name": "Xóa ca làm việc (🔒 Admin)",
+					"request": { "method": "DELETE", "header": [], "url": { "raw": "{{base_url}}/api/v1/ca-lam-viec/1", "host": ["{{base_url}}"], "path": ["api","v1","ca-lam-viec","1"] }, "description": "Chỉ Admin — Xóa ca làm việc" }
+				}
+			]
+		},
+		{
+			"name": "Lịch Làm Việc (🔒 Admin/NV)",
+			"description": "Quản lý lịch làm việc — Hỗ trợ import Excel hàng loạt",
+			"item": [
+				{
+					"name": "Xem tất cả lịch làm việc",
+					"request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/api/v1/lich-lam-viec", "host": ["{{base_url}}"], "path": ["api","v1","lich-lam-viec"] }, "description": "Admin/NV — Xem tất cả lịch làm việc" }
+				},
+				{
+					"name": "Xem lịch làm việc theo id",
+					"request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/api/v1/lich-lam-viec/1", "host": ["{{base_url}}"], "path": ["api","v1","lich-lam-viec","1"] }, "description": "Admin/NV — Xem chi tiết lịch làm theo ID" }
+				},
+				{
+					"name": "Xem lịch làm theo nhân viên",
+					"request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/api/v1/lich-lam-viec/nhan-vien/1", "host": ["{{base_url}}"], "path": ["api","v1","lich-lam-viec","nhan-vien","1"] }, "description": "Admin/NV — Xem tất cả lịch làm của nhân viên ID=1" }
+				},
+				{
+					"name": "Tạo lịch làm việc",
+					"request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n    \"nhanVien\": { \"id\": 1 },\n    \"ngayLamViec\": \"2026-04-01\",\n    \"trangThai\": 1\n}" }, "url": { "raw": "{{base_url}}/api/v1/lich-lam-viec", "host": ["{{base_url}}"], "path": ["api","v1","lich-lam-viec"] }, "description": "Admin/NV — Tạo lịch làm việc mới" }
+				},
+				{
+					"name": "Cập nhật lịch làm việc (🔒 Admin)",
+					"request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n    \"id\": 1,\n    \"nhanVien\": { \"id\": 1 },\n    \"ngayLamViec\": \"2026-04-01\",\n    \"trangThai\": 0\n}" }, "url": { "raw": "{{base_url}}/api/v1/lich-lam-viec", "host": ["{{base_url}}"], "path": ["api","v1","lich-lam-viec"] }, "description": "Chỉ Admin — Cập nhật lịch làm việc" }
+				},
+				{
+					"name": "Xóa lịch làm việc",
+					"request": { "method": "DELETE", "header": [], "url": { "raw": "{{base_url}}/api/v1/lich-lam-viec/5", "host": ["{{base_url}}"], "path": ["api","v1","lich-lam-viec","5"] }, "description": "Admin/NV — Xóa lịch làm việc" }
+				},
+				{
+					"name": "Import lịch làm việc từ Excel",
+					"request": { "method": "POST", "header": [], "body": { "mode": "formdata", "formdata": [{ "key": "file", "type": "file", "src": "", "description": "File Excel .xlsx chứa dữ liệu lịch làm việc (theo file mẫu)" }] }, "url": { "raw": "{{base_url}}/api/v1/lich-lam-viec/import", "host": ["{{base_url}}"], "path": ["api","v1","lich-lam-viec","import"] }, "description": "Admin/NV — Import hàng loạt lịch làm việc từ file Excel (.xlsx). Tải file mẫu trước bằng request Download Template" }
+				},
+				{
+					"name": "Tải file Excel mẫu lịch làm",
+					"request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/api/v1/lich-lam-viec/download-template", "host": ["{{base_url}}"], "path": ["api","v1","lich-lam-viec","download-template"] }, "description": "Admin/NV — Tải file mẫu Excel để import lịch làm việc hàng loạt" }
+				}
+			]
+		},
+		{
+			"name": "Chi Tiết Lịch Làm (🔒 Admin/NV)",
+			"description": "Quản lý chi tiết ca trong lịch làm việc (lịch ↔ ca)",
+			"item": [
+				{
+					"name": "Xem tất cả chi tiết lịch làm",
+					"request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/api/v1/chi-tiet-lich-lam", "host": ["{{base_url}}"], "path": ["api","v1","chi-tiet-lich-lam"] }, "description": "Admin/NV — Xem tất cả chi tiết lịch làm" }
+				},
+				{
+					"name": "Xem chi tiết lịch làm theo id",
+					"request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/api/v1/chi-tiet-lich-lam/1", "host": ["{{base_url}}"], "path": ["api","v1","chi-tiet-lich-lam","1"] }, "description": "Admin/NV — Xem chi tiết theo ID" }
+				},
+				{
+					"name": "Xem chi tiết theo lịch làm việc",
+					"request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/api/v1/chi-tiet-lich-lam/lich-lam-viec/1", "host": ["{{base_url}}"], "path": ["api","v1","chi-tiet-lich-lam","lich-lam-viec","1"] }, "description": "Admin/NV — Lấy tất cả chi tiết ca theo mã lịch làm việc" }
+				},
+				{
+					"name": "Tạo chi tiết lịch làm",
+					"request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n    \"lichLamViec\": { \"id\": 1 },\n    \"caLamViec\": { \"id\": 3 },\n    \"trangThai\": 1\n}" }, "url": { "raw": "{{base_url}}/api/v1/chi-tiet-lich-lam", "host": ["{{base_url}}"], "path": ["api","v1","chi-tiet-lich-lam"] }, "description": "Admin/NV — Gán ca làm việc vào lịch" }
+				},
+				{
+					"name": "Cập nhật chi tiết lịch làm (🔒 Admin)",
+					"request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n    \"id\": 1,\n    \"lichLamViec\": { \"id\": 1 },\n    \"caLamViec\": { \"id\": 2 },\n    \"trangThai\": 1\n}" }, "url": { "raw": "{{base_url}}/api/v1/chi-tiet-lich-lam", "host": ["{{base_url}}"], "path": ["api","v1","chi-tiet-lich-lam"] }, "description": "Chỉ Admin — Cập nhật chi tiết lịch làm" }
+				},
+				{
+					"name": "Xóa chi tiết lịch làm (🔒 Admin)",
+					"request": { "method": "DELETE", "header": [], "url": { "raw": "{{base_url}}/api/v1/chi-tiet-lich-lam/1", "host": ["{{base_url}}"], "path": ["api","v1","chi-tiet-lich-lam","1"] }, "description": "Chỉ Admin — Xóa chi tiết lịch làm" }
+				}
+			]
+		},
+		{
+			"name": "Lương Cơ Bản (🔒 Admin)",
+			"description": "Quản lý mức lương cơ bản theo nhân viên — Chỉ Admin",
+			"item": [
+				{
+					"name": "Xem tất cả lương cơ bản",
+					"request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/api/v1/luong-co-ban", "host": ["{{base_url}}"], "path": ["api","v1","luong-co-ban"] }, "description": "Admin — Xem tất cả bản ghi lương cơ bản" }
+				},
+				{
+					"name": "Xem lương cơ bản theo id",
+					"request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/api/v1/luong-co-ban/1", "host": ["{{base_url}}"], "path": ["api","v1","luong-co-ban","1"] }, "description": "Admin — Xem chi tiết lương cơ bản theo ID" }
+				},
+				{
+					"name": "Xem lương cơ bản theo nhân viên",
+					"request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/api/v1/luong-co-ban/nhan-vien/1", "host": ["{{base_url}}"], "path": ["api","v1","luong-co-ban","nhan-vien","1"] }, "description": "Admin — Xem lịch sử lương cơ bản của nhân viên ID=1" }
+				},
+				{
+					"name": "Tạo lương cơ bản",
+					"request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n    \"nhanVien\": { \"id\": 1 },\n    \"luongCoBan\": 9000000,\n    \"ngayApDung\": \"2026-04-01T00:00:00\",\n    \"trangThai\": 1\n}" }, "url": { "raw": "{{base_url}}/api/v1/luong-co-ban", "host": ["{{base_url}}"], "path": ["api","v1","luong-co-ban"] }, "description": "Admin — Tạo mức lương cơ bản mới cho nhân viên" }
+				},
+				{
+					"name": "Cập nhật lương cơ bản",
+					"request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n    \"id\": 1,\n    \"nhanVien\": { \"id\": 1 },\n    \"luongCoBan\": 8500000,\n    \"ngayApDung\": \"2026-01-01T00:00:00\",\n    \"trangThai\": 0\n}" }, "url": { "raw": "{{base_url}}/api/v1/luong-co-ban", "host": ["{{base_url}}"], "path": ["api","v1","luong-co-ban"] }, "description": "Admin — Cập nhật mức lương cơ bản (vd: chuyển sang hết hiệu lực)" }
+				}
+			]
+		},
+		{
+			"name": "Lương Thưởng (🔒 Admin)",
+			"description": "Quản lý tiền thưởng theo kỳ — Chỉ Admin",
+			"item": [
+				{
+					"name": "Xem tất cả lương thưởng",
+					"request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/api/v1/luong-thuong", "host": ["{{base_url}}"], "path": ["api","v1","luong-thuong"] }, "description": "Admin — Xem tất cả bản ghi lương thưởng" }
+				},
+				{
+					"name": "Xem lương thưởng theo id",
+					"request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/api/v1/luong-thuong/1", "host": ["{{base_url}}"], "path": ["api","v1","luong-thuong","1"] }, "description": "Admin — Xem chi tiết lương thưởng theo ID" }
+				},
+				{
+					"name": "Xem lương thưởng theo nhân viên",
+					"request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/api/v1/luong-thuong/nhan-vien/1", "host": ["{{base_url}}"], "path": ["api","v1","luong-thuong","nhan-vien","1"] }, "description": "Admin — Xem lịch sử thưởng của nhân viên ID=1" }
+				},
+				{
+					"name": "Tạo lương thưởng",
+					"request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n    \"nhanVien\": { \"id\": 2 },\n    \"tienThuong\": 500000,\n    \"ngayBatDau\": \"2026-04-01T00:00:00\",\n    \"ngayKetThuc\": \"2026-04-30T23:59:59\",\n    \"trangThai\": 0\n}" }, "url": { "raw": "{{base_url}}/api/v1/luong-thuong", "host": ["{{base_url}}"], "path": ["api","v1","luong-thuong"] }, "description": "Admin — Tạo bản ghi thưởng cho nhân viên (trangThai=0: chờ chi)" }
+				},
+				{
+					"name": "Cập nhật lương thưởng (chi thưởng)",
+					"request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n    \"id\": 3,\n    \"nhanVien\": { \"id\": 2 },\n    \"tienThuong\": 500000,\n    \"ngayBatDau\": \"2026-04-01T00:00:00\",\n    \"ngayKetThuc\": \"2026-04-30T23:59:59\",\n    \"trangThai\": 1\n}" }, "url": { "raw": "{{base_url}}/api/v1/luong-thuong", "host": ["{{base_url}}"], "path": ["api","v1","luong-thuong"] }, "description": "Admin — Cập nhật trạng thái = 1 (đã chi)" }
+				},
+				{
+					"name": "Xóa lương thưởng",
+					"request": { "method": "DELETE", "header": [], "url": { "raw": "{{base_url}}/api/v1/luong-thuong/4", "host": ["{{base_url}}"], "path": ["api","v1","luong-thuong","4"] }, "description": "Admin — Xóa bản ghi lương thưởng" }
+				}
+			]
+		},
+		{
+			"name": "Đổi Ca (🔒 Admin/NV)",
+			"description": "Quản lý yêu cầu đổi ca — 0=Chờ duyệt, 1=Đồng ý, 2=Từ chối",
+			"item": [
+				{
+					"name": "Xem tất cả đổi ca",
+					"request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/api/v1/doi-ca", "host": ["{{base_url}}"], "path": ["api","v1","doi-ca"] }, "description": "Admin/NV — Xem tất cả yêu cầu đổi ca" }
+				},
+				{
+					"name": "Xem đổi ca theo id",
+					"request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/api/v1/doi-ca/1", "host": ["{{base_url}}"], "path": ["api","v1","doi-ca","1"] }, "description": "Admin/NV — Xem chi tiết yêu cầu đổi ca" }
+				},
+				{
+					"name": "Xem đổi ca theo lịch làm việc",
+					"request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/api/v1/doi-ca/lich-lam-viec/1", "host": ["{{base_url}}"], "path": ["api","v1","doi-ca","lich-lam-viec","1"] }, "description": "Admin/NV — Xem tất cả đổi ca của lịch làm việc ID=1" }
+				},
+				{
+					"name": "Tạo yêu cầu đổi ca",
+					"request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n    \"lichLamViec\": { \"id\": 4 },\n    \"chiTietLichLam\": { \"id\": 5 },\n    \"nhanVienNhanCa\": { \"id\": 2 },\n    \"trangThai\": 0\n}" }, "url": { "raw": "{{base_url}}/api/v1/doi-ca", "host": ["{{base_url}}"], "path": ["api","v1","doi-ca"] }, "description": "Admin/NV — Tạo yêu cầu đổi ca mới (trangThai=0: chờ duyệt)" }
+				},
+				{
+					"name": "Duyệt yêu cầu đổi ca (đồng ý)",
+					"request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n    \"id\": 2,\n    \"lichLamViec\": { \"id\": 3 },\n    \"chiTietLichLam\": { \"id\": 4 },\n    \"nhanVienNhanCa\": { \"id\": 1 },\n    \"trangThai\": 1\n}" }, "url": { "raw": "{{base_url}}/api/v1/doi-ca", "host": ["{{base_url}}"], "path": ["api","v1","doi-ca"] }, "description": "Admin/NV — Duyệt yêu cầu đổi ca (trangThai=1: đồng ý)" }
+				},
+				{
+					"name": "Từ chối yêu cầu đổi ca",
+					"request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n    \"id\": 2,\n    \"lichLamViec\": { \"id\": 3 },\n    \"chiTietLichLam\": { \"id\": 4 },\n    \"nhanVienNhanCa\": { \"id\": 1 },\n    \"trangThai\": 2\n}" }, "url": { "raw": "{{base_url}}/api/v1/doi-ca", "host": ["{{base_url}}"], "path": ["api","v1","doi-ca"] }, "description": "Admin/NV — Từ chối yêu cầu đổi ca (trangThai=2)" }
+				}
+			]
+		},
+		{
+			"name": "Lỗi Phát Sinh (🔒 Admin)",
+			"description": "Quản lý lỗi và tiền phạt trong ca làm việc — Chỉ Admin toàn quyền, NV chỉ xem",
+			"item": [
+				{
+					"name": "Xem tất cả lỗi phát sinh",
+					"request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/api/v1/loi-phat-sinh", "host": ["{{base_url}}"], "path": ["api","v1","loi-phat-sinh"] }, "description": "Admin/NV — Xem tất cả lỗi phát sinh" }
+				},
+				{
+					"name": "Xem lỗi phát sinh theo id",
+					"request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/api/v1/loi-phat-sinh/1", "host": ["{{base_url}}"], "path": ["api","v1","loi-phat-sinh","1"] }, "description": "Admin/NV — Xem chi tiết lỗi phát sinh" }
+				},
+				{
+					"name": "Xem lỗi theo lịch làm việc",
+					"request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/api/v1/loi-phat-sinh/lich-lam-viec/2", "host": ["{{base_url}}"], "path": ["api","v1","loi-phat-sinh","lich-lam-viec","2"] }, "description": "Admin/NV — Xem tất cả lỗi theo mã lịch làm việc" }
+				},
+				{
+					"name": "Tạo lỗi phát sinh (🔒 Admin)",
+					"request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n    \"lichLamViec\": { \"id\": 1 },\n    \"chiTietLichLam\": { \"id\": 1 },\n    \"tenLoiPhatSinh\": \"Đi trễ 15 phút\",\n    \"soTienTru\": 30000,\n    \"trangThai\": 0\n}" }, "url": { "raw": "{{base_url}}/api/v1/loi-phat-sinh", "host": ["{{base_url}}"], "path": ["api","v1","loi-phat-sinh"] }, "description": "Chỉ Admin — Ghi nhận lỗi phát sinh (trangThai=0: chờ xử lý)" }
+				},
+				{
+					"name": "Cập nhật lỗi phát sinh (🔒 Admin)",
+					"request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n    \"id\": 2,\n    \"lichLamViec\": { \"id\": 3 },\n    \"chiTietLichLam\": { \"id\": 4 },\n    \"tenLoiPhatSinh\": \"Rời ca sớm 30 phút\",\n    \"soTienTru\": 80000,\n    \"trangThai\": 1\n}" }, "url": { "raw": "{{base_url}}/api/v1/loi-phat-sinh", "host": ["{{base_url}}"], "path": ["api","v1","loi-phat-sinh"] }, "description": "Chỉ Admin — Cập nhật lỗi (trangThai=1: đã xử lý)" }
+				},
+				{
+					"name": "Xóa lỗi phát sinh (🔒 Admin)",
+					"request": { "method": "DELETE", "header": [], "url": { "raw": "{{base_url}}/api/v1/loi-phat-sinh/1", "host": ["{{base_url}}"], "path": ["api","v1","loi-phat-sinh","1"] }, "description": "Chỉ Admin — Xóa bản ghi lỗi phát sinh" }
+				}
+			]
 		}
 	]
 }

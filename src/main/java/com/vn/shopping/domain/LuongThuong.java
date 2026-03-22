@@ -7,48 +7,38 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "ChiTietSanPham")
+@Table(name = "LuongThuong")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
-public class ChiTietSanPham {
+public class LuongThuong {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "MaChiTietSanPham")
+    @Column(name = "MaLuongThuong")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "MaSanPham")
-    private SanPham sanPham;
+    @JoinColumn(name = "MaNhanVien")
+    @JsonIgnoreProperties(value = { "refreshToken", "matKhau", "role" })
+    private NhanVien nhanVien;
 
-    @Column(name = "MaPhieuNhap")
-    private Long maPhieuNhap;
+    @Column(name = "TienThuong")
+    private Long tienThuong;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "MaMauSac")
-    private MauSac mauSac;
+    @Column(name = "NgayBatDau")
+    private LocalDateTime ngayBatDau;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "MaKichThuoc")
-    private KichThuoc kichThuoc;
-
-    @Column(name = "MaCuaHang")
-    private Long maCuaHang;
-
-    @Column(name = "SoLuong")
-    private Integer soLuong;
+    @Column(name = "NgayKetThuc")
+    private LocalDateTime ngayKetThuc;
 
     @Column(name = "TrangThai")
     private Integer trangThai;
 
-    @Column(name = "MoTa", length = 255)
-    private String moTa;
-
-    @Column(name = "GhiTru", length = 255)
-    private String ghiTru;
+    @Column(name = "Json", columnDefinition = "TEXT")
+    private String json;
 
     @Column(name = "NgayTao")
     private LocalDateTime ngayTao;
@@ -59,9 +49,6 @@ public class ChiTietSanPham {
     @PrePersist
     public void handleBeforeCreate() {
         this.ngayTao = LocalDateTime.now();
-        if (this.soLuong == null) {
-            this.soLuong = 0;
-        }
     }
 
     @PreUpdate

@@ -60,6 +60,9 @@ public class ChiTietSanPhamService {
 
     @Transactional
     public ChiTietSanPham create(ChiTietSanPham chiTietSanPham) {
+        if (chiTietSanPham.getSoLuong() == null) {
+            chiTietSanPham.setSoLuong(0);
+        }
         ChiTietSanPham saved = chiTietSanPhamRepository.save(chiTietSanPham);
         entityManager.flush();
         entityManager.clear();
@@ -106,7 +109,7 @@ public class ChiTietSanPhamService {
             ChiTietSanPham ct = new ChiTietSanPham();
             ct.setMaPhieuNhap(maPhieuNhap);
             ct.setMaCuaHang(cuaHang.getId());
-            ct.setSoLuong(soLuong);
+            ct.setSoLuong(soLuong != null ? soLuong : 0);
             ct.setTrangThai(trangThai);
             ct.setMoTa(moTa);
             ct.setGhiTru(ghiTru);
@@ -234,6 +237,7 @@ public class ChiTietSanPhamService {
 
         // Lấy tên cửa hàng từ mã cửa hàng
         if (ct.getMaCuaHang() != null) {
+            dto.setMaCuaHang(ct.getMaCuaHang());
             CuaHang cuaHang = cuaHangService.findById(ct.getMaCuaHang());
             if (cuaHang != null) {
                 dto.setTenCuaHang(cuaHang.getTenCuaHang());
