@@ -1,5 +1,6 @@
 package com.vn.shopping.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,9 +26,11 @@ public class CaLamViec {
     private String tenCaLam;
 
     @Column(name = "GioBatDau")
+    @JsonFormat(pattern = "HH:mm:ss")
     private LocalTime gioBatDau;
 
     @Column(name = "GioKetThuc")
+    @JsonFormat(pattern = "HH:mm:ss")
     private LocalTime gioKetThuc;
 
     @Column(name = "TrangThai")

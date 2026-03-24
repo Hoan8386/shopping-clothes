@@ -234,8 +234,8 @@
         ('Tạo lịch làm việc',                 '/api/v1/lich-lam-viec',                       'POST',   'LICH_LAM_VIEC', NOW()),
         ('Cập nhật lịch làm việc',            '/api/v1/lich-lam-viec',                       'PUT',    'LICH_LAM_VIEC', NOW()),
         ('Xóa lịch làm việc',                 '/api/v1/lich-lam-viec/{id}',                  'DELETE', 'LICH_LAM_VIEC', NOW()),
-        ('Import lịch làm việc từ Excel',     '/api/v1/lich-lam-viec/import',                'POST',   'LICH_LAM_VIEC', NOW()),
-        ('Tải file Excel mẫu lịch làm việc',  '/api/v1/lich-lam-viec/download-template',     'GET',    'LICH_LAM_VIEC', NOW()),
+        ('Import lịch làm việc từ Excel',     '/api/v1/lich-lam-viec/cua-hang/{cuaHangId}/import',                'POST',   'LICH_LAM_VIEC', NOW()),
+        ('Tải file Excel mẫu lịch làm việc',  '/api/v1/lich-lam-viec/cua-hang/{cuaHangId}/download-template',     'GET',    'LICH_LAM_VIEC', NOW()),
 
         -- === CHI_TIET_LICH_LAM (155-160) ===
         ('Xem tất cả chi tiết lịch làm',         '/api/v1/chi-tiet-lich-lam',                                  'GET',    'CHI_TIET_LICH_LAM', NOW()),
@@ -272,7 +272,14 @@
         ('Xem lỗi phát sinh theo lịch',    '/api/v1/loi-phat-sinh/lich-lam-viec/{lichLamViecId}',    'GET',    'LOI_PHAT_SINH', NOW()),
         ('Tạo lỗi phát sinh',              '/api/v1/loi-phat-sinh',                                  'POST',   'LOI_PHAT_SINH', NOW()),
         ('Cập nhật lỗi phát sinh',         '/api/v1/loi-phat-sinh',                                  'PUT',    'LOI_PHAT_SINH', NOW()),
-        ('Xóa lỗi phát sinh',              '/api/v1/loi-phat-sinh/{id}',                             'DELETE', 'LOI_PHAT_SINH', NOW());
+        ('Xóa lỗi phát sinh',              '/api/v1/loi-phat-sinh/{id}',                             'DELETE', 'LOI_PHAT_SINH', NOW()),
+
+        -- === LICH_LAM_VIEC_EXTRA (182-186) ===
+        ('Xem lịch làm việc theo cửa hàng', '/api/v1/lich-lam-viec/cua-hang/{cuaHangId}',        'GET',    'LICH_LAM_VIEC', NOW()),
+        ('Xem lịch làm việc theo tháng',    '/api/v1/lich-lam-viec/cua-hang/{cuaHangId}/thang', 'GET',    'LICH_LAM_VIEC', NOW()),
+        ('Cập nhật trạng thái ngày làm việc', '/api/v1/lich-lam-viec/cua-hang/{cuaHangId}/ngay/trang-thai', 'PUT', 'LICH_LAM_VIEC', NOW()),
+        ('Thêm nhân viên vào ca', '/api/v1/lich-lam-viec/cua-hang/{cuaHangId}/ngay/ca-lam-viec', 'POST', 'LICH_LAM_VIEC', NOW()),
+        ('Xóa nhân viên khỏi ca', '/api/v1/lich-lam-viec/cua-hang/{cuaHangId}/ngay/ca-lam-viec', 'DELETE', 'LICH_LAM_VIEC', NOW());
 
     -- ---------------------------------------------------------
     -- 3. PERMISSION_ROLE
@@ -320,7 +327,9 @@
         -- DOI_CA (171-175)
         (1,171),(1,172),(1,173),(1,174),(1,175),
         -- LOI_PHAT_SINH (176-181)
-        (1,176),(1,177),(1,178),(1,179),(1,180),(1,181);
+        (1,176),(1,177),(1,178),(1,179),(1,180),(1,181),
+        -- LICH_LAM_VIEC_EXTRA (182-186)
+        (1,182),(1,183),(1,184),(1,185),(1,186);
 
     -- NHAN_VIEN (role_id=2): Xem tất cả danh mục, SP, CTSP, hình ảnh, cửa hàng (chỉ GET) + Phiếu nhập + Đơn hàng + Ca & Lịch làm
     INSERT INTO permission_role (role_id, permission_id) VALUES
@@ -356,7 +365,9 @@
         -- DOI_CA: xem all, xem id, xem theo lịch, tạo, cập nhật
         (2,171),(2,172),(2,173),(2,174),(2,175),
         -- LOI_PHAT_SINH: xem all, xem id, xem theo lịch
-        (2,176),(2,177),(2,178);
+        (2,176),(2,177),(2,178),
+        -- LICH_LAM_VIEC_EXTRA
+        (2,182),(2,183),(2,184),(2,185),(2,186);
 
     -- KHACH_HANG (role_id=3): Xem SP/danh mục + giỏ hàng (thêm/xem/xóa/khuyến mãi)
     INSERT INTO permission_role (role_id, permission_id) VALUES
@@ -654,12 +665,13 @@
     -- ---------------------------------------------------------
     -- 34. LỊCH LÀM VIỆC
     -- ---------------------------------------------------------
-    INSERT INTO LichLamViec (MaNhanVien, NgayLamViec, TrangThai, NgayTao) VALUES
-        (1, '2026-03-24', 1, NOW()),   -- id=1: NV An - 24/03
-        (2, '2026-03-24', 1, NOW()),   -- id=2: NV Bình - 24/03
-        (3, '2026-03-24', 1, NOW()),   -- id=3: NV Chi - 24/03
-        (1, '2026-03-25', 1, NOW()),   -- id=4: NV An - 25/03
-        (4, '2026-03-25', 0, NOW());   -- id=5: NV Danh - 25/03 (nghỉ)
+    INSERT INTO LichLamViec (MaNhanVien, NgayLamViec, TrangThai, Json, NgayTao) VALUES
+        (1, '2026-03-24', 1, NULL, NOW()),   -- id=1: NV An - 24/03
+        (2, '2026-03-24', 1, NULL, NOW()),   -- id=2: NV Bình - 24/03
+        (3, '2026-03-24', 1, NULL, NOW()),   -- id=3: NV Chi - 24/03
+        (1, '2026-03-25', 1, NULL, NOW()),   -- id=4: NV An - 25/03
+        (4, '2026-03-25', 0, '{"isHoliday": true, "isFestival": false}', NOW()),   -- id=5: NV Danh - 25/03 (nghỉ)
+        (5, '2026-04-30', 2, '{"isHoliday": false, "isFestival": true}', NOW());   -- id=6: NV Hùng - 30/04 (lễ)
 
     -- ---------------------------------------------------------
     -- 35. CHI TIẾT LỊCH LÀM

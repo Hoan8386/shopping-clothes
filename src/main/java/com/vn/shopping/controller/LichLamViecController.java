@@ -53,6 +53,53 @@ public class LichLamViecController {
         return ResponseEntity.ok(lichLamViecService.findByNhanVienId(nhanVienId));
     }
 
+    @GetMapping("/cua-hang/{cuaHangId}")
+    @ApiMessage("Lấy lịch làm việc theo cửa hàng")
+    public ResponseEntity<List<LichLamViec>> getByCuaHang(@PathVariable("cuaHangId") Long cuaHangId) {
+        return ResponseEntity.ok(lichLamViecService.findByCuaHangId(cuaHangId));
+    }
+
+    @GetMapping("/cua-hang/{cuaHangId}/thang")
+    @ApiMessage("Lấy lịch làm việc theo cửa hàng và tháng")
+    public ResponseEntity<List<LichLamViec>> getByCuaHangAndMonth(
+            @PathVariable("cuaHangId") Long cuaHangId,
+            @RequestParam("year") int year,
+            @RequestParam("month") int month) {
+        return ResponseEntity.ok(lichLamViecService.findByCuaHangAndMonth(cuaHangId, year, month));
+    }
+
+    @PutMapping("/cua-hang/{cuaHangId}/ngay/trang-thai")
+    @ApiMessage("Cập nhật trạng thái ngày làm việc rảnh/nghỉ/lễ")
+    public ResponseEntity<Void> updateDayStatus(
+            @PathVariable("cuaHangId") Long cuaHangId,
+            @RequestParam("date") @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate date,
+            @RequestParam("status") int status) {
+        lichLamViecService.updateDayStatus(cuaHangId, date, status);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/cua-hang/{cuaHangId}/ngay/ca-lam-viec")
+    @ApiMessage("Thêm nhân viên vào ca làm việc")
+    public ResponseEntity<Void> addShift(
+            @PathVariable("cuaHangId") Long cuaHangId,
+            @RequestParam("nhanVienId") Long nhanVienId,
+            @RequestParam("caLamViecId") Long caLamViecId,
+            @RequestParam("date") @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate date) {
+        lichLamViecService.addShift(nhanVienId, date, caLamViecId);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/cua-hang/{cuaHangId}/ngay/ca-lam-viec")
+    @ApiMessage("Xóa nhân viên khỏi ca làm việc")
+    public ResponseEntity<Void> removeShift(
+            @PathVariable("cuaHangId") Long cuaHangId,
+            @RequestParam("nhanVienId") Long nhanVienId,
+            @RequestParam("caLamViecId") Long caLamViecId,
+            @RequestParam("date") @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate date) {
+        lichLamViecService.removeShift(nhanVienId, date, caLamViecId);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping
     @ApiMessage("Tạo lịch làm việc")
     public ResponseEntity<LichLamViec> create(@RequestBody LichLamViec lichLamViec) {
@@ -80,11 +127,12 @@ public class LichLamViecController {
 
     /**
      * Import lịch làm việc từ file Excel.
-     * File Excel phải có 3 cột: MaNhanVien | NgayLamViec (yyyy-MM-dd) | TrangThai
+     * File Excel phải có 3 cột: MaNhanVien | NgayLamViec (yyyy-MM-dd) | MaCaLam
      */
-    @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/cua-hang/{cuaHangId}/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiMessage("Import lịch làm việc từ Excel")
     public ResponseEntity<List<LichLamViec>> importFromExcel(
+            @PathVariable("cuaHangId") Long cuaHangId,
             @RequestParam("file") MultipartFile file) throws IdInvalidException {
 
         if (file.isEmpty()) {
@@ -96,7 +144,7 @@ public class LichLamViecController {
         }
 
         try {
-            List<LichLamViec> imported = lichLamViecService.importFromExcel(file);
+            List<LichLamViec> imported = lichLamViecService.importFromExcel(cuaHangId, file);
             return ResponseEntity.status(HttpStatus.CREATED).body(imported);
         } catch (IOException e) {
             throw new IdInvalidException("Lỗi đọc file Excel: " + e.getMessage());
@@ -106,68 +154,20 @@ public class LichLamViecController {
     /**
      * Tải file Excel mẫu để import lịch làm việc.
      */
-    @GetMapping("/download-template")
+    @GetMapping("/cua-hang/{cuaHangId}/download-template")
     @ApiMessage("Tải file Excel mẫu lịch làm việc")
-    public ResponseEntity<Resource> downloadTemplate() throws IOException {
-        try (Workbook workbook = new XSSFWorkbook();
-                ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+    public ResponseEntity<Resource> downloadTemplate(
+            @PathVariable("cuaHangId") Long cuaHangId,
+            @RequestParam("year") int year,
+            @RequestParam("month") int month) throws IOException {
+        byte[] bytes = lichLamViecService.downloadTemplateFromCuaHang(cuaHangId, year, month);
+        ByteArrayResource resource = new ByteArrayResource(bytes);
 
-            Sheet sheet = workbook.createSheet("LichLamViec");
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.parseMediaType(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+        httpHeaders.setContentDispositionFormData("attachment", "lich-lam-viec-mau.xlsx");
 
-            // Header style
-            CellStyle headerStyle = workbook.createCellStyle();
-            Font headerFont = workbook.createFont();
-            headerFont.setBold(true);
-            headerStyle.setFont(headerFont);
-            headerStyle.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
-            headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-            headerStyle.setBorderBottom(BorderStyle.THIN);
-            headerStyle.setBorderTop(BorderStyle.THIN);
-            headerStyle.setBorderLeft(BorderStyle.THIN);
-            headerStyle.setBorderRight(BorderStyle.THIN);
-            headerStyle.setAlignment(HorizontalAlignment.CENTER);
-
-            // Data style
-            CellStyle dataStyle = workbook.createCellStyle();
-            dataStyle.setBorderBottom(BorderStyle.THIN);
-            dataStyle.setBorderTop(BorderStyle.THIN);
-            dataStyle.setBorderLeft(BorderStyle.THIN);
-            dataStyle.setBorderRight(BorderStyle.THIN);
-
-            // Create header row
-            Row headerRow = sheet.createRow(0);
-            String[] headers = { "MaNhanVien (*)", "NgayLamViec (*) yyyy-MM-dd", "TrangThai (1=Đang làm, 0=Nghỉ)" };
-            for (int i = 0; i < headers.length; i++) {
-                Cell cell = headerRow.createCell(i);
-                cell.setCellValue(headers[i]);
-                cell.setCellStyle(headerStyle);
-                sheet.setColumnWidth(i, 7000);
-            }
-
-            // Create sample data rows
-            String[][] sampleData = {
-                    { "1", "2026-03-18", "1" },
-                    { "2", "2026-03-18", "1" },
-                    { "3", "2026-03-19", "1" }
-            };
-            for (int i = 0; i < sampleData.length; i++) {
-                Row row = sheet.createRow(i + 1);
-                for (int j = 0; j < sampleData[i].length; j++) {
-                    Cell cell = row.createCell(j);
-                    cell.setCellValue(sampleData[i][j]);
-                    cell.setCellStyle(dataStyle);
-                }
-            }
-
-            workbook.write(out);
-            ByteArrayResource resource = new ByteArrayResource(out.toByteArray());
-
-            HttpHeaders httpHeaders = new HttpHeaders();
-            httpHeaders.setContentType(MediaType.parseMediaType(
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
-            httpHeaders.setContentDispositionFormData("attachment", "lich-lam-viec-mau.xlsx");
-
-            return ResponseEntity.ok().headers(httpHeaders).body(resource);
-        }
+        return ResponseEntity.ok().headers(httpHeaders).body(resource);
     }
 }

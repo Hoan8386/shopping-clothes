@@ -2814,12 +2814,24 @@
 					"request": { "method": "DELETE", "header": [], "url": { "raw": "{{base_url}}/api/v1/lich-lam-viec/5", "host": ["{{base_url}}"], "path": ["api","v1","lich-lam-viec","5"] }, "description": "Admin/NV — Xóa lịch làm việc" }
 				},
 				{
+					"name": "Cập nhật trạng thái ngày làm việc rảnh/nghỉ/lễ",
+					"request": { "method": "PUT", "header": [], "url": { "raw": "{{base_url}}/api/v1/lich-lam-viec/cua-hang/1/ngay/trang-thai?date=2026-03-24&status=0", "host": ["{{base_url}}"], "path": ["api","v1","lich-lam-viec","cua-hang","1","ngay","trang-thai"], "query": [{ "key": "date", "value": "2026-03-24" }, { "key": "status", "value": "0" }] }, "description": "Admin/NV — Cập nhật trạng thái ngày làm việc (0: Nghỉ, 1: Làm, 2: Lễ)" }
+				},
+				{
+					"name": "Thêm nhân viên vào ca làm việc",
+					"request": { "method": "POST", "header": [], "url": { "raw": "{{base_url}}/api/v1/lich-lam-viec/cua-hang/1/ngay/ca-lam-viec?nhanVienId=1&caLamViecId=1&date=2026-03-24", "host": ["{{base_url}}"], "path": ["api","v1","lich-lam-viec","cua-hang","1","ngay","ca-lam-viec"], "query": [{ "key": "nhanVienId", "value": "1" }, { "key": "caLamViecId", "value": "1" }, { "key": "date", "value": "2026-03-24" }] }, "description": "Admin/NV — Thêm nhân viên vào ca làm việc" }
+				},
+				{
+					"name": "Xóa nhân viên khỏi ca làm việc",
+					"request": { "method": "DELETE", "header": [], "url": { "raw": "{{base_url}}/api/v1/lich-lam-viec/cua-hang/1/ngay/ca-lam-viec?nhanVienId=1&caLamViecId=1&date=2026-03-24", "host": ["{{base_url}}"], "path": ["api","v1","lich-lam-viec","cua-hang","1","ngay","ca-lam-viec"], "query": [{ "key": "nhanVienId", "value": "1" }, { "key": "caLamViecId", "value": "1" }, { "key": "date", "value": "2026-03-24" }] }, "description": "Admin/NV — Xóa nhân viên khỏi ca làm việc" }
+				},
+				{
 					"name": "Import lịch làm việc từ Excel",
-					"request": { "method": "POST", "header": [], "body": { "mode": "formdata", "formdata": [{ "key": "file", "type": "file", "src": "", "description": "File Excel .xlsx chứa dữ liệu lịch làm việc (theo file mẫu)" }] }, "url": { "raw": "{{base_url}}/api/v1/lich-lam-viec/import", "host": ["{{base_url}}"], "path": ["api","v1","lich-lam-viec","import"] }, "description": "Admin/NV — Import hàng loạt lịch làm việc từ file Excel (.xlsx). Tải file mẫu trước bằng request Download Template" }
+					"request": { "method": "POST", "header": [], "body": { "mode": "formdata", "formdata": [{ "key": "file", "type": "file", "src": "", "description": "File Excel .xlsx chứa dữ liệu lịch làm việc (theo file mẫu)" }] }, "url": { "raw": "{{base_url}}/api/v1/lich-lam-viec/cua-hang/1/import", "host": ["{{base_url}}"], "path": ["api","v1","lich-lam-viec","cua-hang","1","import"] }, "description": "Admin/NV — Import hàng loạt lịch làm việc từ file Excel (.xlsx). Tải file mẫu trước bằng request Download Template" }
 				},
 				{
 					"name": "Tải file Excel mẫu lịch làm",
-					"request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/api/v1/lich-lam-viec/download-template", "host": ["{{base_url}}"], "path": ["api","v1","lich-lam-viec","download-template"] }, "description": "Admin/NV — Tải file mẫu Excel để import lịch làm việc hàng loạt" }
+					"request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/api/v1/lich-lam-viec/cua-hang/1/download-template", "host": ["{{base_url}}"], "path": ["api","v1","lich-lam-viec","cua-hang","1","download-template"] }, "description": "Admin/NV — Tải file mẫu Excel để import lịch làm việc hàng loạt" }
 				}
 			]
 		},
