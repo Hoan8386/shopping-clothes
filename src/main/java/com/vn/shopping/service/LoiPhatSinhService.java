@@ -31,6 +31,7 @@ public class LoiPhatSinhService {
         existing.setChiTietLichLam(loiPhatSinh.getChiTietLichLam());
         existing.setTenLoiPhatSinh(loiPhatSinh.getTenLoiPhatSinh());
         existing.setSoTienTru(loiPhatSinh.getSoTienTru());
+        existing.setHinhAnh(loiPhatSinh.getHinhAnh());
         existing.setTrangThai(loiPhatSinh.getTrangThai());
         existing.setJson(loiPhatSinh.getJson());
         return loiPhatSinhRepository.save(existing);
@@ -52,5 +53,9 @@ public class LoiPhatSinhService {
         LichLamViec lichLamViec = lichLamViecRepository.findById(lichLamViecId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy lịch làm việc: " + lichLamViecId));
         return loiPhatSinhRepository.findByLichLamViec(lichLamViec);
+    }
+
+    public List<LoiPhatSinh> findByCuaHangId(Long cuaHangId, Integer year, Integer month) {
+        return loiPhatSinhRepository.findByCuaHangId(cuaHangId, year, month);
     }
 }

@@ -15,6 +15,7 @@ public class PhieuNhapSpecification {
     public static Specification<PhieuNhap> filter(
             String tenPhieuNhap,
             Integer trangThai,
+            Long cuaHangId,
             String tenCuaHang,
             String tenNhaCungCap,
             LocalDateTime ngayTaoTu,
@@ -35,6 +36,10 @@ public class PhieuNhapSpecification {
 
             if (trangThai != null) {
                 predicates.add(criteriaBuilder.equal(root.get("trangThai"), trangThai));
+            }
+
+            if (cuaHangId != null) {
+                predicates.add(criteriaBuilder.equal(root.get("cuaHang").get("id"), cuaHangId));
             }
 
             if (tenCuaHang != null && !tenCuaHang.trim().isEmpty()) {

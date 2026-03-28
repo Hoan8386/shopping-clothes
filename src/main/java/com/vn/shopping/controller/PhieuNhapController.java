@@ -35,6 +35,7 @@ public class PhieuNhapController {
     public ResponseEntity<ResultPaginationDTO> getAll(
             @RequestParam(required = false) String tenPhieuNhap,
             @RequestParam(required = false) Integer trangThai,
+            @RequestParam(required = false) Long cuaHangId,
             @RequestParam(required = false) String tenCuaHang,
             @RequestParam(required = false) String tenNhaCungCap,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime ngayTaoTu,
@@ -52,7 +53,7 @@ public class PhieuNhapController {
         }
 
         ResultPaginationDTO result = phieuNhapService.filterPhieuNhap(
-                tenPhieuNhap, trangThai, tenCuaHang, tenNhaCungCap,
+                tenPhieuNhap, trangThai, cuaHangId, tenCuaHang, tenNhaCungCap,
                 ngayTaoTu, ngayTaoDen,
                 ngayDatHangTu, ngayDatHangDen, ngayNhanHangTu, ngayNhanHangDen, effectivePageable);
         return ResponseEntity.ok(result);

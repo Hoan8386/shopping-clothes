@@ -1,7 +1,14 @@
 package com.vn.shopping.controller;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -13,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.vn.shopping.domain.LichLamViec;
+import com.vn.shopping.domain.response.ResLichLamViecThangDTO;
 import com.vn.shopping.service.LichLamViecService;
 import com.vn.shopping.util.anotation.ApiMessage;
 import com.vn.shopping.util.error.IdInvalidException;
@@ -61,11 +69,118 @@ public class LichLamViecController {
 
     @GetMapping("/cua-hang/{cuaHangId}/thang")
     @ApiMessage("Lấy lịch làm việc theo cửa hàng và tháng")
-    public ResponseEntity<List<LichLamViec>> getByCuaHangAndMonth(
+    public ResponseEntity<ResLichLamViecThangDTO> getByCuaHangAndMonth(
             @PathVariable("cuaHangId") Long cuaHangId,
             @RequestParam("year") int year,
             @RequestParam("month") int month) {
-        return ResponseEntity.ok(lichLamViecService.findByCuaHangAndMonth(cuaHangId, year, month));
+        List<LichLamViec> lichLamViecs = lichLamViecService.findByCuaHangAndMonth(cuaHangId, year, month);
+
+        return ResponseEntity.ok(buildMonthlyResponse(cuaHangId, year, month, lichLamViecs));
+    }
+
+    private ResLichLamViecThangDTO buildMonthlyResponse(Long cuaHangId, int year, int month,
+            List<LichLamViec> lichLamViecs) {
+
+        Map<LocalDate, List<LichLamViec>> lichTheoNgay = new HashMap<>();
+        for (LichLamViec lichLamViec : lichLamViecs) {
+            lichTheoNgay.computeIfAbsent(lichLamViec.getNgayLamViec(), k -> new ArrayList<>()).add(lichLamViec);
+        }
+
+        List<ResLichLamViecThangDTO.NgayLichLamDTO> ngayLichLams = new ArrayList<>();
+
+        lichTheoNgay.forEach((ngay, lichTrongNgay) -> {
+            ResLichLamViecThangDTO.NgayLichLamDTO ngayDto = new ResLichLamViecThangDTO.NgayLichLamDTO();
+            ngayDto.setNgayLamViec(ngay);
+            Integer trangThaiNgay = resolveTrangThaiNgay(lichTrongNgay);
+            ngayDto.setTrangThaiNgay(trangThaiNgay);
+            if (Integer.valueOf(0).equals(trangThaiNgay)) {
+                ngayDto.setChiTietNhanViens(Collections.emptyList());
+            } else {
+                ngayDto.setChiTietNhanViens(toChiTietNhanVienTrongNgay(lichTrongNgay));
+            }
+
+            ngayLichLams.add(ngayDto);
+        });
+
+        ResLichLamViecThangDTO response = new ResLichLamViecThangDTO();
+        response.setCuaHangId(cuaHangId);
+        response.setYear(year);
+        response.setMonth(month);
+        response.setNgayLichLams(ngayLichLams);
+
+        return response;
+    }
+
+    private Integer resolveTrangThaiNgay(List<LichLamViec> lichTrongNgay) {
+        if (lichTrongNgay == null || lichTrongNgay.isEmpty()) {
+            return 1;
+        }
+
+        boolean hasFestival = lichTrongNgay.stream().anyMatch(lich -> Integer.valueOf(2).equals(lich.getTrangThai()));
+        if (hasFestival) {
+            return 2;
+        }
+
+        boolean hasHoliday = lichTrongNgay.stream().anyMatch(lich -> Integer.valueOf(0).equals(lich.getTrangThai()));
+        if (hasHoliday) {
+            return 0;
+        }
+
+        return 1;
+    }
+
+    private List<ResLichLamViecThangDTO.ChiTietNhanVienTrongNgayDTO> toChiTietNhanVienTrongNgay(
+            List<LichLamViec> lichTrongNgay) {
+        return lichTrongNgay.stream()
+                .sorted(Comparator.comparing(l -> l.getNhanVien() != null ? l.getNhanVien().getId() : Long.MAX_VALUE))
+                .map(lich -> {
+                    ResLichLamViecThangDTO.ChiTietNhanVienTrongNgayDTO item = new ResLichLamViecThangDTO.ChiTietNhanVienTrongNgayDTO();
+                    item.setLichLamViecId(lich.getId());
+                    item.setTrangThaiLich(lich.getTrangThai());
+                    item.setNhanVien(toNhanVienInfo(lich));
+                    item.setChiTietCaLams(toChiTietCaLam(lich));
+                    return item;
+                })
+                .toList();
+    }
+
+    private ResLichLamViecThangDTO.NhanVienInfoDTO toNhanVienInfo(LichLamViec lich) {
+        ResLichLamViecThangDTO.NhanVienInfoDTO nhanVienInfoDTO = new ResLichLamViecThangDTO.NhanVienInfoDTO();
+        if (lich.getNhanVien() == null) {
+            return nhanVienInfoDTO;
+        }
+
+        nhanVienInfoDTO.setId(lich.getNhanVien().getId());
+        nhanVienInfoDTO.setTenNhanVien(lich.getNhanVien().getTenNhanVien());
+        nhanVienInfoDTO.setEmail(lich.getNhanVien().getEmail());
+        nhanVienInfoDTO.setSoDienThoai(lich.getNhanVien().getSoDienThoai());
+        return nhanVienInfoDTO;
+    }
+
+    private List<ResLichLamViecThangDTO.ChiTietCaLamDTO> toChiTietCaLam(LichLamViec lich) {
+        if (lich.getChiTiets() == null || lich.getChiTiets().isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        return lich.getChiTiets().stream()
+                .map(chiTiet -> {
+                    ResLichLamViecThangDTO.ChiTietCaLamDTO caLamDTO = new ResLichLamViecThangDTO.ChiTietCaLamDTO();
+                    caLamDTO.setId(chiTiet.getId());
+                    caLamDTO.setTrangThai(chiTiet.getTrangThai());
+
+                    ResLichLamViecThangDTO.CaLamInfoDTO caLamInfoDTO = new ResLichLamViecThangDTO.CaLamInfoDTO();
+                    if (chiTiet.getCaLamViec() != null) {
+                        caLamInfoDTO.setId(chiTiet.getCaLamViec().getId());
+                        caLamInfoDTO.setTenCaLam(chiTiet.getCaLamViec().getTenCaLam());
+                        caLamInfoDTO.setGioBatDau(chiTiet.getCaLamViec().getGioBatDau());
+                        caLamInfoDTO.setGioKetThuc(chiTiet.getCaLamViec().getGioKetThuc());
+                        caLamInfoDTO.setTrangThai(chiTiet.getCaLamViec().getTrangThai());
+                    }
+                    caLamDTO.setCaLamViec(caLamInfoDTO);
+
+                    return caLamDTO;
+                })
+                .toList();
     }
 
     @PutMapping("/cua-hang/{cuaHangId}/ngay/trang-thai")

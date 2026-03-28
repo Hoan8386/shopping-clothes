@@ -35,6 +35,9 @@ public class LoiPhatSinh {
     @Column(name = "SoTienTru")
     private Long soTienTru;
 
+    @Column(name = "HinhAnh")
+    private String hinhAnh;
+
     @Column(name = "TrangThai")
     private Integer trangThai;
 

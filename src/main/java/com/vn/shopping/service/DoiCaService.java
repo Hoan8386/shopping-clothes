@@ -21,16 +21,56 @@ public class DoiCaService {
     }
 
     public DoiCa create(DoiCa doiCa) {
+        String lyDo = normalizeText(doiCa.getLyDo());
+        if (lyDo == null) {
+            throw new RuntimeException("Khi đổi ca bắt buộc phải nhập lý do");
+        }
+        doiCa.setLyDo(lyDo);
+
+        if (doiCa.getTrangThai() != null && doiCa.getTrangThai() == 2) {
+            String phanHoi = normalizeText(doiCa.getPhanHoi());
+            if (phanHoi == null) {
+                throw new RuntimeException("Khi từ chối đổi ca bắt buộc phải nhập phản hồi");
+            }
+            doiCa.setPhanHoi(phanHoi);
+        } else {
+            doiCa.setPhanHoi(null);
+        }
+
         return doiCaRepository.save(doiCa);
     }
 
     public DoiCa update(DoiCa doiCa) {
         DoiCa existing = doiCaRepository.findById(doiCa.getId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đổi ca: " + doiCa.getId()));
+
+        String lyDo = normalizeText(doiCa.getLyDo());
+        if (lyDo == null) {
+            lyDo = normalizeText(existing.getLyDo());
+        }
+        if (lyDo == null) {
+            throw new RuntimeException("Khi đổi ca bắt buộc phải nhập lý do");
+        }
+
         existing.setLichLamViec(doiCa.getLichLamViec());
         existing.setChiTietLichLam(doiCa.getChiTietLichLam());
         existing.setNhanVienNhanCa(doiCa.getNhanVienNhanCa());
         existing.setTrangThai(doiCa.getTrangThai());
+        existing.setLyDo(lyDo);
+
+        if (doiCa.getTrangThai() != null && doiCa.getTrangThai() == 2) {
+            String phanHoi = normalizeText(doiCa.getPhanHoi());
+            if (phanHoi == null) {
+                phanHoi = normalizeText(existing.getPhanHoi());
+            }
+            if (phanHoi == null) {
+                throw new RuntimeException("Khi từ chối đổi ca bắt buộc phải nhập phản hồi");
+            }
+            existing.setPhanHoi(phanHoi);
+        } else {
+            existing.setPhanHoi(null);
+        }
+
         existing.setJson(doiCa.getJson());
         return doiCaRepository.save(existing);
     }
@@ -51,5 +91,13 @@ public class DoiCaService {
         LichLamViec lichLamViec = lichLamViecRepository.findById(lichLamViecId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy lịch làm việc: " + lichLamViecId));
         return doiCaRepository.findByLichLamViec(lichLamViec);
+    }
+
+    private String normalizeText(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 }

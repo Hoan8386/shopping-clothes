@@ -11,7 +11,10 @@ import com.vn.shopping.repository.LichLamViecRepository;
 import com.vn.shopping.repository.NhanVienRepository;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -19,10 +22,12 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
 
 @Service
 public class LichLamViecService {
@@ -104,27 +109,117 @@ public class LichLamViecService {
         Long resolvedId = resolveCuaHangId(cuaHangId);
         LocalDate tuNgay = LocalDate.of(year, month, 1);
         LocalDate denNgay = tuNgay.withDayOfMonth(tuNgay.lengthOfMonth());
-        return lichLamViecRepository.findByCuaHangIdAndDateRange(resolvedId, tuNgay, denNgay);
+        List<LichLamViec> storeSchedules = lichLamViecRepository.findByCuaHangIdAndDateRange(resolvedId, tuNgay,
+                denNgay);
+
+        if (isCurrentUserAdmin()) {
+            return storeSchedules;
+        }
+
+        NhanVien currentNhanVien = getCurrentNhanVien()
+                .orElseThrow(() -> new RuntimeException("Không xác định được nhân viên hiện tại"));
+
+        return storeSchedules.stream()
+                .filter(item -> item.getNhanVien() != null
+                        && item.getNhanVien().getId() != null
+                        && item.getNhanVien().getId().equals(currentNhanVien.getId()))
+                .toList();
     }
 
+    private boolean isCurrentUserAdmin() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getAuthorities() != null) {
+            boolean hasAdminAuthority = authentication.getAuthorities().stream()
+                    .map(authority -> authority.getAuthority() == null ? "" : authority.getAuthority().toUpperCase())
+                    .anyMatch(authority -> "ROLE_ADMIN".equals(authority) || "ADMIN".equals(authority));
+
+            if (hasAdminAuthority) {
+                return true;
+            }
+        }
+
+        // Fallback: read role from employee record resolved from current login.
+        return getCurrentNhanVien()
+                .map(nv -> nv.getRole() != null
+                        && nv.getRole().getName() != null
+                        && "ADMIN".equalsIgnoreCase(nv.getRole().getName()))
+                .orElse(false);
+    }
+
+    private java.util.Optional<NhanVien> getCurrentNhanVien() {
+        String email = com.vn.shopping.util.SecurityUtil.getCurrentUserLogin().orElse("");
+        if (email.isEmpty()) {
+            return java.util.Optional.empty();
+        }
+        return nhanVienRepository.findByEmail(email);
+    }
+
+    @Transactional
     public void updateDayStatus(Long cuaHangId, LocalDate date, int newStatus) {
         Long resolvedId = resolveCuaHangId(cuaHangId);
+
         List<NhanVien> activeEmployees = nhanVienRepository.findByCuaHang_Id(resolvedId).stream()
                 .filter(nv -> nv.getTrangThai() == 1)
                 .toList();
+
+        if (newStatus == 0) {
+            for (NhanVien nhanVien : activeEmployees) {
+                List<LichLamViec> existingLichs = lichLamViecRepository.findByNhanVienAndNgayLamViec(nhanVien, date);
+                LichLamViec llv = existingLichs.isEmpty() ? null : existingLichs.get(0);
+
+                if (llv == null) {
+                    llv = new LichLamViec();
+                    llv.setNhanVien(nhanVien);
+                    llv.setNgayLamViec(date);
+                }
+
+                List<ChiTietLichLam> chiTiets = chiTietLichLamRepository.findByLichLamViec(llv);
+                if (!chiTiets.isEmpty()) {
+                    Set<Long> chiTietIds = new HashSet<>();
+                    for (ChiTietLichLam chiTiet : chiTiets) {
+                        chiTietIds.add(chiTiet.getId());
+                    }
+
+                    List<com.vn.shopping.domain.DoiCa> doiCas = doiCaRepository.findByLichLamViec(llv).stream()
+                            .filter(d -> d.getChiTietLichLam() != null
+                                    && chiTietIds.contains(d.getChiTietLichLam().getId()))
+                            .toList();
+                    if (!doiCas.isEmpty()) {
+                        doiCaRepository.deleteAll(doiCas);
+                    }
+
+                    List<com.vn.shopping.domain.LoiPhatSinh> loiPhatSinhs = loiPhatSinhRepository
+                            .findByLichLamViec(llv).stream()
+                            .filter(l -> l.getChiTietLichLam() != null
+                                    && chiTietIds.contains(l.getChiTietLichLam().getId()))
+                            .toList();
+                    if (!loiPhatSinhs.isEmpty()) {
+                        loiPhatSinhRepository.deleteAll(loiPhatSinhs);
+                    }
+
+                    chiTietLichLamRepository.deleteAll(chiTiets);
+                }
+
+                llv.setChiTiets(new ArrayList<>());
+                llv.setTrangThai(0);
+                llv.setJson("{\"isHoliday\": true, \"isFestival\": false}");
+                lichLamViecRepository.save(llv);
+            }
+            return;
+        }
 
         for (NhanVien nhanVien : activeEmployees) {
             List<LichLamViec> existingLichs = lichLamViecRepository.findByNhanVienAndNgayLamViec(nhanVien, date);
             LichLamViec llv = existingLichs.isEmpty() ? null : existingLichs.get(0);
 
-            if (newStatus == 0 || newStatus == 2) {
+            if (newStatus == 2) {
                 if (llv == null) {
                     llv = new LichLamViec();
                     llv.setNhanVien(nhanVien);
                     llv.setNgayLamViec(date);
                 }
                 llv.setTrangThai(newStatus);
-                llv.setJson("{\"isHoliday\": " + (newStatus == 0) + ", \"isFestival\": " + (newStatus == 2) + "}");
+                llv.setJson("{\"isHoliday\": false, \"isFestival\": true}");
                 lichLamViecRepository.save(llv);
             } else if (newStatus == 1) {
                 if (llv != null) {
@@ -191,14 +286,18 @@ public class LichLamViecService {
 
             if (target != null) {
                 List<com.vn.shopping.domain.DoiCa> doiCas = doiCaRepository.findByLichLamViec(llv).stream()
-                        .filter(d -> d.getChiTietLichLam() != null && d.getChiTietLichLam().getId().equals(target.getId()))
+                        .filter(d -> d.getChiTietLichLam() != null
+                                && d.getChiTietLichLam().getId().equals(target.getId()))
                         .toList();
-                if (!doiCas.isEmpty()) doiCaRepository.deleteAll(doiCas);
+                if (!doiCas.isEmpty())
+                    doiCaRepository.deleteAll(doiCas);
 
                 List<com.vn.shopping.domain.LoiPhatSinh> lois = loiPhatSinhRepository.findByLichLamViec(llv).stream()
-                        .filter(l -> l.getChiTietLichLam() != null && l.getChiTietLichLam().getId().equals(target.getId()))
+                        .filter(l -> l.getChiTietLichLam() != null
+                                && l.getChiTietLichLam().getId().equals(target.getId()))
                         .toList();
-                if (!lois.isEmpty()) loiPhatSinhRepository.deleteAll(lois);
+                if (!lois.isEmpty())
+                    loiPhatSinhRepository.deleteAll(lois);
 
                 chiTietLichLamRepository.delete(target);
 
@@ -210,7 +309,8 @@ public class LichLamViecService {
     }
 
     /**
-     * Import lịch làm việc từ file Excel (.xlsx) theo format Grid chi tiết từng ca cho mỗi ngày.
+     * Import lịch làm việc từ file Excel (.xlsx) theo format Grid chi tiết từng ca
+     * cho mỗi ngày.
      */
     public List<LichLamViec> importFromExcel(Long cuaHangId, MultipartFile file) throws IOException {
         List<LichLamViec> result = new ArrayList<>();
@@ -219,11 +319,16 @@ public class LichLamViecService {
         Map<String, CaLamViec> shiftMap = new HashMap<>(); // shortcode "S" -> CaLamViec
         for (CaLamViec ca : allShifts) {
             String name = ca.getTenCaLam().toLowerCase();
-            if (name.contains("sáng")) shiftMap.put("S", ca);
-            else if (name.contains("chiều")) shiftMap.put("C", ca);
-            else if (name.contains("tối")) shiftMap.put("T", ca);
-            else if (name.contains("toàn")) shiftMap.put("X", ca);
-            else shiftMap.put(String.valueOf(ca.getId()), ca);
+            if (name.contains("sáng"))
+                shiftMap.put("S", ca);
+            else if (name.contains("chiều"))
+                shiftMap.put("C", ca);
+            else if (name.contains("tối"))
+                shiftMap.put("T", ca);
+            else if (name.contains("toàn"))
+                shiftMap.put("X", ca);
+            else
+                shiftMap.put(String.valueOf(ca.getId()), ca);
         }
 
         try (InputStream is = file.getInputStream();
@@ -232,8 +337,9 @@ public class LichLamViecService {
             Sheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rowIterator = sheet.iterator();
 
-            if (!rowIterator.hasNext()) return result;
-            Row storeRow = rowIterator.next(); 
+            if (!rowIterator.hasNext())
+                return result;
+            Row storeRow = rowIterator.next();
             String storeHeader = getCellStringValue(storeRow.getCell(0));
             int year = 0, month = 0;
             try {
@@ -247,33 +353,38 @@ public class LichLamViecService {
             }
             int daysInMonth = java.time.YearMonth.of(year, month).lengthOfMonth();
 
-            if (rowIterator.hasNext()) rowIterator.next(); // Skip row 1 (Hướng dẫn)
+            if (rowIterator.hasNext())
+                rowIterator.next(); // Skip row 1 (Hướng dẫn)
 
-            if (!rowIterator.hasNext()) return result;
+            if (!rowIterator.hasNext())
+                return result;
             Row dayRow = rowIterator.next(); // Row 2: Days (01, 02)
 
-            if (!rowIterator.hasNext()) return result;
+            if (!rowIterator.hasNext())
+                return result;
             Row holidayRow = rowIterator.next(); // Row 3: Ngày nghỉ (N/L)
 
-            if (!rowIterator.hasNext()) return result;
+            if (!rowIterator.hasNext())
+                return result;
             Row shiftRow = rowIterator.next(); // Row 4: Shifts (S, C, T, X)
-            
+
             Map<Integer, Integer> holidayMap = new HashMap<>();
             List<Integer> colDays = new ArrayList<>();
             List<String> colShifts = new ArrayList<>();
             int lastDay = 0;
             int lastCellNum = shiftRow.getLastCellNum();
-            
+
             for (int c = 2; c < lastCellNum; c++) {
                 String dayStr = getCellStringValue(dayRow.getCell(c)).trim();
                 if (!dayStr.isEmpty()) {
                     try {
                         lastDay = (int) Double.parseDouble(dayStr);
-                    } catch (Exception e) {}
+                    } catch (Exception e) {
+                    }
                 }
                 colDays.add(lastDay);
                 colShifts.add(getCellStringValue(shiftRow.getCell(c)).trim().toUpperCase());
-                
+
                 if (lastDay > 0) {
                     String hol = getCellStringValue(holidayRow.getCell(c)).trim().toUpperCase();
                     if (hol.equals("N")) {
@@ -286,27 +397,32 @@ public class LichLamViecService {
 
             while (rowIterator.hasNext()) {
                 Row row = rowIterator.next();
-                if (isRowEmpty(row)) continue;
+                if (isRowEmpty(row))
+                    continue;
 
                 Cell maNhanVienCell = row.getCell(0);
-                if (maNhanVienCell == null) continue;
+                if (maNhanVienCell == null)
+                    continue;
 
                 long maNhanVien = (long) getCellNumericValue(maNhanVienCell);
                 NhanVien nhanVien = nhanVienRepository.findById(maNhanVien).orElse(null);
                 if (nhanVien == null || nhanVien.getCuaHang() == null || nhanVien.getCuaHang().getId() != cuaHangId) {
-                    continue; 
+                    continue;
                 }
 
                 Map<LocalDate, List<CaLamViec>> dayShifts = new HashMap<>();
 
                 for (int c = 2; c < lastCellNum; c++) {
-                    if (c - 2 >= colDays.size()) break;
+                    if (c - 2 >= colDays.size())
+                        break;
                     int day = colDays.get(c - 2);
-                    if (day < 1 || day > daysInMonth) continue;
-                    
+                    if (day < 1 || day > daysInMonth)
+                        continue;
+
                     String caCode = colShifts.get(c - 2);
                     CaLamViec ca = shiftMap.get(caCode);
-                    if (ca == null) continue;
+                    if (ca == null)
+                        continue;
 
                     Cell cell = row.getCell(c);
                     String val = getCellStringValue(cell).trim().toUpperCase();
@@ -327,7 +443,8 @@ public class LichLamViecService {
                     }
 
                     // clear old data for this day
-                    List<LichLamViec> existingLichs = lichLamViecRepository.findByNhanVienAndNgayLamViec(nhanVien, date);
+                    List<LichLamViec> existingLichs = lichLamViecRepository.findByNhanVienAndNgayLamViec(nhanVien,
+                            date);
                     LichLamViec llv = null;
                     if (!existingLichs.isEmpty()) {
                         llv = existingLichs.get(0);
@@ -347,7 +464,8 @@ public class LichLamViecService {
                     }
 
                     if (assignedShifts.isEmpty() && statusDay == 1) {
-                        if (llv != null) lichLamViecRepository.delete(llv);
+                        if (llv != null)
+                            lichLamViecRepository.delete(llv);
                         continue;
                     }
 
@@ -358,7 +476,8 @@ public class LichLamViecService {
                     }
                     llv.setTrangThai(statusDay);
                     if (statusDay != 1) {
-                        llv.setJson("{\"isHoliday\": " + (statusDay == 0) + ", \"isFestival\": " + (statusDay == 2) + "}");
+                        llv.setJson(
+                                "{\"isHoliday\": " + (statusDay == 0) + ", \"isFestival\": " + (statusDay == 2) + "}");
                     } else {
                         llv.setJson(null);
                     }
@@ -371,7 +490,8 @@ public class LichLamViecService {
                         chiTiet.setTrangThai(1);
                         chiTietLichLamRepository.save(chiTiet);
                     }
-                    if (!result.contains(llv)) result.add(llv);
+                    if (!result.contains(llv))
+                        result.add(llv);
                 }
             }
         }
@@ -379,7 +499,8 @@ public class LichLamViecService {
     }
 
     /**
-     * Tải file Excel mẫu để import lịch làm việc cho cửa hàng cụ thể (Format chi tiết Từng Ca).
+     * Tải file Excel mẫu để import lịch làm việc cho cửa hàng cụ thể (Format chi
+     * tiết Từng Ca).
      */
     public byte[] downloadTemplateFromCuaHang(Long cuaHangId, int year, int month) throws IOException {
         com.vn.shopping.domain.CuaHang cuaHang = cuaHangRepository.findById(cuaHangId)
@@ -393,15 +514,20 @@ public class LichLamViecService {
         Map<Long, String> shiftShortcodes = new HashMap<>();
         for (CaLamViec ca : caLamViecs) {
             String name = ca.getTenCaLam().toLowerCase();
-            if (name.contains("sáng")) shiftShortcodes.put(ca.getId(), "S");
-            else if (name.contains("chiều")) shiftShortcodes.put(ca.getId(), "C");
-            else if (name.contains("tối")) shiftShortcodes.put(ca.getId(), "T");
-            else if (name.contains("toàn")) shiftShortcodes.put(ca.getId(), "X");
-            else shiftShortcodes.put(ca.getId(), String.valueOf(ca.getId()));
+            if (name.contains("sáng"))
+                shiftShortcodes.put(ca.getId(), "S");
+            else if (name.contains("chiều"))
+                shiftShortcodes.put(ca.getId(), "C");
+            else if (name.contains("tối"))
+                shiftShortcodes.put(ca.getId(), "T");
+            else if (name.contains("toàn"))
+                shiftShortcodes.put(ca.getId(), "X");
+            else
+                shiftShortcodes.put(ca.getId(), String.valueOf(ca.getId()));
         }
 
         try (Workbook workbook = new XSSFWorkbook();
-             java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream()) {
+                java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream()) {
 
             Sheet sheet = workbook.createSheet("LichLamViec");
 
@@ -413,12 +539,14 @@ public class LichLamViecService {
 
             Row storeRow = sheet.createRow(0);
             Cell storeCell = storeRow.createCell(0);
-            storeCell.setCellValue("Cửa hàng: " + cuaHang.getTenCuaHang() + " | Tháng: " + String.format("%02d/%d", month, year));
+            storeCell.setCellValue(
+                    "Cửa hàng: " + cuaHang.getTenCuaHang() + " | Tháng: " + String.format("%02d/%d", month, year));
             storeCell.setCellStyle(storeStyle);
 
             Row guideRow = sheet.createRow(1);
             Cell guideCell = guideRow.createCell(0);
-            guideCell.setCellValue("Điền 1, X hoặc TRUE vào ô trống nếu làm ca đó. Bỏ trống nếu không làm. Các mã ca: S=Sáng, C=Chiều, T=Tối, X=Cả ngày.");
+            guideCell.setCellValue(
+                    "Điền 1, X hoặc TRUE vào ô trống nếu làm ca đó. Bỏ trống nếu không làm. Các mã ca: S=Sáng, C=Chiều, T=Tối, X=Cả ngày.");
 
             CellStyle headerStyle = workbook.createCellStyle();
             Font headerFont = workbook.createFont();
@@ -452,7 +580,7 @@ public class LichLamViecService {
 
             dayRow.createCell(1).setCellValue("TenNhanVien");
             dayRow.getCell(1).setCellStyle(headerStyle);
-            
+
             holidayRow.createCell(1).setCellValue("Ngày nghỉ / Ngày lễ (N/L):");
             CellStyle holidayHeaderStyle = workbook.createCellStyle();
             holidayHeaderStyle.cloneStyleFrom(headerStyle);
@@ -464,7 +592,7 @@ public class LichLamViecService {
             shiftHeaderStyle.cloneStyleFrom(headerStyle);
             shiftHeaderStyle.setAlignment(HorizontalAlignment.RIGHT);
             shiftRow.getCell(1).setCellStyle(shiftHeaderStyle);
-            
+
             sheet.setColumnWidth(1, 6000);
 
             int daysInMonth = java.time.YearMonth.of(year, month).lengthOfMonth();
@@ -482,7 +610,7 @@ public class LichLamViecService {
                     Cell shiftCell = shiftRow.createCell(colIdx);
                     shiftCell.setCellValue(shiftShortcodes.get(ca.getId()));
                     shiftCell.setCellStyle(headerStyle);
-                    
+
                     sheet.setColumnWidth(colIdx, 1800);
                     colIdx++;
                 }
@@ -496,14 +624,18 @@ public class LichLamViecService {
             int rowIdx = 5;
             for (NhanVien nv : nhanViens) {
                 Row row = sheet.createRow(rowIdx++);
-                Cell c0 = row.createCell(0); c0.setCellValue(nv.getId()); c0.setCellStyle(dataStyle);
-                Cell c1 = row.createCell(1); c1.setCellValue(nv.getTenNhanVien()); c1.setCellStyle(dataStyle);
-                
+                Cell c0 = row.createCell(0);
+                c0.setCellValue(nv.getId());
+                c0.setCellStyle(dataStyle);
+                Cell c1 = row.createCell(1);
+                c1.setCellValue(nv.getTenNhanVien());
+                c1.setCellStyle(dataStyle);
+
                 int cData = 2;
                 for (int d = 1; d <= daysInMonth; d++) {
                     for (int i = 0; i < caLamViecs.size(); i++) {
                         Cell cx = row.createCell(cData++);
-                        cx.setCellValue(""); 
+                        cx.setCellValue("");
                         cx.setCellStyle(dataStyle);
                     }
                 }
@@ -515,24 +647,32 @@ public class LichLamViecService {
     }
 
     private boolean isRowEmpty(Row row) {
-        if (row == null) return true;
+        if (row == null)
+            return true;
         for (int c = row.getFirstCellNum(); c < row.getLastCellNum(); c++) {
             Cell cell = row.getCell(c);
-            if (cell != null && cell.getCellType() != CellType.BLANK) return false;
+            if (cell != null && cell.getCellType() != CellType.BLANK)
+                return false;
         }
         return true;
     }
 
     private double getCellNumericValue(Cell cell) {
-        if (cell.getCellType() == CellType.NUMERIC) return cell.getNumericCellValue();
+        if (cell.getCellType() == CellType.NUMERIC)
+            return cell.getNumericCellValue();
         if (cell.getCellType() == CellType.STRING) {
-            try { return Double.parseDouble(cell.getStringCellValue()); } catch (NumberFormatException e) { return 0; }
+            try {
+                return Double.parseDouble(cell.getStringCellValue());
+            } catch (NumberFormatException e) {
+                return 0;
+            }
         }
         return 0;
     }
 
     private String getCellStringValue(Cell cell) {
-        if (cell == null) return "";
+        if (cell == null)
+            return "";
         return switch (cell.getCellType()) {
             case STRING -> cell.getStringCellValue();
             case NUMERIC -> {

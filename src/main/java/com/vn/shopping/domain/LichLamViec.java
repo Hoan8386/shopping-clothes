@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "LichLamViec")
@@ -40,6 +41,10 @@ public class LichLamViec {
 
     @Column(name = "NgayCapNhat")
     private LocalDateTime ngayCapNhat;
+
+    @OneToMany(mappedBy = "lichLamViec", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonIgnoreProperties("lichLamViec")
+    private List<ChiTietLichLam> chiTiets;
 
     @PrePersist
     public void handleBeforeCreate() {

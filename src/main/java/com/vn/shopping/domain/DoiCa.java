@@ -34,6 +34,12 @@ public class DoiCa {
     @JsonIgnoreProperties(value = { "refreshToken", "matKhau", "role" })
     private NhanVien nhanVienNhanCa;
 
+    @Column(name = "LyDo", length = 500)
+    private String lyDo;
+
+    @Column(name = "PhanHoi", length = 500)
+    private String phanHoi;
+
     @Column(name = "TrangThai")
     private Integer trangThai;
 

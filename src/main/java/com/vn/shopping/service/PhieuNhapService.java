@@ -295,6 +295,7 @@ public class PhieuNhapService {
 
     public ResultPaginationDTO filterPhieuNhap(
             String tenPhieuNhap, Integer trangThai,
+            Long cuaHangId,
             String tenCuaHang, String tenNhaCungCap,
             LocalDateTime ngayTaoTu, LocalDateTime ngayTaoDen,
             LocalDateTime ngayDatHangTu, LocalDateTime ngayDatHangDen,
@@ -302,7 +303,7 @@ public class PhieuNhapService {
             Pageable pageable) {
 
         Specification<PhieuNhap> spec = PhieuNhapSpecification.filter(
-                tenPhieuNhap, trangThai, tenCuaHang, tenNhaCungCap,
+                tenPhieuNhap, trangThai, cuaHangId, tenCuaHang, tenNhaCungCap,
                 ngayTaoTu, ngayTaoDen,
                 ngayDatHangTu, ngayDatHangDen, ngayNhanHangTu, ngayNhanHangDen);
 

@@ -1,13 +1,18 @@
 package com.vn.shopping.controller;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.vn.shopping.domain.LoiPhatSinh;
 import com.vn.shopping.service.LoiPhatSinhService;
+import com.vn.shopping.service.StorageService;
 import com.vn.shopping.util.anotation.ApiMessage;
 import com.vn.shopping.util.error.IdInvalidException;
 
@@ -16,9 +21,11 @@ import com.vn.shopping.util.error.IdInvalidException;
 public class LoiPhatSinhController {
 
     private final LoiPhatSinhService loiPhatSinhService;
+    private final StorageService storageService;
 
-    public LoiPhatSinhController(LoiPhatSinhService loiPhatSinhService) {
+    public LoiPhatSinhController(LoiPhatSinhService loiPhatSinhService, StorageService storageService) {
         this.loiPhatSinhService = loiPhatSinhService;
+        this.storageService = storageService;
     }
 
     @GetMapping
@@ -42,6 +49,28 @@ public class LoiPhatSinhController {
     public ResponseEntity<List<LoiPhatSinh>> getByLichLamViec(
             @PathVariable("lichLamViecId") Long lichLamViecId) {
         return ResponseEntity.ok(loiPhatSinhService.findByLichLamViecId(lichLamViecId));
+    }
+
+    @GetMapping("/cua-hang/{cuaHangId}")
+    @ApiMessage("Lấy lỗi phát sinh theo cửa hàng")
+    public ResponseEntity<List<LoiPhatSinh>> getByCuaHang(
+            @PathVariable("cuaHangId") Long cuaHangId,
+            @RequestParam(value = "year", required = false) Integer year,
+            @RequestParam(value = "month", required = false) Integer month) {
+        return ResponseEntity.ok(loiPhatSinhService.findByCuaHangId(cuaHangId, year, month));
+    }
+
+    @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ApiMessage("Upload ảnh lỗi phát sinh")
+    public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file)
+            throws IdInvalidException {
+        if (file.isEmpty()) {
+            throw new IdInvalidException("File không được để trống");
+        }
+        String imageUrl = storageService.uploadSingleFile(file, "error");
+        Map<String, String> response = new HashMap<>();
+        response.put("imageUrl", imageUrl);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping

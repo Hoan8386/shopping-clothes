@@ -279,7 +279,16 @@
         ('Xem lịch làm việc theo tháng',    '/api/v1/lich-lam-viec/cua-hang/{cuaHangId}/thang', 'GET',    'LICH_LAM_VIEC', NOW()),
         ('Cập nhật trạng thái ngày làm việc', '/api/v1/lich-lam-viec/cua-hang/{cuaHangId}/ngay/trang-thai', 'PUT', 'LICH_LAM_VIEC', NOW()),
         ('Thêm nhân viên vào ca', '/api/v1/lich-lam-viec/cua-hang/{cuaHangId}/ngay/ca-lam-viec', 'POST', 'LICH_LAM_VIEC', NOW()),
-        ('Xóa nhân viên khỏi ca', '/api/v1/lich-lam-viec/cua-hang/{cuaHangId}/ngay/ca-lam-viec', 'DELETE', 'LICH_LAM_VIEC', NOW());
+        ('Xóa nhân viên khỏi ca', '/api/v1/lich-lam-viec/cua-hang/{cuaHangId}/ngay/ca-lam-viec', 'DELETE', 'LICH_LAM_VIEC', NOW()),
+        ('Tạo phiếu đổi hàng',             '/api/v1/doi-hang',                                      'POST',   'DOI_HANG',            NOW()),
+        ('Xem tất cả phiếu đổi hàng',      '/api/v1/doi-hang',                                      'GET',    'DOI_HANG',            NOW()),
+        ('Xem phiếu đổi hàng theo mã',     '/api/v1/doi-hang/{id}',                                 'GET',    'DOI_HANG',            NOW()),
+        ('Xem phiếu đổi theo đơn hàng',    '/api/v1/doi-hang/don-hang/{donHangId}',                 'GET',    'DOI_HANG',            NOW()),
+        ('Cập nhật trạng thái đổi hàng',   '/api/v1/doi-hang/{id}/trang-thai',                      'PUT',    'DOI_HANG',            NOW()),
+
+        -- === LOI_PHAT_SINH_EXTRA (192-193) ===
+        ('Upload ảnh lỗi phát sinh',       '/api/v1/loi-phat-sinh/upload-image',                    'POST',   'LOI_PHAT_SINH',       NOW()),
+        ('Xem lỗi phát sinh theo cửa hàng', '/api/v1/loi-phat-sinh/cua-hang/{cuaHangId}',           'GET',    'LOI_PHAT_SINH',       NOW());
 
     -- ---------------------------------------------------------
     -- 3. PERMISSION_ROLE
@@ -329,7 +338,11 @@
         -- LOI_PHAT_SINH (176-181)
         (1,176),(1,177),(1,178),(1,179),(1,180),(1,181),
         -- LICH_LAM_VIEC_EXTRA (182-186)
-        (1,182),(1,183),(1,184),(1,185),(1,186);
+        (1,182),(1,183),(1,184),(1,185),(1,186),
+        -- DOI_HANG (187-191)
+        (1,187),(1,188),(1,189),(1,190),(1,191),
+        -- LOI_PHAT_SINH_EXTRA (192-193)
+        (1,192),(1,193);
 
     -- NHAN_VIEN (role_id=2): Xem tất cả danh mục, SP, CTSP, hình ảnh, cửa hàng (chỉ GET) + Phiếu nhập + Đơn hàng + Ca & Lịch làm
     INSERT INTO permission_role (role_id, permission_id) VALUES
@@ -364,10 +377,14 @@
         (2,155),(2,156),(2,157),(2,158),
         -- DOI_CA: xem all, xem id, xem theo lịch, tạo, cập nhật
         (2,171),(2,172),(2,173),(2,174),(2,175),
-        -- LOI_PHAT_SINH: xem all, xem id, xem theo lịch
-        (2,176),(2,177),(2,178),
+        -- LOI_PHAT_SINH: xem all, xem id, xem theo lịch, tạo
+        (2,176),(2,177),(2,178),(2,179),
         -- LICH_LAM_VIEC_EXTRA
-        (2,182),(2,183),(2,184),(2,185),(2,186);
+        (2,182),(2,183),(2,184),(2,185),(2,186),
+        -- DOI_HANG: xem all, xem theo mã, xem theo đơn hàng, cập nhật trạng thái
+        (2,188),(2,189),(2,190),(2,191),
+        -- LOI_PHAT_SINH_EXTRA
+        (2,192),(2,193);
 
     -- KHACH_HANG (role_id=3): Xem SP/danh mục + giỏ hàng (thêm/xem/xóa/khuyến mãi)
     INSERT INTO permission_role (role_id, permission_id) VALUES
@@ -386,7 +403,8 @@
         (3,89),(3,90),         -- KHUYEN_MAI_HOA_DON: xem all, xem id
         (3,94),(3,95),         -- KHUYEN_MAI_DIEM: xem all, xem id
         (3,99),(3,100),(3,101),(3,102),(3,103),(3,104),(3,106),(3,107), -- DANH_GIA_SP: xem all, xem id, xem theo SP, xem của tôi, tạo, xóa, cập nhật, xem theo CTDH
-        (3,114),(3,116),(3,117); -- TRA_HANG: tạo phiếu, xem theo mã, xem theo đơn hàng
+        (3,114),(3,116),(3,117), -- TRA_HANG: tạo phiếu, xem theo mã, xem theo đơn hàng
+        (3,187),(3,189),(3,190); -- DOI_HANG: tạo phiếu, xem theo mã, xem theo đơn hàng
 
     -- ---------------------------------------------------------
     -- 4. CỬA HÀNG
@@ -475,21 +493,21 @@
     -- 13. NHÂN VIÊN (MatKhau = BCrypt '123456')
     -- ---------------------------------------------------------
     INSERT INTO NhanVien (MaCuaHang, role_id, TenNhanVien, Email, SoDienThoai, MatKhau, TrangThai) VALUES
-        (1, 2, 'An',   'an@s.com', '0901000001', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG', 1),
-        (1, 2, 'Bình', 'b@s.com',  '0901000002', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG', 1),
-        (2, 2, 'Chi',  'c@s.com',  '0901000003', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG', 1),
-        (2, 2, 'Danh', 'd@s.com',  '0901000004', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG', 1),
-        (1, 1, 'Hùng', 'h@s.com',  '0901000005', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG', 1);
+        (1, 2, 'An',   'an@s.com', '0901000001', '$2a$10$iIsMPCG8iMiSnXa9UQ5jF.1uGOkLshrEI0Ymp.S.OA6iY4fGRvEmC', 1),
+        (1, 2, 'Bình', 'b@s.com',  '0901000002', '$2a$10$iIsMPCG8iMiSnXa9UQ5jF.1uGOkLshrEI0Ymp.S.OA6iY4fGRvEmC', 1),
+        (2, 2, 'Chi',  'c@s.com',  '0901000003', '$2a$10$iIsMPCG8iMiSnXa9UQ5jF.1uGOkLshrEI0Ymp.S.OA6iY4fGRvEmC', 1),
+        (2, 2, 'Danh', 'd@s.com',  '0901000004', '$2a$10$iIsMPCG8iMiSnXa9UQ5jF.1uGOkLshrEI0Ymp.S.OA6iY4fGRvEmC', 1),
+        (1, 1, 'Hùng', 'h@s.com',  '0901000005', '$2a$10$iIsMPCG8iMiSnXa9UQ5jF.1uGOkLshrEI0Ymp.S.OA6iY4fGRvEmC', 1);
 
     -- ---------------------------------------------------------
     -- 14. KHÁCH HÀNG (Password = BCrypt '123456')
     -- ---------------------------------------------------------
     INSERT INTO KhachHang (role_id, TenKhachHang, Email, Sdt, Password, DiemTichLuy) VALUES
-        (3, 'Lan',  'lan@g.com', '0911000001', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG',  10),
-        (3, 'Minh', 'm@g.com',   '0922000002', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG',   0),
-        (3, 'Hoa',  'h@g.com',   '0933000003', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG', 100),
-        (3, 'Tuấn', 't@g.com',   '0944000004', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG',   5),
-        (3, 'Yến',  'y@g.com',   '0955000005', '$10$2/B268smXhzBemUenG3Y8e2zYUbueXGHVC8BoGtOsWlHp7TWArLiG',  50);
+        (3, 'Lan',  'lan@g.com', '0911000001', '$2a$10$iIsMPCG8iMiSnXa9UQ5jF.1uGOkLshrEI0Ymp.S.OA6iY4fGRvEmC',  10),
+        (3, 'Minh', 'm@g.com',   '0922000002', '$2a$10$iIsMPCG8iMiSnXa9UQ5jF.1uGOkLshrEI0Ymp.S.OA6iY4fGRvEmC',   0),
+        (3, 'Hoa',  'h@g.com',   '0933000003', '$2a$10$iIsMPCG8iMiSnXa9UQ5jF.1uGOkLshrEI0Ymp.S.OA6iY4fGRvEmC', 100),
+        (3, 'Tuấn', 't@g.com',   '0944000004', '$2a$10$iIsMPCG8iMiSnXa9UQ5jF.1uGOkLshrEI0Ymp.S.OA6iY4fGRvEmC',   5),
+        (3, 'Yến',  'y@g.com',   '0955000005', '$2a$10$iIsMPCG8iMiSnXa9UQ5jF.1uGOkLshrEI0Ymp.S.OA6iY4fGRvEmC',  50);
 
     -- ---------------------------------------------------------
     -- 15. NHÀ CUNG CẤP
@@ -718,3 +736,16 @@
         (3, 4, 'Rời ca sớm 30 phút không báo cáo',   80000,  0, NOW()),   -- Chi rời ca sớm, chờ xử lý
         (4, 5, 'Không mặc đồng phục theo quy định',   30000,  0, NOW());   -- An không mặc đồng phục, chờ xử lý
 
+    -- ---------------------------------------------------------
+    -- 40. ĐỔI HÀNG
+    -- ---------------------------------------------------------
+    INSERT INTO DoiHang (MaDonHang, GhiTru, TrangThai, TongTien, NgayTao) VALUES
+        (5, 'Đổi áo Oxford M Trắng lấy L Trắng do mặc chật', 0, 0, NOW()),   -- id=1: KH Yến đổi CTDH 6 (Áo Oxford M Trắng) sang L Trắng.
+        (3, 'Đổi Váy Hoa S Đỏ sang áo Oxford M', 1, 0, NOW());   -- id=2: KH Hoa đổi CTDH 4 (Váy Hoa 300k) sang áo Oxford (200k)
+
+    -- ---------------------------------------------------------
+    -- 41. CHI TIẾT ĐỔI HÀNG
+    -- ---------------------------------------------------------
+    INSERT INTO ChiTietDoiHang (MaDoiHang, MaSanPhamTra, MaSanPhamDoi, GhiTru, TrangThai, NgayTao) VALUES
+        (1, 6, 2, 'Size M hơi chật, đổi sang L', 0, NOW()),   -- Đổi CTDH 6 (Áo Trắng M) lấy CTSP 2 (Áo Trắng L), chờ xử lý
+        (2, 4, 1, 'Đổi kiểu khác', 1, NOW());   -- Đổi CTDH 4 (Váy Hoa) lấy CTSP 1 (Áo Trắng M), đã duyệt
