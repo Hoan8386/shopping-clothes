@@ -7,9 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.vn.shopping.domain.DonHang;
 import com.vn.shopping.domain.request.ReqCapNhatDonHangDTO;
 import com.vn.shopping.domain.request.ReqTaoDonHangDTO;
+import com.vn.shopping.domain.request.ReqTaoDonHangTaiQuayDTO;
 import com.vn.shopping.domain.response.ResDonHangDTO;
 import com.vn.shopping.domain.response.ResultPaginationDTO;
 import com.vn.shopping.service.DonHangService;
@@ -72,9 +72,10 @@ public class DonHangController {
      */
     @PostMapping("/tai-quay")
     @ApiMessage("Nhân viên tạo đơn hàng tại quầy")
-    public ResponseEntity<ResDonHangDTO> taoDonHangTaiQuay(@RequestBody DonHang donHang) throws IdInvalidException {
+    public ResponseEntity<ResDonHangDTO> taoDonHangTaiQuay(@RequestBody ReqTaoDonHangTaiQuayDTO req)
+            throws IdInvalidException {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(donHangService.convertToDTO(donHangService.taoDonHangTaiQuay(donHang)));
+                .body(donHangService.convertToDTO(donHangService.taoDonHangTaiQuay(req)));
     }
 
     @PutMapping

@@ -288,13 +288,41 @@
 
         -- === LOI_PHAT_SINH_EXTRA (192-193) ===
         ('Upload ảnh lỗi phát sinh',       '/api/v1/loi-phat-sinh/upload-image',                    'POST',   'LOI_PHAT_SINH',       NOW()),
-        ('Xem lỗi phát sinh theo cửa hàng', '/api/v1/loi-phat-sinh/cua-hang/{cuaHangId}',           'GET',    'LOI_PHAT_SINH',       NOW());
+        ('Xem lỗi phát sinh theo cửa hàng', '/api/v1/loi-phat-sinh/cua-hang/{cuaHangId}',           'GET',    'LOI_PHAT_SINH',       NOW()),
+
+        -- === AUTH_VNPAY_GIO_HANG_NV (194-215) ===
+        ('Xem thông tin tài khoản',         '/api/v1/auth/account',                                  'GET',    'AUTH',                NOW()),
+        ('Làm mới phiên đăng nhập',         '/api/v1/auth/refresh',                                  'GET',    'AUTH',                NOW()),
+        ('VNPay trả kết quả',               '/api/v1/auth/vnpay/return',                             'GET',    'VNPAY',               NOW()),
+        ('Đổi mật khẩu',                    '/api/v1/auth/change-password',                           'PUT',    'AUTH',                NOW()),
+        ('Cập nhật hồ sơ cá nhân',          '/api/v1/auth/profile',                                   'PUT',    'AUTH',                NOW()),
+        ('Đăng nhập',                       '/api/v1/auth/login',                                     'POST',   'AUTH',                NOW()),
+        ('Đăng ký',                         '/api/v1/auth/register',                                  'POST',   'AUTH',                NOW()),
+        ('Đăng xuất',                       '/api/v1/auth/logout',                                    'POST',   'AUTH',                NOW()),
+        ('Tạo URL thanh toán VNPay',        '/api/v1/auth/vnpay/create-payment-url',                 'POST',   'VNPAY',               NOW()),
+        ('Quét mã vạch CTSP',               '/api/v1/chi-tiet-san-pham/scan',                         'GET',    'CHI_TIET_SP',         NOW()),
+        ('Upload hình ảnh theo CTSP',       '/api/v1/hinh-anh/upload/{chiTietSanPhamId}',            'POST',   'HINH_ANH',            NOW()),
+        ('Tra cứu khách hàng theo SĐT',     '/api/v1/khach-hang/lookup',                              'GET',    'KHACH_HANG',          NOW()),
+        ('Xem giỏ hàng nhân viên hiện tại', '/api/v1/gio-hang-nhan-vien/hien-tai',                   'GET',    'GIO_HANG_NHAN_VIEN',  NOW()),
+        ('Cập nhật thông tin khách giỏ NV', '/api/v1/gio-hang-nhan-vien/thong-tin-khach',            'PUT',    'GIO_HANG_NHAN_VIEN',  NOW()),
+        ('Thêm sản phẩm vào giỏ NV',        '/api/v1/gio-hang-nhan-vien/them-san-pham',              'POST',   'GIO_HANG_NHAN_VIEN',  NOW()),
+        ('Cập nhật chi tiết giỏ NV',        '/api/v1/gio-hang-nhan-vien/chi-tiet/{id}',              'PUT',    'GIO_HANG_NHAN_VIEN',  NOW()),
+        ('Xóa chi tiết giỏ NV',             '/api/v1/gio-hang-nhan-vien/chi-tiet/{id}',              'DELETE', 'GIO_HANG_NHAN_VIEN',  NOW()),
+        ('Cập nhật khuyến mãi giỏ NV',      '/api/v1/gio-hang-nhan-vien/khuyen-mai',                 'PUT',    'GIO_HANG_NHAN_VIEN',  NOW()),
+        ('Thanh toán giỏ hàng nhân viên',   '/api/v1/gio-hang-nhan-vien/thanh-toan',                 'POST',   'GIO_HANG_NHAN_VIEN',  NOW()),
+        ('Xem danh sách giỏ hàng NV chưa thanh toán', '/api/v1/gio-hang-nhan-vien/danh-sach',        'GET',    'GIO_HANG_NHAN_VIEN',  NOW()),
+        ('Xem chi tiết giỏ hàng NV',        '/api/v1/gio-hang-nhan-vien/{id}',                       'GET',    'GIO_HANG_NHAN_VIEN',  NOW()),
+        ('Tạo giỏ hàng nhân viên mới',      '/api/v1/gio-hang-nhan-vien/moi',                        'POST',   'GIO_HANG_NHAN_VIEN',  NOW()),
+        ('Xóa đổi ca',                       '/api/v1/doi-ca/{id}',                                   'DELETE', 'DOI_CA',              NOW()),
+        ('Xóa lương cơ bản',                 '/api/v1/luong-co-ban/{id}',                             'DELETE', 'LUONG_CO_BAN',        NOW()),
+        ('Xóa lương thưởng',                 '/api/v1/luong-thuong/{id}',                             'DELETE', 'LUONG_THUONG',        NOW()),
+        ('Quét ảnh mã vạch CTSP',            '/api/v1/chi-tiet-san-pham/scan-image',                   'POST',   'CHI_TIET_SP',         NOW());
 
     -- ---------------------------------------------------------
     -- 3. PERMISSION_ROLE
     -- ---------------------------------------------------------
 
-    -- ADMIN (role_id=1): TẤT CẢ QUYỀN (1-181)
+    -- ADMIN (role_id=1): TẤT CẢ QUYỀN (1-215)
     INSERT INTO permission_role (role_id, permission_id) VALUES
         (1,1),(1,2),(1,3),(1,4),(1,5),
         (1,6),(1,7),(1,8),(1,9),(1,10),
@@ -342,7 +370,13 @@
         -- DOI_HANG (187-191)
         (1,187),(1,188),(1,189),(1,190),(1,191),
         -- LOI_PHAT_SINH_EXTRA (192-193)
-        (1,192),(1,193);
+        (1,192),(1,193),
+        -- AUTH_VNPAY_GIO_HANG_NV (194-215)
+        (1,194),(1,195),(1,196),(1,197),(1,198),(1,199),(1,200),(1,201),(1,202),(1,203),
+        (1,204),(1,205),(1,206),(1,207),(1,208),(1,209),(1,210),(1,211),(1,212),(1,213),
+        (1,214),(1,215),
+        -- GIO_HANG_NHAN_VIEN_EXTRA + CHI_TIET_SP_EXTRA (216-219)
+        (1,216),(1,217),(1,218),(1,219);
 
     -- NHAN_VIEN (role_id=2): Xem tất cả danh mục, SP, CTSP, hình ảnh, cửa hàng (chỉ GET) + Phiếu nhập + Đơn hàng + Ca & Lịch làm
     INSERT INTO permission_role (role_id, permission_id) VALUES
@@ -384,7 +418,11 @@
         -- DOI_HANG: xem all, xem theo mã, xem theo đơn hàng, cập nhật trạng thái
         (2,188),(2,189),(2,190),(2,191),
         -- LOI_PHAT_SINH_EXTRA
-        (2,192),(2,193);
+        (2,192),(2,193),
+        -- AUTH + POS + GIỎ NHÂN VIÊN
+        (2,194),(2,195),(2,197),(2,198),(2,201),(2,203),(2,204),(2,205),(2,206),(2,207),(2,208),(2,209),(2,210),(2,211),(2,212),(2,213),(2,214),(2,215),
+        -- GIO_HANG_NHAN_VIEN_EXTRA + CHI_TIET_SP_EXTRA
+        (2,216),(2,217),(2,218),(2,219);
 
     -- KHACH_HANG (role_id=3): Xem SP/danh mục + giỏ hàng (thêm/xem/xóa/khuyến mãi)
     INSERT INTO permission_role (role_id, permission_id) VALUES
@@ -404,7 +442,9 @@
         (3,94),(3,95),         -- KHUYEN_MAI_DIEM: xem all, xem id
         (3,99),(3,100),(3,101),(3,102),(3,103),(3,104),(3,106),(3,107), -- DANH_GIA_SP: xem all, xem id, xem theo SP, xem của tôi, tạo, xóa, cập nhật, xem theo CTDH
         (3,114),(3,116),(3,117), -- TRA_HANG: tạo phiếu, xem theo mã, xem theo đơn hàng
-        (3,187),(3,189),(3,190); -- DOI_HANG: tạo phiếu, xem theo mã, xem theo đơn hàng
+        (3,187),(3,189),(3,190), -- DOI_HANG: tạo phiếu, xem theo mã, xem theo đơn hàng
+        -- AUTH + VNPAY cho khách hàng
+        (3,194),(3,195),(3,196),(3,197),(3,198),(3,200),(3,201),(3,202); 
 
     -- ---------------------------------------------------------
     -- 4. CỬA HÀNG

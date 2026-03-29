@@ -1,13 +1,29 @@
 package com.vn.shopping.service;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import javax.imageio.ImageIO;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.BinaryBitmap;
+import com.google.zxing.DecodeHintType;
+import com.google.zxing.MultiFormatReader;
+import com.google.zxing.NotFoundException;
+import com.google.zxing.Result;
+import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
+import com.google.zxing.common.HybridBinarizer;
 
 import com.vn.shopping.domain.ChiTietSanPham;
 import com.vn.shopping.domain.CuaHang;
@@ -60,10 +76,14 @@ public class ChiTietSanPhamService {
 
     @Transactional
     public ChiTietSanPham create(ChiTietSanPham chiTietSanPham) {
-        if (chiTietSanPham.getSoLuong() == null) {
-            chiTietSanPham.setSoLuong(0);
-        }
         ChiTietSanPham saved = chiTietSanPhamRepository.save(chiTietSanPham);
+
+        if (saved.getMaVach() == null || saved.getMaVach().isBlank()) {
+            Long sanPhamId = saved.getSanPham() != null ? saved.getSanPham().getId() : null;
+            saved.setMaVach(buildBarcode(sanPhamId, saved.getId(), saved.getMaCuaHang()));
+            saved = chiTietSanPhamRepository.save(saved);
+        }
+
         entityManager.flush();
         entityManager.clear();
         return chiTietSanPhamRepository.findById(saved.getId()).orElse(saved);
@@ -109,7 +129,7 @@ public class ChiTietSanPhamService {
             ChiTietSanPham ct = new ChiTietSanPham();
             ct.setMaPhieuNhap(maPhieuNhap);
             ct.setMaCuaHang(cuaHang.getId());
-            ct.setSoLuong(soLuong != null ? soLuong : 0);
+            ct.setSoLuong(soLuong);
             ct.setTrangThai(trangThai);
             ct.setMoTa(moTa);
             ct.setGhiTru(ghiTru);
@@ -119,6 +139,11 @@ public class ChiTietSanPhamService {
 
             // Lưu + flush, KHÔNG clear để tránh detach entity trước khi convert DTO
             ChiTietSanPham created = chiTietSanPhamRepository.save(ct);
+            created.setMaVach(buildBarcode(
+                    created.getSanPham() != null ? created.getSanPham().getId() : null,
+                    created.getId(),
+                    created.getMaCuaHang()));
+            created = chiTietSanPhamRepository.save(created);
             entityManager.flush();
 
             // Gắn ảnh cho từng chi tiết sản phẩm
@@ -234,6 +259,7 @@ public class ChiTietSanPhamService {
         dto.setTrangThai(ct.getTrangThai());
         dto.setMoTa(ct.getMoTa());
         dto.setGhiTru(ct.getGhiTru());
+        dto.setMaVach(ct.getMaVach());
 
         // Lấy tên cửa hàng từ mã cửa hàng
         if (ct.getMaCuaHang() != null) {
@@ -313,24 +339,67 @@ public class ChiTietSanPhamService {
         return convertToListDTO(chiTietSanPhamRepository.findBySanPhamId(sanPhamId));
     }
 
-    /**
-     * Lấy danh sách cửa hàng có tồn kho cho sản phẩm để nhập hàng
-     * Staff chỉ xem các cửa hàng khác ngoài cửa hàng của mình
-     */
     @Transactional(readOnly = true)
-    public List<ResChiTietSanPhamDTO> findStoresWithInventoryForImport(long sanPhamId, Long excludeStoreId) {
-        List<ChiTietSanPham> allDetails = chiTietSanPhamRepository.findBySanPhamId(sanPhamId);
+    public ResChiTietSanPhamDTO findByBarcodeInStore(String maVach, Long maCuaHang) {
+        if (maVach == null || maVach.isBlank() || maCuaHang == null) {
+            return null;
+        }
 
-        // Lọc những chi tiết sản phẩm:
-        // 1. Có tồn kho (soLuong > 0)
-        // 2. Không phải cửa hàng của staff hiện tại
-        // 3. Sắp xếp theo số lượng giảm dần (gần nhất)
-        List<ChiTietSanPham> withInventory = allDetails.stream()
-                .filter(ct -> ct.getSoLuong() != null && ct.getSoLuong() > 0)
-                .filter(ct -> excludeStoreId == null || !ct.getMaCuaHang().equals(excludeStoreId))
-                .sorted((ct1, ct2) -> Integer.compare(ct2.getSoLuong(), ct1.getSoLuong()))
-                .collect(Collectors.toList());
+        return chiTietSanPhamRepository.findFirstByMaVachAndMaCuaHang(maVach.trim(), maCuaHang)
+                .map(this::convertToDTO)
+                .orElse(null);
+    }
 
-        return convertToListDTO(withInventory);
+    @Transactional(readOnly = true)
+    public ResChiTietSanPhamDTO findByBarcodeImageInStore(MultipartFile file, Long maCuaHang)
+            throws IdInvalidException {
+        if (file == null || file.isEmpty()) {
+            throw new IdInvalidException("Vui lòng chọn ảnh mã vạch");
+        }
+
+        String maVach = decodeCode128(file);
+        return findByBarcodeInStore(maVach, maCuaHang);
+    }
+
+    private String decodeCode128(MultipartFile file) throws IdInvalidException {
+        try {
+            BufferedImage image = ImageIO.read(new ByteArrayInputStream(file.getBytes()));
+            if (image == null) {
+                throw new IdInvalidException("File tải lên không phải ảnh hợp lệ");
+            }
+
+            BufferedImageLuminanceSource source = new BufferedImageLuminanceSource(image);
+            BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
+
+            Map<DecodeHintType, Object> hints = new EnumMap<>(DecodeHintType.class);
+            hints.put(DecodeHintType.POSSIBLE_FORMATS, List.of(BarcodeFormat.CODE_128));
+            hints.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);
+
+            Result result = new MultiFormatReader().decode(bitmap, hints);
+            String value = result.getText();
+            if (value == null || value.isBlank()) {
+                throw new IdInvalidException("Không đọc được mã vạch từ ảnh");
+            }
+            return value.trim();
+        } catch (NotFoundException e) {
+            throw new IdInvalidException("Không nhận diện được mã vạch Code 128 trong ảnh");
+        } catch (IOException e) {
+            throw new IdInvalidException("Không thể xử lý ảnh mã vạch");
+        }
+    }
+
+    private String buildBarcode(Long sanPhamId, Long chiTietSanPhamId, Long cuaHangId) {
+        String spPart = sanPhamId != null ? Long.toString(sanPhamId, 36).toUpperCase() : "0";
+        String ctPart = chiTietSanPhamId != null ? Long.toString(chiTietSanPhamId, 36).toUpperCase() : "0";
+        String chPart = cuaHangId != null ? Long.toString(cuaHangId, 36).toUpperCase() : "0";
+
+        // SP + mã sản phẩm + mã chi tiết sản phẩm + mã cửa hàng
+        String barcode = "SP" + spPart + "CT" + ctPart + "CH" + chPart;
+
+        if (barcode.length() > 32) {
+            barcode = barcode.substring(0, 32);
+        }
+
+        return barcode;
     }
 }

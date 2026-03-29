@@ -45,6 +45,9 @@ public class DonHang {
     @Column(name = "Sdt", length = 20)
     private String sdt;
 
+    @Column(name = "TenNguoiMua", length = 255)
+    private String tenNguoiMua;
+
     @Column(name = "TongTien")
     private Integer tongTien;
 

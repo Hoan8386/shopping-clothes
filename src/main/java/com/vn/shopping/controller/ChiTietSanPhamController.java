@@ -81,6 +81,24 @@ public class ChiTietSanPhamController {
                 chiTietSanPhamService.findAllDTOWithFilter(null, null, null, maCuaHang, null));
     }
 
+    @PostMapping(value = "/scan-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ApiMessage("Quét mã vạch từ ảnh sản phẩm theo cửa hàng của nhân viên")
+    public ResponseEntity<ResChiTietSanPhamDTO> scanByBarcodeImage(@RequestPart("file") MultipartFile file)
+            throws IdInvalidException {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        NhanVien nhanVien = nhanVienService.findByEmail(email);
+        if (nhanVien == null || nhanVien.getCuaHang() == null || nhanVien.getCuaHang().getId() == null) {
+            throw new IdInvalidException("Không xác định được cửa hàng của nhân viên hiện tại");
+        }
+
+        ResChiTietSanPhamDTO dto = chiTietSanPhamService.findByBarcodeImageInStore(file, nhanVien.getCuaHang().getId());
+        if (dto == null) {
+            throw new IdInvalidException("Không tìm thấy sản phẩm tương ứng với mã vạch trong ảnh");
+        }
+
+        return ResponseEntity.ok(dto);
+    }
+
     /**
      * Tạo chi tiết sản phẩm + upload nhiều hình ảnh lên Cloudinary
      * Tự động tạo cho TẤT CẢ cửa hàng hiện có

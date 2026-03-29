@@ -50,6 +50,9 @@ public class ChiTietSanPham {
     @Column(name = "GhiTru", length = 255)
     private String ghiTru;
 
+    @Column(name = "MaVach", length = 32, unique = true)
+    private String maVach;
+
     @Column(name = "NgayTao")
     private LocalDateTime ngayTao;
 

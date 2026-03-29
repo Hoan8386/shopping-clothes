@@ -11,6 +11,8 @@ import com.vn.shopping.domain.KhachHang;
 public interface KhachHangRepository extends JpaRepository<KhachHang, Long> {
     Optional<KhachHang> findByEmail(String email);
 
+    Optional<KhachHang> findBySdt(String sdt);
+
     boolean existsByEmail(String email);
 
     boolean existsBySdt(String sdt);

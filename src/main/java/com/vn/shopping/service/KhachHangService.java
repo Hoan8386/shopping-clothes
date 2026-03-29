@@ -24,6 +24,13 @@ public class KhachHangService {
         return khachHangRepository.findByEmail(email).orElse(null);
     }
 
+    public KhachHang findBySdt(String sdt) {
+        if (sdt == null || sdt.isBlank()) {
+            return null;
+        }
+        return khachHangRepository.findBySdt(sdt.trim()).orElse(null);
+    }
+
     public boolean isEmailExist(String email) {
         return khachHangRepository.existsByEmail(email);
     }

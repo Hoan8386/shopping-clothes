@@ -23,6 +23,7 @@ public class ResChiTietSanPhamDTO {
     private Integer trangThai;
     private String moTa;
     private String ghiTru;
+    private String maVach;
     private String tenSanPham;
     private String tenMauSac;
     private String tenKichThuoc;

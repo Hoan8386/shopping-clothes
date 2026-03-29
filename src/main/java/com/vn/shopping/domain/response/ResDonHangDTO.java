@@ -16,6 +16,7 @@ public class ResDonHangDTO {
     private Long id;
     private String diaChi;
     private String sdt;
+    private String tenNguoiMua;
     private Integer tongTien;
     private Integer tienGiam;
     private Integer tongTienGiam;

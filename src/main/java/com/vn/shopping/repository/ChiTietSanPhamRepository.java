@@ -11,13 +11,17 @@ import com.vn.shopping.domain.ChiTietSanPham;
 
 @Repository
 public interface ChiTietSanPhamRepository extends JpaRepository<ChiTietSanPham, Long>,
-        JpaSpecificationExecutor<ChiTietSanPham> {
+                JpaSpecificationExecutor<ChiTietSanPham> {
 
-    List<ChiTietSanPham> findBySanPhamId(long sanPhamId);
+        List<ChiTietSanPham> findBySanPhamId(long sanPhamId);
 
-    Optional<ChiTietSanPham> findFirstBySanPhamIdAndMauSacIdAndKichThuocIdAndMaCuaHang(
-            Long sanPhamId,
-            Long mauSacId,
-            Long kichThuocId,
-            Long maCuaHang);
+        Optional<ChiTietSanPham> findFirstBySanPhamIdAndMauSacIdAndKichThuocIdAndMaCuaHang(
+                        Long sanPhamId,
+                        Long mauSacId,
+                        Long kichThuocId,
+                        Long maCuaHang);
+
+        Optional<ChiTietSanPham> findFirstByMaVachAndMaCuaHang(String maVach, Long maCuaHang);
+
+        boolean existsByMaVach(String maVach);
 }

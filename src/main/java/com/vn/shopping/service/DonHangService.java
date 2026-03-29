@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.vn.shopping.domain.*;
 import com.vn.shopping.domain.request.ReqCapNhatDonHangDTO;
 import com.vn.shopping.domain.request.ReqTaoDonHangDTO;
+import com.vn.shopping.domain.request.ReqTaoDonHangTaiQuayDTO;
 import com.vn.shopping.domain.response.ResDonHangDTO;
 import com.vn.shopping.domain.response.ResultPaginationDTO;
 import com.vn.shopping.repository.*;
@@ -179,28 +180,109 @@ public class DonHangService {
      * - HinhThucDonHang = 0 (tại quầy)
      */
     @Transactional
-    public DonHang taoDonHangTaiQuay(DonHang donHang) throws IdInvalidException {
+    public DonHang taoDonHangTaiQuay(ReqTaoDonHangTaiQuayDTO req) throws IdInvalidException {
         // Lấy nhân viên từ token
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         NhanVien nhanVien = nhanVienRepository.findByEmail(email)
                 .orElseThrow(() -> new IdInvalidException("Không tìm thấy nhân viên với email: " + email));
 
-        donHang.setNhanVien(nhanVien);
-        donHang.setHinhThucDonHang(0); // 0 = COD/Tiền mặt
-
-        // Nếu nhân viên thuộc cửa hàng nào thì gán cửa hàng đó
-        if (nhanVien.getCuaHang() != null) {
-            donHang.setCuaHang(nhanVien.getCuaHang());
+        if (nhanVien.getCuaHang() == null || nhanVien.getCuaHang().getId() == null) {
+            throw new IdInvalidException("Nhân viên chưa được gán cửa hàng");
         }
 
-        DonHang saved = save(donHang);
+        if (req.getChiTietDonHangs() == null || req.getChiTietDonHangs().isEmpty()) {
+            throw new IdInvalidException("Đơn hàng tại quầy phải có ít nhất 1 sản phẩm");
+        }
+
+        DonHang donHang = new DonHang();
+        donHang.setNhanVien(nhanVien);
+        donHang.setCuaHang(nhanVien.getCuaHang());
+        Integer hinhThucDonHang = req.getHinhThucDonHang() != null ? req.getHinhThucDonHang() : 0;
+        donHang.setHinhThucDonHang(hinhThucDonHang);
+        donHang.setTrangThai(5); // Đã nhận hàng tại quầy
+        donHang.setTrangThaiThanhToan(1); // Đã thanh toán
+        donHang.setDiaChi("Mua tại cửa hàng");
+
+        KhachHang khachHang = null;
+        if (req.getKhachHangId() != null) {
+            khachHang = khachHangRepository.findById(req.getKhachHangId())
+                    .orElseThrow(() -> new IdInvalidException("Không tìm thấy khách hàng: " + req.getKhachHangId()));
+        } else if (req.getSdt() != null && !req.getSdt().isBlank()) {
+            khachHang = khachHangRepository.findBySdt(req.getSdt().trim()).orElse(null);
+        }
+
+        donHang.setKhachHang(khachHang);
+        donHang.setSdt(req.getSdt());
+        donHang.setTenNguoiMua(khachHang != null ? khachHang.getTenKhachHang() : req.getTenNguoiMua());
+        donHang.setMaKhuyenMaiHoaDon(req.getMaKhuyenMaiHoaDon());
+        donHang.setMaKhuyenMaiDiem(req.getMaKhuyenMaiDiem());
+
+        List<ChiTietDonHang> chiTietDonHangs = new ArrayList<>();
+        int tongTien = 0;
+
+        for (ReqTaoDonHangTaiQuayDTO.ChiTietDonTaiQuayDTO item : req.getChiTietDonHangs()) {
+            if (item.getChiTietSanPhamId() == null || item.getSoLuong() == null || item.getSoLuong() <= 0) {
+                throw new IdInvalidException("Thông tin chi tiết đơn hàng không hợp lệ");
+            }
+
+            ChiTietSanPham ctsp = chiTietSanPhamRepository.findById(item.getChiTietSanPhamId())
+                    .orElseThrow(() -> new IdInvalidException(
+                            "Không tìm thấy chi tiết sản phẩm: " + item.getChiTietSanPhamId()));
+
+            if (!nhanVien.getCuaHang().getId().equals(ctsp.getMaCuaHang())) {
+                throw new IdInvalidException("Sản phẩm " + item.getChiTietSanPhamId()
+                        + " không thuộc cửa hàng hiện tại của nhân viên");
+            }
+
+            int tonKho = ctsp.getSoLuong() != null ? ctsp.getSoLuong() : 0;
+            if (tonKho < item.getSoLuong()) {
+                throw new IdInvalidException("Sản phẩm " + item.getChiTietSanPhamId()
+                        + " không đủ tồn kho. Còn: " + tonKho);
+            }
+
+            SanPham sp = ctsp.getSanPham();
+            double giaBan = sp != null && sp.getGiaBan() != null ? sp.getGiaBan() : 0;
+            int giamSanPham = sp != null && sp.getGiaGiam() != null ? sp.getGiaGiam() : 0;
+            double giaSauGiamSanPham = giaBan - (giaBan * giamSanPham / 100.0);
+            double thanhTien = giaSauGiamSanPham * item.getSoLuong();
+
+            ChiTietDonHang ctdh = new ChiTietDonHang();
+            ctdh.setChiTietSanPham(ctsp);
+            ctdh.setGiaSanPham(giaSauGiamSanPham);
+            ctdh.setGiamGia(0d);
+            ctdh.setGiaGiam(0d);
+            ctdh.setSoLuong(item.getSoLuong());
+            ctdh.setThanhTien(thanhTien);
+
+            chiTietDonHangs.add(ctdh);
+            tongTien += (int) thanhTien;
+        }
+
+        donHang.setTongTien(tongTien);
+        donHang.setTienGiam(0);
+        donHang.setTongTienGiam(0);
+        donHang.setTongTienTra(tongTien);
+
+        DonHang saved = donHangRepository.save(donHang);
+
+        for (ChiTietDonHang ct : chiTietDonHangs) {
+            ct.setDonHang(saved);
+        }
+        chiTietDonHangRepository.saveAll(chiTietDonHangs);
+
+        apDungKhuyenMaiTheoHoaDon(saved, req.getMaKhuyenMaiHoaDon());
+        apDungKhuyenMaiTheoDiem(saved, khachHang, req.getMaKhuyenMaiDiem());
+        phanBoGiamGiaToanDonChoChiTiet(saved, chiTietDonHangs);
+
+        donHangRepository.save(saved);
+        chiTietDonHangRepository.saveAll(chiTietDonHangs);
 
         // Trừ số lượng sản phẩm từ chi tiết đơn hàng
-        if (saved.getChiTietDonHangs() != null && !saved.getChiTietDonHangs().isEmpty()) {
-            truSoLuongSanPham(saved.getChiTietDonHangs());
-        }
+        truSoLuongSanPham(chiTietDonHangs);
 
-        return saved;
+        entityManager.flush();
+        entityManager.clear();
+        return donHangRepository.findById(saved.getId()).orElse(saved);
     }
 
     /**
@@ -685,6 +767,7 @@ public class DonHangService {
         dto.setId(donHang.getId());
         dto.setDiaChi(donHang.getDiaChi());
         dto.setSdt(donHang.getSdt());
+        dto.setTenNguoiMua(donHang.getTenNguoiMua());
         dto.setTongTien(donHang.getTongTien());
         dto.setTienGiam(donHang.getTienGiam());
         dto.setTongTienGiam(donHang.getTongTienGiam());
