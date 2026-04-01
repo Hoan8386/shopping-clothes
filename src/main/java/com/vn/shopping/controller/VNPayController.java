@@ -1,6 +1,9 @@
 package com.vn.shopping.controller;
 
 import com.vn.shopping.domain.request.ReqCreateVNPayPaymentDTO;
+import com.vn.shopping.domain.response.ResDonHangDTO;
+import com.vn.shopping.service.DonHangService;
+import com.vn.shopping.service.GioHangNhanVienService;
 import com.vn.shopping.service.VNPayService;
 import com.vn.shopping.util.anotation.ApiMessage;
 import com.vn.shopping.util.error.IdInvalidException;
@@ -21,9 +24,16 @@ import java.util.Map;
 public class VNPayController {
 
     private final VNPayService vnpayService;
+    private final GioHangNhanVienService gioHangNhanVienService;
+    private final DonHangService donHangService;
 
-    public VNPayController(VNPayService vnpayService) {
+    public VNPayController(
+            VNPayService vnpayService,
+            GioHangNhanVienService gioHangNhanVienService,
+            DonHangService donHangService) {
         this.vnpayService = vnpayService;
+        this.gioHangNhanVienService = gioHangNhanVienService;
+        this.donHangService = donHangService;
     }
 
     @PostMapping("/create-payment-url")
@@ -49,6 +59,29 @@ public class VNPayController {
     public ResponseEntity<Map<String, String>> handleVNPayReturn(
             @RequestParam Map<String, String> params) throws IdInvalidException {
         Map<String, String> data = vnpayService.processReturn(params);
+
+        String txnRef = data.getOrDefault("vnp_TxnRef", "");
+        boolean success = "true".equalsIgnoreCase(data.getOrDefault("success", "false"));
+
+        if (success && vnpayService.isStaffCartTxnRef(txnRef)) {
+            ResDonHangDTO donHang = gioHangNhanVienService.hoanTatThanhToanVNPayTuCallback(
+                    txnRef,
+                    data.getOrDefault("vnp_TransactionNo", ""));
+
+            data.put("donHangId", String.valueOf(donHang.getId()));
+            data.put("paymentRef", donHang.getPaymentRef() != null ? donHang.getPaymentRef() : "");
+        }
+
+        if (success && vnpayService.isOnlineCartTxnRef(txnRef)) {
+            ResDonHangDTO donHang = donHangService.convertToDTO(
+                    donHangService.hoanTatDonHangOnlineTuCallback(
+                            txnRef,
+                            data.getOrDefault("vnp_TransactionNo", "")));
+
+            data.put("donHangId", String.valueOf(donHang.getId()));
+            data.put("paymentRef", donHang.getPaymentRef() != null ? donHang.getPaymentRef() : "");
+        }
+
         return ResponseEntity.ok(data);
     }
 }

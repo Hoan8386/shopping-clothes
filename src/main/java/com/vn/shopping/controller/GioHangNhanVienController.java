@@ -1,6 +1,8 @@
 package com.vn.shopping.controller;
 
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import com.vn.shopping.domain.request.ReqCapNhatKhachGioHangNhanVienDTO;
 import com.vn.shopping.domain.request.ReqCapNhatKhuyenMaiGioHangNhanVienDTO;
@@ -45,6 +49,13 @@ public class GioHangNhanVienController {
     public ResponseEntity<ResGioHangNhanVienDTO> getDraftCartById(@PathVariable("id") Long id)
             throws IdInvalidException {
         return ResponseEntity.ok(gioHangNhanVienService.getDraftCartById(id));
+    }
+
+    @DeleteMapping("/{id}")
+    @ApiMessage("Xóa giỏ hàng nháp của nhân viên")
+    public ResponseEntity<Void> xoaDraftCart(@PathVariable("id") Long id) throws IdInvalidException {
+        gioHangNhanVienService.xoaDraftCart(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/moi")
@@ -101,11 +112,27 @@ public class GioHangNhanVienController {
     }
 
     @PostMapping("/thanh-toan")
-    @ApiMessage("Thanh toán giỏ hàng nhân viên và tạo đơn hàng")
+    @ApiMessage("Thanh toán tiền mặt cho giỏ hàng nhân viên và tạo đơn hàng")
     public ResponseEntity<ResDonHangDTO> thanhToan(
             @RequestBody ReqThanhToanGioHangNhanVienDTO req,
             @RequestParam(required = false) Long cartId)
             throws IdInvalidException {
         return ResponseEntity.ok(gioHangNhanVienService.thanhToan(req, cartId));
+    }
+
+    @PostMapping("/thanh-toan/vnpay-url")
+    @ApiMessage("Tạo URL thanh toán VNPAY cho giỏ hàng nhân viên, chưa tạo đơn")
+    public ResponseEntity<Map<String, String>> taoLinkThanhToanVNPay(
+            @RequestParam(required = false) Long cartId,
+            HttpServletRequest request) throws IdInvalidException {
+        String forwardedFor = request.getHeader("X-Forwarded-For");
+        String ipAddr = (forwardedFor != null && !forwardedFor.isBlank())
+                ? forwardedFor.split(",")[0].trim()
+                : request.getRemoteAddr();
+
+        String paymentUrl = gioHangNhanVienService.taoLinkThanhToanVNPay(cartId, ipAddr);
+        Map<String, String> data = new HashMap<>();
+        data.put("paymentUrl", paymentUrl);
+        return ResponseEntity.ok(data);
     }
 }

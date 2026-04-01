@@ -789,3 +789,113 @@
     INSERT INTO ChiTietDoiHang (MaDoiHang, MaSanPhamTra, MaSanPhamDoi, GhiTru, TrangThai, NgayTao) VALUES
         (1, 6, 2, 'Size M hơi chật, đổi sang L', 0, NOW()),   -- Đổi CTDH 6 (Áo Trắng M) lấy CTSP 2 (Áo Trắng L), chờ xử lý
         (2, 4, 1, 'Đổi kiểu khác', 1, NOW());   -- Đổi CTDH 4 (Váy Hoa) lấy CTSP 1 (Áo Trắng M), đã duyệt
+
+    -- ---------------------------------------------------------
+    -- 42. BỔ SUNG QUYỀN CHO LUỒNG VNPAY MỚI + XÓA GIỎ NV
+    -- ---------------------------------------------------------
+    INSERT INTO permissions (name, apiPath, method, module, createdAt)
+    SELECT 'Tạo link VNPAY cho giỏ hàng nhân viên', '/api/v1/gio-hang-nhan-vien/thanh-toan/vnpay-url', 'POST', 'GIO_HANG_NHAN_VIEN', NOW()
+    WHERE NOT EXISTS (
+        SELECT 1 FROM permissions
+        WHERE apiPath = '/api/v1/gio-hang-nhan-vien/thanh-toan/vnpay-url' AND method = 'POST'
+    );
+
+    INSERT INTO permissions (name, apiPath, method, module, createdAt)
+    SELECT 'Tạo link VNPAY cho checkout online', '/api/v1/don-hang/online/vnpay-url', 'POST', 'DON_HANG', NOW()
+    WHERE NOT EXISTS (
+        SELECT 1 FROM permissions
+        WHERE apiPath = '/api/v1/don-hang/online/vnpay-url' AND method = 'POST'
+    );
+
+    INSERT INTO permissions (name, apiPath, method, module, createdAt)
+    SELECT 'Xóa giỏ hàng nhân viên nháp', '/api/v1/gio-hang-nhan-vien/{id}', 'DELETE', 'GIO_HANG_NHAN_VIEN', NOW()
+    WHERE NOT EXISTS (
+        SELECT 1 FROM permissions
+        WHERE apiPath = '/api/v1/gio-hang-nhan-vien/{id}' AND method = 'DELETE'
+    );
+
+    -- ADMIN + NHAN_VIEN cho endpoint staff VNPAY URL
+    INSERT INTO permission_role (role_id, permission_id)
+    SELECT roles.role_id, p.id
+    FROM permissions p
+    JOIN (
+        SELECT 1 AS role_id
+        UNION ALL SELECT 2 AS role_id
+    ) roles
+    WHERE p.apiPath = '/api/v1/gio-hang-nhan-vien/thanh-toan/vnpay-url'
+      AND p.method = 'POST'
+      AND NOT EXISTS (
+          SELECT 1 FROM permission_role pr
+          WHERE pr.role_id = roles.role_id AND pr.permission_id = p.id
+      );
+
+    -- ADMIN + NHAN_VIEN cho endpoint xóa draft cart
+    INSERT INTO permission_role (role_id, permission_id)
+    SELECT roles.role_id, p.id
+    FROM permissions p
+    JOIN (
+        SELECT 1 AS role_id
+        UNION ALL SELECT 2 AS role_id
+    ) roles
+    WHERE p.apiPath = '/api/v1/gio-hang-nhan-vien/{id}'
+      AND p.method = 'DELETE'
+      AND NOT EXISTS (
+          SELECT 1 FROM permission_role pr
+          WHERE pr.role_id = roles.role_id AND pr.permission_id = p.id
+      );
+
+    -- ADMIN + KHACH_HANG cho endpoint online VNPAY URL
+    INSERT INTO permission_role (role_id, permission_id)
+    SELECT roles.role_id, p.id
+    FROM permissions p
+    JOIN (
+        SELECT 1 AS role_id
+        UNION ALL SELECT 3 AS role_id
+    ) roles
+    WHERE p.apiPath = '/api/v1/don-hang/online/vnpay-url'
+      AND p.method = 'POST'
+      AND NOT EXISTS (
+          SELECT 1 FROM permission_role pr
+          WHERE pr.role_id = roles.role_id AND pr.permission_id = p.id
+      );
+
+    -- ---------------------------------------------------------
+    -- 43. ĐỒNG BỘ QUYỀN TRA CỨU KH + GIỎ HÀNG NHÂN VIÊN (IDEMPOTENT)
+    -- ---------------------------------------------------------
+    INSERT INTO permissions (name, apiPath, method, module, createdAt)
+    SELECT src.name, src.apiPath, src.method, src.module, NOW()
+    FROM (
+        SELECT 'Tra cứu khách hàng theo SĐT' AS name, '/api/v1/khach-hang/lookup' AS apiPath, 'GET' AS method, 'KHACH_HANG' AS module
+        UNION ALL SELECT 'Xem danh sách giỏ hàng NV chưa thanh toán', '/api/v1/gio-hang-nhan-vien/danh-sach', 'GET', 'GIO_HANG_NHAN_VIEN'
+        UNION ALL SELECT 'Xem chi tiết giỏ hàng NV', '/api/v1/gio-hang-nhan-vien/{id}', 'GET', 'GIO_HANG_NHAN_VIEN'
+        UNION ALL SELECT 'Tạo giỏ hàng nhân viên mới', '/api/v1/gio-hang-nhan-vien/moi', 'POST', 'GIO_HANG_NHAN_VIEN'
+        UNION ALL SELECT 'Xem giỏ hàng nhân viên hiện tại', '/api/v1/gio-hang-nhan-vien/hien-tai', 'GET', 'GIO_HANG_NHAN_VIEN'
+        UNION ALL SELECT 'Cập nhật thông tin khách giỏ NV', '/api/v1/gio-hang-nhan-vien/thong-tin-khach', 'PUT', 'GIO_HANG_NHAN_VIEN'
+        UNION ALL SELECT 'Thêm sản phẩm vào giỏ NV', '/api/v1/gio-hang-nhan-vien/them-san-pham', 'POST', 'GIO_HANG_NHAN_VIEN'
+        UNION ALL SELECT 'Cập nhật chi tiết giỏ NV', '/api/v1/gio-hang-nhan-vien/chi-tiet/{id}', 'PUT', 'GIO_HANG_NHAN_VIEN'
+        UNION ALL SELECT 'Xóa chi tiết giỏ NV', '/api/v1/gio-hang-nhan-vien/chi-tiet/{id}', 'DELETE', 'GIO_HANG_NHAN_VIEN'
+        UNION ALL SELECT 'Cập nhật khuyến mãi giỏ NV', '/api/v1/gio-hang-nhan-vien/khuyen-mai', 'PUT', 'GIO_HANG_NHAN_VIEN'
+        UNION ALL SELECT 'Thanh toán giỏ hàng nhân viên', '/api/v1/gio-hang-nhan-vien/thanh-toan', 'POST', 'GIO_HANG_NHAN_VIEN'
+        UNION ALL SELECT 'Tạo link VNPAY cho giỏ hàng nhân viên', '/api/v1/gio-hang-nhan-vien/thanh-toan/vnpay-url', 'POST', 'GIO_HANG_NHAN_VIEN'
+        UNION ALL SELECT 'Xóa giỏ hàng nhân viên nháp', '/api/v1/gio-hang-nhan-vien/{id}', 'DELETE', 'GIO_HANG_NHAN_VIEN'
+    ) src
+    LEFT JOIN permissions p
+        ON p.apiPath = src.apiPath AND p.method = src.method
+    WHERE p.id IS NULL;
+
+    -- Gán quyền ADMIN + NHAN_VIEN cho toàn bộ endpoint lookup + giỏ hàng nhân viên
+    INSERT INTO permission_role (role_id, permission_id)
+    SELECT roles.role_id, p.id
+    FROM permissions p
+    JOIN (
+        SELECT 1 AS role_id
+        UNION ALL SELECT 2 AS role_id
+    ) roles
+    WHERE (
+        p.apiPath = '/api/v1/khach-hang/lookup'
+        OR p.apiPath LIKE '/api/v1/gio-hang-nhan-vien%'
+    )
+      AND NOT EXISTS (
+          SELECT 1 FROM permission_role pr
+          WHERE pr.role_id = roles.role_id AND pr.permission_id = p.id
+      );

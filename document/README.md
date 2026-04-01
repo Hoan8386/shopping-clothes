@@ -43,6 +43,15 @@ Tài liệu này đã được rà soát lại theo mã nguồn backend hiện t
 | 28  | Đổi hàng                        | [28_DoiHang.md](28_DoiHang.md)                                       |
 | 29  | Loại đơn luân chuyển            | [29_LoaiDonLuanChuyen.md](29_LoaiDonLuanChuyen.md)                   |
 | 30  | Thanh toán VNPay                | [30_VNPay.md](30_VNPay.md)                                           |
+| 31  | Ca làm việc                     | [31_CaLamViec.md](31_CaLamViec.md)                                   |
+| 32  | Lịch làm việc                   | [32_LichLamViec.md](32_LichLamViec.md)                               |
+| 33  | Chi tiết lịch làm               | [33_ChiTietLichLam.md](33_ChiTietLichLam.md)                         |
+| 34  | Lương cơ bản                    | [34_LuongCoban.md](34_LuongCoban.md)                                 |
+| 35  | Lương thưởng                    | [35_LuongThuong.md](35_LuongThuong.md)                               |
+| 36  | Đổi ca                          | [36_DoiCa.md](36_DoiCa.md)                                           |
+| 37  | Lỗi phát sinh                   | [37_LoiPhatSinh.md](37_LoiPhatSinh.md)                               |
+| 38  | Giỏ hàng nhân viên              | [38_GioHangNhanVien.md](38_GioHangNhanVien.md)                       |
+| 39  | Tra cứu khách hàng              | [39_KhachHangLookup.md](39_KhachHangLookup.md)                       |
 
 ---
 
@@ -119,6 +128,25 @@ Lưu ý: quyền truy cập thật sự phụ thuộc vào bảng `Permission (a
 - `DELETE /api/v1/gio-hang/chi-tiet/{maChiTietGioHang}`
 - `GET /api/v1/gio-hang/khuyen-mai-hop-le`
 - `POST /api/v1/gio-hang/ap-dung-khuyen-mai`
+
+### GioHangNhanVienController (`/api/v1/gio-hang-nhan-vien`)
+
+- `GET /api/v1/gio-hang-nhan-vien/danh-sach`
+- `GET /api/v1/gio-hang-nhan-vien/{id}`
+- `DELETE /api/v1/gio-hang-nhan-vien/{id}`
+- `POST /api/v1/gio-hang-nhan-vien/moi`
+- `GET /api/v1/gio-hang-nhan-vien/hien-tai`
+- `PUT /api/v1/gio-hang-nhan-vien/thong-tin-khach`
+- `POST /api/v1/gio-hang-nhan-vien/them-san-pham`
+- `PUT /api/v1/gio-hang-nhan-vien/chi-tiet/{id}`
+- `DELETE /api/v1/gio-hang-nhan-vien/chi-tiet/{id}`
+- `PUT /api/v1/gio-hang-nhan-vien/khuyen-mai`
+- `POST /api/v1/gio-hang-nhan-vien/thanh-toan`
+- `POST /api/v1/gio-hang-nhan-vien/thanh-toan/vnpay-url`
+
+### KhachHangLookupController (`/api/v1/khach-hang`)
+
+- `GET /api/v1/khach-hang/lookup`
 
 ### PhieuNhapController (`/api/v1/phieu-nhap`)
 
@@ -305,9 +333,78 @@ Lưu ý: quyền truy cập thật sự phụ thuộc vào bảng `Permission (a
 - `POST /api/v1/doi-hang`
 - `PUT /api/v1/doi-hang/{id}/trang-thai`
 
+### CaLamViecController (`/api/v1/ca-lam-viec`)
+
+- `GET /api/v1/ca-lam-viec`
+- `GET /api/v1/ca-lam-viec/{id}`
+- `POST /api/v1/ca-lam-viec`
+- `PUT /api/v1/ca-lam-viec`
+- `DELETE /api/v1/ca-lam-viec/{id}`
+
+### LichLamViecController (`/api/v1/lich-lam-viec`)
+
+- `GET /api/v1/lich-lam-viec`
+- `GET /api/v1/lich-lam-viec/{id}`
+- `GET /api/v1/lich-lam-viec/nhan-vien/{nhanVienId}`
+- `GET /api/v1/lich-lam-viec/cua-hang/{cuaHangId}`
+- `GET /api/v1/lich-lam-viec/cua-hang/{cuaHangId}/thang`
+- `PUT /api/v1/lich-lam-viec/cua-hang/{cuaHangId}/ngay/trang-thai`
+- `POST /api/v1/lich-lam-viec/cua-hang/{cuaHangId}/ngay/ca-lam-viec`
+- `DELETE /api/v1/lich-lam-viec/cua-hang/{cuaHangId}/ngay/ca-lam-viec`
+- `POST /api/v1/lich-lam-viec`
+- `PUT /api/v1/lich-lam-viec`
+- `DELETE /api/v1/lich-lam-viec/{id}`
+- `POST /api/v1/lich-lam-viec/cua-hang/{cuaHangId}/import` (multipart/form-data)
+- `GET /api/v1/lich-lam-viec/cua-hang/{cuaHangId}/download-template`
+
+### ChiTietLichLamController (`/api/v1/chi-tiet-lich-lam`)
+
+- `GET /api/v1/chi-tiet-lich-lam`
+- `GET /api/v1/chi-tiet-lich-lam/{id}`
+- `GET /api/v1/chi-tiet-lich-lam/lich-lam-viec/{lichLamViecId}`
+- `POST /api/v1/chi-tiet-lich-lam`
+- `PUT /api/v1/chi-tiet-lich-lam`
+- `DELETE /api/v1/chi-tiet-lich-lam/{id}`
+
+### LuongCobanController (`/api/v1/luong-co-ban`)
+
+- `GET /api/v1/luong-co-ban`
+- `GET /api/v1/luong-co-ban/{id}`
+- `GET /api/v1/luong-co-ban/nhan-vien/{nhanVienId}`
+- `POST /api/v1/luong-co-ban`
+- `PUT /api/v1/luong-co-ban`
+
+### LuongThuongController (`/api/v1/luong-thuong`)
+
+- `GET /api/v1/luong-thuong`
+- `GET /api/v1/luong-thuong/{id}`
+- `GET /api/v1/luong-thuong/nhan-vien/{nhanVienId}`
+- `POST /api/v1/luong-thuong`
+- `PUT /api/v1/luong-thuong`
+- `DELETE /api/v1/luong-thuong/{id}`
+
+### DoiCaController (`/api/v1/doi-ca`)
+
+- `GET /api/v1/doi-ca`
+- `GET /api/v1/doi-ca/{id}`
+- `GET /api/v1/doi-ca/lich-lam-viec/{lichLamViecId}`
+- `POST /api/v1/doi-ca`
+- `PUT /api/v1/doi-ca`
+- `DELETE /api/v1/doi-ca/{id}`
+
+### LoiPhatSinhController (`/api/v1/loi-phat-sinh`)
+
+- `GET /api/v1/loi-phat-sinh`
+- `GET /api/v1/loi-phat-sinh/{id}`
+- `GET /api/v1/loi-phat-sinh/lich-lam-viec/{lichLamViecId}`
+- `POST /api/v1/loi-phat-sinh`
+- `PUT /api/v1/loi-phat-sinh`
+- `DELETE /api/v1/loi-phat-sinh/{id}`
+
 ### VNPayController (`/api/v1/auth/vnpay`)
 
 - `POST /api/v1/auth/vnpay/create-payment-url`
+- `GET /api/v1/auth/vnpay/return`
 
 ---
 

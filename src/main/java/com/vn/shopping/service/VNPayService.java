@@ -1,6 +1,7 @@
 package com.vn.shopping.service;
 
 import com.vn.shopping.domain.DonHang;
+import com.vn.shopping.domain.request.ReqTaoDonHangDTO;
 import com.vn.shopping.repository.DonHangRepository;
 import com.vn.shopping.util.error.IdInvalidException;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,9 +15,31 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class VNPayService {
+
+    private static final String STAFF_CART_TXN_PREFIX = "GHNV_";
+    private static final String ONLINE_CART_TXN_PREFIX = "GHKH_";
+
+    public static class PendingOnlineCheckout {
+        private final String customerEmail;
+        private final ReqTaoDonHangDTO request;
+
+        public PendingOnlineCheckout(String customerEmail, ReqTaoDonHangDTO request) {
+            this.customerEmail = customerEmail;
+            this.request = request;
+        }
+
+        public String getCustomerEmail() {
+            return customerEmail;
+        }
+
+        public ReqTaoDonHangDTO getRequest() {
+            return request;
+        }
+    }
 
     @Value("${VNPAY_TMN_CODE:}")
     private String vnpTmnCode;
@@ -30,7 +53,11 @@ public class VNPayService {
     @Value("${VNPAY_RETURN_URL:}")
     private String vnpReturnUrl;
 
+    @Value("${VNPAY_RETURN_URL_STAFF:http://localhost:3000/staff/orders}")
+    private String vnpStaffReturnUrl;
+
     private final DonHangRepository donHangRepository;
+    private final Map<String, PendingOnlineCheckout> pendingOnlineCheckoutMap = new ConcurrentHashMap<>();
 
     public VNPayService(DonHangRepository donHangRepository) {
         this.donHangRepository = donHangRepository;
@@ -61,6 +88,95 @@ public class VNPayService {
                 ? donHang.getPaymentRef()
                 : String.valueOf(donHang.getId());
 
+        return buildPaymentUrl(txnRef, tongTien, "Thanh toan don hang #" + donHang.getId(), ipAddr, null);
+    }
+
+    public String createPaymentUrlForStaffCart(Long cartId, int tongTien, String ipAddr) throws IdInvalidException {
+        if (cartId == null) {
+            throw new IdInvalidException("Mã giỏ hàng không được để trống");
+        }
+        if (tongTien <= 0) {
+            throw new IdInvalidException("Giỏ hàng không hợp lệ để thanh toán VNPAY");
+        }
+
+        String txnRef = STAFF_CART_TXN_PREFIX + cartId + "_" + System.currentTimeMillis();
+        return buildPaymentUrl(
+                txnRef,
+                tongTien,
+                "Thanh toan gio hang tai quay #" + cartId,
+                ipAddr,
+                vnpStaffReturnUrl);
+    }
+
+    public String createPaymentUrlForOnlineCart(Long cartId, int tongTien, String ipAddr) throws IdInvalidException {
+        if (cartId == null) {
+            throw new IdInvalidException("Mã giỏ hàng không được để trống");
+        }
+        if (tongTien <= 0) {
+            throw new IdInvalidException("Giỏ hàng không hợp lệ để thanh toán VNPAY");
+        }
+
+        String txnRef = ONLINE_CART_TXN_PREFIX + cartId + "_" + System.currentTimeMillis();
+        return buildPaymentUrl(txnRef, tongTien, "Thanh toan gio hang online #" + cartId, ipAddr, null);
+    }
+
+    public String createPaymentUrlForOnlineCartWithPending(Long cartId, int tongTien, String ipAddr,
+            String customerEmail, ReqTaoDonHangDTO req) throws IdInvalidException {
+        if (cartId == null) {
+            throw new IdInvalidException("Mã giỏ hàng không được để trống");
+        }
+        if (tongTien <= 0) {
+            throw new IdInvalidException("Giỏ hàng không hợp lệ để thanh toán VNPAY");
+        }
+
+        String txnRef = ONLINE_CART_TXN_PREFIX + cartId + "_" + System.currentTimeMillis();
+        pendingOnlineCheckoutMap.put(txnRef, new PendingOnlineCheckout(customerEmail, req));
+        return buildPaymentUrl(txnRef, tongTien, "Thanh toan gio hang online #" + cartId, ipAddr, null);
+    }
+
+    public void putPendingOnlineCheckout(String txnRef, String customerEmail, ReqTaoDonHangDTO req) {
+        pendingOnlineCheckoutMap.put(txnRef, new PendingOnlineCheckout(customerEmail, req));
+    }
+
+    public PendingOnlineCheckout consumePendingOnlineCheckout(String txnRef) {
+        return pendingOnlineCheckoutMap.remove(txnRef);
+    }
+
+    public boolean isStaffCartTxnRef(String txnRef) {
+        return txnRef != null && txnRef.startsWith(STAFF_CART_TXN_PREFIX);
+    }
+
+    public boolean isOnlineCartTxnRef(String txnRef) {
+        return txnRef != null && txnRef.startsWith(ONLINE_CART_TXN_PREFIX);
+    }
+
+    public Long extractStaffCartId(String txnRef) throws IdInvalidException {
+        if (!isStaffCartTxnRef(txnRef)) {
+            throw new IdInvalidException("Mã tham chiếu không phải của giỏ hàng nhân viên");
+        }
+
+        String raw = txnRef.substring(STAFF_CART_TXN_PREFIX.length());
+        String[] parts = raw.split("_");
+        if (parts.length < 1 || parts[0].isBlank()) {
+            throw new IdInvalidException("Mã tham chiếu giỏ hàng không hợp lệ");
+        }
+
+        try {
+            return Long.parseLong(parts[0]);
+        } catch (NumberFormatException e) {
+            throw new IdInvalidException("Không đọc được mã giỏ hàng từ tham chiếu VNPAY");
+        }
+    }
+
+    private String buildPaymentUrl(String txnRef, long tongTien, String orderInfo, String ipAddr, String returnUrl)
+            throws IdInvalidException {
+        String effectiveReturnUrl = (returnUrl != null && !returnUrl.isBlank()) ? returnUrl : vnpReturnUrl;
+
+        if (vnpTmnCode == null || vnpTmnCode.isBlank() || vnpHashSecret == null || vnpHashSecret.isBlank()
+                || vnpUrl == null || vnpUrl.isBlank() || effectiveReturnUrl == null || effectiveReturnUrl.isBlank()) {
+            throw new IdInvalidException("Cấu hình VNPAY chưa đầy đủ");
+        }
+
         // VNPay expects Vietnam local time (UTC+7).
         // Do not use "Etc/GMT+7" because its sign is inverted (actually UTC-7).
         TimeZone tz = TimeZone.getTimeZone(ZoneId.of("Asia/Ho_Chi_Minh"));
@@ -78,10 +194,10 @@ public class VNPayService {
         vnpParams.put("vnp_Amount", String.valueOf(tongTien * 100));
         vnpParams.put("vnp_CurrCode", "VND");
         vnpParams.put("vnp_TxnRef", txnRef);
-        vnpParams.put("vnp_OrderInfo", "Thanh toan don hang #" + donHang.getId());
+        vnpParams.put("vnp_OrderInfo", orderInfo);
         vnpParams.put("vnp_OrderType", "other");
         vnpParams.put("vnp_Locale", "vn");
-        vnpParams.put("vnp_ReturnUrl", vnpReturnUrl);
+        vnpParams.put("vnp_ReturnUrl", effectiveReturnUrl);
         vnpParams.put("vnp_IpAddr", (ipAddr == null || ipAddr.isBlank()) ? "127.0.0.1" : ipAddr);
         vnpParams.put("vnp_CreateDate", createDate);
         vnpParams.put("vnp_ExpireDate", expireDate);
@@ -143,11 +259,26 @@ public class VNPayService {
             throw new IdInvalidException("Thiếu mã tham chiếu đơn hàng (vnp_TxnRef)");
         }
 
-        DonHang donHang = findOrderByTxnRef(txnRef);
         String transactionNo = params.getOrDefault("vnp_TransactionNo", "");
         String responseCode = params.getOrDefault("vnp_ResponseCode", "");
         String transactionStatus = params.getOrDefault("vnp_TransactionStatus", "");
         boolean success = "00".equals(responseCode) && "00".equals(transactionStatus);
+
+        Map<String, String> result = new HashMap<>();
+        result.put("vnp_TxnRef", txnRef);
+        result.put("vnp_TransactionNo", transactionNo);
+        result.put("vnp_ResponseCode", responseCode);
+        result.put("vnp_TransactionStatus", transactionStatus);
+        result.put("success", String.valueOf(success));
+
+        // Cart-based VNPay flow: order is created later only when callback succeeds.
+        if (isStaffCartTxnRef(txnRef) || isOnlineCartTxnRef(txnRef)) {
+            result.put("donHangId", "");
+            result.put("paymentRef", "");
+            return result;
+        }
+
+        DonHang donHang = findOrderByTxnRef(txnRef);
 
         if (!transactionNo.isBlank()) {
             donHang.setPaymentRef(transactionNo);
@@ -158,15 +289,8 @@ public class VNPayService {
         }
 
         donHangRepository.save(donHang);
-
-        Map<String, String> result = new HashMap<>();
         result.put("donHangId", String.valueOf(donHang.getId()));
         result.put("paymentRef", donHang.getPaymentRef() != null ? donHang.getPaymentRef() : "");
-        result.put("vnp_TxnRef", txnRef);
-        result.put("vnp_TransactionNo", transactionNo);
-        result.put("vnp_ResponseCode", responseCode);
-        result.put("vnp_TransactionStatus", transactionStatus);
-        result.put("success", String.valueOf(success));
         return result;
     }
 

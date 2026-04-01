@@ -26,6 +26,7 @@ import com.vn.shopping.domain.response.ResDonHangDTO;
 import com.vn.shopping.domain.response.ResGioHangNhanVienDTO;
 import com.vn.shopping.repository.ChiTietGioHangNhanVienRepository;
 import com.vn.shopping.repository.ChiTietSanPhamRepository;
+import com.vn.shopping.repository.DonHangRepository;
 import com.vn.shopping.repository.GioHangNhanVienRepository;
 import com.vn.shopping.repository.KhachHangRepository;
 import com.vn.shopping.repository.KhuyenMaiTheoDiemRepository;
@@ -44,6 +45,8 @@ public class GioHangNhanVienService {
     private final KhuyenMaiTheoHoaDonRepository khuyenMaiTheoHoaDonRepository;
     private final KhuyenMaiTheoDiemRepository khuyenMaiTheoDiemRepository;
     private final DonHangService donHangService;
+    private final VNPayService vnPayService;
+    private final DonHangRepository donHangRepository;
 
     public GioHangNhanVienService(
             GioHangNhanVienRepository gioHangNhanVienRepository,
@@ -53,7 +56,9 @@ public class GioHangNhanVienService {
             ChiTietSanPhamRepository chiTietSanPhamRepository,
             KhuyenMaiTheoHoaDonRepository khuyenMaiTheoHoaDonRepository,
             KhuyenMaiTheoDiemRepository khuyenMaiTheoDiemRepository,
-            DonHangService donHangService) {
+            DonHangService donHangService,
+            VNPayService vnPayService,
+            DonHangRepository donHangRepository) {
         this.gioHangNhanVienRepository = gioHangNhanVienRepository;
         this.chiTietGioHangNhanVienRepository = chiTietGioHangNhanVienRepository;
         this.nhanVienRepository = nhanVienRepository;
@@ -62,6 +67,8 @@ public class GioHangNhanVienService {
         this.khuyenMaiTheoHoaDonRepository = khuyenMaiTheoHoaDonRepository;
         this.khuyenMaiTheoDiemRepository = khuyenMaiTheoDiemRepository;
         this.donHangService = donHangService;
+        this.vnPayService = vnPayService;
+        this.donHangRepository = donHangRepository;
     }
 
     private NhanVien getCurrentNhanVien() throws IdInvalidException {
@@ -353,6 +360,91 @@ public class GioHangNhanVienService {
 
     @Transactional
     public ResDonHangDTO thanhToan(ReqThanhToanGioHangNhanVienDTO req, Long cartId) throws IdInvalidException {
+        int hinhThucDonHang = req.getHinhThucDonHang() != null ? req.getHinhThucDonHang() : 0;
+        if (hinhThucDonHang == 1) {
+            throw new IdInvalidException("Thanh toán VNPAY cần tạo link trước, chỉ tạo đơn sau callback thành công");
+        }
+
+        GioHangNhanVien cart = validateCartForCheckout(cartId);
+        ReqTaoDonHangTaiQuayDTO taoDonReq = buildCheckoutRequestFromCart(cart, hinhThucDonHang);
+
+        var donHang = donHangService.taoDonHangTaiQuayByNhanVienId(
+                taoDonReq,
+                cart.getNhanVien() != null ? cart.getNhanVien().getId() : null);
+
+        // Dong gio hien tai va tao gio moi khi can
+        cart.setTrangThai(1);
+        gioHangNhanVienRepository.save(cart);
+
+        return donHangService.convertToDTO(donHang);
+    }
+
+    @Transactional(readOnly = true)
+    public String taoLinkThanhToanVNPay(Long cartId, String ipAddr) throws IdInvalidException {
+        GioHangNhanVien cart = validateCartForCheckout(cartId);
+
+        int tongTienGoc = tinhTongTienGoc(cart);
+        int tienGiamHoaDon = 0;
+        int tienGiamDiem = 0;
+
+        try {
+            tienGiamHoaDon = tinhTienGiamHoaDon(cart.getMaKhuyenMaiHoaDon(), tongTienGoc);
+        } catch (IdInvalidException ex) {
+            // Ignore invalid saved promotion when generating VNPay URL and continue with
+            // remaining valid discounts.
+            tienGiamHoaDon = 0;
+        }
+
+        try {
+            tienGiamDiem = tinhTienGiamDiem(cart.getMaKhuyenMaiDiem(), cart.getKhachHang(), tongTienGoc);
+        } catch (IdInvalidException ex) {
+            // Ignore invalid saved point promotion when generating VNPay URL.
+            tienGiamDiem = 0;
+        }
+        int tongThanhToan = Math.max(tongTienGoc - tienGiamHoaDon - tienGiamDiem, 0);
+
+        if (tongThanhToan <= 0) {
+            throw new IdInvalidException("Tổng thanh toán không hợp lệ để tạo link VNPAY");
+        }
+
+        return vnPayService.createPaymentUrlForStaffCart(cart.getId(), tongThanhToan, ipAddr);
+    }
+
+    @Transactional
+    public ResDonHangDTO hoanTatThanhToanVNPayTuCallback(String txnRef, String transactionNo)
+            throws IdInvalidException {
+        Long cartId = vnPayService.extractStaffCartId(txnRef);
+
+        if (transactionNo != null && !transactionNo.isBlank()) {
+            var existingOrder = donHangRepository.findByPaymentRef(transactionNo).orElse(null);
+            if (existingOrder != null) {
+                return donHangService.convertToDTO(existingOrder);
+            }
+        }
+
+        GioHangNhanVien cart = gioHangNhanVienRepository.findById(cartId)
+                .orElseThrow(() -> new IdInvalidException("Không tìm thấy giỏ hàng: " + cartId));
+
+        if (cart.getTrangThai() != null && cart.getTrangThai() != 0) {
+            throw new IdInvalidException("Giỏ hàng đã được thanh toán trước đó");
+        }
+
+        ReqTaoDonHangTaiQuayDTO taoDonReq = buildCheckoutRequestFromCart(cart, 1);
+        var donHang = donHangService.taoDonHangTaiQuayByNhanVienId(
+                taoDonReq,
+                cart.getNhanVien() != null ? cart.getNhanVien().getId() : null);
+
+        donHang.setTrangThaiThanhToan(1);
+        donHang.setPaymentRef((transactionNo != null && !transactionNo.isBlank()) ? transactionNo : txnRef);
+        donHang = donHangService.save(donHang);
+
+        cart.setTrangThai(1);
+        gioHangNhanVienRepository.save(cart);
+
+        return donHangService.convertToDTO(donHang);
+    }
+
+    private GioHangNhanVien validateCartForCheckout(Long cartId) throws IdInvalidException {
         GioHangNhanVien cart = getCartByIdOrCurrentCart(cartId);
 
         if (cart.getChiTietGioHangs() == null || cart.getChiTietGioHangs().isEmpty()) {
@@ -367,13 +459,17 @@ public class GioHangNhanVienService {
             throw new IdInvalidException("Vui lòng nhập tên người mua trước khi thanh toán");
         }
 
+        return cart;
+    }
+
+    private ReqTaoDonHangTaiQuayDTO buildCheckoutRequestFromCart(GioHangNhanVien cart, Integer hinhThucDonHang) {
         ReqTaoDonHangTaiQuayDTO taoDonReq = new ReqTaoDonHangTaiQuayDTO();
         taoDonReq.setTenNguoiMua(cart.getTenNguoiMua());
         taoDonReq.setSdt(cart.getSdt());
         taoDonReq.setKhachHangId(cart.getKhachHang() != null ? cart.getKhachHang().getId() : null);
         taoDonReq.setMaKhuyenMaiHoaDon(cart.getMaKhuyenMaiHoaDon());
         taoDonReq.setMaKhuyenMaiDiem(cart.getMaKhuyenMaiDiem());
-        taoDonReq.setHinhThucDonHang(req.getHinhThucDonHang());
+        taoDonReq.setHinhThucDonHang(hinhThucDonHang);
 
         List<ReqTaoDonHangTaiQuayDTO.ChiTietDonTaiQuayDTO> chiTiet = new ArrayList<>();
         for (ChiTietGioHangNhanVien ct : cart.getChiTietGioHangs()) {
@@ -383,14 +479,7 @@ public class GioHangNhanVienService {
             chiTiet.add(item);
         }
         taoDonReq.setChiTietDonHangs(chiTiet);
-
-        var donHang = donHangService.taoDonHangTaiQuay(taoDonReq);
-
-        // Dong gio hien tai va tao gio moi khi can
-        cart.setTrangThai(1);
-        gioHangNhanVienRepository.save(cart);
-
-        return donHangService.convertToDTO(donHang);
+        return taoDonReq;
     }
 
     private ResGioHangNhanVienDTO toResponse(GioHangNhanVien cart) throws IdInvalidException {
@@ -482,8 +571,20 @@ public class GioHangNhanVienService {
         dto.setKhuyenMaiHoaDonHopLe(hoaDonDtos);
         dto.setKhuyenMaiDiemHopLe(diemDtos);
 
-        int tienGiamHoaDon = tinhTienGiamHoaDon(cart.getMaKhuyenMaiHoaDon(), tongTienGoc);
-        int tienGiamDiem = tinhTienGiamDiem(cart.getMaKhuyenMaiDiem(), cart.getKhachHang(), tongTienGoc);
+        int tienGiamHoaDon = 0;
+        int tienGiamDiem = 0;
+
+        try {
+            tienGiamHoaDon = tinhTienGiamHoaDon(cart.getMaKhuyenMaiHoaDon(), tongTienGoc);
+        } catch (IdInvalidException ex) {
+            dto.setMaKhuyenMaiHoaDon(null);
+        }
+
+        try {
+            tienGiamDiem = tinhTienGiamDiem(cart.getMaKhuyenMaiDiem(), cart.getKhachHang(), tongTienGoc);
+        } catch (IdInvalidException ex) {
+            dto.setMaKhuyenMaiDiem(null);
+        }
 
         dto.setTienGiamHoaDon(tienGiamHoaDon);
         dto.setTienGiamDiem(tienGiamDiem);
@@ -516,6 +617,20 @@ public class GioHangNhanVienService {
             throw new IdInvalidException("Giỏ hàng này đã thanh toán");
         }
         return toResponse(cart);
+    }
+
+    @Transactional
+    public void xoaDraftCart(Long cartId) throws IdInvalidException {
+        NhanVien nhanVien = getCurrentNhanVien();
+        GioHangNhanVien cart = gioHangNhanVienRepository
+                .findByIdAndNhanVienId(cartId, nhanVien.getId())
+                .orElseThrow(() -> new IdInvalidException("Không tìm thấy giỏ hàng: " + cartId));
+
+        if (cart.getTrangThai() != null && cart.getTrangThai() != 0) {
+            throw new IdInvalidException("Chỉ có thể xóa giỏ hàng chưa thanh toán");
+        }
+
+        gioHangNhanVienRepository.delete(cart);
     }
 
     @Transactional

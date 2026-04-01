@@ -2980,6 +2980,227 @@
 					"request": { "method": "DELETE", "header": [], "url": { "raw": "{{base_url}}/api/v1/loi-phat-sinh/1", "host": ["{{base_url}}"], "path": ["api","v1","loi-phat-sinh","1"] }, "description": "Chỉ Admin — Xóa bản ghi lỗi phát sinh" }
 				}
 			]
+		},
+		{
+			"name": "Khách Hàng Lookup (🔒 Admin/NV)",
+			"description": "Tra cứu nhanh khách hàng theo số điện thoại để dùng trong luồng bán tại quầy",
+			"item": [
+				{
+					"name": "Tra cứu khách hàng theo SĐT",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/khach-hang/lookup?sdt=0911000001",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"khach-hang",
+								"lookup"
+							],
+							"query": [
+								{
+									"key": "sdt",
+									"value": "0911000001"
+								}
+							]
+						},
+						"description": "Admin/NV — Tra cứu thông tin khách hàng theo số điện thoại"
+					}
+				}
+			]
+		},
+		{
+			"name": "Giỏ Hàng Nhân Viên (🔒 Admin/NV)",
+			"description": "Luồng bán tại quầy: tạo giỏ nháp, thêm sản phẩm, áp khuyến mãi và thanh toán",
+			"item": [
+				{
+					"name": "Lấy danh sách giỏ nháp",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/gio-hang-nhan-vien/danh-sach",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "gio-hang-nhan-vien", "danh-sach"]
+						},
+						"description": "Admin/NV — Lấy các giỏ hàng nháp chưa thanh toán"
+					}
+				},
+				{
+					"name": "Lấy giỏ hiện tại",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/gio-hang-nhan-vien/hien-tai",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "gio-hang-nhan-vien", "hien-tai"]
+						},
+						"description": "Admin/NV — Lấy giỏ hiện tại của nhân viên"
+					}
+				},
+				{
+					"name": "Tạo giỏ mới",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/gio-hang-nhan-vien/moi",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "gio-hang-nhan-vien", "moi"]
+						},
+						"description": "Admin/NV — Tạo giỏ nháp mới để tạo đơn tại quầy"
+					}
+				},
+				{
+					"name": "Lấy chi tiết giỏ theo id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/gio-hang-nhan-vien/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "gio-hang-nhan-vien", "1"]
+						},
+						"description": "Admin/NV — Xem chi tiết giỏ nháp theo ID"
+					}
+				},
+				{
+					"name": "Cập nhật thông tin khách",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tenNguoiMua\": \"Nguyen Van A\",\n    \"sdt\": \"0911000001\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/gio-hang-nhan-vien/thong-tin-khach?cartId=1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "gio-hang-nhan-vien", "thong-tin-khach"],
+							"query": [{ "key": "cartId", "value": "1" }]
+						},
+						"description": "Admin/NV — Cập nhật người mua cho giỏ hàng nhân viên"
+					}
+				},
+				{
+					"name": "Thêm sản phẩm vào giỏ",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"chiTietSanPhamId\": 1,\n    \"maVach\": null,\n    \"soLuong\": 2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/gio-hang-nhan-vien/them-san-pham?cartId=1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "gio-hang-nhan-vien", "them-san-pham"],
+							"query": [{ "key": "cartId", "value": "1" }]
+						},
+						"description": "Admin/NV — Thêm sản phẩm vào giỏ nháp"
+					}
+				},
+				{
+					"name": "Cập nhật số lượng dòng sản phẩm",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"soLuong\": 3\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/gio-hang-nhan-vien/chi-tiet/1?cartId=1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "gio-hang-nhan-vien", "chi-tiet", "1"],
+							"query": [{ "key": "cartId", "value": "1" }]
+						},
+						"description": "Admin/NV — Cập nhật số lượng của một dòng trong giỏ"
+					}
+				},
+				{
+					"name": "Xóa dòng sản phẩm khỏi giỏ",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/gio-hang-nhan-vien/chi-tiet/1?cartId=1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "gio-hang-nhan-vien", "chi-tiet", "1"],
+							"query": [{ "key": "cartId", "value": "1" }]
+						},
+						"description": "Admin/NV — Xóa một dòng sản phẩm trong giỏ"
+					}
+				},
+				{
+					"name": "Cập nhật khuyến mãi",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"maKhuyenMaiHoaDon\": 1,\n    \"maKhuyenMaiDiem\": null\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/gio-hang-nhan-vien/khuyen-mai?cartId=1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "gio-hang-nhan-vien", "khuyen-mai"],
+							"query": [{ "key": "cartId", "value": "1" }]
+						},
+						"description": "Admin/NV — Áp dụng hoặc thay đổi khuyến mãi của giỏ"
+					}
+				},
+				{
+					"name": "Thanh toán giỏ nhân viên",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"hinhThucDonHang\": 0\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/gio-hang-nhan-vien/thanh-toan?cartId=1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "gio-hang-nhan-vien", "thanh-toan"],
+							"query": [{ "key": "cartId", "value": "1" }]
+						},
+						"description": "Admin/NV — Thanh toán giỏ và tạo đơn hàng"
+					}
+				},
+				{
+					"name": "Tạo link VNPAY cho giỏ nhân viên",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/gio-hang-nhan-vien/thanh-toan/vnpay-url?cartId=1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "gio-hang-nhan-vien", "thanh-toan", "vnpay-url"],
+							"query": [{ "key": "cartId", "value": "1" }]
+						},
+						"description": "Admin/NV — Tạo URL VNPAY, chưa tạo đơn"
+					}
+				},
+				{
+					"name": "Xóa giỏ nháp theo id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/gio-hang-nhan-vien/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "gio-hang-nhan-vien", "1"]
+						},
+						"description": "Admin/NV — Xóa giỏ hàng nháp"
+					}
+				}
+			]
 		}
 	]
 }

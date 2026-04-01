@@ -7,6 +7,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpServletRequest;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import com.vn.shopping.domain.request.ReqCapNhatDonHangDTO;
 import com.vn.shopping.domain.request.ReqTaoDonHangDTO;
 import com.vn.shopping.domain.request.ReqTaoDonHangTaiQuayDTO;
@@ -63,6 +68,22 @@ public class DonHangController {
     public ResponseEntity<ResDonHangDTO> taoDonHangOnline(@RequestBody ReqTaoDonHangDTO req) throws IdInvalidException {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(donHangService.convertToDTO(donHangService.taoDonHangOnline(req)));
+    }
+
+    @PostMapping("/online/vnpay-url")
+    @ApiMessage("Tạo URL thanh toán VNPAY cho checkout online, chưa tạo đơn")
+    public ResponseEntity<Map<String, String>> taoLinkThanhToanOnlineVNPay(
+            @RequestBody ReqTaoDonHangDTO req,
+            HttpServletRequest request) throws IdInvalidException {
+        String forwardedFor = request.getHeader("X-Forwarded-For");
+        String ipAddr = (forwardedFor != null && !forwardedFor.isBlank())
+                ? forwardedFor.split(",")[0].trim()
+                : request.getRemoteAddr();
+
+        String paymentUrl = donHangService.taoLinkThanhToanOnlineVNPay(req, ipAddr);
+        Map<String, String> data = new HashMap<>();
+        data.put("paymentUrl", paymentUrl);
+        return ResponseEntity.ok(data);
     }
 
     /**

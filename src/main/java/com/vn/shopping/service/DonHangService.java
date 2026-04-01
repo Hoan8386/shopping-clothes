@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vn.shopping.domain.*;
+import com.vn.shopping.domain.request.ReqApDungKhuyenMaiDTO;
 import com.vn.shopping.domain.request.ReqCapNhatDonHangDTO;
 import com.vn.shopping.domain.request.ReqTaoDonHangDTO;
 import com.vn.shopping.domain.request.ReqTaoDonHangTaiQuayDTO;
@@ -37,13 +38,17 @@ public class DonHangService {
     private final CuaHangRepository cuaHangRepository;
     private final KhuyenMaiTheoDiemRepository khuyenMaiTheoDiemRepository;
     private final KhuyenMaiTheoHoaDonRepository khuyenMaiTheoHoaDonRepository;
+    private final GioHangService gioHangService;
+    private final VNPayService vnPayService;
 
     public DonHangService(DonHangRepository donHangRepository, EntityManager entityManager,
             KhachHangRepository khachHangRepository, NhanVienRepository nhanVienRepository,
             GioHangRepository gioHangRepository, ChiTietDonHangRepository chiTietDonHangRepository,
             ChiTietSanPhamRepository chiTietSanPhamRepository, SanPhamRepository sanPhamRepository,
             CuaHangRepository cuaHangRepository, KhuyenMaiTheoDiemRepository khuyenMaiTheoDiemRepository,
-            KhuyenMaiTheoHoaDonRepository khuyenMaiTheoHoaDonRepository) {
+            KhuyenMaiTheoHoaDonRepository khuyenMaiTheoHoaDonRepository,
+            GioHangService gioHangService,
+            VNPayService vnPayService) {
         this.donHangRepository = donHangRepository;
         this.entityManager = entityManager;
         this.khachHangRepository = khachHangRepository;
@@ -55,6 +60,8 @@ public class DonHangService {
         this.cuaHangRepository = cuaHangRepository;
         this.khuyenMaiTheoDiemRepository = khuyenMaiTheoDiemRepository;
         this.khuyenMaiTheoHoaDonRepository = khuyenMaiTheoHoaDonRepository;
+        this.gioHangService = gioHangService;
+        this.vnPayService = vnPayService;
     }
 
     @Transactional
@@ -74,12 +81,90 @@ public class DonHangService {
      */
     @Transactional
     public DonHang taoDonHangOnline(ReqTaoDonHangDTO req) throws IdInvalidException {
-        // 1. Lấy khách hàng từ token
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        KhachHang khachHang = khachHangRepository.findByEmail(email)
+                .orElseThrow(() -> new IdInvalidException("Không tìm thấy khách hàng với email: " + email));
+        return taoDonHangOnlineTheoKhachHang(req, khachHang);
+    }
+
+    @Transactional
+    public DonHang taoDonHangOnlineByEmail(ReqTaoDonHangDTO req, String customerEmail) throws IdInvalidException {
+        if (customerEmail == null || customerEmail.isBlank()) {
+            throw new IdInvalidException("Không xác định được khách hàng để tạo đơn hàng");
+        }
+
+        KhachHang khachHang = khachHangRepository.findByEmail(customerEmail)
+                .orElseThrow(() -> new IdInvalidException("Không tìm thấy khách hàng với email: " + customerEmail));
+        return taoDonHangOnlineTheoKhachHang(req, khachHang);
+    }
+
+    @Transactional(readOnly = true)
+    public String taoLinkThanhToanOnlineVNPay(ReqTaoDonHangDTO req, String ipAddr) throws IdInvalidException {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         KhachHang khachHang = khachHangRepository.findByEmail(email)
                 .orElseThrow(() -> new IdInvalidException("Không tìm thấy khách hàng với email: " + email));
 
-        // 2. Lấy giỏ hàng
+        GioHang gioHang = gioHangRepository.findByKhachHangId(khachHang.getId())
+                .orElseThrow(() -> new IdInvalidException("Giỏ hàng trống, không thể thanh toán"));
+
+        if (gioHang.getChiTietGioHangs() == null || gioHang.getChiTietGioHangs().isEmpty()) {
+            throw new IdInvalidException("Giỏ hàng trống, không thể thanh toán");
+        }
+
+        if (req == null) {
+            throw new IdInvalidException("Thông tin thanh toán không hợp lệ");
+        }
+
+        if (req.getSdt() == null || req.getSdt().isBlank()) {
+            throw new IdInvalidException("Vui lòng nhập số điện thoại nhận hàng");
+        }
+
+        if (req.getDiaChi() == null || req.getDiaChi().isBlank()) {
+            throw new IdInvalidException("Vui lòng nhập địa chỉ giao hàng");
+        }
+
+        if (req.getHinhThucDonHang() == null || req.getHinhThucDonHang() != 1) {
+            throw new IdInvalidException("Checkout VNPAY online yêu cầu hinhThucDonHang = 1");
+        }
+
+        ReqApDungKhuyenMaiDTO previewReq = new ReqApDungKhuyenMaiDTO();
+        previewReq.setMaKhuyenMaiHoaDon(req.getMaKhuyenMaiHoaDon());
+        previewReq.setMaKhuyenMaiDiem(req.getMaKhuyenMaiDiem());
+
+        int tongThanhToan = gioHangService.xemTruocKhuyenMai(previewReq).getTongTienTra();
+        if (tongThanhToan <= 0) {
+            throw new IdInvalidException("Tổng thanh toán không hợp lệ để tạo link VNPAY");
+        }
+
+        return vnPayService.createPaymentUrlForOnlineCartWithPending(
+                gioHang.getMaGioHang(),
+                tongThanhToan,
+                ipAddr,
+                email,
+                req);
+    }
+
+    @Transactional
+    public DonHang hoanTatDonHangOnlineTuCallback(String txnRef, String transactionNo) throws IdInvalidException {
+        if (transactionNo != null && !transactionNo.isBlank()) {
+            Optional<DonHang> existingByPaymentRef = donHangRepository.findByPaymentRef(transactionNo);
+            if (existingByPaymentRef.isPresent()) {
+                return existingByPaymentRef.get();
+            }
+        }
+
+        VNPayService.PendingOnlineCheckout pending = vnPayService.consumePendingOnlineCheckout(txnRef);
+        if (pending == null) {
+            throw new IdInvalidException("Không tìm thấy phiên thanh toán online đang chờ xác nhận");
+        }
+
+        DonHang donHang = taoDonHangOnlineByEmail(pending.getRequest(), pending.getCustomerEmail());
+        donHang.setTrangThaiThanhToan(1);
+        donHang.setPaymentRef((transactionNo != null && !transactionNo.isBlank()) ? transactionNo : txnRef);
+        return save(donHang);
+    }
+
+    private DonHang taoDonHangOnlineTheoKhachHang(ReqTaoDonHangDTO req, KhachHang khachHang) throws IdInvalidException {
         GioHang gioHang = gioHangRepository.findByKhachHangId(khachHang.getId())
                 .orElseThrow(() -> new IdInvalidException("Giỏ hàng trống, không thể tạo đơn hàng"));
 
@@ -88,18 +173,16 @@ public class DonHangService {
             throw new IdInvalidException("Giỏ hàng trống, không thể tạo đơn hàng");
         }
 
-        // 3. Tạo đơn hàng
         DonHang donHang = new DonHang();
         donHang.setKhachHang(khachHang);
         donHang.setDiaChi(req.getDiaChi());
         donHang.setSdt(req.getSdt());
         donHang.setMaKhuyenMaiHoaDon(req.getMaKhuyenMaiHoaDon());
         donHang.setMaKhuyenMaiDiem(req.getMaKhuyenMaiDiem());
-        // 0 = COD/Tiền mặt, 1 = VNPAY
         Integer hinhThucThanhToan = req.getHinhThucDonHang() != null ? req.getHinhThucDonHang() : 0;
         donHang.setHinhThucDonHang(hinhThucThanhToan);
-        donHang.setTrangThai(0); // 0 = chờ xác nhận
-        donHang.setTrangThaiThanhToan(0); // 0 = chưa thanh toán
+        donHang.setTrangThai(0);
+        donHang.setTrangThaiThanhToan(0);
 
         if (req.getCuaHangId() != null) {
             CuaHang ch = cuaHangRepository.findById(req.getCuaHangId())
@@ -110,12 +193,9 @@ public class DonHangService {
         DonHang savedDonHang = donHangRepository.save(donHang);
 
         if (savedDonHang.getHinhThucDonHang() != null && savedDonHang.getHinhThucDonHang() == 1) {
-            // Theo yêu cầu VNPAY: lưu lại id đơn hàng vào payment_ref làm mã tham chiếu.
             savedDonHang.setPaymentRef(String.valueOf(savedDonHang.getId()));
         }
 
-        // 4. Tạo chi tiết đơn hàng từ giỏ hàng
-        // Giá sản phẩm ở chi tiết đơn hàng là giá đã gồm giảm của sản phẩm (nếu có).
         int tongTien = 0;
         List<ChiTietDonHang> chiTietDonHangs = new ArrayList<>();
 
@@ -143,28 +223,20 @@ public class DonHangService {
 
         chiTietDonHangRepository.saveAll(chiTietDonHangs);
 
-        // 5. Cập nhật tổng tiền đơn hàng
         savedDonHang.setTongTien(tongTien);
         savedDonHang.setTienGiam(0);
         savedDonHang.setTongTienGiam(0);
         savedDonHang.setTongTienTra(tongTien);
 
-        // 5.1. Áp dụng khuyến mãi theo hóa đơn (nếu người dùng nhập mã)
         apDungKhuyenMaiTheoHoaDon(savedDonHang, req.getMaKhuyenMaiHoaDon());
-
-        // 5.2. Áp dụng khuyến mãi theo điểm tích lũy theo mã người dùng chọn
         apDungKhuyenMaiTheoDiem(savedDonHang, khachHang, req.getMaKhuyenMaiDiem());
-
-        // 5.3. Phân bổ giảm giá toàn đơn xuống từng sản phẩm để dùng đúng khi trả hàng.
         phanBoGiamGiaToanDonChoChiTiet(savedDonHang, chiTietDonHangs);
 
         donHangRepository.save(savedDonHang);
         chiTietDonHangRepository.saveAll(chiTietDonHangs);
 
-        // 6. Trừ số lượng sản phẩm
         truSoLuongSanPham(chiTietDonHangs);
 
-        // 7. Xóa giỏ hàng sau khi tạo đơn thành công
         gioHang.getChiTietGioHangs().clear();
         gioHangRepository.save(gioHang);
 
@@ -181,10 +253,26 @@ public class DonHangService {
      */
     @Transactional
     public DonHang taoDonHangTaiQuay(ReqTaoDonHangTaiQuayDTO req) throws IdInvalidException {
-        // Lấy nhân viên từ token
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         NhanVien nhanVien = nhanVienRepository.findByEmail(email)
                 .orElseThrow(() -> new IdInvalidException("Không tìm thấy nhân viên với email: " + email));
+        return taoDonHangTaiQuayVoiNhanVien(req, nhanVien);
+    }
+
+    @Transactional
+    public DonHang taoDonHangTaiQuayByNhanVienId(ReqTaoDonHangTaiQuayDTO req, Long nhanVienId)
+            throws IdInvalidException {
+        if (nhanVienId == null) {
+            throw new IdInvalidException("Không xác định được nhân viên xử lý đơn hàng");
+        }
+
+        NhanVien nhanVien = nhanVienRepository.findById(nhanVienId)
+                .orElseThrow(() -> new IdInvalidException("Không tìm thấy nhân viên: " + nhanVienId));
+        return taoDonHangTaiQuayVoiNhanVien(req, nhanVien);
+    }
+
+    private DonHang taoDonHangTaiQuayVoiNhanVien(ReqTaoDonHangTaiQuayDTO req, NhanVien nhanVien)
+            throws IdInvalidException {
 
         if (nhanVien.getCuaHang() == null || nhanVien.getCuaHang().getId() == null) {
             throw new IdInvalidException("Nhân viên chưa được gán cửa hàng");
