@@ -1,7 +1,6 @@
     -- =============================================================
     -- INSERT DỮ LIỆU MẪU - SHOPPING DATABASE
     -- Chạy sau khi Hibernate (ddl-auto=update) đã tạo bảng
-    -- CHỈ ADMIN có toàn quyền truy cập API
     -- =============================================================
 
     CREATE DATABASE IF NOT EXISTS shopping DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -16,7 +15,7 @@
         ('KHACH_HANG', 'Khách hàng mua sắm',        TRUE, NOW());
 
     -- ---------------------------------------------------------
-    -- 2. PERMISSIONS (141 quyền cho tất cả endpoint)
+    -- 2. PERMISSIONS
     -- ---------------------------------------------------------
     INSERT INTO permissions (name, apiPath, method, module, createdAt) VALUES
         -- === SAN_PHAM (1-5) ===
@@ -512,12 +511,12 @@
     -- ---------------------------------------------------------
     -- 11. CHI TIẾT SẢN PHẨM
     -- ---------------------------------------------------------
-    INSERT INTO ChiTietSanPham (MaSanPham, MaKichThuoc, MaMauSac, MaCuaHang, TrangThai, NgayTao) VALUES
-        (1, 2, 1, 1, 1, NOW()),   -- id=1: Áo Oxford / M / Trắng / CN Q.1
-        (1, 3, 1, 1, 1, NOW()),   -- id=2: Áo Oxford / L / Trắng / CN Q.1
-        (2, 2, 2, 1, 1, NOW()),   -- id=3: Quần Jean / M / Đen / CN Q.1
-        (3, 1, 3, 2, 1, NOW()),   -- id=4: Váy Hoa   / S / Đỏ / CN Q.3
-        (4, 3, 2, 2, 1, NOW());   -- id=5: Nịt Da    / L / Đen / CN Q.3
+    INSERT INTO ChiTietSanPham (MaSanPham, MaKichThuoc, MaMauSac, MaCuaHang, SoLuong, TrangThai, NgayTao) VALUES
+        (1, 2, 1, 1, 35, 1, NOW()),   -- id=1: Còn hàng
+        (1, 3, 1, 1, 8,  1, NOW()),   -- id=2: Sắp hết (mặc định ngưỡng 10)
+        (2, 2, 2, 1, 0,  1, NOW()),   -- id=3: Đã hết
+        (3, 1, 3, 2, 12, 1, NOW()),   -- id=4: Còn hàng
+        (4, 3, 2, 2, 3,  1, NOW());   -- id=5: Sắp hết
 
     -- ---------------------------------------------------------
     -- 12. HÌNH ẢNH
@@ -898,4 +897,61 @@
       AND NOT EXISTS (
           SELECT 1 FROM permission_role pr
           WHERE pr.role_id = roles.role_id AND pr.permission_id = p.id
+      );
+
+    -- ---------------------------------------------------------
+    -- 44. DASHBOARD APIs (IDEMPOTENT) - 1 API CHO ADMIN / STAFF
+    -- ---------------------------------------------------------
+    INSERT INTO permissions (name, apiPath, method, module, createdAt)
+    SELECT src.name, src.apiPath, src.method, src.module, NOW()
+    FROM (
+        SELECT 'Dashboard Admin: Tổng quan' AS name, '/api/admin/dashboard/summary' AS apiPath,
+               'GET' AS method, 'DASHBOARD_ADMIN' AS module
+        UNION ALL SELECT 'Dashboard Staff: Tổng quan', '/api/staff/dashboard/summary', 'GET', 'DASHBOARD_STAFF'
+    ) src
+    LEFT JOIN permissions p
+        ON p.apiPath = src.apiPath AND p.method = src.method
+    WHERE p.id IS NULL;
+
+    -- Gán quyền ADMIN cho dashboard tổng quan
+    INSERT INTO permission_role (role_id, permission_id)
+    SELECT 1, p.id
+    FROM permissions p
+    WHERE p.apiPath = '/api/admin/dashboard/summary'
+      AND p.method = 'GET'
+      AND NOT EXISTS (
+          SELECT 1 FROM permission_role pr
+          WHERE pr.role_id = 1 AND pr.permission_id = p.id
+      );
+
+    -- Gán quyền NHAN_VIEN cho dashboard tổng quan
+    INSERT INTO permission_role (role_id, permission_id)
+    SELECT 2, p.id
+    FROM permissions p
+    WHERE p.apiPath = '/api/staff/dashboard/summary'
+      AND p.method = 'GET'
+      AND NOT EXISTS (
+          SELECT 1 FROM permission_role pr
+          WHERE pr.role_id = 2 AND pr.permission_id = p.id
+      );
+
+    -- ---------------------------------------------------------
+    -- 45. API GỢI Ý NHẬP HÀNG (IDEMPOTENT)
+    -- ---------------------------------------------------------
+    INSERT INTO permissions (name, apiPath, method, module, createdAt)
+    SELECT 'Xem gợi ý nhập hàng theo tồn kho', '/api/v1/phieu-nhap/goi-y-nhap-hang', 'GET', 'PHIEU_NHAP', NOW()
+    WHERE NOT EXISTS (
+        SELECT 1 FROM permissions
+        WHERE apiPath = '/api/v1/phieu-nhap/goi-y-nhap-hang' AND method = 'GET'
+    );
+
+    -- Gán quyền ADMIN cho API gợi ý nhập hàng
+    INSERT INTO permission_role (role_id, permission_id)
+    SELECT 1, p.id
+    FROM permissions p
+    WHERE p.apiPath = '/api/v1/phieu-nhap/goi-y-nhap-hang'
+      AND p.method = 'GET'
+      AND NOT EXISTS (
+          SELECT 1 FROM permission_role pr
+          WHERE pr.role_id = 1 AND pr.permission_id = p.id
       );

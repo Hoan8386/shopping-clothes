@@ -1,8 +1,6 @@
 package com.vn.shopping.controller;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
@@ -14,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.vn.shopping.domain.PhieuNhap;
 import com.vn.shopping.domain.request.ReqPhieuNhapDTO;
+import com.vn.shopping.domain.response.ResInventorySuggestionDTO;
 import com.vn.shopping.domain.response.ResPhieuNhapDTO;
 import com.vn.shopping.domain.response.ResultPaginationDTO;
 import com.vn.shopping.service.PhieuNhapService;
@@ -101,5 +100,14 @@ public class PhieuNhapController {
         }
         phieuNhapService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/goi-y-nhap-hang")
+    @ApiMessage("Lấy danh sách gợi ý nhập hàng theo trạng thái tồn kho")
+    public ResponseEntity<ResInventorySuggestionDTO> getInventorySuggestions(
+            @RequestParam(value = "status", required = false, defaultValue = "SAP_HET") String status,
+            @RequestParam(value = "nearOutThreshold", required = false, defaultValue = "10") Integer nearOutThreshold,
+            @RequestParam(value = "cuaHangId", required = false) Long cuaHangId) {
+        return ResponseEntity.ok(phieuNhapService.getInventorySuggestions(status, nearOutThreshold, cuaHangId));
     }
 }

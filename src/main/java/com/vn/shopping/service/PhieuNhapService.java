@@ -1,8 +1,13 @@
 package com.vn.shopping.service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -18,6 +23,7 @@ import com.vn.shopping.domain.NhaCungCap;
 import com.vn.shopping.domain.PhieuNhap;
 import com.vn.shopping.domain.SanPham;
 import com.vn.shopping.domain.request.ReqPhieuNhapDTO;
+import com.vn.shopping.domain.response.ResInventorySuggestionDTO;
 import com.vn.shopping.domain.response.ResPhieuNhapDTO;
 import com.vn.shopping.domain.response.ResultPaginationDTO;
 import com.vn.shopping.repository.ChiTietPhieuNhapRepository;
@@ -39,6 +45,7 @@ public class PhieuNhapService {
     private static final int TRANG_THAI_HUY = 3;
     private static final int TRANG_THAI_THIEU_HANG = 4;
     private static final int TRANG_THAI_HOAN_THANH = 5;
+    private static final int DEFAULT_NEAR_OUT_THRESHOLD = 10;
 
     private final PhieuNhapRepository phieuNhapRepository;
     private final ChiTietPhieuNhapRepository chiTietPhieuNhapRepository;
@@ -82,6 +89,92 @@ public class PhieuNhapService {
         }
 
         return phieuNhapRepository.save(pn);
+    }
+
+    public ResInventorySuggestionDTO getInventorySuggestions(
+            String status,
+            Integer nearOutThreshold,
+            Long cuaHangId) {
+
+        int threshold = nearOutThreshold == null || nearOutThreshold < 0
+                ? DEFAULT_NEAR_OUT_THRESHOLD
+                : nearOutThreshold;
+        InventoryStockStatus targetStatus = InventoryStockStatus.from(status);
+
+        Map<Long, String> tenCuaHangMap = new HashMap<>();
+        cuaHangRepository.findAll().forEach(store -> tenCuaHangMap.put(store.getId(), store.getTenCuaHang()));
+
+        List<ResInventorySuggestionDTO.Item> items = chiTietSanPhamRepository.findAll().stream()
+                .filter(detail -> cuaHangId == null || Objects.equals(detail.getMaCuaHang(), cuaHangId))
+                .filter(detail -> getInventoryStatus(detail.getSoLuong(), threshold) == targetStatus)
+                .sorted(Comparator
+                        .comparing((ChiTietSanPham detail) -> Optional.ofNullable(detail.getSoLuong()).orElse(0))
+                        .thenComparing(detail -> detail.getId() == null ? Long.MAX_VALUE : detail.getId()))
+                .map(detail -> {
+                    SanPham sanPham = detail.getSanPham();
+                    Long maCuaHang = detail.getMaCuaHang();
+                    return new ResInventorySuggestionDTO.Item(
+                            detail.getId(),
+                            sanPham != null ? sanPham.getId() : null,
+                            sanPham != null ? sanPham.getTenSanPham() : null,
+                            detail.getMauSac() != null ? detail.getMauSac().getTenMauSac() : null,
+                            detail.getKichThuoc() != null ? detail.getKichThuoc().getTenKichThuoc() : null,
+                            maCuaHang,
+                            maCuaHang != null ? tenCuaHangMap.get(maCuaHang) : null,
+                            Optional.ofNullable(detail.getSoLuong()).orElse(0),
+                            getInventoryStatus(detail.getSoLuong(), threshold).name());
+                })
+                .collect(Collectors.toList());
+
+        return new ResInventorySuggestionDTO(
+                targetStatus.name(),
+                threshold,
+                cuaHangId,
+                items);
+    }
+
+    private InventoryStockStatus getInventoryStatus(Integer quantity, int threshold) {
+        int currentQty = Optional.ofNullable(quantity).orElse(0);
+        if (currentQty <= 0) {
+            return InventoryStockStatus.DA_HET;
+        }
+        if (currentQty <= threshold) {
+            return InventoryStockStatus.SAP_HET;
+        }
+        return InventoryStockStatus.CON_HANG;
+    }
+
+    private enum InventoryStockStatus {
+        CON_HANG,
+        SAP_HET,
+        DA_HET;
+
+        public static InventoryStockStatus from(String rawStatus) {
+            if (rawStatus == null || rawStatus.isBlank()) {
+                return SAP_HET;
+            }
+
+            String normalized = rawStatus.trim().toUpperCase(Locale.ROOT)
+                    .replace('-', '_')
+                    .replace(' ', '_');
+
+            if ("GAN_HET".equals(normalized) || "NEAR_OUT".equals(normalized)
+                    || "LOW_STOCK".equals(normalized)) {
+                normalized = "SAP_HET";
+            }
+            if ("HET_HANG".equals(normalized) || "OUT_OF_STOCK".equals(normalized)) {
+                normalized = "DA_HET";
+            }
+            if ("IN_STOCK".equals(normalized)) {
+                normalized = "CON_HANG";
+            }
+
+            try {
+                return InventoryStockStatus.valueOf(normalized);
+            } catch (IllegalArgumentException ex) {
+                return SAP_HET;
+            }
+        }
     }
 
     @Transactional
