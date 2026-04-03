@@ -1,5 +1,7 @@
 package com.vn.shopping.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +21,12 @@ public class KhachHangLookupController {
 
     public KhachHangLookupController(KhachHangService khachHangService) {
         this.khachHangService = khachHangService;
+    }
+
+    @GetMapping
+    @ApiMessage("Lấy danh sách khách hàng")
+    public ResponseEntity<List<ResKhachHangLookupDTO>> getAll() {
+        return ResponseEntity.ok(khachHangService.findAllLookupDTO());
     }
 
     @GetMapping("/lookup")

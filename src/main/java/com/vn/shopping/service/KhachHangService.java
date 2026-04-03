@@ -1,10 +1,14 @@
 package com.vn.shopping.service;
 
+import java.util.Comparator;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.vn.shopping.domain.KhachHang;
 import com.vn.shopping.domain.Role;
 import com.vn.shopping.domain.response.ResCreateUserDTO;
+import com.vn.shopping.domain.response.ResKhachHangLookupDTO;
 import com.vn.shopping.repository.KhachHangRepository;
 import com.vn.shopping.repository.RoleRepository;
 import com.vn.shopping.util.error.IdInvalidException;
@@ -92,5 +96,17 @@ public class KhachHangService {
         dto.setEmail(khachHang.getEmail());
         dto.setSdt(khachHang.getSdt());
         return dto;
+    }
+
+    public List<ResKhachHangLookupDTO> findAllLookupDTO() {
+        return khachHangRepository.findAll().stream()
+                .sorted(Comparator.comparing(KhachHang::getId).reversed())
+                .map(item -> new ResKhachHangLookupDTO(
+                        item.getId(),
+                        item.getTenKhachHang(),
+                        item.getSdt(),
+                        item.getEmail(),
+                        item.getDiemTichLuy()))
+                .toList();
     }
 }

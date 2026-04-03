@@ -1,6 +1,7 @@
 package com.vn.shopping.controller;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
@@ -115,5 +116,15 @@ public class DanhGiaSanPhamController {
     public ResponseEntity<Void> delete(@PathVariable("id") long id) throws IdInvalidException {
         danhGiaSanPhamService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}/phan-hoi")
+    @ApiMessage("Admin trả lời đánh giá")
+    public ResponseEntity<ResDanhGiaSanPhamDTO> adminReply(
+            @PathVariable("id") Long id,
+            @RequestBody Map<String, String> payload) throws IdInvalidException {
+        String noiDung = payload == null ? null : payload.get("noiDung");
+        DanhGiaSanPham updated = danhGiaSanPhamService.replyAsAdmin(id, noiDung);
+        return ResponseEntity.ok(danhGiaSanPhamService.convertToDTO(updated));
     }
 }

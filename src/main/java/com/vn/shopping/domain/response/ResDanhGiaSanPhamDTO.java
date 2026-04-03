@@ -23,6 +23,9 @@ public class ResDanhGiaSanPhamDTO {
     private String ghiTru;
     private String hinhAnh;
     private String linkVideo;
+    private String adminPhanHoi;
+    private String adminPhanHoiBy;
+    private LocalDateTime adminPhanHoiAt;
     private LocalDateTime ngayTao;
     private LocalDateTime ngayCapNhat;
 }

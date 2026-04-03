@@ -62,6 +62,8 @@ public class SanPhamService {
             String moTa, Integer soLuong, Integer trangThai, Long kieuSanPhamId, Long boSuuTapId,
             Long thuongHieuId, MultipartFile file) throws IdInvalidException {
 
+        validatePriceInput(giaVon, giaBan, giaGiam);
+
         SanPham sanPham = new SanPham();
         sanPham.setTenSanPham(tenSanPham);
         sanPham.setGiaVon(giaVon);
@@ -92,7 +94,7 @@ public class SanPhamService {
             String imageUrl = storageService.uploadSingleFile(file);
             sanPham.setHinhAnhChinh(imageUrl);
         }
-        System.out.println(file.getName());
+
         return create(sanPham);
     }
 
@@ -138,6 +140,8 @@ public class SanPhamService {
             String moTa, Integer soLuong, Integer trangThai, Long kieuSanPhamId, Long boSuuTapId,
             Long thuongHieuId, MultipartFile file) throws IdInvalidException {
 
+        validatePriceInput(giaVon, giaBan, giaGiam);
+
         SanPham sanPham = new SanPham();
         sanPham.setId(id);
         sanPham.setTenSanPham(tenSanPham);
@@ -171,6 +175,18 @@ public class SanPhamService {
         }
 
         return update(sanPham);
+    }
+
+    private void validatePriceInput(Double giaVon, Double giaBan, Integer giaGiam) throws IdInvalidException {
+        if (giaVon == null || giaVon < 0) {
+            throw new IdInvalidException("Giá vốn phải lớn hơn hoặc bằng 0");
+        }
+        if (giaBan == null || giaBan <= 0) {
+            throw new IdInvalidException("Giá bán phải lớn hơn 0");
+        }
+        if (giaGiam != null && (giaGiam < 0 || giaGiam > 100)) {
+            throw new IdInvalidException("Giảm giá phải trong khoảng từ 0 đến 100");
+        }
     }
 
     public void delete(long id) {

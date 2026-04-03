@@ -39,7 +39,7 @@ public class NhaCungCapController {
 
     @PostMapping
     @ApiMessage("Tạo nhà cung cấp")
-    public ResponseEntity<NhaCungCap> create(@RequestBody NhaCungCap nhaCungCap) {
+    public ResponseEntity<NhaCungCap> create(@RequestBody NhaCungCap nhaCungCap) throws IdInvalidException {
         return ResponseEntity.status(HttpStatus.CREATED).body(nhaCungCapService.create(nhaCungCap));
     }
 

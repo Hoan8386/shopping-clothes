@@ -1,6 +1,7 @@
 package com.vn.shopping.service;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,9 +11,12 @@ import com.vn.shopping.domain.CuaHang;
 import com.vn.shopping.domain.response.ResCuaHangDTO;
 import com.vn.shopping.domain.response.ResultPaginationDTO;
 import com.vn.shopping.repository.CuaHangRepository;
+import com.vn.shopping.util.error.IdInvalidException;
 
 @Service
 public class CuaHangService {
+
+    private static final Pattern PHONE_PATTERN = Pattern.compile("^\\d{10}$");
 
     private final CuaHangRepository cuaHangRepository;
 
@@ -20,17 +24,20 @@ public class CuaHangService {
         this.cuaHangRepository = cuaHangRepository;
     }
 
-    public CuaHang create(CuaHang cuaHang) {
+    public CuaHang create(CuaHang cuaHang) throws IdInvalidException {
+        validateStoreInput(cuaHang);
+        cuaHang.setSoDienThoai(cuaHang.getSoDienThoai().trim());
         return cuaHangRepository.save(cuaHang);
     }
 
-    public CuaHang update(CuaHang cuaHang) {
+    public CuaHang update(CuaHang cuaHang) throws IdInvalidException {
+        validateStoreInput(cuaHang);
         CuaHang existing = cuaHangRepository.findById(cuaHang.getId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy cửa hàng: " + cuaHang.getId()));
         existing.setTenCuaHang(cuaHang.getTenCuaHang());
         existing.setDiaChi(cuaHang.getDiaChi());
         existing.setViTri(cuaHang.getViTri());
-        existing.setSoDienThoai(cuaHang.getSoDienThoai());
+        existing.setSoDienThoai(cuaHang.getSoDienThoai().trim());
         existing.setEmail(cuaHang.getEmail());
         existing.setTrangThai(cuaHang.getTrangThai());
         return cuaHangRepository.save(existing);
@@ -83,5 +90,15 @@ public class CuaHangService {
             }
         }
         return dto;
+    }
+
+    private void validateStoreInput(CuaHang cuaHang) throws IdInvalidException {
+        String phone = cuaHang.getSoDienThoai() == null ? "" : cuaHang.getSoDienThoai().trim();
+        if (phone.isEmpty()) {
+            throw new IdInvalidException("Số điện thoại không được để trống");
+        }
+        if (!PHONE_PATTERN.matcher(phone).matches()) {
+            throw new IdInvalidException("Số điện thoại phải gồm đúng 10 chữ số");
+        }
     }
 }

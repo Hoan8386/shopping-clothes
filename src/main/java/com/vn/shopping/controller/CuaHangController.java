@@ -44,7 +44,7 @@ public class CuaHangController {
 
     @PostMapping
     @ApiMessage("Tạo cửa hàng")
-    public ResponseEntity<ResCuaHangDTO> create(@RequestBody CuaHang cuaHang) {
+    public ResponseEntity<ResCuaHangDTO> create(@RequestBody CuaHang cuaHang) throws IdInvalidException {
         return ResponseEntity.status(HttpStatus.CREATED).body(cuaHangService.toDTO(cuaHangService.create(cuaHang)));
     }
 

@@ -955,3 +955,57 @@
           SELECT 1 FROM permission_role pr
           WHERE pr.role_id = 1 AND pr.permission_id = p.id
       );
+
+        -- ---------------------------------------------------------
+        -- 46. QUYỀN TRẢ LỜI ĐÁNH GIÁ (ADMIN ONLY) - IDEMPOTENT
+        -- ---------------------------------------------------------
+        INSERT INTO permissions (name, apiPath, method, module, createdAt)
+        SELECT 'Admin trả lời đánh giá sản phẩm', '/api/v1/danh-gia-san-pham/{id}/phan-hoi', 'PUT', 'DANH_GIA_SP', NOW()
+        WHERE NOT EXISTS (
+                SELECT 1 FROM permissions
+                WHERE apiPath = '/api/v1/danh-gia-san-pham/{id}/phan-hoi' AND method = 'PUT'
+        );
+
+        -- Chỉ gán cho ADMIN
+        INSERT INTO permission_role (role_id, permission_id)
+        SELECT 1, p.id
+        FROM permissions p
+        WHERE p.apiPath = '/api/v1/danh-gia-san-pham/{id}/phan-hoi'
+            AND p.method = 'PUT'
+            AND NOT EXISTS (
+                    SELECT 1 FROM permission_role pr
+                    WHERE pr.role_id = 1 AND pr.permission_id = p.id
+            );
+
+        -- Thu hồi quyền này khỏi role khác (nếu từng gán nhầm)
+        DELETE pr
+        FROM permission_role pr
+        JOIN permissions p ON p.id = pr.permission_id
+        WHERE p.apiPath = '/api/v1/danh-gia-san-pham/{id}/phan-hoi'
+            AND p.method = 'PUT'
+            AND pr.role_id <> 1;
+
+    -- ---------------------------------------------------------
+    -- 47. QUYỀN DANH SÁCH KHÁCH HÀNG (IDEMPOTENT)
+    -- ---------------------------------------------------------
+    INSERT INTO permissions (name, apiPath, method, module, createdAt)
+    SELECT 'Xem danh sách khách hàng', '/api/v1/khach-hang', 'GET', 'KHACH_HANG', NOW()
+    WHERE NOT EXISTS (
+        SELECT 1 FROM permissions
+        WHERE apiPath = '/api/v1/khach-hang' AND method = 'GET'
+    );
+
+    -- Gán quyền ADMIN + NHAN_VIEN cho endpoint danh sách khách hàng
+    INSERT INTO permission_role (role_id, permission_id)
+    SELECT roles.role_id, p.id
+    FROM permissions p
+    JOIN (
+        SELECT 1 AS role_id
+        UNION ALL SELECT 2 AS role_id
+    ) roles
+    WHERE p.apiPath = '/api/v1/khach-hang'
+      AND p.method = 'GET'
+      AND NOT EXISTS (
+          SELECT 1 FROM permission_role pr
+          WHERE pr.role_id = roles.role_id AND pr.permission_id = p.id
+      );

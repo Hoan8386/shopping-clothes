@@ -2,13 +2,18 @@ package com.vn.shopping.service;
 
 import java.util.List;
 import java.util.Collections;
+import java.util.Locale;
+import java.util.regex.Pattern;
 
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.vn.shopping.domain.KhachHang;
 import com.vn.shopping.domain.NhanVien;
 import com.vn.shopping.domain.Role;
 import com.vn.shopping.domain.response.ResNhanVienDTO;
+import com.vn.shopping.repository.KhachHangRepository;
 import com.vn.shopping.repository.NhanVienRepository;
 import com.vn.shopping.repository.RoleRepository;
 import com.vn.shopping.util.error.IdInvalidException;
@@ -16,12 +21,20 @@ import com.vn.shopping.util.error.IdInvalidException;
 @Service
 public class NhanVienService {
 
+    private static final Pattern PHONE_PATTERN = Pattern.compile("^\\d{10}$");
+    private static final Pattern GMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9._%+-]+@gmail\\.com$");
+
     private final NhanVienRepository nhanVienRepository;
     private final RoleRepository roleRepository;
+    private final KhachHangRepository khachHangRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public NhanVienService(NhanVienRepository nhanVienRepository, RoleRepository roleRepository) {
+    public NhanVienService(NhanVienRepository nhanVienRepository, RoleRepository roleRepository,
+            KhachHangRepository khachHangRepository, PasswordEncoder passwordEncoder) {
         this.nhanVienRepository = nhanVienRepository;
         this.roleRepository = roleRepository;
+        this.khachHangRepository = khachHangRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<NhanVien> findAll() {
@@ -50,7 +63,13 @@ public class NhanVienService {
         return nhanVienRepository.findById(id).orElse(null);
     }
 
-    public NhanVien handleCreateNhanVien(NhanVien nhanVien) {
+    public NhanVien handleCreateNhanVien(NhanVien nhanVien) throws IdInvalidException {
+        validateNhanVienInput(nhanVien, true, null);
+
+        nhanVien.setEmail(nhanVien.getEmail().trim().toLowerCase(Locale.ROOT));
+        nhanVien.setSoDienThoai(nhanVien.getSoDienThoai().trim());
+        nhanVien.setMatKhau(passwordEncoder.encode(nhanVien.getMatKhau().trim()));
+
         // Tự động gán role NHAN_VIEN (id=3) nếu chưa có role
         if (nhanVien.getRole() == null) {
             nhanVien.setRole(getDefaultNhanVienRole());
@@ -62,10 +81,14 @@ public class NhanVienService {
         NhanVien existing = nhanVienRepository.findById(nhanVien.getId())
                 .orElseThrow(() -> new IdInvalidException("Không tìm thấy nhân viên: " + nhanVien.getId()));
 
+        validateNhanVienInput(nhanVien, false, existing.getId());
+
         existing.setTenNhanVien(nhanVien.getTenNhanVien());
-        existing.setEmail(nhanVien.getEmail());
-        existing.setSoDienThoai(nhanVien.getSoDienThoai());
-        existing.setMatKhau(nhanVien.getMatKhau());
+        existing.setEmail(nhanVien.getEmail().trim().toLowerCase(Locale.ROOT));
+        existing.setSoDienThoai(nhanVien.getSoDienThoai().trim());
+        if (nhanVien.getMatKhau() != null && !nhanVien.getMatKhau().isBlank()) {
+            existing.setMatKhau(passwordEncoder.encode(nhanVien.getMatKhau().trim()));
+        }
         existing.setNgayBatDauLam(nhanVien.getNgayBatDauLam());
         existing.setNgayKetThucLam(nhanVien.getNgayKetThucLam());
         existing.setTrangThai(nhanVien.getTrangThai());
@@ -158,5 +181,63 @@ public class NhanVienService {
 
     private Role getDefaultNhanVienRole() {
         return roleRepository.findById(3L).orElse(null);
+    }
+
+    private void validateNhanVienInput(NhanVien nhanVien, boolean isCreate, Long currentNhanVienId)
+            throws IdInvalidException {
+        String tenNhanVien = nhanVien.getTenNhanVien() == null ? "" : nhanVien.getTenNhanVien().trim();
+        String email = nhanVien.getEmail() == null ? "" : nhanVien.getEmail().trim().toLowerCase(Locale.ROOT);
+        String soDienThoai = nhanVien.getSoDienThoai() == null ? "" : nhanVien.getSoDienThoai().trim();
+        String matKhau = nhanVien.getMatKhau() == null ? "" : nhanVien.getMatKhau().trim();
+
+        if (tenNhanVien.isEmpty()) {
+            throw new IdInvalidException("Tên nhân viên không được để trống");
+        }
+        if (email.isEmpty()) {
+            throw new IdInvalidException("Email không được để trống");
+        }
+        if (!GMAIL_PATTERN.matcher(email).matches()) {
+            throw new IdInvalidException("Email phải có định dạng @gmail.com");
+        }
+        if (soDienThoai.isEmpty()) {
+            throw new IdInvalidException("Số điện thoại không được để trống");
+        }
+        if (!PHONE_PATTERN.matcher(soDienThoai).matches()) {
+            throw new IdInvalidException("Số điện thoại phải gồm đúng 10 chữ số");
+        }
+
+        if (isCreate) {
+            if (matKhau.isEmpty()) {
+                throw new IdInvalidException("Mật khẩu không được để trống");
+            }
+            if (matKhau.length() < 6) {
+                throw new IdInvalidException("Mật khẩu phải có ít nhất 6 ký tự");
+            }
+        } else if (!matKhau.isEmpty() && matKhau.length() < 6) {
+            throw new IdInvalidException("Mật khẩu phải có ít nhất 6 ký tự");
+        }
+
+        NhanVien nhanVienByEmail = nhanVienRepository.findByEmail(email).orElse(null);
+        if (nhanVienByEmail != null && !nhanVienByEmail.getId().equals(currentNhanVienId)) {
+            throw new IdInvalidException("Email nhân viên đã tồn tại");
+        }
+
+        KhachHang khachHangByEmail = khachHangRepository.findByEmail(email).orElse(null);
+        if (khachHangByEmail != null) {
+            throw new IdInvalidException("Email đã tồn tại ở tài khoản khách hàng");
+        }
+
+        boolean isPhoneUsedByAnotherNhanVien = nhanVienRepository.findAll().stream()
+                .anyMatch(item -> item.getSoDienThoai() != null
+                        && soDienThoai.equals(item.getSoDienThoai().trim())
+                        && !item.getId().equals(currentNhanVienId));
+        if (isPhoneUsedByAnotherNhanVien) {
+            throw new IdInvalidException("Số điện thoại nhân viên đã tồn tại");
+        }
+
+        KhachHang khachHangByPhone = khachHangRepository.findBySdt(soDienThoai).orElse(null);
+        if (khachHangByPhone != null) {
+            throw new IdInvalidException("Số điện thoại đã tồn tại ở tài khoản khách hàng");
+        }
     }
 }

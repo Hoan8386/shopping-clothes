@@ -39,7 +39,8 @@ public class KhuyenMaiTheoDiemController {
 
     @PostMapping
     @ApiMessage("Tạo khuyến mãi theo điểm")
-    public ResponseEntity<KhuyenMaiTheoDiem> create(@RequestBody KhuyenMaiTheoDiem khuyenMai) {
+    public ResponseEntity<KhuyenMaiTheoDiem> create(@RequestBody KhuyenMaiTheoDiem khuyenMai)
+            throws IdInvalidException {
         return ResponseEntity.status(HttpStatus.CREATED).body(khuyenMaiTheoDiemService.create(khuyenMai));
     }
 

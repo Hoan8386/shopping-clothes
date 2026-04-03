@@ -37,7 +37,7 @@ public class NhanVienController {
 
     @PostMapping
     @ApiMessage("Tạo nhân viên")
-    public ResponseEntity<ResNhanVienDTO> create(@RequestBody NhanVien nhanVien) {
+    public ResponseEntity<ResNhanVienDTO> create(@RequestBody NhanVien nhanVien) throws IdInvalidException {
         NhanVien createdNhanVien = nhanVienService.handleCreateNhanVien(nhanVien);
         return ResponseEntity.status(HttpStatus.CREATED).body(nhanVienService.toDTO(createdNhanVien));
     }

@@ -12,6 +12,10 @@ import com.vn.shopping.domain.NhanVien;
 public interface NhanVienRepository extends JpaRepository<NhanVien, Long> {
     Optional<NhanVien> findByEmail(String email);
 
+    boolean existsByEmail(String email);
+
+    boolean existsBySoDienThoai(String soDienThoai);
+
     List<NhanVien> findByCuaHang_Id(Long cuaHangId);
 
     Optional<NhanVien> findByRefreshTokenAndEmail(String refreshToken, String email);

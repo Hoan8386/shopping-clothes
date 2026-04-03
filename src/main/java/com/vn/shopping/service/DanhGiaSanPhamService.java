@@ -10,6 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.vn.shopping.domain.*;
 import com.vn.shopping.domain.request.ReqDanhGiaSanPhamDTO;
 import com.vn.shopping.domain.response.ResDanhGiaSanPhamDTO;
@@ -24,16 +27,22 @@ public class DanhGiaSanPhamService {
     private final DanhGiaSanPhamRepository danhGiaSanPhamRepository;
     private final KhachHangRepository khachHangRepository;
     private final ChiTietDonHangRepository chiTietDonHangRepository;
+    private final NhanVienRepository nhanVienRepository;
     private final StorageService storageService;
+    private final ObjectMapper objectMapper;
 
     public DanhGiaSanPhamService(DanhGiaSanPhamRepository danhGiaSanPhamRepository,
             KhachHangRepository khachHangRepository,
             ChiTietDonHangRepository chiTietDonHangRepository,
-            StorageService storageService) {
+            NhanVienRepository nhanVienRepository,
+            StorageService storageService,
+            ObjectMapper objectMapper) {
         this.danhGiaSanPhamRepository = danhGiaSanPhamRepository;
         this.khachHangRepository = khachHangRepository;
         this.chiTietDonHangRepository = chiTietDonHangRepository;
+        this.nhanVienRepository = nhanVienRepository;
         this.storageService = storageService;
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -166,6 +175,31 @@ public class DanhGiaSanPhamService {
         danhGiaSanPhamRepository.deleteById(id);
     }
 
+    @Transactional
+    public DanhGiaSanPham replyAsAdmin(Long id, String noiDung) throws IdInvalidException {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        NhanVien nhanVien = nhanVienRepository.findByEmail(email)
+                .orElseThrow(() -> new IdInvalidException("Chỉ admin mới có quyền trả lời đánh giá"));
+
+        if (nhanVien.getRole() == null || !"ADMIN".equalsIgnoreCase(nhanVien.getRole().getName())) {
+            throw new IdInvalidException("Chỉ admin mới có quyền trả lời đánh giá");
+        }
+
+        String noiDungTrim = normalizeNullableText(noiDung);
+        if (noiDungTrim == null) {
+            throw new IdInvalidException("Nội dung phản hồi không được để trống");
+        }
+        if (noiDungTrim.length() > 1000) {
+            throw new IdInvalidException("Nội dung phản hồi tối đa 1000 ký tự");
+        }
+
+        DanhGiaSanPham danhGia = danhGiaSanPhamRepository.findById(id)
+                .orElseThrow(() -> new IdInvalidException("Không tìm thấy đánh giá: " + id));
+
+        danhGia.setJson(mergeReplyMetadata(danhGia.getJson(), noiDungTrim, email));
+        return danhGiaSanPhamRepository.save(danhGia);
+    }
+
     public DanhGiaSanPham findById(long id) {
         return danhGiaSanPhamRepository.findById(id).orElse(null);
     }
@@ -202,6 +236,20 @@ public class DanhGiaSanPhamService {
         dto.setLinkVideo(dg.getLinkVideo());
         dto.setNgayTao(dg.getNgayTao());
         dto.setNgayCapNhat(dg.getNgayCapNhat());
+
+        JsonNode replyNode = getReplyNode(dg.getJson());
+        if (replyNode != null) {
+            dto.setAdminPhanHoi(getTextNode(replyNode, "adminReply"));
+            dto.setAdminPhanHoiBy(getTextNode(replyNode, "adminReplyBy"));
+            String replyAt = getTextNode(replyNode, "adminReplyAt");
+            if (StringUtils.hasText(replyAt)) {
+                try {
+                    dto.setAdminPhanHoiAt(java.time.LocalDateTime.parse(replyAt));
+                } catch (Exception ignored) {
+                    dto.setAdminPhanHoiAt(null);
+                }
+            }
+        }
 
         if (dg.getKhachHang() != null) {
             dto.setKhachHangId(dg.getKhachHang().getId());
@@ -243,5 +291,47 @@ public class DanhGiaSanPhamService {
             return null;
         }
         return value.trim();
+    }
+
+    private String mergeReplyMetadata(String rawJson, String replyText, String replyBy) {
+        try {
+            ObjectNode root;
+            if (StringUtils.hasText(rawJson)) {
+                JsonNode parsed = objectMapper.readTree(rawJson);
+                root = parsed != null && parsed.isObject() ? (ObjectNode) parsed : objectMapper.createObjectNode();
+            } else {
+                root = objectMapper.createObjectNode();
+            }
+            root.put("adminReply", replyText);
+            root.put("adminReplyBy", replyBy);
+            root.put("adminReplyAt", java.time.LocalDateTime.now().toString());
+            return objectMapper.writeValueAsString(root);
+        } catch (Exception e) {
+            ObjectNode fallback = objectMapper.createObjectNode();
+            fallback.put("adminReply", replyText);
+            fallback.put("adminReplyBy", replyBy);
+            fallback.put("adminReplyAt", java.time.LocalDateTime.now().toString());
+            return fallback.toString();
+        }
+    }
+
+    private JsonNode getReplyNode(String rawJson) {
+        if (!StringUtils.hasText(rawJson)) {
+            return null;
+        }
+        try {
+            JsonNode node = objectMapper.readTree(rawJson);
+            return node != null && node.isObject() ? node : null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private String getTextNode(JsonNode node, String fieldName) {
+        if (node == null || !node.has(fieldName) || node.get(fieldName).isNull()) {
+            return null;
+        }
+        String value = node.get(fieldName).asText();
+        return StringUtils.hasText(value) ? value : null;
     }
 }
