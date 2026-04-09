@@ -813,6 +813,7 @@
         WHERE apiPath = '/api/v1/gio-hang-nhan-vien/{id}' AND method = 'DELETE'
     );
 
+    -- Update moi
     -- ADMIN + NHAN_VIEN cho endpoint staff VNPAY URL
     INSERT INTO permission_role (role_id, permission_id)
     SELECT roles.role_id, p.id
@@ -976,6 +977,64 @@
                     SELECT 1 FROM permission_role pr
                     WHERE pr.role_id = 1 AND pr.permission_id = p.id
             );
+
+    -- ---------------------------------------------------------
+    -- 47. THONG KE P1/P2 + XUAT EXCEL (IDEMPOTENT)
+    -- ---------------------------------------------------------
+    INSERT INTO permissions (name, apiPath, method, module, createdAt)
+    SELECT src.name, src.apiPath, src.method, src.module, NOW()
+    FROM (
+        SELECT 'Thong ke doanh thu ban hang' AS name, '/api/v1/thong-ke/doanh-thu' AS apiPath, 'GET' AS method, 'THONG_KE' AS module
+        UNION ALL SELECT 'Xuat Excel thong ke doanh thu ban hang', '/api/v1/thong-ke/doanh-thu/export', 'GET', 'THONG_KE'
+        UNION ALL SELECT 'Thong ke hieu suat don hang', '/api/v1/thong-ke/hieu-suat-don-hang', 'GET', 'THONG_KE'
+        UNION ALL SELECT 'Xuat Excel thong ke hieu suat don hang', '/api/v1/thong-ke/hieu-suat-don-hang/export', 'GET', 'THONG_KE'
+        UNION ALL SELECT 'Thong ke ton kho va canh bao', '/api/v1/thong-ke/ton-kho-canh-bao', 'GET', 'THONG_KE'
+        UNION ALL SELECT 'Xuat Excel thong ke ton kho va canh bao', '/api/v1/thong-ke/ton-kho-canh-bao/export', 'GET', 'THONG_KE'
+        UNION ALL SELECT 'Thong ke top san pham', '/api/v1/thong-ke/top-san-pham', 'GET', 'THONG_KE'
+        UNION ALL SELECT 'Xuat Excel thong ke top san pham', '/api/v1/thong-ke/top-san-pham/export', 'GET', 'THONG_KE'
+        UNION ALL SELECT 'Thong ke nhap hang va nha cung cap', '/api/v1/thong-ke/nhap-hang-ncc', 'GET', 'THONG_KE'
+        UNION ALL SELECT 'Xuat Excel thong ke nhap hang va nha cung cap', '/api/v1/thong-ke/nhap-hang-ncc/export', 'GET', 'THONG_KE'
+        UNION ALL SELECT 'Thong ke tra doi', '/api/v1/thong-ke/tra-doi', 'GET', 'THONG_KE'
+        UNION ALL SELECT 'Xuat Excel thong ke tra doi', '/api/v1/thong-ke/tra-doi/export', 'GET', 'THONG_KE'
+        UNION ALL SELECT 'Thong ke khuyen mai', '/api/v1/thong-ke/khuyen-mai', 'GET', 'THONG_KE'
+        UNION ALL SELECT 'Xuat Excel thong ke khuyen mai', '/api/v1/thong-ke/khuyen-mai/export', 'GET', 'THONG_KE'
+        UNION ALL SELECT 'Thong ke nang suat nhan vien', '/api/v1/thong-ke/nang-suat-nhan-vien', 'GET', 'THONG_KE'
+        UNION ALL SELECT 'Xuat Excel thong ke nang suat nhan vien', '/api/v1/thong-ke/nang-suat-nhan-vien/export', 'GET', 'THONG_KE'
+    ) src
+    LEFT JOIN permissions p
+        ON p.apiPath = src.apiPath AND p.method = src.method
+    WHERE p.id IS NULL;
+
+    -- ADMIN co toan quyen thong ke
+    INSERT INTO permission_role (role_id, permission_id)
+    SELECT 1, p.id
+    FROM permissions p
+    WHERE p.apiPath LIKE '/api/v1/thong-ke/%'
+      AND NOT EXISTS (
+          SELECT 1 FROM permission_role pr
+          WHERE pr.role_id = 1 AND pr.permission_id = p.id
+      );
+
+    -- NHAN_VIEN duoc xem + xuat mot so bao cao van hanh
+    INSERT INTO permission_role (role_id, permission_id)
+    SELECT 2, p.id
+    FROM permissions p
+    WHERE p.apiPath IN (
+        '/api/v1/thong-ke/hieu-suat-don-hang',
+        '/api/v1/thong-ke/hieu-suat-don-hang/export',
+        '/api/v1/thong-ke/ton-kho-canh-bao',
+        '/api/v1/thong-ke/ton-kho-canh-bao/export',
+        '/api/v1/thong-ke/top-san-pham',
+        '/api/v1/thong-ke/top-san-pham/export',
+        '/api/v1/thong-ke/nhap-hang-ncc',
+        '/api/v1/thong-ke/nhap-hang-ncc/export',
+        '/api/v1/thong-ke/nang-suat-nhan-vien',
+        '/api/v1/thong-ke/nang-suat-nhan-vien/export'
+    )
+      AND NOT EXISTS (
+          SELECT 1 FROM permission_role pr
+          WHERE pr.role_id = 2 AND pr.permission_id = p.id
+      );
 
         -- Thu hồi quyền này khỏi role khác (nếu từng gán nhầm)
         DELETE pr
