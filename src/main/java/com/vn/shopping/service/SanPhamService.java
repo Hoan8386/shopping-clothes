@@ -3,6 +3,8 @@ package com.vn.shopping.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -46,6 +48,7 @@ public class SanPhamService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = "product", allEntries = true)
     public SanPham create(SanPham sanPham) {
         SanPham saved = sanPhamRepository.save(sanPham);
         // Flush + clear cache để re-fetch load đầy đủ LAZY relations
@@ -99,6 +102,7 @@ public class SanPhamService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = "product", allEntries = true)
     public SanPham update(SanPham sanPham) throws IdInvalidException {
         SanPham existing = sanPhamRepository.findById(sanPham.getId())
                 .orElseThrow(() -> new IdInvalidException("Không tìm thấy sản phẩm: " + sanPham.getId()));
@@ -189,6 +193,7 @@ public class SanPhamService {
         }
     }
 
+    @CacheEvict(cacheNames = "product", allEntries = true)
     public void delete(long id) {
         sanPhamRepository.deleteById(id);
     }
@@ -238,12 +243,14 @@ public class SanPhamService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "product", key = "'detail_' + #id")
     public ResSanPhamDTO findByIdDTO(long id) {
         SanPham sp = sanPhamRepository.findById(id).orElse(null);
         return convertToDTO(sp);
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "product", key = "'all'")
     public List<ResSanPhamDTO> findAllDTO() {
         return convertToListDTO(sanPhamRepository.findAll());
     }
@@ -252,6 +259,7 @@ public class SanPhamService {
      * Lọc sản phẩm theo nhiều tiêu chí + phân trang
      */
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "product", key = "'filter_' + #tenSanPham + '_' + #kieuSanPhamId + '_' + #boSuuTapId + '_' + #thuongHieuId + '_' + #kichThuocId + '_' + #mauSacId + '_' + #trangThai + '_' + #giaMin + '_' + #giaMax + '_' + #pageable.pageNumber + '_' + #pageable.pageSize")
     public ResultPaginationDTO filterSanPham(
             String tenSanPham,
             Long kieuSanPhamId,

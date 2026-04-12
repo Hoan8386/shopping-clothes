@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,6 +77,7 @@ public class ChiTietSanPhamService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = "product_detail", allEntries = true)
     public ChiTietSanPham create(ChiTietSanPham chiTietSanPham) {
         ChiTietSanPham saved = chiTietSanPhamRepository.save(chiTietSanPham);
 
@@ -94,6 +97,7 @@ public class ChiTietSanPhamService {
      * Mỗi cửa hàng sẽ có 1 bản ghi ChiTietSanPham riêng với cùng thông tin sản phẩm
      */
     @Transactional
+    @CacheEvict(cacheNames = "product_detail", allEntries = true)
     public List<ResChiTietSanPhamDTO> createChiTietSanPham(
             Long sanPhamId, Long maPhieuNhap, Long mauSacId, Long kichThuocId,
             Integer soLuong, Integer trangThai, String moTa, String ghiTru,
@@ -165,6 +169,7 @@ public class ChiTietSanPhamService {
      * Cập nhật chi tiết sản phẩm từ các trường riêng lẻ + upload thêm ảnh mới
      */
     @Transactional
+    @CacheEvict(cacheNames = "product_detail", allEntries = true)
     public ChiTietSanPham updateChiTietSanPham(
             Long id, Long sanPhamId, Long maPhieuNhap, Long mauSacId, Long kichThuocId,
             Long maCuaHang, Integer soLuong, Integer trangThai, String moTa, String ghiTru,
@@ -212,6 +217,7 @@ public class ChiTietSanPhamService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = "product_detail", allEntries = true)
     public ChiTietSanPham update(ChiTietSanPham chiTietSanPham) throws IdInvalidException {
         ChiTietSanPham existing = chiTietSanPhamRepository.findById(chiTietSanPham.getId())
                 .orElseThrow(
@@ -229,6 +235,7 @@ public class ChiTietSanPhamService {
         return chiTietSanPhamRepository.findById(saved.getId()).orElse(saved);
     }
 
+    @CacheEvict(cacheNames = "product_detail", allEntries = true)
     public void delete(long id) {
         chiTietSanPhamRepository.deleteById(id);
     }
@@ -298,12 +305,14 @@ public class ChiTietSanPhamService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "product_detail", key = "'by_id_' + #id")
     public ResChiTietSanPhamDTO findByIdDTO(long id) {
         ChiTietSanPham ct = chiTietSanPhamRepository.findById(id).orElse(null);
         return convertToDTO(ct);
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "product_detail", key = "'all'")
     public List<ResChiTietSanPhamDTO> findAllDTO() {
         return convertToListDTO(chiTietSanPhamRepository.findAll());
     }
@@ -335,6 +344,7 @@ public class ChiTietSanPhamService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "product_detail", key = "'by_product_' + #sanPhamId")
     public List<ResChiTietSanPhamDTO> findBySanPhamIdDTO(long sanPhamId) {
         return convertToListDTO(chiTietSanPhamRepository.findBySanPhamId(sanPhamId));
     }
