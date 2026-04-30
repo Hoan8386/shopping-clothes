@@ -1,5 +1,7 @@
 package com.vn.shopping.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -21,6 +23,8 @@ import com.vn.shopping.domain.response.ResLoginDTO;
 import com.vn.shopping.domain.request.ReqChangePasswordDTO;
 import com.vn.shopping.domain.request.ReqLoginDTO;
 import com.vn.shopping.service.KhachHangService;
+import com.vn.shopping.service.VerificationTokenService;
+import com.vn.shopping.service.EmailService;
 import com.vn.shopping.service.NhanVienService;
 import com.vn.shopping.service.StorageService;
 import com.vn.shopping.util.SecurityUtil;
@@ -45,11 +49,14 @@ import java.util.regex.Pattern;
 @RestController
 @RequestMapping("/api/v1")
 public class AuthController {
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
     private static final Pattern VIETNAM_PHONE_PATTERN = Pattern.compile("^(0\\d{9}|\\+84\\d{9})$");
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final SecurityUtil securityUtil;
     private final KhachHangService khachHangService;
+    private final VerificationTokenService verificationTokenService;
+    private final EmailService emailService;
     private final NhanVienService nhanVienService;
     private final StorageService storageService;
     private final PasswordEncoder passwordEncoder;
@@ -57,16 +64,23 @@ public class AuthController {
     @Value("${shopping.jwt.refresh-token-validity-in-seconds}")
     private long refreshTokenExpiration;
 
+    @Value("${shopping.frontend-login-url}")
+    private String frontendLoginUrl;
+
     public AuthController(
             AuthenticationManagerBuilder authenticationManagerBuilder,
             SecurityUtil securityUtil,
             KhachHangService khachHangService,
+            VerificationTokenService verificationTokenService,
+            EmailService emailService,
             NhanVienService nhanVienService,
             StorageService storageService,
             PasswordEncoder passwordEncoder) {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.securityUtil = securityUtil;
         this.khachHangService = khachHangService;
+        this.verificationTokenService = verificationTokenService;
+        this.emailService = emailService;
         this.nhanVienService = nhanVienService;
         this.storageService = storageService;
         this.passwordEncoder = passwordEncoder;
@@ -401,8 +415,191 @@ public class AuthController {
         String hashPassword = this.passwordEncoder.encode(postManUser.getPassword());
         postManUser.setPassword(hashPassword);
         KhachHang savedUser = this.khachHangService.handleCreateUser(postManUser);
+
+        // Tạo verification token và gửi email xác thực
+        try {
+            String token = this.verificationTokenService.createVerificationToken(savedUser);
+            this.emailService.sendVerificationEmail(savedUser, token);
+            logger.info("Email xác thực đã được gửi tới: {}", savedUser.getEmail());
+        } catch (Exception ex) {
+            logger.error("Lỗi khi gửi email xác thực cho người dùng {}: ", savedUser.getEmail(), ex);
+            throw new IdInvalidException("Không thể gửi email xác thực. Lỗi: " + ex.getMessage());
+        }
+
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(this.khachHangService.convertToResCreateUserDTO(savedUser));
+    }
+
+    @GetMapping("/auth/confirm")
+    @ApiMessage("Confirm email registration")
+    public ResponseEntity<String> confirmRegistration(@RequestParam("token") String token) {
+        boolean ok = this.verificationTokenService.validateVerificationToken(token);
+        if (ok) {
+            return ResponseEntity.ok()
+                    .contentType(MediaType.TEXT_HTML)
+                    .body(buildConfirmSuccessPage());
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.TEXT_HTML)
+                .body(buildConfirmErrorPage());
+    }
+
+    private String buildConfirmSuccessPage() {
+        return """
+                <!doctype html>
+                <html lang="vi">
+                <head>
+                    <meta charset="UTF-8" />
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                    <title>Xác nhận thành công</title>
+                    <style>
+                        :root {
+                            --bg-1: #f0fdf4;
+                            --bg-2: #ecfeff;
+                            --text: #052e16;
+                            --subtext: #14532d;
+                            --card: #ffffff;
+                            --primary: #16a34a;
+                            --primary-hover: #15803d;
+                        }
+                        * { box-sizing: border-box; }
+                        body {
+                            margin: 0;
+                            min-height: 100vh;
+                            display: grid;
+                            place-items: center;
+                            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                            color: var(--text);
+                            background: radial-gradient(circle at top right, var(--bg-2), var(--bg-1));
+                            padding: 24px;
+                        }
+                        .card {
+                            width: min(640px, 100%);
+                            background: var(--card);
+                            border-radius: 20px;
+                            padding: 32px;
+                            box-shadow: 0 18px 45px rgba(5, 46, 22, 0.14);
+                            text-align: center;
+                        }
+                        .icon {
+                            width: 72px;
+                            height: 72px;
+                            border-radius: 50%;
+                            margin: 0 auto 16px;
+                            display: grid;
+                            place-items: center;
+                            background: rgba(22, 163, 74, 0.12);
+                            font-size: 38px;
+                        }
+                        h1 {
+                            margin: 0;
+                            font-size: clamp(24px, 4vw, 32px);
+                        }
+                        p {
+                            margin: 12px 0 0;
+                            color: var(--subtext);
+                            font-size: 16px;
+                            line-height: 1.6;
+                        }
+                        .actions {
+                            margin-top: 28px;
+                        }
+                        .btn {
+                            display: inline-block;
+                            background: var(--primary);
+                            color: #ffffff;
+                            text-decoration: none;
+                            font-weight: 700;
+                            padding: 12px 22px;
+                            border-radius: 12px;
+                            transition: background 0.2s ease, transform 0.2s ease;
+                        }
+                        .btn:hover {
+                            background: var(--primary-hover);
+                            transform: translateY(-1px);
+                        }
+                    </style>
+                </head>
+                <body>
+                    <main class="card">
+                        <div class="icon">✓</div>
+                        <h1>Xác nhận đăng ký thành công</h1>
+                        <p>Tài khoản của bạn đã được kích hoạt. Bấm nút bên dưới để đăng nhập vào hệ thống.</p>
+                        <div class="actions">
+                            <a class="btn" href="__FRONTEND_LOGIN_URL__">Đi tới trang đăng nhập</a>
+                        </div>
+                    </main>
+                </body>
+                </html>
+                """.replace("__FRONTEND_LOGIN_URL__", frontendLoginUrl);
+    }
+
+    private String buildConfirmErrorPage() {
+        return """
+                <!doctype html>
+                <html lang="vi">
+                <head>
+                    <meta charset="UTF-8" />
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                    <title>Xác nhận thất bại</title>
+                    <style>
+                        :root {
+                            --bg-1: #fff1f2;
+                            --bg-2: #fffbeb;
+                            --text: #7f1d1d;
+                            --subtext: #9f1239;
+                            --card: #ffffff;
+                        }
+                        * { box-sizing: border-box; }
+                        body {
+                            margin: 0;
+                            min-height: 100vh;
+                            display: grid;
+                            place-items: center;
+                            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                            color: var(--text);
+                            background: radial-gradient(circle at top right, var(--bg-2), var(--bg-1));
+                            padding: 24px;
+                        }
+                        .card {
+                            width: min(640px, 100%);
+                            background: var(--card);
+                            border-radius: 20px;
+                            padding: 32px;
+                            box-shadow: 0 18px 45px rgba(127, 29, 29, 0.12);
+                            text-align: center;
+                        }
+                        .icon {
+                            width: 72px;
+                            height: 72px;
+                            border-radius: 50%;
+                            margin: 0 auto 16px;
+                            display: grid;
+                            place-items: center;
+                            background: rgba(244, 63, 94, 0.16);
+                            font-size: 38px;
+                        }
+                        h1 {
+                            margin: 0;
+                            font-size: clamp(24px, 4vw, 32px);
+                        }
+                        p {
+                            margin: 12px 0 0;
+                            color: var(--subtext);
+                            font-size: 16px;
+                            line-height: 1.6;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <main class="card">
+                        <div class="icon">!</div>
+                        <h1>Không thể xác nhận đăng ký</h1>
+                        <p>Liên kết xác nhận không hợp lệ hoặc đã hết hạn. Vui lòng đăng ký lại để nhận liên kết mới.</p>
+                    </main>
+                </body>
+                </html>
+                """;
     }
 
     private ResLoginDTO.UserLogin buildUserLogin(String email) {

@@ -45,4 +45,7 @@ public class KhachHang {
     @JoinColumn(name = "role_id")
     @JsonIgnoreProperties(value = { "permissions" })
     private Role role;
+
+    @Column(name = "Enabled", nullable = false)
+    private Integer enabled = 0;
 }

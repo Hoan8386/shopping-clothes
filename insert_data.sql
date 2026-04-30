@@ -289,7 +289,7 @@
         ('Upload ảnh lỗi phát sinh',       '/api/v1/loi-phat-sinh/upload-image',                    'POST',   'LOI_PHAT_SINH',       NOW()),
         ('Xem lỗi phát sinh theo cửa hàng', '/api/v1/loi-phat-sinh/cua-hang/{cuaHangId}',           'GET',    'LOI_PHAT_SINH',       NOW()),
 
-        -- === AUTH_VNPAY_GIO_HANG_NV (194-215) ===
+        -- === AUTH_VNPAY_GIO_HANG_NV (194-220) ===
         ('Xem thông tin tài khoản',         '/api/v1/auth/account',                                  'GET',    'AUTH',                NOW()),
         ('Làm mới phiên đăng nhập',         '/api/v1/auth/refresh',                                  'GET',    'AUTH',                NOW()),
         ('VNPay trả kết quả',               '/api/v1/auth/vnpay/return',                             'GET',    'VNPAY',               NOW()),
@@ -321,7 +321,7 @@
     -- 3. PERMISSION_ROLE
     -- ---------------------------------------------------------
 
-    -- ADMIN (role_id=1): TẤT CẢ QUYỀN (1-215)
+    -- ADMIN (role_id=1): TẤT CẢ QUYỀN (1-219)
     INSERT INTO permission_role (role_id, permission_id) VALUES
         (1,1),(1,2),(1,3),(1,4),(1,5),
         (1,6),(1,7),(1,8),(1,9),(1,10),
@@ -370,7 +370,7 @@
         (1,187),(1,188),(1,189),(1,190),(1,191),
         -- LOI_PHAT_SINH_EXTRA (192-193)
         (1,192),(1,193),
-        -- AUTH_VNPAY_GIO_HANG_NV (194-215)
+        -- AUTH_VNPAY_GIO_HANG_NV (194-220)
         (1,194),(1,195),(1,196),(1,197),(1,198),(1,199),(1,200),(1,201),(1,202),(1,203),
         (1,204),(1,205),(1,206),(1,207),(1,208),(1,209),(1,210),(1,211),(1,212),(1,213),
         (1,214),(1,215),
@@ -541,12 +541,12 @@
     -- ---------------------------------------------------------
     -- 14. KHÁCH HÀNG (Password = BCrypt '123456')
     -- ---------------------------------------------------------
-    INSERT INTO KhachHang (role_id, TenKhachHang, Email, Sdt, Password, DiemTichLuy) VALUES
-        (3, 'Lan',  'lan@g.com', '0911000001', '$2a$10$iIsMPCG8iMiSnXa9UQ5jF.1uGOkLshrEI0Ymp.S.OA6iY4fGRvEmC',  10),
-        (3, 'Minh', 'm@g.com',   '0922000002', '$2a$10$iIsMPCG8iMiSnXa9UQ5jF.1uGOkLshrEI0Ymp.S.OA6iY4fGRvEmC',   0),
-        (3, 'Hoa',  'h@g.com',   '0933000003', '$2a$10$iIsMPCG8iMiSnXa9UQ5jF.1uGOkLshrEI0Ymp.S.OA6iY4fGRvEmC', 100),
-        (3, 'Tuấn', 't@g.com',   '0944000004', '$2a$10$iIsMPCG8iMiSnXa9UQ5jF.1uGOkLshrEI0Ymp.S.OA6iY4fGRvEmC',   5),
-        (3, 'Yến',  'y@g.com',   '0955000005', '$2a$10$iIsMPCG8iMiSnXa9UQ5jF.1uGOkLshrEI0Ymp.S.OA6iY4fGRvEmC',  50);
+    INSERT INTO KhachHang (role_id, TenKhachHang, Email, Sdt, Password, DiemTichLuy, Enabled) VALUES
+        (3, 'Lan',  'lan@g.com', '0911000001', '$2a$10$iIsMPCG8iMiSnXa9UQ5jF.1uGOkLshrEI0Ymp.S.OA6iY4fGRvEmC',  10, 1),
+        (3, 'Minh', 'm@g.com',   '0922000002', '$2a$10$iIsMPCG8iMiSnXa9UQ5jF.1uGOkLshrEI0Ymp.S.OA6iY4fGRvEmC',   0, 1),
+        (3, 'Hoa',  'h@g.com',   '0933000003', '$2a$10$iIsMPCG8iMiSnXa9UQ5jF.1uGOkLshrEI0Ymp.S.OA6iY4fGRvEmC', 100, 1),
+        (3, 'Tuấn', 't@g.com',   '0944000004', '$2a$10$iIsMPCG8iMiSnXa9UQ5jF.1uGOkLshrEI0Ymp.S.OA6iY4fGRvEmC',   5, 1),
+        (3, 'Yến',  'y@g.com',   '0955000005', '$2a$10$iIsMPCG8iMiSnXa9UQ5jF.1uGOkLshrEI0Ymp.S.OA6iY4fGRvEmC',  50, 1);
 
     -- ---------------------------------------------------------
     -- 15. NHÀ CUNG CẤP
@@ -1045,7 +1045,17 @@
             AND pr.role_id <> 1;
 
     -- ---------------------------------------------------------
-    -- 47. QUYỀN DANH SÁCH KHÁCH HÀNG (IDEMPOTENT)
+    -- 47. QUYỀN XÁC NHẬN ĐĂNG KÝ KHÁCH HÀNG (IDEMPOTENT)
+    -- ---------------------------------------------------------
+    INSERT INTO permissions (name, apiPath, method, module, createdAt)
+    SELECT 'Xác nhận đăng ký qua email', '/api/v1/auth/confirm', 'GET', 'AUTH', NOW()
+    WHERE NOT EXISTS (
+        SELECT 1 FROM permissions
+        WHERE apiPath = '/api/v1/auth/confirm' AND method = 'GET'
+    );
+
+    -- ---------------------------------------------------------
+    -- 48. QUYỀN DANH SÁCH KHÁCH HÀNG (IDEMPOTENT)
     -- ---------------------------------------------------------
     INSERT INTO permissions (name, apiPath, method, module, createdAt)
     SELECT 'Xem danh sách khách hàng', '/api/v1/khach-hang', 'GET', 'KHACH_HANG', NOW()

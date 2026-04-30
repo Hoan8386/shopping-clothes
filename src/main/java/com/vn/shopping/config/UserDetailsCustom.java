@@ -36,9 +36,14 @@ public class UserDetailsCustom implements UserDetailsService {
         }
         KhachHang khachHang = khachHangService.findByEmail(username);
         if (khachHang != null) {
+            boolean enabled = Integer.valueOf(1).equals(khachHang.getEnabled());
             return new User(
                     khachHang.getEmail(),
                     khachHang.getPassword(),
+                    enabled,
+                    true,
+                    true,
+                    true,
                     Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
         }
         throw new UsernameNotFoundException("Không tìm thấy người dùng với email: " + username);

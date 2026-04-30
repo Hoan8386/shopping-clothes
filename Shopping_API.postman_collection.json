@@ -23,6 +23,10 @@
 		{
 			"key": "access_token",
 			"value": ""
+		},
+		{
+			"key": "verification_token",
+			"value": ""
 		}
 	],
 	"item": [
@@ -169,6 +173,23 @@
 							"path": ["api", "v1", "auth", "register"]
 						},
 						"description": " Public — Đăng ký tài khoản khách hàng mới (tự động gán role_id=4)"
+					}
+				},
+				{
+					"name": "Confirm Register ( Public)",
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/confirm?token={{verification_token}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "confirm"],
+							"query": [
+								{ "key": "token", "value": "{{verification_token}}", "description": "Token nhận từ email xác nhận" }
+							]
+						},
+						"description": " Public — Xác nhận email đăng ký để kích hoạt tài khoản"
 					}
 				}
 			]

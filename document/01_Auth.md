@@ -2,7 +2,7 @@
 
 > **Base Path:** `/api/v1/auth`  
 > **File:** `AuthController.java`  
-> Quản lý xác thực người dùng: đăng nhập, đăng ký, refresh token, đăng xuất, xem thông tin tài khoản.
+> Quản lý xác thực người dùng: đăng nhập, đăng ký, xác nhận email, refresh token, đăng xuất, xem thông tin tài khoản.
 
 ---
 
@@ -15,10 +15,12 @@ Hệ thống sử dụng **JWT (JSON Web Token)** để xác thực. Hỗ trợ 
 
 ### Luồng xác thực
 
-1. Gọi `POST /api/v1/auth/login` → Nhận `access_token` + cookie `refresh_token`
-2. Đính kèm token vào header: `Authorization: Bearer <access_token>`
-3. Khi `access_token` hết hạn → Gọi `GET /api/v1/auth/refresh` (dùng cookie `refresh_token`)
-4. Đăng xuất → Gọi `POST /api/v1/auth/logout` → Xóa `refresh_token`
+1. Gọi `POST /api/v1/auth/register` → Tạo tài khoản và gửi email xác nhận
+2. Khách hàng bấm link xác nhận trong email → Gọi `GET /api/v1/auth/confirm?token=...`
+3. Khi tài khoản đã được kích hoạt, gọi `POST /api/v1/auth/login` → Nhận `access_token` + cookie `refresh_token`
+4. Đính kèm token vào header: `Authorization: Bearer <access_token>`
+5. Khi `access_token` hết hạn → Gọi `GET /api/v1/auth/refresh` (dùng cookie `refresh_token`)
+6. Đăng xuất → Gọi `POST /api/v1/auth/logout` → Xóa `refresh_token`
 
 ---
 
@@ -109,6 +111,7 @@ Hệ thống sử dụng **JWT (JSON Web Token)** để xác thực. Hỗ trợ 
 > - Response trả kèm cookie `refresh_token` (httpOnly, secure, path=/).
 > - Hệ thống kiểm tra bảng NhanVien trước → nếu không tìm thấy → kiểm tra KhachHang.
 > - Trường `diemTichLuy` chỉ trả về giá trị khi đăng nhập bằng tài khoản khách hàng. Nhân viên sẽ nhận `null`.
+> - Tài khoản khách hàng phải xác nhận email trước khi đăng nhập. Nếu chưa xác nhận, hệ thống sẽ từ chối đăng nhập.
 
 ---
 
@@ -308,6 +311,8 @@ Hệ thống sử dụng **JWT (JSON Web Token)** để xác thực. Hỗ trợ 
 > **Lưu ý:**
 >
 > - Tài khoản khách hàng mới tự động được gán `role_id = 4` (KHACH_HANG).
+> - Tài khoản mới được tạo ở trạng thái chưa kích hoạt (`enabled = false`).
+> - Hệ thống sẽ gửi email xác nhận tới địa chỉ email đã đăng ký.
 > - Password được mã hóa bằng BCrypt trước khi lưu.
 > - `diemTichLuy` mặc định = 0.
 
@@ -317,6 +322,34 @@ Hệ thống sử dụng **JWT (JSON Web Token)** để xác thực. Hỗ trợ 
 | ----------- | ------------------------ |
 | `400`       | Email đã tồn tại         |
 | `400`       | Số điện thoại đã tồn tại |
+
+---
+
+## 6. Xác nhận đăng ký qua email
+
+| Thuộc tính   | Chi tiết                             |
+| ------------ | ------------------------------------ |
+| **URL**      | `GET /api/v1/auth/confirm?token=...` |
+| **Method**   | `GET`                                |
+| **Xác thực** | Không yêu cầu (🔓 Public)            |
+
+**Request Query:**
+
+| Trường  | Kiểu   | Bắt buộc | Mô tả                   |
+| ------- | ------ | -------- | ----------------------- |
+| `token` | String | **Có**   | Token xác nhận từ email |
+
+**Response:** `200 OK`
+
+```text
+Xác nhận đăng ký thành công
+```
+
+**Lỗi:**
+
+| HTTP Status | Mô tả                                       |
+| ----------- | ------------------------------------------- |
+| `400`       | Token xác nhận không hợp lệ hoặc đã hết hạn |
 
 ---
 
@@ -330,5 +363,3 @@ Hệ thống sử dụng **JWT (JSON Web Token)** để xác thực. Hỗ trợ 
 | Khách hàng | `lan@g.com` | `123456` | KHACH_HANG | KH Lan (10 điểm)      |
 | Khách hàng | `m@g.com`   | `123456` | KHACH_HANG | KH Minh (0 điểm)      |
 | Khách hàng | `h@g.com`   | `123456` | KHACH_HANG | KH Hoa (100 điểm)     |
-
-

@@ -49,6 +49,8 @@ public class KhachHangService {
             Role khachHangRole = roleRepository.findById(3L).orElse(null);
             khachHang.setRole(khachHangRole);
         }
+        // Ensure new user is not enabled until email verification
+        khachHang.setEnabled(0);
         return khachHangRepository.save(khachHang);
     }
 
