@@ -12,7 +12,8 @@
     INSERT INTO roles (name, description, active, createdAt) VALUES
         ('ADMIN',      'Quản trị viên toàn quyền', TRUE, NOW()),
         ('NHAN_VIEN',  'Nhân viên bán hàng',        TRUE, NOW()),
-        ('KHACH_HANG', 'Khách hàng mua sắm',        TRUE, NOW());
+        ('KHACH_HANG', 'Khách hàng mua sắm',        TRUE, NOW()),
+        ('NHAN_VIEN_KHO', 'Nhân viên kho',         TRUE, NOW());
 
     -- ---------------------------------------------------------
     -- 2. PERMISSIONS
@@ -399,7 +400,7 @@
         (2,110),          -- NHAN_VIEN: xem danh sách nhân viên (cùng cửa hàng)
         (2,115),(2,116),(2,117),(2,118), -- TRA_HANG: xem all, xem mã, xem theo đơn, cập nhật trạng thái
         (2,120),(2,121),                -- LOAI_DON_LUAN_CHUYEN: xem all, xem id
-        (2,125),(2,126),(2,127),(2,128),(2,129),(2,130), -- DON_LUAN_CHUYEN: tạo, xem all, xem mã, xem theo ch đặt, xem theo ch gửi, cập nhật TT
+        (2,126),(2,127),(2,125),        -- DON_LUAN_CHUYEN: xem all, xem mã, tạo (POST)
         (2,131),(2,132),                -- LOAI_KIEM_KE: xem all, xem id
         (2,136),(2,137),(2,138),(2,139),(2,140), -- KIEM_KE_HANG_HOA: xem all, xem id, tạo, cập nhật, gửi duyệt
         -- CA_LAM_VIEC: chỉ xem
@@ -443,7 +444,16 @@
         (3,114),(3,116),(3,117), -- TRA_HANG: tạo phiếu, xem theo mã, xem theo đơn hàng
         (3,187),(3,189),(3,190), -- DOI_HANG: tạo phiếu, xem theo mã, xem theo đơn hàng
         -- AUTH + VNPAY cho khách hàng
-        (3,194),(3,195),(3,196),(3,197),(3,198),(3,200),(3,201),(3,202); 
+        (3,194),(3,195),(3,196),(3,197),(3,198),(3,200),(3,201),(3,202);
+
+    -- NHAN_VIEN_KHO (role_id=4): Kiểm kê hàng hóa + cập nhật trạng thái luân chuyển
+    INSERT INTO permission_role (role_id, permission_id) VALUES
+        (4,120),(4,121),                -- LOAI_DON_LUAN_CHUYEN: xem all, xem id
+        (4,126),(4,127),(4,128),(4,129),(4,130), -- DON_LUAN_CHUYEN: xem all, xem mã, xem theo ch đặt, xem theo ch gửi, cập nhật TT
+        (4,131),(4,132),                -- LOAI_KIEM_KE: xem all, xem id
+        (4,136),(4,137),(4,138),(4,139),(4,140), -- KIEM_KE_HANG_HOA: xem all, xem id, tạo, cập nhật, gửi duyệt
+        -- AUTH
+        (4,194),(4,195),(4,197),(4,198); 
 
     -- ---------------------------------------------------------
     -- 4. CỬA HÀNG
@@ -829,6 +839,9 @@
           WHERE pr.role_id = roles.role_id AND pr.permission_id = p.id
       );
 
+    -- ---------------------------------------------------------
+   
+
     -- ADMIN + NHAN_VIEN cho endpoint xóa draft cart
     INSERT INTO permission_role (role_id, permission_id)
     SELECT roles.role_id, p.id
@@ -1078,3 +1091,53 @@
           SELECT 1 FROM permission_role pr
           WHERE pr.role_id = roles.role_id AND pr.permission_id = p.id
       );
+
+
+
+-- =========================================================
+-- 49. QUYỀN BÊN VẬN CHUYỂN (IDEMPOTENT FULL)
+-- =========================================================
+
+-- 1. TẠO PERMISSIONS (KHÔNG TRÙNG)
+INSERT INTO permissions (name, apiPath, method, module, createdAt)
+SELECT src.name, src.apiPath, src.method, src.module, NOW()
+FROM (
+SELECT 'Xem tất cả bên vận chuyển' AS name, '/api/v1/van-chuyen' AS apiPath, 'GET' AS method, 'VAN_CHUYEN' AS module
+UNION ALL SELECT 'Xem chi tiết bên vận chuyển', '/api/v1/van-chuyen/{id}', 'GET', 'VAN_CHUYEN'
+UNION ALL SELECT 'Tạo bên vận chuyển', '/api/v1/van-chuyen', 'POST', 'VAN_CHUYEN'
+UNION ALL SELECT 'Cập nhật bên vận chuyển', '/api/v1/van-chuyen', 'PUT', 'VAN_CHUYEN'
+UNION ALL SELECT 'Xóa bên vận chuyển', '/api/v1/van-chuyen/{id}', 'DELETE', 'VAN_CHUYEN'
+) src
+LEFT JOIN permissions p
+ON p.apiPath = src.apiPath AND p.method = src.method
+WHERE p.id IS NULL;
+
+-- =========================================================
+-- 2. GÁN FULL QUYỀN CHO ROLE ADMIN (role_id = 1)
+-- =========================================================
+INSERT INTO permission_role (role_id, permission_id)
+SELECT 1, p.id
+FROM permissions p
+WHERE p.apiPath LIKE '/api/v1/van-chuyen%'
+AND NOT EXISTS (
+SELECT 1
+FROM permission_role pr
+WHERE pr.role_id = 1 AND pr.permission_id = p.id
+);
+
+-- =========================================================
+-- 3. GÁN QUYỀN XEM (GET) CHO ROLE 2 VÀ 3
+-- =========================================================
+INSERT INTO permission_role (role_id, permission_id)
+SELECT r.role_id, p.id
+FROM (
+SELECT 2 AS role_id
+UNION ALL
+SELECT 3
+) r
+JOIN permissions p
+ON p.apiPath LIKE '/api/v1/van-chuyen%'
+AND p.method = 'GET'
+LEFT JOIN permission_role pr
+ON pr.role_id = r.role_id AND pr.permission_id = p.id
+WHERE pr.permission_id IS NULL;

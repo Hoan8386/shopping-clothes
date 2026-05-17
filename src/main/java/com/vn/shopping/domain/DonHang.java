@@ -33,6 +33,10 @@ public class DonHang {
     @JoinColumn(name = "MaNhanVien")
     private NhanVien nhanVien;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "MaVanChuyen")
+    private VanChuyen vanChuyen;
+
     @Column(name = "MaKhuyenMaiHoaDon")
     private Long maKhuyenMaiHoaDon;
 

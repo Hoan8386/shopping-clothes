@@ -50,6 +50,7 @@ public class KiemKeHangHoaService {
     @Transactional
     public KiemKeHangHoa create(ReqKiemKeHangHoaDTO dto) throws IdInvalidException {
         NhanVien currentNhanVien = getCurrentNhanVien();
+        validateCanCreatePhieu(currentNhanVien);
 
         KiemKeHangHoa phieu = new KiemKeHangHoa();
         phieu.setTenPhieuKiemKe(dto.getTenPhieuKiemKe());
@@ -393,6 +394,13 @@ public class KiemKeHangHoaService {
         }
     }
 
+    private void validateCanCreatePhieu(NhanVien nhanVien) throws IdInvalidException {
+        if (isAdmin(nhanVien) || isWarehouseStaff(nhanVien)) {
+            return;
+        }
+        throw new IdInvalidException("Chỉ nhân viên kho mới có quyền tạo phiếu kiểm kê");
+    }
+
     private boolean isAdmin(NhanVien nhanVien) {
         if (nhanVien == null || nhanVien.getRole() == null || nhanVien.getRole().getName() == null) {
             return false;
@@ -400,6 +408,15 @@ public class KiemKeHangHoaService {
 
         String roleName = nhanVien.getRole().getName().trim().toUpperCase();
         return roleName.equals("ADMIN") || roleName.contains("ADMIN");
+    }
+
+    private boolean isWarehouseStaff(NhanVien nhanVien) {
+        if (nhanVien == null || nhanVien.getRole() == null || nhanVien.getRole().getName() == null) {
+            return false;
+        }
+
+        String roleName = nhanVien.getRole().getName().trim().toUpperCase();
+        return roleName.equals("NHAN_VIEN_KHO") || roleName.contains("KHO");
     }
 
     private void validateChiTietSanPhamTheoCuaHang(CuaHang cuaHang, ChiTietSanPham ctsp) throws IdInvalidException {

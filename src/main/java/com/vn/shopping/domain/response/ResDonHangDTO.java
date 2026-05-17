@@ -25,6 +25,7 @@ public class ResDonHangDTO {
     private String trangThai;
     private String trangThaiThanhToan;
     private String hinhThucDonHang;
+    private VanChuyenDTO vanChuyen;
     private KhuyenMaiHoaDonDTO khuyenMaiHoaDon;
     private KhuyenMaiDiemDTO khuyenMaiDiem;
     private LocalDateTime ngayTao;
@@ -67,6 +68,18 @@ public class ResDonHangDTO {
         private String tenNhanVien;
         private String email;
         private String soDienThoai;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class VanChuyenDTO {
+        private Long id;
+        private String tenVanChuyen;
+        private String soDienThoai;
+        private String website;
+        private String ghiTru;
     }
 
     @Getter

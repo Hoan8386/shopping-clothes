@@ -16,6 +16,9 @@ public class ReqTaoDonHangDTO {
     // Mã cửa hàng (nhân viên tạo tại quầy thì truyền, online có thể null)
     private Long cuaHangId;
 
+    // Bên vận chuyển được chọn khi tạo đơn online
+    private Long vanChuyenId;
+
     // Mã khuyến mãi (tùy chọn)
     private Long maKhuyenMaiHoaDon;
     private Long maKhuyenMaiDiem;

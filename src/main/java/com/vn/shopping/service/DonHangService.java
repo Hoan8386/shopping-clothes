@@ -36,6 +36,7 @@ public class DonHangService {
     private final ChiTietSanPhamRepository chiTietSanPhamRepository;
     private final SanPhamRepository sanPhamRepository;
     private final CuaHangRepository cuaHangRepository;
+    private final VanChuyenRepository vanChuyenRepository;
     private final KhuyenMaiTheoDiemRepository khuyenMaiTheoDiemRepository;
     private final KhuyenMaiTheoHoaDonRepository khuyenMaiTheoHoaDonRepository;
     private final GioHangService gioHangService;
@@ -45,7 +46,8 @@ public class DonHangService {
             KhachHangRepository khachHangRepository, NhanVienRepository nhanVienRepository,
             GioHangRepository gioHangRepository, ChiTietDonHangRepository chiTietDonHangRepository,
             ChiTietSanPhamRepository chiTietSanPhamRepository, SanPhamRepository sanPhamRepository,
-            CuaHangRepository cuaHangRepository, KhuyenMaiTheoDiemRepository khuyenMaiTheoDiemRepository,
+            CuaHangRepository cuaHangRepository, VanChuyenRepository vanChuyenRepository,
+            KhuyenMaiTheoDiemRepository khuyenMaiTheoDiemRepository,
             KhuyenMaiTheoHoaDonRepository khuyenMaiTheoHoaDonRepository,
             GioHangService gioHangService,
             VNPayService vnPayService) {
@@ -58,6 +60,7 @@ public class DonHangService {
         this.chiTietSanPhamRepository = chiTietSanPhamRepository;
         this.sanPhamRepository = sanPhamRepository;
         this.cuaHangRepository = cuaHangRepository;
+        this.vanChuyenRepository = vanChuyenRepository;
         this.khuyenMaiTheoDiemRepository = khuyenMaiTheoDiemRepository;
         this.khuyenMaiTheoHoaDonRepository = khuyenMaiTheoHoaDonRepository;
         this.gioHangService = gioHangService;
@@ -117,6 +120,10 @@ public class DonHangService {
 
         if (req.getSdt() == null || req.getSdt().isBlank()) {
             throw new IdInvalidException("Vui lòng nhập số điện thoại nhận hàng");
+        }
+
+        if (req.getVanChuyenId() == null) {
+            throw new IdInvalidException("Vui lòng chọn bên vận chuyển");
         }
 
         if (req.getDiaChi() == null || req.getDiaChi().isBlank()) {
@@ -189,6 +196,13 @@ public class DonHangService {
                     .orElseThrow(() -> new IdInvalidException("Không tìm thấy cửa hàng: " + req.getCuaHangId()));
             donHang.setCuaHang(ch);
         }
+
+        if (req.getVanChuyenId() == null) {
+            throw new IdInvalidException("Vui lòng chọn bên vận chuyển");
+        }
+        VanChuyen vanChuyen = vanChuyenRepository.findById(req.getVanChuyenId())
+                .orElseThrow(() -> new IdInvalidException("Không tìm thấy bên vận chuyển: " + req.getVanChuyenId()));
+        donHang.setVanChuyen(vanChuyen);
 
         DonHang savedDonHang = donHangRepository.save(donHang);
 
@@ -866,6 +880,12 @@ public class DonHangService {
         dto.setHinhThucDonHang(mapHinhThucDonHang(donHang.getHinhThucDonHang()));
         dto.setNgayTao(donHang.getNgayTao());
         dto.setNgayCapNhat(donHang.getNgayCapNhat());
+
+        if (donHang.getVanChuyen() != null) {
+            VanChuyen vc = donHang.getVanChuyen();
+            dto.setVanChuyen(new ResDonHangDTO.VanChuyenDTO(
+                    vc.getId(), vc.getTenVanChuyen(), vc.getSoDienThoai(), vc.getWebsite(), vc.getGhiTru()));
+        }
 
         // Map khuyến mãi theo hóa đơn
         if (donHang.getMaKhuyenMaiHoaDon() != null) {

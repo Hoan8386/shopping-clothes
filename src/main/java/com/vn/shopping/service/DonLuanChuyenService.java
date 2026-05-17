@@ -156,6 +156,17 @@ public class DonLuanChuyenService {
         Optional<NhanVien> currentStaff = getCurrentNhanVien();
         if (currentStaff.isPresent()) {
             NhanVien nhanVien = currentStaff.get();
+            
+            // Kiểm tra role: chỉ nhân viên kho (role_id = 4) được phép cập nhật trạng thái
+            if (nhanVien.getRole() == null || nhanVien.getRole().getId() == null) {
+                throw new IdInvalidException("Nhân viên không có quyền hạn");
+            }
+            
+            Long roleId = nhanVien.getRole().getId();
+            if (!roleId.equals(4L)) {
+                throw new IdInvalidException("Chỉ nhân viên kho mới có quyền cập nhật trạng thái đơn luân chuyển");
+            }
+            
             if (nhanVien.getCuaHang() == null || nhanVien.getCuaHang().getId() == null) {
                 throw new IdInvalidException("Nhân viên chưa được gán cửa hàng");
             }
