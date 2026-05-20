@@ -30,6 +30,7 @@ public class ResLoginDTO {
         @JsonIgnoreProperties("permissions")
         private Role role;
         private Integer diemTichLuy;
+        private String cuaHang;
     }
 
     @Getter

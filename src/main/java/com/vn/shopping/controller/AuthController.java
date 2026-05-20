@@ -20,6 +20,7 @@ import com.vn.shopping.domain.NhanVien;
 import com.vn.shopping.domain.Role;
 import com.vn.shopping.domain.response.ResCreateUserDTO;
 import com.vn.shopping.domain.response.ResLoginDTO;
+import com.vn.shopping.domain.response.ResLoginDTO.UserLogin;
 import com.vn.shopping.domain.request.ReqChangePasswordDTO;
 import com.vn.shopping.domain.request.ReqLoginDTO;
 import com.vn.shopping.service.KhachHangService;
@@ -109,6 +110,7 @@ public class AuthController {
             if (role != null) {
                 role.getName(); // Trigger lazy loading
             }
+            String cuaHang = nhanVien.getCuaHang().getTenCuaHang();
             ResLoginDTO.UserLogin userLogin = new ResLoginDTO.UserLogin(
                     nhanVien.getId(),
                     nhanVien.getEmail(),
@@ -116,7 +118,8 @@ public class AuthController {
                     nhanVien.getSoDienThoai(),
                     nhanVien.getAvatar(),
                     role,
-                    null);
+                    null,
+                    cuaHang);
             res.setUser(userLogin);
         } else {
             // Kiểm tra KhachHang
@@ -134,7 +137,8 @@ public class AuthController {
                         currentUserDB.getSdt(),
                         currentUserDB.getAvatar(),
                         role,
-                        currentUserDB.getDiemTichLuy());
+                        currentUserDB.getDiemTichLuy(),
+                        null);
                 res.setUser(userLogin);
             }
         }
@@ -232,6 +236,7 @@ public class AuthController {
         if (nhanVien != null) {
             // Trigger lazy loading để tránh proxy issues
             Role role = nhanVien.getRole();
+            String cuaHang = nhanVien.getCuaHang().getTenCuaHang();
             if (role != null) {
                 role.getName(); // Trigger lazy loading
             }
@@ -242,7 +247,8 @@ public class AuthController {
                     nhanVien.getSoDienThoai(),
                     nhanVien.getAvatar(),
                     role,
-                    null);
+                    null,
+                    cuaHang);
             res.setUser(userLogin);
         } else {
             // Trigger lazy loading để tránh proxy issues
@@ -257,7 +263,8 @@ public class AuthController {
                     khachHang.getSdt(),
                     khachHang.getAvatar(),
                     role,
-                    khachHang.getDiemTichLuy());
+                    khachHang.getDiemTichLuy(),
+                    null);
             res.setUser(userLogin);
         }
 
@@ -609,6 +616,8 @@ public class AuthController {
             if (role != null) {
                 role.getName();
             }
+            String cuaHang = nhanVienDB.getCuaHang().getTenCuaHang();
+
             return new ResLoginDTO.UserLogin(
                     nhanVienDB.getId(),
                     nhanVienDB.getEmail(),
@@ -616,7 +625,8 @@ public class AuthController {
                     nhanVienDB.getSoDienThoai(),
                     nhanVienDB.getAvatar(),
                     role,
-                    null);
+                    null,
+                    cuaHang);
         }
 
         KhachHang currentUserDB = this.khachHangService.findByEmail(email);
@@ -632,7 +642,8 @@ public class AuthController {
                     currentUserDB.getSdt(),
                     currentUserDB.getAvatar(),
                     role,
-                    currentUserDB.getDiemTichLuy());
+                    currentUserDB.getDiemTichLuy(),
+                    null);
         }
 
         return null;
