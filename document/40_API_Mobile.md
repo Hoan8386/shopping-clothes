@@ -11,7 +11,7 @@ Tai lieu nay tong hop cac API can cho mobile theo controller hien tai, trinh bay
 
 ---
 
-## 1. Dang nhap (tai khoan nhan vien)
+## 1. Dang nhap (nhan vien / khach hang)
 
 | Thuoc tinh   | Chi tiet                  |
 | ------------ | ------------------------- |
@@ -37,7 +37,7 @@ Tai lieu nay tong hop cac API can cho mobile theo controller hien tai, trinh bay
 }
 ```
 
-**Response:** `200 OK` — Tra ve `ResLoginDTO`
+**Response:** `200 OK` — Tra ve `ResLoginDTO` va set cookie `refresh_token`
 
 ```json
 {
@@ -54,7 +54,8 @@ Tai lieu nay tong hop cac API can cho mobile theo controller hien tai, trinh bay
       "description": "Nhan vien",
       "active": true
     },
-    "diemTichLuy": null
+    "diemTichLuy": null,
+    "cuaHang": "Chi nhanh Q1"
   }
 }
 ```
@@ -76,9 +77,16 @@ Tai lieu nay tong hop cac API can cho mobile theo controller hien tai, trinh bay
       "description": "String",
       "active": "Boolean"
     },
-    "diemTichLuy": "Integer"
+    "diemTichLuy": "Integer | null",
+    "cuaHang": "String | null"
   }
 }
+
+**Ghi chu:**
+
+- Nhan vien: `cuaHang` co gia tri, `diemTichLuy` = null.
+- Khach hang: `cuaHang` = null, `diemTichLuy` co gia tri (hoac null neu chua co).
+- Response set cookie `refresh_token` (HttpOnly, Secure, Path=/).
 ```
 
 ---
