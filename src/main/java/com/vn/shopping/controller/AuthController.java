@@ -110,7 +110,7 @@ public class AuthController {
             if (role != null) {
                 role.getName(); // Trigger lazy loading
             }
-            String cuaHang = nhanVien.getCuaHang().getTenCuaHang();
+            Long cuaHang = nhanVien.getCuaHang().getId();
             ResLoginDTO.UserLogin userLogin = new ResLoginDTO.UserLogin(
                     nhanVien.getId(),
                     nhanVien.getEmail(),
@@ -192,6 +192,7 @@ public class AuthController {
             userLogin.setAvatar(nhanVienDB.getAvatar());
             userLogin.setRole(role);
             userLogin.setDiemTichLuy(null);
+            userLogin.setIdCuaHang(nhanVienDB.getCuaHang().getId());
             userGetAccount.setUser(userLogin);
         } else {
             KhachHang currentUserDB = this.khachHangService.findByEmail(email);
@@ -208,6 +209,7 @@ public class AuthController {
                 userLogin.setAvatar(currentUserDB.getAvatar());
                 userLogin.setRole(role);
                 userLogin.setDiemTichLuy(currentUserDB.getDiemTichLuy());
+                userLogin.setIdCuaHang(null);
                 userGetAccount.setUser(userLogin);
             }
         }
@@ -236,7 +238,7 @@ public class AuthController {
         if (nhanVien != null) {
             // Trigger lazy loading để tránh proxy issues
             Role role = nhanVien.getRole();
-            String cuaHang = nhanVien.getCuaHang().getTenCuaHang();
+            Long idCuaHang = nhanVien.getCuaHang().getId();
             if (role != null) {
                 role.getName(); // Trigger lazy loading
             }
@@ -248,7 +250,7 @@ public class AuthController {
                     nhanVien.getAvatar(),
                     role,
                     null,
-                    cuaHang);
+                    idCuaHang);
             res.setUser(userLogin);
         } else {
             // Trigger lazy loading để tránh proxy issues
@@ -616,8 +618,6 @@ public class AuthController {
             if (role != null) {
                 role.getName();
             }
-            String cuaHang = nhanVienDB.getCuaHang().getTenCuaHang();
-
             return new ResLoginDTO.UserLogin(
                     nhanVienDB.getId(),
                     nhanVienDB.getEmail(),
@@ -626,7 +626,7 @@ public class AuthController {
                     nhanVienDB.getAvatar(),
                     role,
                     null,
-                    cuaHang);
+                    nhanVienDB.getCuaHang().getId());
         }
 
         KhachHang currentUserDB = this.khachHangService.findByEmail(email);
