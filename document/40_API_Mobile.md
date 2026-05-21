@@ -153,6 +153,50 @@ Tai lieu nay tong hop cac API can cho mobile theo controller hien tai, trinh bay
 
 **Response:** `200 OK` — Tra ve `ResLoginDTO` (giong dang nhap)
 
+```json
+{
+  "access_token": "eyJhbGciOi...",
+  "user": {
+    "id": 5,
+    "email": "h@s.com",
+    "name": "Hung",
+    "sdt": "0901000005",
+    "avatar": "https://...",
+    "role": {
+      "id": 1,
+      "name": "ADMIN",
+      "description": "Nhan vien",
+      "active": true
+    },
+    "diemTichLuy": null,
+    "cuaHang": "Chi nhanh Q1"
+  }
+}
+```
+
+**Kieu du lieu:**
+
+```json
+{
+  "access_token": "String",
+  "user": {
+    "id": "Long",
+    "email": "String",
+    "name": "String",
+    "sdt": "String",
+    "avatar": "String",
+    "role": {
+      "id": "Long",
+      "name": "String",
+      "description": "String",
+      "active": "Boolean"
+    },
+    "diemTichLuy": "Integer | null",
+    "cuaHang": "String | null"
+  }
+}
+```
+
 ---
 
 ## 4. Dang xuat
@@ -510,6 +554,369 @@ Khach hang xac nhan da nhan hang.
 | **Xac thuc** | Bearer Token (JWT)                       |
 
 **Request Body:** `ReqTaoDonHangDTO` (giong muc 3)
+
+**Response:** `200 OK`
+
+```json
+{
+  "paymentUrl": "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html?..."
+}
+```
+
+---
+
+# Gio Hang Nhan Vien Controller (tai quay)
+
+> Base Path: `/api/v1/gio-hang-nhan-vien`
+> File: `GioHangNhanVienController.java`
+
+---
+
+## 1. Lay danh sach gio hang nhap (chua thanh toan)
+
+| Thuoc tinh   | Chi tiet                                   |
+| ------------ | ------------------------------------------ |
+| **URL**      | `GET /api/v1/gio-hang-nhan-vien/danh-sach` |
+| **Method**   | `GET`                                      |
+| **Xac thuc** | Bearer Token (JWT)                         |
+
+**Response:** `200 OK` — Tra ve `List<ResGioHangNhanVienDTO>`
+
+---
+
+## 2. Lay chi tiet gio hang theo ID
+
+| Thuoc tinh   | Chi tiet                              |
+| ------------ | ------------------------------------- |
+| **URL**      | `GET /api/v1/gio-hang-nhan-vien/{id}` |
+| **Method**   | `GET`                                 |
+| **Xac thuc** | Bearer Token (JWT)                    |
+
+**Path Parameters:**
+
+| Tham so | Kieu | Mo ta       |
+| ------- | ---- | ----------- |
+| `id`    | Long | Ma gio hang |
+
+**Response:** `200 OK` — Tra ve `ResGioHangNhanVienDTO`
+
+---
+
+## 3. Xoa gio hang nhap
+
+| Thuoc tinh   | Chi tiet                                 |
+| ------------ | ---------------------------------------- |
+| **URL**      | `DELETE /api/v1/gio-hang-nhan-vien/{id}` |
+| **Method**   | `DELETE`                                 |
+| **Xac thuc** | Bearer Token (JWT)                       |
+
+**Response:** `204 No Content`
+
+---
+
+## 4. Tao gio hang moi (bat dau ban tai quay)
+
+| Thuoc tinh   | Chi tiet                              |
+| ------------ | ------------------------------------- |
+| **URL**      | `POST /api/v1/gio-hang-nhan-vien/moi` |
+| **Method**   | `POST`                                |
+| **Xac thuc** | Bearer Token (JWT)                    |
+
+**Response:** `200 OK` — Tra ve `ResGioHangNhanVienDTO`
+
+---
+
+## 6. Cap nhat thong tin khach hang cho gio hang
+
+| Thuoc tinh   | Chi tiet                                         |
+| ------------ | ------------------------------------------------ |
+| **URL**      | `PUT /api/v1/gio-hang-nhan-vien/thong-tin-khach` |
+| **Method**   | `PUT`                                            |
+| **Xac thuc** | Bearer Token (JWT)                               |
+
+**Query Parameters:**
+
+| Tham so  | Kieu | Bat buoc | Mo ta                |
+| -------- | ---- | -------- | -------------------- |
+| `cartId` | Long | Khong    | Ma gio hang (neu co) |
+
+**Request Body:**
+
+```json
+{
+  "tenNguoiMua": "Tran Van A",
+  "sdt": "0911000001"
+}
+```
+
+**Kieu du lieu:**
+
+```json
+{
+  "tenNguoiMua": "String",
+  "sdt": "String"
+}
+```
+
+**Response:** `200 OK` — Tra ve `ResGioHangNhanVienDTO`
+
+---
+
+## 7. Them san pham vao gio hang
+
+| Thuoc tinh   | Chi tiet                                        |
+| ------------ | ----------------------------------------------- |
+| **URL**      | `POST /api/v1/gio-hang-nhan-vien/them-san-pham` |
+| **Method**   | `POST`                                          |
+| **Xac thuc** | Bearer Token (JWT)                              |
+
+**Query Parameters:**
+
+| Tham so  | Kieu | Bat buoc | Mo ta                |
+| -------- | ---- | -------- | -------------------- |
+| `cartId` | Long | Khong    | Ma gio hang (neu co) |
+
+**Request Body:**
+
+```json
+{
+  "chiTietSanPhamId": 10,
+  "maVach": null,
+  "soLuong": 2
+}
+```
+
+**Kieu du lieu:**
+
+```json
+{
+  "chiTietSanPhamId": "Long",
+  "maVach": "String | null",
+  "soLuong": "Integer"
+}
+```
+
+**Response:** `200 OK` — Tra ve `ResGioHangNhanVienDTO`
+
+---
+
+## 8. Quet ma vach them san pham
+
+| Thuoc tinh   | Chi tiet                                        |
+| ------------ | ----------------------------------------------- |
+| **URL**      | `POST /api/v1/gio-hang-nhan-vien/them-san-pham` |
+| **Method**   | `POST`                                          |
+| **Xac thuc** | Bearer Token (JWT)                              |
+
+**Query Parameters:**
+
+| Tham so  | Kieu | Bat buoc | Mo ta                |
+| -------- | ---- | -------- | -------------------- |
+| `cartId` | Long | Khong    | Ma gio hang (neu co) |
+
+**Request Body:**
+
+```json
+{
+  "chiTietSanPhamId": null,
+  "maVach": "SP3HCTSGCH2",
+  "soLuong": 1
+}
+```
+
+**Kieu du lieu:**
+
+```json
+{
+  "chiTietSanPhamId": "Long | null",
+  "maVach": "String",
+  "soLuong": "Integer"
+}
+```
+
+**Response:** `200 OK` — Tra ve `ResGioHangNhanVienDTO`
+
+---
+
+**Ghi chu:** Neu can quet ma vach bang anh, dung API `POST /api/v1/chi-tiet-san-pham/scan-image` (xem muc "Tim san pham theo anh ma vach").
+
+**Request:** `multipart/form-data`
+
+| Tham so | Kieu | Bat buoc | Mo ta       |
+| ------- | ---- | -------- | ----------- |
+| `file`  | File | Co       | Anh ma vach |
+
+**Response:** `200 OK` — Tra ve `ResChiTietSanPhamDTO`
+
+```json
+{
+  "id": 1,
+  "sanPhamId": 1,
+  "maPhieuNhap": null,
+  "maCuaHang": 1,
+  "tenCuaHang": "Chi nhanh Q1",
+  "soLuong": 15,
+  "giaBan": 250000,
+  "trangThai": 1,
+  "moTa": "Ao polo den size M",
+  "ghiTru": null,
+  "maVach": "SP3HCTSGCH2",
+  "tenSanPham": "Ao Polo Classic",
+  "tenMauSac": "Den",
+  "tenKichThuoc": "M",
+  "hinhAnhUrls": ["polo-den-1.jpg", "polo-den-2.jpg"]
+}
+```
+
+---
+
+## 9. Cap nhat so luong san pham trong gio hang
+
+| Thuoc tinh   | Chi tiet                                       |
+| ------------ | ---------------------------------------------- |
+| **URL**      | `PUT /api/v1/gio-hang-nhan-vien/chi-tiet/{id}` |
+| **Method**   | `PUT`                                          |
+| **Xac thuc** | Bearer Token (JWT)                             |
+
+**Path Parameters:**
+
+| Tham so | Kieu | Mo ta                |
+| ------- | ---- | -------------------- |
+| `id`    | Long | Ma chi tiet gio hang |
+
+**Query Parameters:**
+
+| Tham so  | Kieu | Bat buoc | Mo ta                |
+| -------- | ---- | -------- | -------------------- |
+| `cartId` | Long | Khong    | Ma gio hang (neu co) |
+
+**Request Body:**
+
+```json
+{
+  "soLuong": 2
+}
+```
+
+**Kieu du lieu:**
+
+```json
+{
+  "soLuong": "Integer"
+}
+```
+
+**Response:** `200 OK` — Tra ve `ResGioHangNhanVienDTO`
+
+---
+
+## 10. Xoa san pham khoi gio hang
+
+| Thuoc tinh   | Chi tiet                                          |
+| ------------ | ------------------------------------------------- |
+| **URL**      | `DELETE /api/v1/gio-hang-nhan-vien/chi-tiet/{id}` |
+| **Method**   | `DELETE`                                          |
+| **Xac thuc** | Bearer Token (JWT)                                |
+
+**Path Parameters:**
+
+| Tham so | Kieu | Mo ta                |
+| ------- | ---- | -------------------- |
+| `id`    | Long | Ma chi tiet gio hang |
+
+**Query Parameters:**
+
+| Tham so  | Kieu | Bat buoc | Mo ta                |
+| -------- | ---- | -------- | -------------------- |
+| `cartId` | Long | Khong    | Ma gio hang (neu co) |
+
+**Response:** `200 OK` — Tra ve `ResGioHangNhanVienDTO`
+
+---
+
+## 11. Cap nhat ma khuyen mai cho gio hang
+
+| Thuoc tinh   | Chi tiet                                    |
+| ------------ | ------------------------------------------- |
+| **URL**      | `PUT /api/v1/gio-hang-nhan-vien/khuyen-mai` |
+| **Method**   | `PUT`                                       |
+| **Xac thuc** | Bearer Token (JWT)                          |
+
+**Query Parameters:**
+
+| Tham so  | Kieu | Bat buoc | Mo ta                |
+| -------- | ---- | -------- | -------------------- |
+| `cartId` | Long | Khong    | Ma gio hang (neu co) |
+
+**Request Body:**
+
+```json
+{
+  "maKhuyenMaiHoaDon": null,
+  "maKhuyenMaiDiem": null
+}
+```
+
+**Kieu du lieu:**
+
+```json
+{
+  "maKhuyenMaiHoaDon": "Long | null",
+  "maKhuyenMaiDiem": "Long | null"
+}
+```
+
+**Response:** `200 OK` — Tra ve `ResGioHangNhanVienDTO`
+
+---
+
+## 12. Thanh toan tien mat va tao don hang
+
+| Thuoc tinh   | Chi tiet                                     |
+| ------------ | -------------------------------------------- |
+| **URL**      | `POST /api/v1/gio-hang-nhan-vien/thanh-toan` |
+| **Method**   | `POST`                                       |
+| **Xac thuc** | Bearer Token (JWT)                           |
+
+**Query Parameters:**
+
+| Tham so  | Kieu | Bat buoc | Mo ta                |
+| -------- | ---- | -------- | -------------------- |
+| `cartId` | Long | Khong    | Ma gio hang (neu co) |
+
+**Request Body:**
+
+```json
+{
+  "hinhThucDonHang": 0
+}
+```
+
+**Kieu du lieu:**
+
+```json
+{
+  "hinhThucDonHang": "Integer"
+}
+```
+
+**Response:** `200 OK` — Tra ve `ResDonHangDTO`
+
+---
+
+## 13. Tao link thanh toan VNPAY (chua tao don)
+
+| Thuoc tinh   | Chi tiet                                               |
+| ------------ | ------------------------------------------------------ |
+| **URL**      | `POST /api/v1/gio-hang-nhan-vien/thanh-toan/vnpay-url` |
+| **Method**   | `POST`                                                 |
+| **Xac thuc** | Bearer Token (JWT)                                     |
+
+**Query Parameters:**
+
+| Tham so  | Kieu | Bat buoc | Mo ta                |
+| -------- | ---- | -------- | -------------------- |
+| `cartId` | Long | Khong    | Ma gio hang (neu co) |
 
 **Response:** `200 OK`
 
