@@ -47,7 +47,7 @@ public class SanPham {
     @Column(name = "HinhAnhChinh", length = 255)
     private String hinhAnhChinh;
 
-    @Column(name = "MoTa", length = 255)
+    @Column(name = "MoTa", columnDefinition = "LONGTEXT")
     private String moTa;
 
     @Column(name = "SoLuong")

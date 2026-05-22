@@ -168,6 +168,20 @@ public class AuthController {
                 .body(res);
     }
 
+    @PostMapping("/auth/change-account")
+    @ApiMessage("Đổi tài khoản thành công")
+    public ResponseEntity<ResLoginDTO> changeAccount(@Valid @RequestBody ReqLoginDTO loginDto) {
+        String currentEmail = SecurityUtil.getCurrentUserLogin().orElse("");
+        ResponseEntity<ResLoginDTO> response = this.login(loginDto);
+
+        if (!currentEmail.isBlank() && !currentEmail.equalsIgnoreCase(loginDto.getUsername().trim())) {
+            this.nhanVienService.updateUserToken(null, currentEmail);
+            this.khachHangService.updateUserToken(null, currentEmail);
+        }
+
+        return response;
+    }
+
     @GetMapping("/auth/account")
     @ApiMessage("fetch account")
     public ResponseEntity<ResLoginDTO.UserGetAccount> getAccount() {

@@ -248,7 +248,33 @@ Hệ thống sử dụng **JWT (JSON Web Token)** để xác thực. Hỗ trợ 
 
 ---
 
-## 5. Đăng ký tài khoản khách hàng
+## 5. Đổi tài khoản
+
+| Thuộc tính       | Chi tiết                           |
+| ---------------- | ---------------------------------- |
+| **URL**          | `POST /api/v1/auth/change-account` |
+| **Method**       | `POST`                             |
+| **Content-Type** | `application/json`                 |
+| **Xác thực**     | Bearer Token (JWT)                 |
+
+**Request Body:**
+
+```json
+{
+  "username": "lan@g.com",
+  "password": "123456"
+}
+```
+
+**Lưu ý:**
+
+> - API này dùng khi muốn chuyển sang một tài khoản khác ngay trong phiên hiện tại.
+> - Hệ thống vẫn xác thực giống `POST /api/v1/auth/login`, nhưng sẽ xóa refresh token của tài khoản đang đăng nhập trước khi trả token mới cho tài khoản đích.
+> - Response trả về cùng cấu trúc với `POST /api/v1/auth/login`.
+
+---
+
+## 6. Đăng ký tài khoản khách hàng
 
 | Thuộc tính       | Chi tiết                     |
 | ---------------- | ---------------------------- |
