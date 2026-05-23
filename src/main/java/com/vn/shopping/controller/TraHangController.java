@@ -1,6 +1,7 @@
 package com.vn.shopping.controller;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Pageable;
@@ -23,9 +24,11 @@ import com.vn.shopping.util.error.IdInvalidException;
 public class TraHangController {
 
     private final TraHangService traHangService;
+    private final com.vn.shopping.service.VNPayService vnPayService;
 
-    public TraHangController(TraHangService traHangService) {
+    public TraHangController(TraHangService traHangService, com.vn.shopping.service.VNPayService vnPayService) {
         this.traHangService = traHangService;
+        this.vnPayService = vnPayService;
     }
 
     @PostMapping
@@ -77,5 +80,41 @@ public class TraHangController {
             @RequestParam Integer trangThai) throws IdInvalidException {
         TraHang traHang = traHangService.capNhatTrangThai(id, trangThai);
         return ResponseEntity.ok(traHangService.convertToDTO(traHang));
+    }
+
+    @PostMapping("/{id}/vnpay-url")
+    @ApiMessage("Tạo URL thanh toán VNPAY cho phiếu trả hàng")
+    public ResponseEntity<Map<String, String>> taoLinkThanhToanVNPay(
+            @PathVariable Long id,
+            jakarta.servlet.http.HttpServletRequest request) throws IdInvalidException {
+        TraHang traHang = traHangService.findById(id);
+        if (traHang == null) {
+            throw new IdInvalidException("Không tìm thấy phiếu trả hàng: " + id);
+        }
+
+        long tongTienTra = 0;
+        if (traHang.getChiTietTraHangs() != null) {
+            for (com.vn.shopping.domain.ChiTietTraHang chiTiet : traHang.getChiTietTraHangs()) {
+                if (chiTiet != null && chiTiet.getSanPhamTra() != null) {
+                    Double thanhTien = chiTiet.getSanPhamTra().getThanhTien();
+                    if (thanhTien != null) {
+                        tongTienTra += Math.round(thanhTien);
+                    }
+                }
+            }
+        }
+
+        if (tongTienTra <= 0) {
+            throw new IdInvalidException("Phiếu trả hàng không hợp lệ để thanh toán VNPAY");
+        }
+
+        String forwardedFor = request.getHeader("X-Forwarded-For");
+        String ipAddr = (forwardedFor != null && !forwardedFor.isBlank())
+                ? forwardedFor.split(",")[0].trim()
+                : request.getRemoteAddr();
+
+        String paymentUrl = vnPayService.createReturnPaymentUrl(id, tongTienTra, ipAddr);
+
+        return ResponseEntity.ok(Map.of("paymentUrl", paymentUrl));
     }
 }

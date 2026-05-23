@@ -20,9 +20,10 @@ import com.vn.shopping.domain.NhanVien;
 import com.vn.shopping.domain.Role;
 import com.vn.shopping.domain.response.ResCreateUserDTO;
 import com.vn.shopping.domain.response.ResLoginDTO;
-import com.vn.shopping.domain.response.ResLoginDTO.UserLogin;
+import com.vn.shopping.domain.request.ReqForgotPasswordDTO;
 import com.vn.shopping.domain.request.ReqChangePasswordDTO;
 import com.vn.shopping.domain.request.ReqLoginDTO;
+import com.vn.shopping.domain.request.ReqResetPasswordDTO;
 import com.vn.shopping.service.KhachHangService;
 import com.vn.shopping.service.VerificationTokenService;
 import com.vn.shopping.service.EmailService;
@@ -45,6 +46,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 
 @RestController
@@ -67,6 +70,9 @@ public class AuthController {
 
     @Value("${shopping.frontend-login-url}")
     private String frontendLoginUrl;
+
+    @Value("${shopping.frontend-reset-password-url}")
+    private String frontendResetPasswordUrl;
 
     public AuthController(
             AuthenticationManagerBuilder authenticationManagerBuilder,
@@ -168,18 +174,79 @@ public class AuthController {
                 .body(res);
     }
 
-    @PostMapping("/auth/change-account")
-    @ApiMessage("Đổi tài khoản thành công")
-    public ResponseEntity<ResLoginDTO> changeAccount(@Valid @RequestBody ReqLoginDTO loginDto) {
-        String currentEmail = SecurityUtil.getCurrentUserLogin().orElse("");
-        ResponseEntity<ResLoginDTO> response = this.login(loginDto);
-
-        if (!currentEmail.isBlank() && !currentEmail.equalsIgnoreCase(loginDto.getUsername().trim())) {
-            this.nhanVienService.updateUserToken(null, currentEmail);
-            this.khachHangService.updateUserToken(null, currentEmail);
+    @PostMapping({ "/auth/forgot-password", "/auth/change-account" })
+    @ApiMessage("Quên mật khẩu")
+    public ResponseEntity<Void> forgotPassword(@Valid @RequestBody ReqForgotPasswordDTO req)
+            throws IdInvalidException {
+        String email = req.getEmail() == null ? "" : req.getEmail().trim();
+        if (email.isBlank()) {
+            throw new IdInvalidException("Email không được để trống");
         }
 
-        return response;
+        NhanVien nhanVien = this.nhanVienService.findByEmail(email);
+        KhachHang khachHang = this.khachHangService.findByEmail(email);
+        if (nhanVien == null && khachHang == null) {
+            return ResponseEntity.ok().build();
+        }
+
+        String fullName = nhanVien != null ? nhanVien.getTenNhanVien() : khachHang.getTenKhachHang();
+        String token = this.securityUtil.createPasswordResetToken(email);
+        String resetUrl = this.frontendResetPasswordUrl + "?token=" + URLEncoder.encode(token, StandardCharsets.UTF_8);
+
+        try {
+            this.emailService.sendPasswordResetEmail(email, fullName, resetUrl);
+            logger.info("Email đặt lại mật khẩu đã được gửi tới: {}", email);
+        } catch (Exception ex) {
+            logger.error("Lỗi khi gửi email đặt lại mật khẩu cho người dùng {}: ", email, ex);
+            throw new IdInvalidException("Không thể gửi email đặt lại mật khẩu. Lỗi: " + ex.getMessage());
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/auth/reset-password")
+    @ApiMessage("Đặt lại mật khẩu thành công")
+    public ResponseEntity<Void> resetPassword(@Valid @RequestBody ReqResetPasswordDTO req) throws IdInvalidException {
+        String token = req.getToken() == null ? "" : req.getToken().trim();
+        String newPassword = req.getNewPassword() == null ? "" : req.getNewPassword().trim();
+        String confirmPassword = req.getConfirmPassword() == null ? "" : req.getConfirmPassword().trim();
+
+        if (token.isBlank()) {
+            throw new IdInvalidException("Token đặt lại mật khẩu không được để trống");
+        }
+        if (newPassword.isBlank()) {
+            throw new IdInvalidException("Mật khẩu mới không được để trống");
+        }
+        if (newPassword.length() < 6) {
+            throw new IdInvalidException("Mật khẩu mới phải có ít nhất 6 ký tự");
+        }
+        if (!newPassword.equals(confirmPassword)) {
+            throw new IdInvalidException("Xác nhận mật khẩu không khớp");
+        }
+
+        Jwt decodedToken = this.securityUtil.checkValidPasswordResetToken(token);
+        String email = decodedToken.getSubject();
+        if (email == null || email.isBlank()) {
+            throw new IdInvalidException("Token đặt lại mật khẩu không hợp lệ");
+        }
+
+        NhanVien nhanVien = this.nhanVienService.findByEmail(email);
+        if (nhanVien != null) {
+            this.nhanVienService.updatePasswordByEmail(email, passwordEncoder.encode(newPassword));
+            this.nhanVienService.updateUserToken(null, email);
+            this.khachHangService.updateUserToken(null, email);
+            return ResponseEntity.ok().build();
+        }
+
+        KhachHang khachHang = this.khachHangService.findByEmail(email);
+        if (khachHang != null) {
+            this.khachHangService.updatePasswordByEmail(email, passwordEncoder.encode(newPassword));
+            this.nhanVienService.updateUserToken(null, email);
+            this.khachHangService.updateUserToken(null, email);
+            return ResponseEntity.ok().build();
+        }
+
+        throw new IdInvalidException("Không tìm thấy người dùng để đặt lại mật khẩu");
     }
 
     @GetMapping("/auth/account")
@@ -474,7 +541,7 @@ public class AuthController {
                 <head>
                     <meta charset="UTF-8" />
                     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-                    <title>Xác nhận thành công</title>
+                    <title>Đăng ký thành công</title>
                     <style>
                         :root {
                             --bg-1: #f0fdf4;
@@ -524,8 +591,25 @@ public class AuthController {
                             font-size: 16px;
                             line-height: 1.6;
                         }
+                        .note {
+                            margin-top: 14px;
+                            font-size: 14px;
+                            color: #166534;
+                        }
+                        .login-link {
+                            display: inline-block;
+                            margin-top: 14px;
+                            color: #15803d;
+                            font-weight: 700;
+                            text-decoration: none;
+                        }
+                        .login-link:hover {
+                            text-decoration: underline;
+                        }
                         .actions {
-                            margin-top: 28px;
+                            margin-top: 30px;
+                            display: flex;
+                            justify-content: center;
                         }
                         .btn {
                             display: inline-block;
@@ -533,7 +617,7 @@ public class AuthController {
                             color: #ffffff;
                             text-decoration: none;
                             font-weight: 700;
-                            padding: 12px 22px;
+                            padding: 12px 24px;
                             border-radius: 12px;
                             transition: background 0.2s ease, transform 0.2s ease;
                         }
@@ -546,11 +630,13 @@ public class AuthController {
                 <body>
                     <main class="card">
                         <div class="icon">✓</div>
-                        <h1>Xác nhận đăng ký thành công</h1>
-                        <p>Tài khoản của bạn đã được kích hoạt. Bấm nút bên dưới để đăng nhập vào hệ thống.</p>
+                        <h1>Đăng ký tài khoản thành công</h1>
+                        <p>Tài khoản của bạn đã được xác thực qua email và sẵn sàng sử dụng.</p>
+                        <p class="note">Bạn có thể đăng nhập ngay bằng mật khẩu đã đăng ký.</p>
                         <div class="actions">
                             <a class="btn" href="__FRONTEND_LOGIN_URL__">Đi tới trang đăng nhập</a>
                         </div>
+                        <a class="login-link" href="__FRONTEND_LOGIN_URL__">Hoặc bấm vào đây để đăng nhập</a>
                     </main>
                 </body>
                 </html>

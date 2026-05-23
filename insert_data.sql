@@ -13,7 +13,7 @@
         ('ADMIN',      'Quản trị viên toàn quyền', TRUE, NOW()),
         ('NHAN_VIEN',  'Nhân viên bán hàng',        TRUE, NOW()),
         ('KHACH_HANG', 'Khách hàng mua sắm',        TRUE, NOW()),
-        ('NHAN_VIEN_KHO', 'Nhân viên kho',         TRUE, NOW());
+        ('NHAN_VIEN_QUAN_LY', 'Nhân viên kho',         TRUE, NOW());
 
     -- ---------------------------------------------------------
     -- 2. PERMISSIONS
@@ -318,6 +318,28 @@
         ('Xóa lương thưởng',                 '/api/v1/luong-thuong/{id}',                             'DELETE', 'LUONG_THUONG',        NOW()),
         ('Quét ảnh mã vạch CTSP',            '/api/v1/chi-tiet-san-pham/scan-image',                   'POST',   'CHI_TIET_SP',         NOW());
 
+    -- === TRA_HANG_EXTRA (idempotent) ===
+    INSERT INTO permissions (name, apiPath, method, module, createdAt)
+    SELECT 'Thanh toán VNPay phiếu trả hàng', '/api/v1/tra-hang/{id}/vnpay-url', 'POST', 'TRA_HANG', NOW()
+    WHERE NOT EXISTS (
+        SELECT 1 FROM permissions
+        WHERE apiPath = '/api/v1/tra-hang/{id}/vnpay-url' AND method = 'POST'
+    );
+
+    INSERT INTO permission_role (role_id, permission_id)
+    SELECT roles.role_id, p.id
+    FROM permissions p
+    JOIN (
+        SELECT 1 AS role_id
+        UNION ALL SELECT 2 AS role_id
+    ) roles
+    WHERE p.apiPath = '/api/v1/tra-hang/{id}/vnpay-url'
+      AND p.method = 'POST'
+      AND NOT EXISTS (
+          SELECT 1 FROM permission_role pr
+          WHERE pr.role_id = roles.role_id AND pr.permission_id = p.id
+      );
+
     -- ---------------------------------------------------------
     -- 3. PERMISSION_ROLE
     -- ---------------------------------------------------------
@@ -446,14 +468,42 @@
         -- AUTH + VNPAY cho khách hàng
         (3,194),(3,195),(3,196),(3,197),(3,198),(3,200),(3,201),(3,202);
 
-    -- NHAN_VIEN_KHO (role_id=4): Kiểm kê hàng hóa + cập nhật trạng thái luân chuyển
-    INSERT INTO permission_role (role_id, permission_id) VALUES
-        (4,120),(4,121),                -- LOAI_DON_LUAN_CHUYEN: xem all, xem id
+  INSERT INTO permission_role (role_id, permission_id) VALUES
+        (4,120),(4,121), -- LOAI_DON_LUAN_CHUYEN: xem all, xem id
         (4,126),(4,127),(4,128),(4,129),(4,130), -- DON_LUAN_CHUYEN: xem all, xem mã, xem theo ch đặt, xem theo ch gửi, cập nhật TT
-        (4,131),(4,132),                -- LOAI_KIEM_KE: xem all, xem id
+        (4,131),(4,132), -- LOAI_KIEM_KE: xem all, xem id
         (4,136),(4,137),(4,138),(4,139),(4,140), -- KIEM_KE_HANG_HOA: xem all, xem id, tạo, cập nhật, gửi duyệt
-        -- AUTH
-        (4,194),(4,195),(4,197),(4,198); 
+        (4,194),(4,195),(4,197),(4,198), -- AUTH
+        (4,1),(4,2), -- SAN_PHAM: xem all, xem id
+        (4,6),(4,7), -- MAU_SAC: xem all, xem id
+        (4,11),(4,12), -- KICH_THUOC: xem all, xem id
+        (4,16),(4,17),(4,18),(4,119), -- CHI_TIET_SP: xem all, xem id, xem theo SP, xem theo cửa hàng đang đăng nhập
+        (4,25),(4,26), -- KIEU_SAN_PHAM: xem all, xem id
+        (4,30),(4,31), -- BO_SUU_TAP: xem all, xem id
+        (4,35),(4,36), -- THUONG_HIEU: xem all, xem id
+        (4,40),(4,41),(4,42), -- HINH_ANH: xem all, xem id, xem theo CTSP
+        (4,46),(4,47), -- CUA_HANG: xem all, xem id
+        (4,61),(4,62), -- NHA_CUNG_CAP: xem all, xem id
+        (4,66),(4,67),(4,68),(4,69),(4,105), -- PHIEU_NHAP: xem all, xem id, tạo, cập nhật, kiểm kê
+        (4,71),(4,72),(4,73),(4,74),(4,75), -- CHI_TIET_PHIEU_NHAP: xem all, xem id, xem theo PN, tạo, cập nhật
+        (4,77),(4,78),(4,80),(4,81), -- DON_HANG: xem all, xem id, tạo tại quầy, cập nhật
+        (4,83),(4,84),(4,85), -- CHI_TIET_DON_HANG: xem all, xem theo đơn, xem id
+        (4,89),(4,90), -- KHUYEN_MAI_HOA_DON: xem all, xem id
+        (4,94),(4,95), -- KHUYEN_MAI_DIEM: xem all, xem id
+        (4,99),(4,100),(4,101),(4,107), -- DANH_GIA_SP: xem all, xem id, xem theo SP, xem theo CTDH
+        (4,110), -- NHAN_VIEN: xem danh sách nhân viên (cùng cửa hàng)
+        (4,115),(4,116),(4,117),(4,118), -- TRA_HANG: xem all, xem mã, xem theo đơn, cập nhật trạng thái
+        (4,125), -- DON_LUAN_CHUYEN: tạo (POST)
+        (4,142),(4,143), -- CA_LAM_VIEC: chỉ xem
+        (4,147),(4,148),(4,149),(4,150),(4,152),(4,153),(4,154), -- LICH_LAM_VIEC: xem all, xem id, xem theo NV, tạo, xóa, import, download-template
+        (4,155),(4,156),(4,157),(4,158), -- CHI_TIET_LICH_LAM: xem all, xem id, xem theo lịch, tạo
+        (4,171),(4,172),(4,173),(4,174),(4,175), -- DOI_CA: xem all, xem id, xem theo lịch, tạo, cập nhật
+        (4,176),(4,177),(4,178),(4,179), -- LOI_PHAT_SINH: xem all, xem id, xem theo lịch, tạo
+        (4,182),(4,183),(4,184),(4,185),(4,186), -- LICH_LAM_VIEC_EXTRA
+        (4,188),(4,189),(4,190),(4,191), -- DOI_HANG: xem all, xem theo mã, xem theo đơn hàng, cập nhật trạng thái
+        (4,192),(4,193), -- LOI_PHAT_SINH_EXTRA
+        (4,201),(4,203),(4,204),(4,205),(4,206),(4,207),(4,208),(4,209),(4,210),(4,211),(4,212),(4,213),(4,214),(4,215), -- AUTH + POS + GIỎ NHÂN VIÊN
+        (4,216),(4,217),(4,218),(4,219); -- GIO_HANG_NHAN_VIEN_EXTRA + CHI_TIET_SP_EXTRA
 
     -- ---------------------------------------------------------
     -- 4. CỬA HÀNG

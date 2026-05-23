@@ -32,6 +32,7 @@ import com.vn.shopping.domain.response.ResLoginDTO;
 public class SecurityUtil {
 
     private final JwtEncoder jwtEncoder;
+    private static final String PASSWORD_RESET_TOKEN_TYPE = "password_reset";
 
     public SecurityUtil(JwtEncoder jwtEncoder) {
         this.jwtEncoder = jwtEncoder;
@@ -47,6 +48,9 @@ public class SecurityUtil {
 
     @Value("${shopping.jwt.refresh-token-validity-in-seconds}")
     private long refreshTokenExpiration;
+
+    @Value("${shopping.jwt.password-reset-token-validity-in-seconds:1800}")
+    private long passwordResetTokenExpiration;
 
     public String createAccessToken(String email, ResLoginDTO dto) {
         ResLoginDTO.UserInsideToken userToken = new ResLoginDTO.UserInsideToken();
@@ -97,6 +101,21 @@ public class SecurityUtil {
 
     }
 
+    public String createPasswordResetToken(String email) {
+        Instant now = Instant.now();
+        Instant validity = now.plus(this.passwordResetTokenExpiration, ChronoUnit.SECONDS);
+
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+            .issuedAt(now)
+            .expiresAt(validity)
+            .subject(email)
+            .claim("purpose", PASSWORD_RESET_TOKEN_TYPE)
+            .build();
+
+        JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
+        return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+    }
+
     private SecretKey getSecretKey() {
         byte[] keyBytes = Base64.from(jwtKey).decode();
         return new SecretKeySpec(keyBytes, 0, keyBytes.length,
@@ -112,6 +131,22 @@ public class SecurityUtil {
                     System.out.println(">>> Refresh Token error: " + e.getMessage());
                     throw e;
                 }
+    }
+
+    public Jwt checkValidPasswordResetToken(String token) {
+        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withSecretKey(
+                getSecretKey()).macAlgorithm(SecurityUtil.JWT_ALGORITHM).build();
+        try {
+            Jwt jwt = jwtDecoder.decode(token);
+            Object purpose = jwt.getClaims().get("purpose");
+            if (!PASSWORD_RESET_TOKEN_TYPE.equals(purpose)) {
+                throw new IllegalArgumentException("Invalid password reset token");
+            }
+            return jwt;
+        } catch (Exception e) {
+            System.out.println(">>> Password Reset Token error: " + e.getMessage());
+            throw e;
+        }
     }
     
     /**

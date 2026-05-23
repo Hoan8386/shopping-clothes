@@ -243,8 +243,10 @@ public class TraHangService {
                 ChiTietDonHang ctdh = ct.getSanPhamTra();
                 if (ctdh != null) {
                     ctDto.setChiTietDonHangId(ctdh.getId());
-                    ctDto.setGiaSanPham(ctdh.getThanhTien());
+                    // giaSanPham should represent unit price after product-level discounts
+                    ctDto.setGiaSanPham(ctdh.getGiaSanPham());
                     ctDto.setSoLuong(ctdh.getSoLuong());
+                    // thanhTien is the line total (unit price * quantity) after allocations
                     ctDto.setThanhTien(ctdh.getThanhTien());
 
                     ChiTietSanPham ctsp = ctdh.getChiTietSanPham();

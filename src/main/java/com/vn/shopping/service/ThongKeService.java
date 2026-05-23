@@ -20,6 +20,14 @@ import java.util.stream.Collectors;
 @Service
 public class ThongKeService {
 
+    private static final int TITLE_ROW = 3;
+    private static final int PERIOD_ROW = 4;
+    private static final int EXPORT_ROW = 5;
+    private static final int TABLE_HEADER_ROW = 7;
+    private static final int TABLE_DATA_START_ROW = 10;
+    private static final int TITLE_START_COLUMN = 2;
+    private static final int TITLE_END_COLUMN = 10;
+
     private final DonHangRepository donHangRepository;
     private final ChiTietDonHangRepository chiTietDonHangRepository;
     private final ChiTietSanPhamRepository chiTietSanPhamRepository;
@@ -30,6 +38,7 @@ public class ThongKeService {
     private final KhuyenMaiTheoHoaDonRepository khuyenMaiTheoHoaDonRepository;
     private final KhuyenMaiTheoDiemRepository khuyenMaiTheoDiemRepository;
     private final NhanVienRepository nhanVienRepository;
+    private final CuaHangRepository cuaHangRepository;
 
     public ThongKeService(DonHangRepository donHangRepository,
             ChiTietDonHangRepository chiTietDonHangRepository,
@@ -40,7 +49,8 @@ public class ThongKeService {
             DoiHangRepository doiHangRepository,
             KhuyenMaiTheoHoaDonRepository khuyenMaiTheoHoaDonRepository,
             KhuyenMaiTheoDiemRepository khuyenMaiTheoDiemRepository,
-            NhanVienRepository nhanVienRepository) {
+            NhanVienRepository nhanVienRepository,
+            CuaHangRepository cuaHangRepository) {
         this.donHangRepository = donHangRepository;
         this.chiTietDonHangRepository = chiTietDonHangRepository;
         this.chiTietSanPhamRepository = chiTietSanPhamRepository;
@@ -51,13 +61,15 @@ public class ThongKeService {
         this.khuyenMaiTheoHoaDonRepository = khuyenMaiTheoHoaDonRepository;
         this.khuyenMaiTheoDiemRepository = khuyenMaiTheoDiemRepository;
         this.nhanVienRepository = nhanVienRepository;
+        this.cuaHangRepository = cuaHangRepository;
     }
 
-    public ResThongKeDTO.RevenueReport getRevenueReport(LocalDate fromDate, LocalDate toDate) {
+    public ResThongKeDTO.RevenueReport getRevenueReport(LocalDate fromDate, LocalDate toDate, Long cuaHangId) {
         LocalDate start = normalizeFromDate(fromDate);
         LocalDate end = normalizeToDate(toDate);
 
-        List<DonHang> orders = filterByDate(donHangRepository.findAll(), DonHang::getNgayTao, start, end);
+        List<DonHang> orders = filterByStoreAndDate(donHangRepository.findAll(), DonHang::getNgayTao, start, end,
+                cuaHangId, DonHang::getCuaHang);
         long totalOrders = orders.size();
         long completedOrders = orders.stream().filter(o -> Objects.equals(o.getTrangThai(), 5)).count();
         long cancelledOrders = orders.stream().filter(o -> Objects.equals(o.getTrangThai(), 4)).count();
@@ -86,11 +98,13 @@ public class ThongKeService {
                 dailyRevenues);
     }
 
-    public ResThongKeDTO.OrderPerformanceReport getOrderPerformanceReport(LocalDate fromDate, LocalDate toDate) {
+    public ResThongKeDTO.OrderPerformanceReport getOrderPerformanceReport(LocalDate fromDate, LocalDate toDate,
+            Long cuaHangId) {
         LocalDate start = normalizeFromDate(fromDate);
         LocalDate end = normalizeToDate(toDate);
 
-        List<DonHang> orders = filterByDate(donHangRepository.findAll(), DonHang::getNgayTao, start, end);
+        List<DonHang> orders = filterByStoreAndDate(donHangRepository.findAll(), DonHang::getNgayTao, start, end,
+                cuaHangId, DonHang::getCuaHang);
         long totalOrders = orders.size();
         long paidOrders = orders.stream().filter(o -> Objects.equals(o.getTrangThaiThanhToan(), 1)).count();
         long onlineOrders = orders.stream().filter(o -> Objects.equals(o.getHinhThucDonHang(), 1)).count();
@@ -121,9 +135,11 @@ public class ThongKeService {
                 statusCounts);
     }
 
-    public ResThongKeDTO.InventoryAlertReport getInventoryAlertReport(int lowStockThreshold) {
+    public ResThongKeDTO.InventoryAlertReport getInventoryAlertReport(int lowStockThreshold, Long cuaHangId) {
         int threshold = Math.max(0, lowStockThreshold);
-        List<ChiTietSanPham> variants = chiTietSanPhamRepository.findAll();
+        List<ChiTietSanPham> variants = chiTietSanPhamRepository.findAll().stream()
+                .filter(v -> cuaHangId == null || Objects.equals(v.getMaCuaHang(), cuaHangId))
+                .toList();
 
         long totalVariants = variants.size();
         long totalStock = variants.stream().mapToLong(v -> safeInt(v.getSoLuong())).sum();
@@ -164,12 +180,14 @@ public class ThongKeService {
                 alerts);
     }
 
-    public ResThongKeDTO.TopProductReport getTopProductReport(LocalDate fromDate, LocalDate toDate, int limit) {
+    public ResThongKeDTO.TopProductReport getTopProductReport(LocalDate fromDate, LocalDate toDate, int limit,
+            Long cuaHangId) {
         LocalDate start = normalizeFromDate(fromDate);
         LocalDate end = normalizeToDate(toDate);
         int topN = Math.max(1, Math.min(limit, 100));
 
-        List<DonHang> orders = filterByDate(donHangRepository.findAll(), DonHang::getNgayTao, start, end);
+        List<DonHang> orders = filterByStoreAndDate(donHangRepository.findAll(), DonHang::getNgayTao, start, end,
+                cuaHangId, DonHang::getCuaHang);
 
         class ProductAccumulator {
             long qty;
@@ -215,11 +233,13 @@ public class ThongKeService {
         return new ResThongKeDTO.TopProductReport(start.toString(), end.toString(), topN, items);
     }
 
-    public ResThongKeDTO.ImportSupplierReport getImportSupplierReport(LocalDate fromDate, LocalDate toDate) {
+    public ResThongKeDTO.ImportSupplierReport getImportSupplierReport(LocalDate fromDate, LocalDate toDate,
+            Long cuaHangId) {
         LocalDate start = normalizeFromDate(fromDate);
         LocalDate end = normalizeToDate(toDate);
 
-        List<PhieuNhap> receipts = filterByDate(phieuNhapRepository.findAll(), this::getReceiptDate, start, end);
+        List<PhieuNhap> receipts = filterByStoreAndDate(phieuNhapRepository.findAll(), this::getReceiptDate, start, end,
+                cuaHangId, PhieuNhap::getCuaHang);
 
         class SupplierAccumulator {
             String name;
@@ -274,13 +294,17 @@ public class ThongKeService {
                 suppliers);
     }
 
-    public ResThongKeDTO.ReturnExchangeReport getReturnExchangeReport(LocalDate fromDate, LocalDate toDate) {
+    public ResThongKeDTO.ReturnExchangeReport getReturnExchangeReport(LocalDate fromDate, LocalDate toDate,
+            Long cuaHangId) {
         LocalDate start = normalizeFromDate(fromDate);
         LocalDate end = normalizeToDate(toDate);
 
-        List<TraHang> returns = filterByDate(traHangRepository.findAll(), TraHang::getNgayTao, start, end);
-        List<DoiHang> exchanges = filterByDate(doiHangRepository.findAll(), DoiHang::getNgayTao, start, end);
-        List<DonHang> orders = filterByDate(donHangRepository.findAll(), DonHang::getNgayTao, start, end);
+        List<TraHang> returns = filterByStoreAndDate(traHangRepository.findAll(), TraHang::getNgayTao, start, end,
+                cuaHangId, tr -> tr.getDonHang() == null ? null : tr.getDonHang().getCuaHang());
+        List<DoiHang> exchanges = filterByStoreAndDate(doiHangRepository.findAll(), DoiHang::getNgayTao, start, end,
+                cuaHangId, dh -> dh.getDonHang() == null ? null : dh.getDonHang().getCuaHang());
+        List<DonHang> orders = filterByStoreAndDate(donHangRepository.findAll(), DonHang::getNgayTao, start, end,
+                cuaHangId, DonHang::getCuaHang);
 
         long totalOrders = orders.size();
         long totalReturns = returns.size();
@@ -302,11 +326,12 @@ public class ThongKeService {
                 exchangeRate);
     }
 
-    public ResThongKeDTO.PromotionReport getPromotionReport(LocalDate fromDate, LocalDate toDate) {
+    public ResThongKeDTO.PromotionReport getPromotionReport(LocalDate fromDate, LocalDate toDate, Long cuaHangId) {
         LocalDate start = normalizeFromDate(fromDate);
         LocalDate end = normalizeToDate(toDate);
 
-        List<DonHang> orders = filterByDate(donHangRepository.findAll(), DonHang::getNgayTao, start, end);
+        List<DonHang> orders = filterByStoreAndDate(donHangRepository.findAll(), DonHang::getNgayTao, start, end,
+                cuaHangId, DonHang::getCuaHang);
         LocalDateTime now = LocalDateTime.now();
 
         long activeHoaDon = khuyenMaiTheoHoaDonRepository.findAll().stream()
@@ -339,12 +364,17 @@ public class ThongKeService {
                 totalDiscountAmount);
     }
 
-    public ResThongKeDTO.StaffPerformanceReport getStaffPerformanceReport(LocalDate fromDate, LocalDate toDate) {
+    public ResThongKeDTO.StaffPerformanceReport getStaffPerformanceReport(LocalDate fromDate, LocalDate toDate,
+            Long cuaHangId) {
         LocalDate start = normalizeFromDate(fromDate);
         LocalDate end = normalizeToDate(toDate);
 
-        List<DonHang> orders = filterByDate(donHangRepository.findAll(), DonHang::getNgayTao, start, end);
-        List<NhanVien> staffs = nhanVienRepository.findAll();
+        List<DonHang> orders = filterByStoreAndDate(donHangRepository.findAll(), DonHang::getNgayTao, start, end,
+                cuaHangId, DonHang::getCuaHang);
+        List<NhanVien> staffs = nhanVienRepository.findAll().stream()
+                .filter(staff -> cuaHangId == null || (staff.getCuaHang() != null
+                        && Objects.equals(staff.getCuaHang().getId(), cuaHangId)))
+                .toList();
 
         Map<Long, List<DonHang>> byStaff = orders.stream()
                 .filter(o -> o.getNhanVien() != null && o.getNhanVien().getId() != null)
@@ -382,26 +412,28 @@ public class ThongKeService {
                 items);
     }
 
-    public byte[] exportRevenueReport(LocalDate fromDate, LocalDate toDate) throws IOException {
-        ResThongKeDTO.RevenueReport report = getRevenueReport(fromDate, toDate);
+    public byte[] exportRevenueReport(LocalDate fromDate, LocalDate toDate, Long cuaHangId) throws IOException {
+        ResThongKeDTO.RevenueReport report = getRevenueReport(fromDate, toDate, cuaHangId);
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             writeKeyValueSheet(
-                    workbook.createSheet("TongQuan"),
-                    "Thong ke doanh thu ban hang",
+                    workbook.createSheet("TổngQuan"),
+                    "Thống kê doanh thu bán hàng",
                     report.getFromDate(),
                     report.getToDate(),
-                    kv("Tu ngay", report.getFromDate()),
-                    kv("Den ngay", report.getToDate()),
-                    kv("Tong don", report.getTotalOrders()),
-                    kv("Don hoan thanh", report.getCompletedOrders()),
-                    kv("Don huy", report.getCancelledOrders()),
-                    kv("Tong doanh thu", report.getTotalRevenue()),
-                    kv("Gia tri don TB", report.getAverageOrderValue()));
+                    cuaHangId,
+                    kv("Từ ngày", report.getFromDate()),
+                    kv("Đến ngày", report.getToDate()),
+                    kv("Tổng đơn", report.getTotalOrders()),
+                    kv("Đơn hoàn thành", report.getCompletedOrders()),
+                    kv("Đơn hủy", report.getCancelledOrders()),
+                    kv("Tổng doanh thu", report.getTotalRevenue()),
+                    kv("Giá trị đơn trung bình", report.getAverageOrderValue()));
 
-            Sheet detail = workbook.createSheet("TheoNgay");
-            writeTableTitle(detail, "Chi tiet doanh thu theo ngay", report.getFromDate(), report.getToDate());
-            writeHeader(detail, "Ngay", "DoanhThu", "SoDon");
-            int rowNum = 4;
+            Sheet detail = workbook.createSheet("TheoNgày");
+            writeTableTitle(detail, "Chi tiết doanh thu theo ngày", report.getFromDate(), report.getToDate(),
+                    cuaHangId);
+            writeHeader(detail, "Ngày", "Doanh thu", "Số đơn");
+            int rowNum = TABLE_DATA_START_ROW;
             for (ResThongKeDTO.DailyRevenue item : report.getDailyRevenues()) {
                 Row row = detail.createRow(rowNum++);
                 boolean altRow = rowNum % 2 == 0;
@@ -425,27 +457,30 @@ public class ThongKeService {
         }
     }
 
-    public byte[] exportOrderPerformanceReport(LocalDate fromDate, LocalDate toDate) throws IOException {
-        ResThongKeDTO.OrderPerformanceReport report = getOrderPerformanceReport(fromDate, toDate);
+    public byte[] exportOrderPerformanceReport(LocalDate fromDate, LocalDate toDate, Long cuaHangId)
+            throws IOException {
+        ResThongKeDTO.OrderPerformanceReport report = getOrderPerformanceReport(fromDate, toDate, cuaHangId);
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             writeKeyValueSheet(
-                    workbook.createSheet("TongQuan"),
-                    "Thong ke hieu suat don hang",
+                    workbook.createSheet("TổngQuan"),
+                    "Thống kê hiệu suất đơn hàng",
                     report.getFromDate(),
                     report.getToDate(),
-                    kv("Tu ngay", report.getFromDate()),
-                    kv("Den ngay", report.getToDate()),
-                    kv("Tong don", report.getTotalOrders()),
-                    kv("Don da thanh toan", report.getPaidOrders()),
-                    kv("Don online", report.getOnlineOrders()),
-                    kv("Don tai quay", report.getStoreOrders()),
-                    kv("Ty le thanh cong", report.getSuccessRate()),
-                    kv("Ty le huy", report.getCancelRate()));
+                    cuaHangId,
+                    kv("Từ ngày", report.getFromDate()),
+                    kv("Đến ngày", report.getToDate()),
+                    kv("Tổng đơn", report.getTotalOrders()),
+                    kv("Đơn đã thanh toán", report.getPaidOrders()),
+                    kv("Đơn online", report.getOnlineOrders()),
+                    kv("Đơn tại quầy", report.getStoreOrders()),
+                    kv("Tỷ lệ thành công", report.getSuccessRate()),
+                    kv("Tỷ lệ hủy", report.getCancelRate()));
 
-            Sheet detail = workbook.createSheet("TrangThaiDon");
-            writeTableTitle(detail, "Chi tiet don hang theo trang thai", report.getFromDate(), report.getToDate());
-            writeHeader(detail, "TrangThai", "SoLuong");
-            int rowNum = 4;
+            Sheet detail = workbook.createSheet("TrạngTháiĐơn");
+            writeTableTitle(detail, "Chi tiết đơn hàng theo trạng thái", report.getFromDate(), report.getToDate(),
+                    cuaHangId);
+            writeHeader(detail, "Trạng thái", "Số lượng");
+            int rowNum = TABLE_DATA_START_ROW;
             for (ResThongKeDTO.StatusCount item : report.getStatusCounts()) {
                 Row row = detail.createRow(rowNum++);
                 boolean altRow = rowNum % 2 == 0;
@@ -465,24 +500,25 @@ public class ThongKeService {
         }
     }
 
-    public byte[] exportInventoryAlertReport(int lowStockThreshold) throws IOException {
-        ResThongKeDTO.InventoryAlertReport report = getInventoryAlertReport(lowStockThreshold);
+    public byte[] exportInventoryAlertReport(int lowStockThreshold, Long cuaHangId) throws IOException {
+        ResThongKeDTO.InventoryAlertReport report = getInventoryAlertReport(lowStockThreshold, cuaHangId);
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             writeKeyValueSheet(
-                    workbook.createSheet("TongQuan"),
-                    "Thong ke ton kho va canh bao",
-                    "N/A",
-                    "N/A",
-                    kv("Tong bien the", report.getTotalVariants()),
-                    kv("Tong ton", report.getTotalStock()),
-                    kv("Het hang", report.getOutOfStockCount()),
-                    kv("Sap het", report.getLowStockCount()),
-                    kv("Nguong canh bao", report.getLowStockThreshold()));
+                    workbook.createSheet("TổngQuan"),
+                    "Thống kê tồn kho và cảnh báo",
+                    null,
+                    null,
+                    cuaHangId,
+                    kv("Tổng biến thể", report.getTotalVariants()),
+                    kv("Tổng tồn", report.getTotalStock()),
+                    kv("Hết hàng", report.getOutOfStockCount()),
+                    kv("Sắp hết", report.getLowStockCount()),
+                    kv("Ngưỡng cảnh báo", report.getLowStockThreshold()));
 
-            Sheet detail = workbook.createSheet("CanhBao");
-            writeTableTitle(detail, "Danh sach canh bao ton kho", "N/A", "N/A");
-            writeHeader(detail, "ChiTietSP", "SanPham", "TenSP", "CuaHang", "Mau", "Size", "SoLuong", "CanhBao");
-            int rowNum = 4;
+            Sheet detail = workbook.createSheet("CảnhBáo");
+            writeTableTitle(detail, "Danh sách cảnh báo tồn kho", null, null, cuaHangId);
+            writeHeader(detail, "Chi tiết SP", "Sản phẩm", "Tên SP", "Cửa hàng", "Màu", "Size", "Số lượng", "Cảnh báo");
+            int rowNum = TABLE_DATA_START_ROW;
             for (ResThongKeDTO.InventoryAlertItem item : report.getAlerts()) {
                 Row row = detail.createRow(rowNum++);
                 boolean altRow = rowNum % 2 == 0;
@@ -526,22 +562,24 @@ public class ThongKeService {
         }
     }
 
-    public byte[] exportTopProductReport(LocalDate fromDate, LocalDate toDate, int limit) throws IOException {
-        ResThongKeDTO.TopProductReport report = getTopProductReport(fromDate, toDate, limit);
+    public byte[] exportTopProductReport(LocalDate fromDate, LocalDate toDate, int limit, Long cuaHangId)
+            throws IOException {
+        ResThongKeDTO.TopProductReport report = getTopProductReport(fromDate, toDate, limit, cuaHangId);
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             writeKeyValueSheet(
-                    workbook.createSheet("TongQuan"),
-                    "Thong ke top san pham",
+                    workbook.createSheet("TổngQuan"),
+                    "Thống kê top sản phẩm",
                     report.getFromDate(),
                     report.getToDate(),
-                    kv("Tu ngay", report.getFromDate()),
-                    kv("Den ngay", report.getToDate()),
+                    cuaHangId,
+                    kv("Từ ngày", report.getFromDate()),
+                    kv("Đến ngày", report.getToDate()),
                     kv("Top", report.getLimit()));
 
-            Sheet detail = workbook.createSheet("TopSanPham");
-            writeTableTitle(detail, "Danh sach top san pham", report.getFromDate(), report.getToDate());
-            writeHeader(detail, "SanPhamId", "TenSanPham", "SoLuongBan", "DoanhThu", "BienLoiNhuan");
-            int rowNum = 4;
+            Sheet detail = workbook.createSheet("TopSảnPhẩm");
+            writeTableTitle(detail, "Danh sách top sản phẩm", report.getFromDate(), report.getToDate(), cuaHangId);
+            writeHeader(detail, "Mã SP", "Tên sản phẩm", "Số lượng bán", "Doanh thu", "Biên lợi nhuận");
+            int rowNum = TABLE_DATA_START_ROW;
             for (ResThongKeDTO.TopProductItem item : report.getTopProducts()) {
                 Row row = detail.createRow(rowNum++);
                 boolean altRow = rowNum % 2 == 0;
@@ -573,23 +611,25 @@ public class ThongKeService {
         }
     }
 
-    public byte[] exportImportSupplierReport(LocalDate fromDate, LocalDate toDate) throws IOException {
-        ResThongKeDTO.ImportSupplierReport report = getImportSupplierReport(fromDate, toDate);
+    public byte[] exportImportSupplierReport(LocalDate fromDate, LocalDate toDate, Long cuaHangId)
+            throws IOException {
+        ResThongKeDTO.ImportSupplierReport report = getImportSupplierReport(fromDate, toDate, cuaHangId);
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             writeKeyValueSheet(
-                    workbook.createSheet("TongQuan"),
-                    "Thong ke nhap hang va nha cung cap",
+                    workbook.createSheet("TổngQuan"),
+                    "Thống kê nhập hàng và nhà cung cấp",
                     report.getFromDate(),
                     report.getToDate(),
-                    kv("Tu ngay", report.getFromDate()),
-                    kv("Den ngay", report.getToDate()),
-                    kv("Tong phieu nhap", report.getTotalReceipts()),
-                    kv("Tong gia tri nhap", report.getTotalImportValue()));
+                    cuaHangId,
+                    kv("Từ ngày", report.getFromDate()),
+                    kv("Đến ngày", report.getToDate()),
+                    kv("Tổng phiếu nhập", report.getTotalReceipts()),
+                    kv("Tổng giá trị nhập", report.getTotalImportValue()));
 
-            Sheet detail = workbook.createSheet("NhaCungCap");
-            writeTableTitle(detail, "Chi tiet nha cung cap", report.getFromDate(), report.getToDate());
-            writeHeader(detail, "NCCId", "TenNCC", "SoPhieu", "TongSL", "TongSLThieu", "GiaTriNhap");
-            int rowNum = 4;
+            Sheet detail = workbook.createSheet("NhàCungCấp");
+            writeTableTitle(detail, "Chi tiết nhà cung cấp", report.getFromDate(), report.getToDate(), cuaHangId);
+            writeHeader(detail, "Mã NCC", "Tên NCC", "Số phiếu", "Tổng SL", "Tổng SL thiếu", "Giá trị nhập");
+            int rowNum = TABLE_DATA_START_ROW;
             for (ResThongKeDTO.SupplierImportItem item : report.getSuppliers()) {
                 Row row = detail.createRow(rowNum++);
                 boolean altRow = rowNum % 2 == 0;
@@ -625,65 +665,71 @@ public class ThongKeService {
         }
     }
 
-    public byte[] exportReturnExchangeReport(LocalDate fromDate, LocalDate toDate) throws IOException {
-        ResThongKeDTO.ReturnExchangeReport report = getReturnExchangeReport(fromDate, toDate);
+    public byte[] exportReturnExchangeReport(LocalDate fromDate, LocalDate toDate, Long cuaHangId)
+            throws IOException {
+        ResThongKeDTO.ReturnExchangeReport report = getReturnExchangeReport(fromDate, toDate, cuaHangId);
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             writeKeyValueSheet(
-                    workbook.createSheet("TongQuan"),
-                    "Thong ke tra doi",
+                    workbook.createSheet("TổngQuan"),
+                    "Thống kê trả đổi",
                     report.getFromDate(),
                     report.getToDate(),
-                    kv("Tu ngay", report.getFromDate()),
-                    kv("Den ngay", report.getToDate()),
-                    kv("So tra hang", report.getTotalReturns()),
-                    kv("So doi hang", report.getTotalExchanges()),
-                    kv("Tien tra hang", report.getTotalReturnAmount()),
-                    kv("Tien doi hang", report.getTotalExchangeAmount()),
-                    kv("Ty le tra", report.getReturnRate()),
-                    kv("Ty le doi", report.getExchangeRate()));
+                    cuaHangId,
+                    kv("Từ ngày", report.getFromDate()),
+                    kv("Đến ngày", report.getToDate()),
+                    kv("Số trả hàng", report.getTotalReturns()),
+                    kv("Số đổi hàng", report.getTotalExchanges()),
+                    kv("Tiền trả hàng", report.getTotalReturnAmount()),
+                    kv("Tiền đổi hàng", report.getTotalExchangeAmount()),
+                    kv("Tỷ lệ trả", report.getReturnRate()),
+                    kv("Tỷ lệ đổi", report.getExchangeRate()));
 
             workbook.write(out);
             return out.toByteArray();
         }
     }
 
-    public byte[] exportPromotionReport(LocalDate fromDate, LocalDate toDate) throws IOException {
-        ResThongKeDTO.PromotionReport report = getPromotionReport(fromDate, toDate);
+    public byte[] exportPromotionReport(LocalDate fromDate, LocalDate toDate, Long cuaHangId) throws IOException {
+        ResThongKeDTO.PromotionReport report = getPromotionReport(fromDate, toDate, cuaHangId);
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             writeKeyValueSheet(
-                    workbook.createSheet("TongQuan"),
-                    "Thong ke khuyen mai",
+                    workbook.createSheet("TổngQuan"),
+                    "Thống kê khuyến mãi",
                     report.getFromDate(),
                     report.getToDate(),
-                    kv("Tu ngay", report.getFromDate()),
-                    kv("Den ngay", report.getToDate()),
-                    kv("KM hoa don dang hoat dong", report.getActiveHoaDonPromotions()),
-                    kv("KM diem dang hoat dong", report.getActiveDiemPromotions()),
-                    kv("Don dung KM hoa don", report.getUsedHoaDonPromotions()),
-                    kv("Don dung KM diem", report.getUsedDiemPromotions()),
-                    kv("Tong tien giam", report.getTotalDiscountAmount()));
+                    cuaHangId,
+                    kv("Từ ngày", report.getFromDate()),
+                    kv("Đến ngày", report.getToDate()),
+                    kv("KM hóa đơn đang hoạt động", report.getActiveHoaDonPromotions()),
+                    kv("KM điểm đang hoạt động", report.getActiveDiemPromotions()),
+                    kv("Đơn dùng KM hóa đơn", report.getUsedHoaDonPromotions()),
+                    kv("Đơn dùng KM điểm", report.getUsedDiemPromotions()),
+                    kv("Tổng tiền giảm", report.getTotalDiscountAmount()));
 
             workbook.write(out);
             return out.toByteArray();
         }
     }
 
-    public byte[] exportStaffPerformanceReport(LocalDate fromDate, LocalDate toDate) throws IOException {
-        ResThongKeDTO.StaffPerformanceReport report = getStaffPerformanceReport(fromDate, toDate);
+    public byte[] exportStaffPerformanceReport(LocalDate fromDate, LocalDate toDate, Long cuaHangId)
+            throws IOException {
+        ResThongKeDTO.StaffPerformanceReport report = getStaffPerformanceReport(fromDate, toDate, cuaHangId);
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             writeKeyValueSheet(
-                    workbook.createSheet("TongQuan"),
-                    "Thong ke nang suat nhan vien",
+                    workbook.createSheet("TổngQuan"),
+                    "Thống kê năng suất nhân viên",
                     report.getFromDate(),
                     report.getToDate(),
-                    kv("Tu ngay", report.getFromDate()),
-                    kv("Den ngay", report.getToDate()),
-                    kv("Tong nhan vien", report.getTotalStaff()));
+                    cuaHangId,
+                    kv("Từ ngày", report.getFromDate()),
+                    kv("Đến ngày", report.getToDate()),
+                    kv("Tổng nhân viên", report.getTotalStaff()));
 
-            Sheet detail = workbook.createSheet("NhanVien");
-            writeTableTitle(detail, "Chi tiet nang suat nhan vien", report.getFromDate(), report.getToDate());
-            writeHeader(detail, "NhanVienId", "TenNhanVien", "CuaHangId", "SoDon", "DoanhThu", "SoKhach", "DonTB");
-            int rowNum = 4;
+            Sheet detail = workbook.createSheet("NhânViên");
+            writeTableTitle(detail, "Chi tiết năng suất nhân viên", report.getFromDate(), report.getToDate(),
+                    cuaHangId);
+            writeHeader(detail, "Mã NV", "Tên nhân viên", "Mã cửa hàng", "Số đơn", "Doanh thu", "Số khách", "Đơn TB");
+            int rowNum = TABLE_DATA_START_ROW;
             for (ResThongKeDTO.StaffPerformanceItem item : report.getStaffs()) {
                 Row row = detail.createRow(rowNum++);
                 boolean altRow = rowNum % 2 == 0;
@@ -730,14 +776,23 @@ public class ThongKeService {
         return phieuNhap.getNgayTao();
     }
 
-    private <T> List<T> filterByDate(List<T> source,
+    private <T> List<T> filterByStoreAndDate(List<T> source,
             Function<T, LocalDateTime> dateExtractor,
             LocalDate from,
-            LocalDate to) {
+            LocalDate to,
+            Long cuaHangId,
+            Function<T, CuaHang> storeExtractor) {
         LocalDateTime fromAt = from.atStartOfDay();
         LocalDateTime toAt = to.atTime(23, 59, 59);
         return source.stream()
                 .filter(item -> {
+                    if (cuaHangId != null) {
+                        CuaHang cuaHang = storeExtractor.apply(item);
+                        if (cuaHang == null || cuaHang.getId() == null || !Objects.equals(cuaHang.getId(), cuaHangId)) {
+                            return false;
+                        }
+                    }
+
                     LocalDateTime time = dateExtractor.apply(item);
                     if (time == null) {
                         return false;
@@ -778,56 +833,90 @@ public class ThongKeService {
     }
 
     private void writeKeyValueSheet(Sheet sheet, String reportTitle, String fromDate, String toDate,
-            String[]... kvPairs) {
-        writeTableTitle(sheet, reportTitle, fromDate, toDate);
+            Long cuaHangId, String[]... kvPairs) {
+        writeTableTitle(sheet, reportTitle, fromDate, toDate, cuaHangId);
 
         Workbook workbook = sheet.getWorkbook();
         CellStyle keyStyle = createCellStyle(workbook, false, false, true);
+        XSSFFont keyFont = createVietnameseFont(workbook);
+        keyFont.setBold(true);
+        keyFont.setColor(IndexedColors.DARK_BLUE.getIndex());
+        keyStyle.setFont(keyFont);
         CellStyle valueStyle = createCellStyle(workbook, false, false, false);
 
-        int rowNum = 4;
+        int rowNum = TABLE_HEADER_ROW + 1;
+        Row storeRow = sheet.createRow(rowNum++);
+        storeRow.createCell(0);
+
+        Cell storeKeyCell = storeRow.createCell(1);
+        storeKeyCell.setCellValue("Tên cửa hàng");
+        storeKeyCell.setCellStyle(keyStyle);
+
+        Cell storeValueCell = storeRow.createCell(2);
+        storeValueCell.setCellValue(resolveStoreName(cuaHangId));
+        storeValueCell.setCellStyle(valueStyle);
+
         for (String[] kv : kvPairs) {
             Row row = sheet.createRow(rowNum++);
-            Cell keyCell = row.createCell(0);
+            row.createCell(0);
+
+            Cell keyCell = row.createCell(1);
             keyCell.setCellValue(kv[0]);
             keyCell.setCellStyle(keyStyle);
 
-            Cell valueCell = row.createCell(1);
+            Cell valueCell = row.createCell(2);
             valueCell.setCellValue(kv[1]);
             valueCell.setCellStyle(valueStyle);
         }
 
-        sheet.setColumnWidth(0, 25 * 256);
-        sheet.setColumnWidth(1, 30 * 256);
+        sheet.setColumnWidth(0, 4 * 256);
+        sheet.setColumnWidth(1, 25 * 256);
+        sheet.setColumnWidth(2, 30 * 256);
     }
 
-    private void writeTableTitle(Sheet sheet, String reportTitle, String fromDate, String toDate) {
+    private void writeTableTitle(Sheet sheet, String reportTitle, String fromDate, String toDate, Long cuaHangId) {
         Workbook workbook = sheet.getWorkbook();
+        int mergeEndColumn = TITLE_END_COLUMN;
 
         // Title row
-        Row titleRow = sheet.createRow(0);
-        Cell titleCell = titleRow.createCell(0);
+        Row titleRow = sheet.createRow(TITLE_ROW);
+        Cell titleCell = titleRow.createCell(TITLE_START_COLUMN);
         titleCell.setCellValue(reportTitle);
         titleCell.setCellStyle(createTitleStyle(workbook));
         titleRow.setHeightInPoints(25);
+        sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(TITLE_ROW, TITLE_ROW, TITLE_START_COLUMN,
+                mergeEndColumn));
 
         // Period row
-        Row periodRow = sheet.createRow(1);
-        Cell periodCell = periodRow.createCell(0);
-        periodCell.setCellValue("Ky bao cao: " + fromDate + " -> " + toDate);
+        Row periodRow = sheet.createRow(PERIOD_ROW);
+        Cell periodCell = periodRow.createCell(TITLE_START_COLUMN);
+        periodCell.setCellValue(formatPeriod(fromDate, toDate));
         periodCell.setCellStyle(createSubtitleStyle(workbook));
         periodRow.setHeightInPoints(18);
+        sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(PERIOD_ROW, PERIOD_ROW, TITLE_START_COLUMN,
+                mergeEndColumn));
 
         // Export timestamp row
-        Row exportRow = sheet.createRow(2);
-        Cell exportCell = exportRow.createCell(0);
-        exportCell.setCellValue("Ngay xuat: " + LocalDateTime.now());
+        Row exportRow = sheet.createRow(EXPORT_ROW);
+        Cell exportCell = exportRow.createCell(TITLE_START_COLUMN);
+        exportCell.setCellValue("Ngày xuất: " + LocalDateTime.now());
         exportCell.setCellStyle(createSubtitleStyle(workbook));
         exportRow.setHeightInPoints(16);
+        sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(EXPORT_ROW, EXPORT_ROW, TITLE_START_COLUMN,
+                mergeEndColumn));
+
+        // Store row
+        Row storeRow = sheet.createRow(EXPORT_ROW + 1);
+        Cell storeCell = storeRow.createCell(TITLE_START_COLUMN);
+        storeCell.setCellValue("Cửa hàng: " + resolveStoreName(cuaHangId));
+        storeCell.setCellStyle(createSubtitleStyle(workbook));
+        storeRow.setHeightInPoints(16);
+        sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(EXPORT_ROW + 1, EXPORT_ROW + 1,
+                TITLE_START_COLUMN, mergeEndColumn));
     }
 
     private void writeHeader(Sheet sheet, String... headers) {
-        Row headerRow = sheet.createRow(3);
+        Row headerRow = sheet.createRow(TABLE_HEADER_ROW);
         headerRow.setHeightInPoints(20);
 
         Workbook workbook = sheet.getWorkbook();
@@ -844,22 +933,22 @@ public class ThongKeService {
         for (int i = 0; i < colCount; i++) {
             sheet.autoSizeColumn(i);
         }
-        // Freeze rows 0-3 (title, period, export time, and header)
-        sheet.createFreezePane(0, 4);
+        // Freeze the title block and header so scrolling keeps the context visible.
+        sheet.createFreezePane(0, TABLE_DATA_START_ROW);
     }
 
     private CellStyle createTitleStyle(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
         XSSFFont font = createVietnameseFont(workbook);
         font.setBold(true);
-        font.setFontHeight(18);
+        font.setFontHeight(19);
         font.setColor(IndexedColors.WHITE.getIndex());
         style.setFont(font);
 
-        XSSFColor bgColor = new XSSFColor(new byte[] { (byte) 0x1F, (byte) 0x47, (byte) 0x88 }, null);
+        XSSFColor bgColor = new XSSFColor(new byte[] { (byte) 0x15, (byte) 0x3E, (byte) 0x75 }, null);
         style.setFillForegroundColor(bgColor);
         style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        style.setAlignment(HorizontalAlignment.LEFT);
+        style.setAlignment(HorizontalAlignment.CENTER);
         style.setVerticalAlignment(VerticalAlignment.CENTER);
 
         BorderStyle border = BorderStyle.THIN;
@@ -875,20 +964,14 @@ public class ThongKeService {
         CellStyle style = workbook.createCellStyle();
         XSSFFont font = createVietnameseFont(workbook);
         font.setFontHeight(11);
-        font.setColor(IndexedColors.BLACK.getIndex());
+        font.setColor(IndexedColors.DARK_BLUE.getIndex());
         style.setFont(font);
 
-        XSSFColor bgColor = new XSSFColor(new byte[] { (byte) 0xE8, (byte) 0xF0, (byte) 0xF8 }, null);
+        XSSFColor bgColor = new XSSFColor(new byte[] { (byte) 0xF4, (byte) 0xF7, (byte) 0xFB }, null);
         style.setFillForegroundColor(bgColor);
         style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        style.setAlignment(HorizontalAlignment.LEFT);
+        style.setAlignment(HorizontalAlignment.CENTER);
         style.setVerticalAlignment(VerticalAlignment.CENTER);
-
-        BorderStyle border = BorderStyle.THIN;
-        style.setBorderTop(border);
-        style.setBorderBottom(border);
-        style.setBorderLeft(border);
-        style.setBorderRight(border);
 
         return style;
     }
@@ -901,7 +984,7 @@ public class ThongKeService {
         font.setColor(IndexedColors.WHITE.getIndex());
         style.setFont(font);
 
-        XSSFColor bgColor = new XSSFColor(new byte[] { (byte) 0x44, (byte) 0x72, (byte) 0xC4 }, null);
+        XSSFColor bgColor = new XSSFColor(new byte[] { (byte) 0x1D, (byte) 0x4E, (byte) 0x89 }, null);
         style.setFillForegroundColor(bgColor);
         style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         style.setAlignment(HorizontalAlignment.CENTER);
@@ -978,8 +1061,25 @@ public class ThongKeService {
 
     private XSSFFont createVietnameseFont(Workbook workbook) {
         XSSFFont font = (XSSFFont) workbook.createFont();
-        font.setFontName("Calibri");
+        font.setFontName("Arial");
         font.setCharSet(1); // Charset 1 = default/Unicode
         return font;
+    }
+
+    private String resolveStoreName(Long cuaHangId) {
+        if (cuaHangId == null) {
+            return "Toàn bộ cửa hàng";
+        }
+        return cuaHangRepository.findById(cuaHangId)
+                .map(CuaHang::getTenCuaHang)
+                .filter(name -> name != null && !name.trim().isEmpty())
+                .orElse("Toàn bộ cửa hàng");
+    }
+
+    private String formatPeriod(String fromDate, String toDate) {
+        if (fromDate == null || toDate == null || "N/A".equalsIgnoreCase(fromDate) || "N/A".equalsIgnoreCase(toDate)) {
+            return "Thời kỳ: Không áp dụng";
+        }
+        return "Kỳ báo cáo: " + fromDate + " -> " + toDate;
     }
 }

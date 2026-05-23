@@ -31,17 +31,19 @@ public class ThongKeController {
     @ApiMessage("Thong ke doanh thu ban hang")
     public ResponseEntity<ResThongKeDTO.RevenueReport> getRevenue(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
-        return ResponseEntity.ok(thongKeService.getRevenueReport(fromDate, toDate));
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+            @RequestParam(required = false) Long cuaHangId) {
+        return ResponseEntity.ok(thongKeService.getRevenueReport(fromDate, toDate, cuaHangId));
     }
 
     @GetMapping("/doanh-thu/export")
     @ApiMessage("Xuat Excel thong ke doanh thu ban hang")
     public ResponseEntity<Resource> exportRevenue(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate)
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+            @RequestParam(required = false) Long cuaHangId)
             throws IOException {
-        byte[] bytes = thongKeService.exportRevenueReport(fromDate, toDate);
+        byte[] bytes = thongKeService.exportRevenueReport(fromDate, toDate, cuaHangId);
         return buildExcelResponse(bytes, "thong-ke-doanh-thu.xlsx");
     }
 
@@ -49,32 +51,36 @@ public class ThongKeController {
     @ApiMessage("Thong ke hieu suat don hang")
     public ResponseEntity<ResThongKeDTO.OrderPerformanceReport> getOrderPerformance(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
-        return ResponseEntity.ok(thongKeService.getOrderPerformanceReport(fromDate, toDate));
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+            @RequestParam(required = false) Long cuaHangId) {
+        return ResponseEntity.ok(thongKeService.getOrderPerformanceReport(fromDate, toDate, cuaHangId));
     }
 
     @GetMapping("/hieu-suat-don-hang/export")
     @ApiMessage("Xuat Excel thong ke hieu suat don hang")
     public ResponseEntity<Resource> exportOrderPerformance(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate)
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+            @RequestParam(required = false) Long cuaHangId)
             throws IOException {
-        byte[] bytes = thongKeService.exportOrderPerformanceReport(fromDate, toDate);
+        byte[] bytes = thongKeService.exportOrderPerformanceReport(fromDate, toDate, cuaHangId);
         return buildExcelResponse(bytes, "thong-ke-hieu-suat-don-hang.xlsx");
     }
 
     @GetMapping("/ton-kho-canh-bao")
     @ApiMessage("Thong ke ton kho va canh bao")
     public ResponseEntity<ResThongKeDTO.InventoryAlertReport> getInventoryAlert(
-            @RequestParam(required = false, defaultValue = "5") Integer lowStockThreshold) {
-        return ResponseEntity.ok(thongKeService.getInventoryAlertReport(lowStockThreshold));
+            @RequestParam(required = false, defaultValue = "5") Integer lowStockThreshold,
+            @RequestParam(required = false) Long cuaHangId) {
+        return ResponseEntity.ok(thongKeService.getInventoryAlertReport(lowStockThreshold, cuaHangId));
     }
 
     @GetMapping("/ton-kho-canh-bao/export")
     @ApiMessage("Xuat Excel thong ke ton kho va canh bao")
     public ResponseEntity<Resource> exportInventoryAlert(
-            @RequestParam(required = false, defaultValue = "5") Integer lowStockThreshold) throws IOException {
-        byte[] bytes = thongKeService.exportInventoryAlertReport(lowStockThreshold);
+            @RequestParam(required = false, defaultValue = "5") Integer lowStockThreshold,
+            @RequestParam(required = false) Long cuaHangId) throws IOException {
+        byte[] bytes = thongKeService.exportInventoryAlertReport(lowStockThreshold, cuaHangId);
         return buildExcelResponse(bytes, "thong-ke-ton-kho-canh-bao.xlsx");
     }
 
@@ -83,8 +89,9 @@ public class ThongKeController {
     public ResponseEntity<ResThongKeDTO.TopProductReport> getTopProducts(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
-            @RequestParam(required = false, defaultValue = "10") Integer limit) {
-        return ResponseEntity.ok(thongKeService.getTopProductReport(fromDate, toDate, limit));
+            @RequestParam(required = false, defaultValue = "10") Integer limit,
+            @RequestParam(required = false) Long cuaHangId) {
+        return ResponseEntity.ok(thongKeService.getTopProductReport(fromDate, toDate, limit, cuaHangId));
     }
 
     @GetMapping("/top-san-pham/export")
@@ -92,8 +99,9 @@ public class ThongKeController {
     public ResponseEntity<Resource> exportTopProducts(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
-            @RequestParam(required = false, defaultValue = "10") Integer limit) throws IOException {
-        byte[] bytes = thongKeService.exportTopProductReport(fromDate, toDate, limit);
+            @RequestParam(required = false, defaultValue = "10") Integer limit,
+            @RequestParam(required = false) Long cuaHangId) throws IOException {
+        byte[] bytes = thongKeService.exportTopProductReport(fromDate, toDate, limit, cuaHangId);
         return buildExcelResponse(bytes, "thong-ke-top-san-pham.xlsx");
     }
 
@@ -101,17 +109,19 @@ public class ThongKeController {
     @ApiMessage("Thong ke nhap hang va nha cung cap")
     public ResponseEntity<ResThongKeDTO.ImportSupplierReport> getImportSupplier(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
-        return ResponseEntity.ok(thongKeService.getImportSupplierReport(fromDate, toDate));
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+            @RequestParam(required = false) Long cuaHangId) {
+        return ResponseEntity.ok(thongKeService.getImportSupplierReport(fromDate, toDate, cuaHangId));
     }
 
     @GetMapping("/nhap-hang-ncc/export")
     @ApiMessage("Xuat Excel thong ke nhap hang va nha cung cap")
     public ResponseEntity<Resource> exportImportSupplier(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate)
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+            @RequestParam(required = false) Long cuaHangId)
             throws IOException {
-        byte[] bytes = thongKeService.exportImportSupplierReport(fromDate, toDate);
+        byte[] bytes = thongKeService.exportImportSupplierReport(fromDate, toDate, cuaHangId);
         return buildExcelResponse(bytes, "thong-ke-nhap-hang-ncc.xlsx");
     }
 
@@ -119,17 +129,19 @@ public class ThongKeController {
     @ApiMessage("Thong ke tra doi")
     public ResponseEntity<ResThongKeDTO.ReturnExchangeReport> getReturnExchange(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
-        return ResponseEntity.ok(thongKeService.getReturnExchangeReport(fromDate, toDate));
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+            @RequestParam(required = false) Long cuaHangId) {
+        return ResponseEntity.ok(thongKeService.getReturnExchangeReport(fromDate, toDate, cuaHangId));
     }
 
     @GetMapping("/tra-doi/export")
     @ApiMessage("Xuat Excel thong ke tra doi")
     public ResponseEntity<Resource> exportReturnExchange(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate)
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+            @RequestParam(required = false) Long cuaHangId)
             throws IOException {
-        byte[] bytes = thongKeService.exportReturnExchangeReport(fromDate, toDate);
+        byte[] bytes = thongKeService.exportReturnExchangeReport(fromDate, toDate, cuaHangId);
         return buildExcelResponse(bytes, "thong-ke-tra-doi.xlsx");
     }
 
@@ -137,17 +149,19 @@ public class ThongKeController {
     @ApiMessage("Thong ke khuyen mai")
     public ResponseEntity<ResThongKeDTO.PromotionReport> getPromotion(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
-        return ResponseEntity.ok(thongKeService.getPromotionReport(fromDate, toDate));
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+            @RequestParam(required = false) Long cuaHangId) {
+        return ResponseEntity.ok(thongKeService.getPromotionReport(fromDate, toDate, cuaHangId));
     }
 
     @GetMapping("/khuyen-mai/export")
     @ApiMessage("Xuat Excel thong ke khuyen mai")
     public ResponseEntity<Resource> exportPromotion(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate)
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+            @RequestParam(required = false) Long cuaHangId)
             throws IOException {
-        byte[] bytes = thongKeService.exportPromotionReport(fromDate, toDate);
+        byte[] bytes = thongKeService.exportPromotionReport(fromDate, toDate, cuaHangId);
         return buildExcelResponse(bytes, "thong-ke-khuyen-mai.xlsx");
     }
 
@@ -155,17 +169,19 @@ public class ThongKeController {
     @ApiMessage("Thong ke nang suat nhan vien")
     public ResponseEntity<ResThongKeDTO.StaffPerformanceReport> getStaffPerformance(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
-        return ResponseEntity.ok(thongKeService.getStaffPerformanceReport(fromDate, toDate));
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+            @RequestParam(required = false) Long cuaHangId) {
+        return ResponseEntity.ok(thongKeService.getStaffPerformanceReport(fromDate, toDate, cuaHangId));
     }
 
     @GetMapping("/nang-suat-nhan-vien/export")
     @ApiMessage("Xuat Excel thong ke nang suat nhan vien")
     public ResponseEntity<Resource> exportStaffPerformance(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate)
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+            @RequestParam(required = false) Long cuaHangId)
             throws IOException {
-        byte[] bytes = thongKeService.exportStaffPerformanceReport(fromDate, toDate);
+        byte[] bytes = thongKeService.exportStaffPerformanceReport(fromDate, toDate, cuaHangId);
         return buildExcelResponse(bytes, "thong-ke-nang-suat-nhan-vien.xlsx");
     }
 

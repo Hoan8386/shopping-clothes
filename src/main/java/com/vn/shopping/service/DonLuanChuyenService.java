@@ -4,11 +4,14 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Comparator;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -106,7 +109,7 @@ public class DonLuanChuyenService {
         donLuanChuyen.setLoaiDonLuanChuyen(loaiDon);
         donLuanChuyen.setTenDon(req.getTenDon());
         donLuanChuyen.setGhiTru(req.getGhiTru());
-        donLuanChuyen.setTrangThai(0);
+        donLuanChuyen.setTrangThai(0); // 0: Chờ xác nhận
 
         List<ChiTietDonLuanChuyen> chiTietList = new ArrayList<>();
         for (ReqDonLuanChuyenDTO.ChiTietDonLuanChuyenItem item : req.getChiTietDonLuanChuyens()) {
@@ -156,17 +159,16 @@ public class DonLuanChuyenService {
         Optional<NhanVien> currentStaff = getCurrentNhanVien();
         if (currentStaff.isPresent()) {
             NhanVien nhanVien = currentStaff.get();
-            
-            // Kiểm tra role: chỉ nhân viên kho (role_id = 4) được phép cập nhật trạng thái
+
             if (nhanVien.getRole() == null || nhanVien.getRole().getId() == null) {
                 throw new IdInvalidException("Nhân viên không có quyền hạn");
             }
-            
+
             Long roleId = nhanVien.getRole().getId();
             if (!roleId.equals(4L)) {
                 throw new IdInvalidException("Chỉ nhân viên kho mới có quyền cập nhật trạng thái đơn luân chuyển");
             }
-            
+
             if (nhanVien.getCuaHang() == null || nhanVien.getCuaHang().getId() == null) {
                 throw new IdInvalidException("Nhân viên chưa được gán cửa hàng");
             }
@@ -183,14 +185,13 @@ public class DonLuanChuyenService {
 
             int currentStatus = donLuanChuyen.getTrangThai() == null ? -1 : donLuanChuyen.getTrangThai();
 
-            // Luồng nghiệp vụ:
-            // - Cửa hàng gửi xác nhận đơn: 0 (Chờ xác nhận) -> 4 (Đã xác nhận) hoặc từ chối
-            // -> 3.
-            // - Cửa hàng gửi bắt đầu giao: 4 -> 1 (Đang giao) hoặc từ chối -> 3.
-            // - Cửa hàng nhận xác nhận đã nhận: 1 -> 2 (Đã nhận).
-            boolean validTransition = (isStoreGui && currentStatus == 0 && (trangThai == 4 || trangThai == 3)) ||
-                    (isStoreGui && currentStatus == 4 && (trangThai == 1 || trangThai == 3)) ||
-                    (isStoreDat && currentStatus == 1 && trangThai == 2);
+            // Luồng nghiệp vụ tuyến tính mới:
+            // 0 (Chờ xác nhận) -> 1 (Đã xác nhận) hoặc 3 (Từ chối) [Cửa hàng gửi thực hiện]
+            // 1 (Đã xác nhận) -> 2 (Đang giao) hoặc 3 (Từ chối) [Cửa hàng gửi thực hiện]
+            // 2 (Đang giao) -> 4 (Đã nhận) [Cửa hàng nhận thực hiện]
+            boolean validTransition = (isStoreGui && currentStatus == 0 && (trangThai == 1 || trangThai == 3)) ||
+                    (isStoreGui && currentStatus == 1 && (trangThai == 2 || trangThai == 3)) ||
+                    (isStoreDat && currentStatus == 2 && trangThai == 4);
 
             if (!validTransition) {
                 throw new IdInvalidException("Trạng thái không hợp lệ cho nghiệp vụ nhân viên");
@@ -199,11 +200,11 @@ public class DonLuanChuyenService {
 
         donLuanChuyen.setTrangThai(trangThai);
 
-        if (trangThai == 1) {
+        if (trangThai == 2) { // 2: Đang giao
             donLuanChuyen.setThoiGianGiao(LocalDateTime.now());
         }
 
-        if (trangThai == 2) {
+        if (trangThai == 4) { // 4: Đã nhận
             donLuanChuyen.setThoiGianNhan(LocalDateTime.now());
             applyInventoryTransfer(donLuanChuyen);
         }
@@ -286,6 +287,9 @@ public class DonLuanChuyenService {
             }
             allTransfers = allTransfers.stream().filter(filter).collect(Collectors.toList());
 
+            allTransfers.sort(Comparator.comparing(DonLuanChuyen::getNgayTao,
+                    Comparator.nullsLast(Comparator.naturalOrder())).reversed());
+
             int fromIndex = (int) pageable.getOffset();
             int toIndex = Math.min(fromIndex + pageable.getPageSize(), allTransfers.size());
             List<DonLuanChuyen> content = fromIndex >= allTransfers.size() ? List.of()
@@ -299,13 +303,22 @@ public class DonLuanChuyenService {
                         .filter(item -> cuaHangDatId == null
                                 || (item.getCuaHangDat() != null && cuaHangDatId.equals(item.getCuaHangDat().getId())))
                         .collect(Collectors.toList());
+
+                filtered.sort(Comparator.comparing(DonLuanChuyen::getNgayTao,
+                        Comparator.nullsLast(Comparator.naturalOrder())).reversed());
                 int fromIndex = (int) pageable.getOffset();
                 int toIndex = Math.min(fromIndex + pageable.getPageSize(), filtered.size());
                 List<DonLuanChuyen> content = fromIndex >= filtered.size() ? List.of()
                         : filtered.subList(fromIndex, toIndex);
                 page = new PageImpl<>(content, pageable, filtered.size());
             } else {
-                page = donLuanChuyenRepository.findAll(pageable);
+                if (!pageable.getSort().isSorted()) {
+                    Pageable pageableSorted = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+                            Sort.by(Sort.Direction.DESC, "ngayTao"));
+                    page = donLuanChuyenRepository.findAll(pageableSorted);
+                } else {
+                    page = donLuanChuyenRepository.findAll(pageable);
+                }
             }
         }
 
@@ -381,12 +394,10 @@ public class DonLuanChuyenService {
                         ctDto.setKichThuoc(ctsp.getKichThuoc().getTenKichThuoc());
                     }
                 }
-
                 chiTietDTOs.add(ctDto);
             }
             dto.setChiTietDonLuanChuyens(chiTietDTOs);
         }
-
         return dto;
     }
 
@@ -477,10 +488,10 @@ public class DonLuanChuyenService {
         }
         return switch (trangThai) {
             case 0 -> "Chờ xác nhận";
-            case 1 -> "Đang giao";
-            case 2 -> "Đã nhận";
+            case 1 -> "Đã xác nhận";
+            case 2 -> "Đang giao";
             case 3 -> "Từ chối";
-            case 4 -> "Đã xác nhận";
+            case 4 -> "Đã nhận";
             default -> "Không xác định";
         };
     }

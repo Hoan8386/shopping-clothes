@@ -108,6 +108,23 @@ public class VNPayService {
                 vnpStaffReturnUrl);
     }
 
+    public String createReturnPaymentUrl(Long traHangId, long tongTien, String ipAddr) throws IdInvalidException {
+        if (traHangId == null) {
+            throw new IdInvalidException("Mã phiếu trả hàng không được để trống");
+        }
+        if (tongTien <= 0) {
+            throw new IdInvalidException("Phiếu trả hàng không hợp lệ để thanh toán VNPAY");
+        }
+
+        String txnRef = "TRH_" + traHangId + "_" + System.currentTimeMillis();
+        return buildPaymentUrl(
+                txnRef,
+                tongTien,
+                "Thanh toan hoan tien phieu tra #" + traHangId,
+                ipAddr,
+                vnpStaffReturnUrl);
+    }
+
     public String createPaymentUrlForOnlineCart(Long cartId, int tongTien, String ipAddr) throws IdInvalidException {
         if (cartId == null) {
             throw new IdInvalidException("Mã giỏ hàng không được để trống");
