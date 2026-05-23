@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,10 @@ import jakarta.persistence.EntityManager;
 
 @Service
 public class DonHangService {
+
+    private static final int STATUS_CONFIRMED = 1;
+    private static final int STATUS_PACKING = 2;
+    private static final int STATUS_SHIPPING = 3;
 
     private final DonHangRepository donHangRepository;
     private final EntityManager entityManager;
@@ -447,13 +452,42 @@ public class DonHangService {
                 existing.setTrangThaiThanhToan(1);
             }
 
-            // Nếu đơn hàng online (1) và nhân viên cập nhật trạng thái → gán nhân viên
-            if (existing.getHinhThucDonHang() != null && existing.getHinhThucDonHang() == 1
-                    && (trangThaiMoi == 1 || trangThaiMoi == 2 || trangThaiMoi == 3)) {
-                String email = SecurityContextHolder.getContext().getAuthentication().getName();
-                NhanVien nv = nhanVienRepository.findByEmail(email).orElse(null);
-                if (nv != null) {
-                    existing.setNhanVien(nv);
+            // Nếu trạng thái được cập nhật sang các trạng thái nội bộ (1,2,3)
+            // - Nếu đơn đã có nhân viên được gán thì chỉ `nhân viên đó` hoặc `ADMIN` mới
+            // được cập nhật.
+            // - Nếu đơn chưa có nhân viên thì nhân viên thực hiện thao tác (ROLE_NHAN_VIEN)
+            // sẽ được gán.
+            if (trangThaiMoi == STATUS_CONFIRMED || trangThaiMoi == STATUS_PACKING || trangThaiMoi == STATUS_SHIPPING) {
+                try {
+                    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                    if (auth != null && auth.isAuthenticated()) {
+                        boolean isAdmin = auth.getAuthorities().stream()
+                                .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
+                        String email = auth.getName();
+
+                        // Nếu đã có nhân viên được gán trước đó và user hiện tại không phải admin
+                        // thì chỉ cho phép nếu chính nhân viên đó đang thao tác.
+                        if (existing.getNhanVien() != null && existing.getNhanVien().getEmail() != null) {
+                            if (!isAdmin) {
+                                if (!existing.getNhanVien().getEmail().equals(email)) {
+                                    throw new IdInvalidException(
+                                            "Đơn hàng đã được gán cho nhân viên khác. Chỉ ADMIN mới có thể cập nhật trạng thái.");
+                                }
+                            }
+                        }
+
+                        // Nếu chưa có nhân viên, gán nhân viên hiện tại (nếu là nhân viên hoặc admin)
+                        boolean isStaffOrAdmin = auth.getAuthorities().stream()
+                                .anyMatch(a -> "ROLE_NHAN_VIEN".equals(a.getAuthority())
+                                        || "ROLE_ADMIN".equals(a.getAuthority()));
+                        if (isStaffOrAdmin && existing.getNhanVien() == null) {
+                            nhanVienRepository.findByEmail(email).ifPresent(existing::setNhanVien);
+                        }
+                    }
+                } catch (IdInvalidException ex) {
+                    throw ex;
+                } catch (Exception ex) {
+                    // Bảo vệ: nếu không có authentication hoặc không tìm thấy, bỏ qua gán/kiểm tra
                 }
             }
 
