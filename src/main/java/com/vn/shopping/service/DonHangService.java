@@ -191,8 +191,10 @@ public class DonHangService {
         donHang.setSdt(req.getSdt());
         donHang.setMaKhuyenMaiHoaDon(req.getMaKhuyenMaiHoaDon());
         donHang.setMaKhuyenMaiDiem(req.getMaKhuyenMaiDiem());
-        Integer hinhThucThanhToan = req.getHinhThucDonHang() != null ? req.getHinhThucDonHang() : 0;
-        donHang.setHinhThucDonHang(hinhThucThanhToan);
+        // Đặt rõ ràng: đơn online
+        donHang.setHinhThucDonHang(0);
+        // Sử dụng trường req.hinhThucDonHang làm phương thức thanh toán (0=COD,1=VNPAY)
+        donHang.setPhuongThucThanhToan(req.getHinhThucDonHang() != null ? req.getHinhThucDonHang() : 0);
         donHang.setTrangThai(0);
         donHang.setTrangThaiThanhToan(0);
 
@@ -304,8 +306,10 @@ public class DonHangService {
         DonHang donHang = new DonHang();
         donHang.setNhanVien(nhanVien);
         donHang.setCuaHang(nhanVien.getCuaHang());
-        Integer hinhThucDonHang = req.getHinhThucDonHang() != null ? req.getHinhThucDonHang() : 0;
-        donHang.setHinhThucDonHang(hinhThucDonHang);
+        // Đặt rõ ràng: đơn tại quầy
+        donHang.setHinhThucDonHang(1);
+        // Phương thức thanh toán có thể do nhân viên truyền (mặc định COD=0)
+        donHang.setPhuongThucThanhToan(req.getHinhThucDonHang() != null ? req.getHinhThucDonHang() : 0);
         donHang.setTrangThai(5); // Đã nhận hàng tại quầy
         donHang.setTrangThaiThanhToan(1); // Đã thanh toán
         donHang.setDiaChi("Mua tại cửa hàng");
@@ -443,63 +447,67 @@ public class DonHangService {
 
         // Cập nhật trạng thái
         if (req.getTrangThai() != null) {
+
             Integer trangThaiMoi = req.getTrangThai();
+
             validateChuyenTrangThai(trangThaiCu, trangThaiMoi);
+
             existing.setTrangThai(trangThaiMoi);
 
-            // Khi khách xác nhận đã nhận hàng, đơn được xem là đã thanh toán.
+            // Khi khách xác nhận đã nhận hàng, đơn được xem là đã thanh toán
             if (trangThaiMoi == 5) {
                 existing.setTrangThaiThanhToan(1);
             }
 
-            // Nếu trạng thái được cập nhật sang các trạng thái nội bộ (1,2,3)
-            // - Nếu đơn đã có nhân viên được gán thì chỉ `nhân viên đó` hoặc `ADMIN` mới
-            // được cập nhật.
-            // - Nếu đơn chưa có nhân viên thì nhân viên thực hiện thao tác (ROLE_NHAN_VIEN)
-            // sẽ được gán.
-            if (trangThaiMoi == STATUS_CONFIRMED || trangThaiMoi == STATUS_PACKING || trangThaiMoi == STATUS_SHIPPING) {
-                try {
-                    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                    if (auth != null && auth.isAuthenticated()) {
-                        boolean isAdmin = auth.getAuthorities().stream()
-                                .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
-                        String email = auth.getName();
+            // Nếu trạng thái được cập nhật sang các trạng thái nội bộ
+            if (trangThaiMoi == STATUS_CONFIRMED
+                    || trangThaiMoi == STATUS_PACKING
+                    || trangThaiMoi == STATUS_SHIPPING) {
 
-                        // Nếu đã có nhân viên được gán trước đó và user hiện tại không phải admin
-                        // thì chỉ cho phép nếu chính nhân viên đó đang thao tác.
-                        if (existing.getNhanVien() != null && existing.getNhanVien().getEmail() != null) {
-                            if (!isAdmin) {
-                                if (!existing.getNhanVien().getEmail().equals(email)) {
-                                    throw new IdInvalidException(
-                                            "Đơn hàng đã được gán cho nhân viên khác. Chỉ ADMIN mới có thể cập nhật trạng thái.");
-                                }
-                            }
-                        }
+                Authentication auth = SecurityContextHolder
+                        .getContext()
+                        .getAuthentication();
 
-                        // Nếu chưa có nhân viên, gán nhân viên hiện tại (nếu là nhân viên hoặc admin)
-                        boolean isStaffOrAdmin = auth.getAuthorities().stream()
-                                .anyMatch(a -> "ROLE_NHAN_VIEN".equals(a.getAuthority())
-                                        || "ROLE_ADMIN".equals(a.getAuthority()));
-                        if (isStaffOrAdmin && existing.getNhanVien() == null) {
-                            nhanVienRepository.findByEmail(email).ifPresent(existing::setNhanVien);
+                if (auth != null && auth.isAuthenticated()) {
+
+                    String email = auth.getName();
+
+                    boolean isAdmin = auth.getAuthorities().stream()
+                            .anyMatch(a -> "ADMIN".equals(a.getAuthority()));
+
+                    // Nếu đơn đã có nhân viên xử lý trước đó
+                    if (existing.getNhanVien() != null
+                            && existing.getNhanVien().getEmail() != null) {
+
+                        String emailNhanVienCu = existing.getNhanVien().getEmail();
+
+                        // Không phải admin và không phải chính người đang xử lý
+                        if (!isAdmin && !emailNhanVienCu.equals(email)) {
+
+                            throw new IdInvalidException(
+                                    "Đơn hàng đã được nhân viên khác xử lý");
                         }
                     }
-                } catch (IdInvalidException ex) {
-                    throw ex;
-                } catch (Exception ex) {
-                    // Bảo vệ: nếu không có authentication hoặc không tìm thấy, bỏ qua gán/kiểm tra
+
+                    // Gán nhân viên hiện tại vào đơn hàng
+                    NhanVien nhanVien = nhanVienRepository.findByEmail(email)
+                            .orElseThrow(() -> new IdInvalidException(
+                                    "Không tìm thấy nhân viên với email: " + email));
+
+                    existing.setNhanVien(nhanVien);
                 }
             }
-
-            // Cộng điểm tích lũy khi khách hàng xác nhận đã nhận hàng (5)
+            // Cộng điểm tích lũy khi khách xác nhận nhận hàng
             if (trangThaiMoi == 5 && trangThaiCu != 5) {
                 congDiemTichLuy(existing);
             }
         }
 
         DonHang saved = donHangRepository.save(existing);
+
         entityManager.flush();
         entityManager.clear();
+
         return donHangRepository.findById(saved.getId()).orElse(saved);
     }
 
@@ -912,6 +920,7 @@ public class DonHangService {
         dto.setTrangThai(mapTrangThai(donHang.getTrangThai()));
         dto.setTrangThaiThanhToan(mapTrangThaiThanhToan(donHang.getTrangThaiThanhToan()));
         dto.setHinhThucDonHang(mapHinhThucDonHang(donHang.getHinhThucDonHang()));
+        dto.setPhuongThucThanhToan(mapPhuongThucThanhToan(donHang.getPhuongThucThanhToan()));
         dto.setNgayTao(donHang.getNgayTao());
         dto.setNgayCapNhat(donHang.getNgayCapNhat());
 
@@ -1035,6 +1044,16 @@ public class DonHangService {
         if (hinhThuc == null)
             return null;
         return switch (hinhThuc) {
+            case 0 -> "Online";
+            case 1 -> "Tại quầy";
+            default -> "Không xác định";
+        };
+    }
+
+    private String mapPhuongThucThanhToan(Integer phuongThuc) {
+        if (phuongThuc == null)
+            return null;
+        return switch (phuongThuc) {
             case 0 -> "COD/Tiền mặt";
             case 1 -> "VNPAY";
             default -> "Không xác định";

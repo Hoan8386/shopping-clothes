@@ -25,6 +25,7 @@ public class ResDonHangDTO {
     private String trangThai;
     private String trangThaiThanhToan;
     private String hinhThucDonHang;
+    private String phuongThucThanhToan;
     private VanChuyenDTO vanChuyen;
     private KhuyenMaiHoaDonDTO khuyenMaiHoaDon;
     private KhuyenMaiDiemDTO khuyenMaiDiem;

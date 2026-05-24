@@ -395,6 +395,18 @@ public class PhieuNhapService {
             LocalDateTime ngayNhanHangTu, LocalDateTime ngayNhanHangDen,
             Pageable pageable) {
 
+        // Nếu người dùng hiện tại không phải ADMIN, giới hạn kết quả chỉ về cửa hàng
+        // của họ
+        if (!isCurrentUserAdmin()) {
+            String email = SecurityUtil.getCurrentUserLogin().orElse("");
+            if (!email.isBlank()) {
+                Long userStoreId = nhanVienRepository.findByEmail(email)
+                        .map(nv -> nv.getCuaHang() != null ? nv.getCuaHang().getId() : null)
+                        .orElse(null);
+                cuaHangId = userStoreId;
+            }
+        }
+
         Specification<PhieuNhap> spec = PhieuNhapSpecification.filter(
                 tenPhieuNhap, trangThai, cuaHangId, tenCuaHang, tenNhaCungCap,
                 ngayTaoTu, ngayTaoDen,

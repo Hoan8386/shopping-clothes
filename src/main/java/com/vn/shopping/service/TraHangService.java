@@ -1,7 +1,9 @@
 package com.vn.shopping.service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -83,6 +85,20 @@ public class TraHangService {
             throw new IdInvalidException("Phải chọn ít nhất một sản phẩm để trả");
         }
 
+        Set<Long> seenChiTietDonHangIds = new HashSet<>();
+        for (ReqTraHangDTO.ChiTietTraHangItem item : req.getChiTietTraHangs()) {
+            if (item.getChiTietDonHangId() == null) {
+                throw new IdInvalidException("Chi tiết trả hàng không hợp lệ");
+            }
+            if (!seenChiTietDonHangIds.add(item.getChiTietDonHangId())) {
+                throw new IdInvalidException("Không được chọn trùng sản phẩm trong cùng một phiếu trả");
+            }
+            Integer soLuongTra = item.getSoLuong();
+            if (soLuongTra == null || soLuongTra <= 0) {
+                throw new IdInvalidException("Số lượng trả phải lớn hơn 0");
+            }
+        }
+
         Integer phuongThucHoanTien = req.getPhuongThucHoanTien() != null ? req.getPhuongThucHoanTien() : 0;
         if (phuongThucHoanTien != 0 && phuongThucHoanTien != 1) {
             throw new IdInvalidException("Phương thức hoàn tiền không hợp lệ. 0 = Tiền mặt, 1 = Chuyển khoản");
@@ -127,16 +143,46 @@ public class TraHangService {
                 throw new IdInvalidException("Chi tiết đơn hàng không thuộc đơn hàng này");
             }
 
+            int soLuongDaMua = ctdh.getSoLuong() != null ? ctdh.getSoLuong() : 0;
+            if (soLuongDaMua <= 0) {
+                throw new IdInvalidException("Số lượng sản phẩm trong đơn hàng không hợp lệ");
+            }
+
+            int soLuongDaTra = chiTietTraHangRepository.findBySanPhamTraId(ctdh.getId()).stream()
+                    .filter(ct -> ct.getTrangThai() == null || ct.getTrangThai() != 2)
+                    .mapToInt(ct -> ct.getSoLuongTra() != null
+                            ? ct.getSoLuongTra()
+                            : (ct.getSanPhamTra() != null && ct.getSanPhamTra().getSoLuong() != null
+                                    ? ct.getSanPhamTra().getSoLuong()
+                                    : 0))
+                    .sum();
+
+            int soLuongConLaiCoTheTra = Math.max(soLuongDaMua - soLuongDaTra, 0);
+            int soLuongTra = item.getSoLuong() != null ? item.getSoLuong() : 0;
+            if (soLuongTra > soLuongConLaiCoTheTra) {
+                throw new IdInvalidException(
+                        "Số lượng trả vượt quá số lượng còn lại có thể trả cho sản phẩm: "
+                                + item.getChiTietDonHangId());
+            }
+
             ChiTietTraHang chiTiet = new ChiTietTraHang();
             chiTiet.setTraHang(traHang);
             chiTiet.setSanPhamTra(ctdh);
             chiTiet.setGhiTru(item.getGhiTru());
+            chiTiet.setSoLuongTra(soLuongTra);
             chiTiet.setTrangThai(0); // 0 = Chờ xử lý
             chiTietList.add(chiTiet);
 
             // Dùng thành tiền dòng đã phân bổ đầy đủ giảm giá toàn đơn để hoàn trả chính
             // xác.
-            tongTienSanPhamTraTheoGiaDaGiam += ctdh.getThanhTien() != null ? ctdh.getThanhTien() : 0;
+            double donGiaSauGiam;
+            if (ctdh.getThanhTien() != null && ctdh.getSoLuong() != null && ctdh.getSoLuong() > 0) {
+                donGiaSauGiam = ctdh.getThanhTien() / ctdh.getSoLuong();
+            } else {
+                donGiaSauGiam = ctdh.getGiaGiam() != null ? ctdh.getGiaGiam()
+                        : (ctdh.getGiaSanPham() != null ? ctdh.getGiaSanPham() : 0D);
+            }
+            tongTienSanPhamTraTheoGiaDaGiam += donGiaSauGiam * soLuongTra;
         }
 
         traHang.setChiTietTraHangs(chiTietList);
@@ -179,7 +225,8 @@ public class TraHangService {
                     ChiTietDonHang ctdh = ct.getSanPhamTra();
                     if (ctdh != null && ctdh.getChiTietSanPham() != null) {
                         ChiTietSanPham ctsp = ctdh.getChiTietSanPham();
-                        int slTra = ctdh.getSoLuong() != null ? ctdh.getSoLuong() : 0;
+                        int slTra = ct.getSoLuongTra() != null ? ct.getSoLuongTra()
+                                : (ctdh.getSoLuong() != null ? ctdh.getSoLuong() : 0);
                         int slHienTai = ctsp.getSoLuong() != null ? ctsp.getSoLuong() : 0;
                         ctsp.setSoLuong(slHienTai + slTra);
                         chiTietSanPhamRepository.save(ctsp);
@@ -242,12 +289,20 @@ public class TraHangService {
 
                 ChiTietDonHang ctdh = ct.getSanPhamTra();
                 if (ctdh != null) {
+                    int soLuongTra = ct.getSoLuongTra() != null ? ct.getSoLuongTra()
+                            : (ctdh.getSoLuong() != null ? ctdh.getSoLuong() : 0);
+                    double donGiaSauGiam;
+                    if (ctdh.getThanhTien() != null && ctdh.getSoLuong() != null && ctdh.getSoLuong() > 0) {
+                        donGiaSauGiam = ctdh.getThanhTien() / ctdh.getSoLuong();
+                    } else {
+                        donGiaSauGiam = ctdh.getGiaGiam() != null ? ctdh.getGiaGiam()
+                                : (ctdh.getGiaSanPham() != null ? ctdh.getGiaSanPham() : 0D);
+                    }
+
                     ctDto.setChiTietDonHangId(ctdh.getId());
-                    // giaSanPham should represent unit price after product-level discounts
-                    ctDto.setGiaSanPham(ctdh.getGiaSanPham());
-                    ctDto.setSoLuong(ctdh.getSoLuong());
-                    // thanhTien is the line total (unit price * quantity) after allocations
-                    ctDto.setThanhTien(ctdh.getThanhTien());
+                    ctDto.setGiaSanPham(donGiaSauGiam);
+                    ctDto.setSoLuong(soLuongTra);
+                    ctDto.setThanhTien(donGiaSauGiam * soLuongTra);
 
                     ChiTietSanPham ctsp = ctdh.getChiTietSanPham();
                     if (ctsp != null) {

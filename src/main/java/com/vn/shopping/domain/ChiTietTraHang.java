@@ -33,6 +33,9 @@ public class ChiTietTraHang {
     @Column(name = "GhiTru", length = 255)
     private String ghiTru;
 
+    @Column(name = "SoLuongTra")
+    private Integer soLuongTra;
+
     @Column(name = "TrangThai")
     private Integer trangThai;
 

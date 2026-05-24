@@ -26,6 +26,7 @@ public class ReqTraHangDTO {
     @AllArgsConstructor
     public static class ChiTietTraHangItem {
         private Long chiTietDonHangId;
+        private Integer soLuong;
         private String ghiTru;
     }
 }

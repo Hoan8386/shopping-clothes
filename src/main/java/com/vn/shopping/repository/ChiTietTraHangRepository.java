@@ -10,4 +10,6 @@ import com.vn.shopping.domain.ChiTietTraHang;
 @Repository
 public interface ChiTietTraHangRepository extends JpaRepository<ChiTietTraHang, Long> {
     List<ChiTietTraHang> findByTraHangId(Long traHangId);
+
+    List<ChiTietTraHang> findBySanPhamTraId(Long sanPhamTraId);
 }

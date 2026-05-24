@@ -96,9 +96,21 @@ public class TraHangController {
         if (traHang.getChiTietTraHangs() != null) {
             for (com.vn.shopping.domain.ChiTietTraHang chiTiet : traHang.getChiTietTraHangs()) {
                 if (chiTiet != null && chiTiet.getSanPhamTra() != null) {
-                    Double thanhTien = chiTiet.getSanPhamTra().getThanhTien();
-                    if (thanhTien != null) {
-                        tongTienTra += Math.round(thanhTien);
+                    com.vn.shopping.domain.ChiTietDonHang ctdh = chiTiet.getSanPhamTra();
+                    int soLuongTra = chiTiet.getSoLuongTra() != null
+                            ? chiTiet.getSoLuongTra()
+                            : (ctdh.getSoLuong() != null ? ctdh.getSoLuong() : 0);
+
+                    double donGiaSauGiam;
+                    if (ctdh.getThanhTien() != null && ctdh.getSoLuong() != null && ctdh.getSoLuong() > 0) {
+                        donGiaSauGiam = ctdh.getThanhTien() / ctdh.getSoLuong();
+                    } else {
+                        donGiaSauGiam = ctdh.getGiaGiam() != null ? ctdh.getGiaGiam()
+                                : (ctdh.getGiaSanPham() != null ? ctdh.getGiaSanPham() : 0D);
+                    }
+
+                    if (soLuongTra > 0 && donGiaSauGiam > 0) {
+                        tongTienTra += Math.round(donGiaSauGiam * soLuongTra);
                     }
                 }
             }

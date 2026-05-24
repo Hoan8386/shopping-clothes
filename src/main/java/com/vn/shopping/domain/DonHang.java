@@ -73,6 +73,9 @@ public class DonHang {
     @Column(name = "HinhThucDonHang")
     private Integer hinhThucDonHang;
 
+    @Column(name = "PhuongThucThanhToan")
+    private Integer phuongThucThanhToan;
+
     @Column(name = "payment_ref", length = 100)
     private String paymentRef;
 
