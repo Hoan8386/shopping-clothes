@@ -257,6 +257,7 @@ Tai lieu nay tong hop cac API can cho mobile theo controller hien tai, trinh bay
       "tongTien": 600000,
       "tongTienTra": 600000,
       "trangThai": "Da xac nhan",
+      "phuongThucThanhToan": "VNPAY",
       "trangThaiThanhToan": "Da thanh toan",
       "hinhThucDonHang": "Online",
       "ngayTao": "2026-03-01T10:00:00"
@@ -286,6 +287,7 @@ Tai lieu nay tong hop cac API can cho mobile theo controller hien tai, trinh bay
       "tongTienGiam": "Integer",
       "tongTienTra": "Integer",
       "paymentRef": "String",
+      "phuongThucThanhToan": "String",
       "trangThai": "String",
       "trangThaiThanhToan": "String",
       "hinhThucDonHang": "String",

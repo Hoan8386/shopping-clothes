@@ -10,26 +10,27 @@
 
 ### Cấu trúc dữ liệu `DonHang`
 
-| Trường               | Kiểu          | Mô tả                                     |
-| -------------------- | ------------- | ----------------------------------------- |
-| `id`                 | Long          | Mã đơn hàng (auto-increment)              |
-| `cuaHang`            | CuaHang       | Cửa hàng xử lý đơn                        |
-| `khachHang`          | KhachHang     | Khách hàng đặt đơn                        |
-| `nhanVien`           | NhanVien      | Nhân viên xử lý đơn                       |
-| `maKhuyenMaiHoaDon`  | Long          | Mã khuyến mãi theo hóa đơn (FK, nullable) |
-| `maKhuyenMaiDiem`    | Long          | Mã khuyến mãi theo điểm (FK, nullable)    |
-| `diaChi`             | String(255)   | Địa chỉ giao hàng                         |
-| `sdt`                | String(255)   | Số điện thoại nhận hàng                   |
-| `tongTien`           | Integer       | Tổng tiền trước giảm (VND)                |
-| `tienGiam`           | Integer       | Số tiền giảm (VND)                        |
-| `tongTienGiam`       | Integer       | Tổng tiền giảm (VND)                      |
-| `tongTienTra`        | Integer       | Tổng tiền phải trả sau giảm (VND)         |
-| `trangThai`          | Integer       | Trạng thái đơn hàng (xem bảng bên dưới)   |
-| `trangThaiThanhToan` | Integer       | Trạng thái thanh toán (xem bảng bên dưới) |
-| `hinhThucDonHang`    | Integer       | Hình thức đơn hàng (xem bảng bên dưới)    |
-| `chiTietDonHangs`    | List          | Danh sách chi tiết đơn hàng               |
-| `ngayTao`            | LocalDateTime | Ngày tạo đơn (tự động)                    |
-| `ngayCapNhat`        | LocalDateTime | Ngày cập nhật (tự động)                   |
+| Trường                | Kiểu          | Mô tả                                     |
+| --------------------- | ------------- | ----------------------------------------- |
+| `id`                  | Long          | Mã đơn hàng (auto-increment)              |
+| `cuaHang`             | CuaHang       | Cửa hàng xử lý đơn                        |
+| `khachHang`           | KhachHang     | Khách hàng đặt đơn                        |
+| `nhanVien`            | NhanVien      | Nhân viên xử lý đơn                       |
+| `maKhuyenMaiHoaDon`   | Long          | Mã khuyến mãi theo hóa đơn (FK, nullable) |
+| `maKhuyenMaiDiem`     | Long          | Mã khuyến mãi theo điểm (FK, nullable)    |
+| `diaChi`              | String(255)   | Địa chỉ giao hàng                         |
+| `sdt`                 | String(255)   | Số điện thoại nhận hàng                   |
+| `tongTien`            | Integer       | Tổng tiền trước giảm (VND)                |
+| `tienGiam`            | Integer       | Số tiền giảm (VND)                        |
+| `tongTienGiam`        | Integer       | Tổng tiền giảm (VND)                      |
+| `tongTienTra`         | Integer       | Tổng tiền phải trả sau giảm (VND)         |
+| `trangThai`           | Integer       | Trạng thái đơn hàng (xem bảng bên dưới)   |
+| `trangThaiThanhToan`  | Integer       | Trạng thái thanh toán (xem bảng bên dưới) |
+| `hinhThucDonHang`     | Integer       | Hình thức đơn hàng (xem bảng bên dưới)    |
+| `phuongThucThanhToan` | Integer       | Phương thức thanh toán (0=COD,1=VNPAY)    |
+| `chiTietDonHangs`     | List          | Danh sách chi tiết đơn hàng               |
+| `ngayTao`             | LocalDateTime | Ngày tạo đơn (tự động)                    |
+| `ngayCapNhat`         | LocalDateTime | Ngày cập nhật (tự động)                   |
 
 ### Mã trạng thái đơn hàng (`trangThai`)
 
@@ -139,6 +140,7 @@ GET /api/v1/don-hang?trangThai=1&hinhThucDonHang=1&page=0&size=10&sort=ngayTao,d
       "trangThai": "Đã xác nhận",
       "trangThaiThanhToan": "Đã thanh toán",
       "hinhThucDonHang": "Online",
+      "phuongThucThanhToan": "VNPAY",
       "chiTietDonHangs": [
         {
           "id": 1,
@@ -217,6 +219,7 @@ GET /api/v1/don-hang?trangThai=1&hinhThucDonHang=1&page=0&size=10&sort=ngayTao,d
       "trangThai": "String (text mô tả)",
       "trangThaiThanhToan": "String (text mô tả)",
       "hinhThucDonHang": "String (text mô tả)",
+      "phuongThucThanhToan": "String (text mô tả)",
       "chiTietDonHangs": [
         {
           "id": "Long",
@@ -496,5 +499,3 @@ GET /api/v1/don-hang?trangThai=1&hinhThucDonHang=1&page=0&size=10&sort=ngayTao,d
 | ADMIN      | ✅ Tất cả       | ❌          | ✅            | ✅        | ✅           |
 | NHAN_VIEN  | ✅ Tất cả       | ❌          | ✅            | ❌        | ❌           |
 | KHACH_HANG | ✅ Chỉ đơn mình | ✅          | ❌            | ❌        | ❌           |
-
-
