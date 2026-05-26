@@ -166,7 +166,7 @@ public class DonLuanChuyenService {
 
             Long roleId = nhanVien.getRole().getId();
             if (!roleId.equals(4L)) {
-                throw new IdInvalidException("Chỉ nhân viên kho mới có quyền cập nhật trạng thái đơn luân chuyển");
+                throw new IdInvalidException("Chỉ nhân viên quản lý mới có quyền cập nhật trạng thái đơn luân chuyển");
             }
 
             if (nhanVien.getCuaHang() == null || nhanVien.getCuaHang().getId() == null) {

@@ -13,7 +13,7 @@
         ('ADMIN',      'Quản trị viên toàn quyền', TRUE, NOW()),
         ('NHAN_VIEN',  'Nhân viên bán hàng',        TRUE, NOW()),
         ('KHACH_HANG', 'Khách hàng mua sắm',        TRUE, NOW()),
-        ('NHAN_VIEN_QUAN_LY', 'Nhân viên kho',         TRUE, NOW());
+        ('NHAN_VIEN_QUAN_LY', 'nhân viên quản lý',         TRUE, NOW());
 
     -- ---------------------------------------------------------
     -- 2. PERMISSIONS
@@ -326,6 +326,13 @@
         WHERE apiPath = '/api/v1/tra-hang/{id}/vnpay-url' AND method = 'POST'
     );
 
+    INSERT INTO permissions (name, apiPath, method, module, createdAt)
+    SELECT 'VNPay trả kết quả phiếu trả hàng', '/api/v1/tra-hang/vnpay/return', 'GET', 'TRA_HANG', NOW()
+    WHERE NOT EXISTS (
+        SELECT 1 FROM permissions
+        WHERE apiPath = '/api/v1/tra-hang/vnpay/return' AND method = 'GET'
+    );
+
     INSERT INTO permission_role (role_id, permission_id)
     SELECT roles.role_id, p.id
     FROM permissions p
@@ -335,6 +342,22 @@
     ) roles
     WHERE p.apiPath = '/api/v1/tra-hang/{id}/vnpay-url'
       AND p.method = 'POST'
+      AND NOT EXISTS (
+          SELECT 1 FROM permission_role pr
+          WHERE pr.role_id = roles.role_id AND pr.permission_id = p.id
+      );
+
+    INSERT INTO permission_role (role_id, permission_id)
+    SELECT roles.role_id, p.id
+    FROM permissions p
+    JOIN (
+        SELECT 1 AS role_id
+        UNION ALL SELECT 2 AS role_id
+        UNION ALL SELECT 3 AS role_id
+        UNION ALL SELECT 4 AS role_id
+    ) roles
+    WHERE p.apiPath = '/api/v1/tra-hang/vnpay/return'
+      AND p.method = 'GET'
       AND NOT EXISTS (
           SELECT 1 FROM permission_role pr
           WHERE pr.role_id = roles.role_id AND pr.permission_id = p.id
@@ -1191,3 +1214,58 @@ AND p.method = 'GET'
 LEFT JOIN permission_role pr
 ON pr.role_id = r.role_id AND pr.permission_id = p.id
 WHERE pr.permission_id IS NULL;
+
+-- =========================================================
+-- 50. QUYỀN KIỂM KÊ HÀNG HÓA BỔ SUNG
+-- =========================================================
+
+-- 1. TẠO PERMISSION XÓA PHIẾU KIỂM KÊ (IDEMPOTENT)
+INSERT INTO permissions (name, apiPath, method, module, createdAt)
+SELECT 'Xóa phiếu kiểm kê', '/api/v1/kiem-ke-hang-hoa/{id}', 'DELETE', 'KIEM_KE_HANG_HOA', NOW()
+WHERE NOT EXISTS (
+    SELECT 1 FROM permissions
+    WHERE apiPath = '/api/v1/kiem-ke-hang-hoa/{id}' AND method = 'DELETE'
+);
+
+-- 2. GÁN QUYỀN CHO ADMIN, NHÂN VIÊN VÀ NHÂN VIÊN QUẢN LÝ
+INSERT INTO permission_role (role_id, permission_id)
+SELECT r.role_id, p.id
+FROM permissions p
+JOIN (
+    SELECT 1 AS role_id
+    UNION ALL SELECT 2 AS role_id
+    UNION ALL SELECT 4 AS role_id
+) r
+WHERE p.apiPath = '/api/v1/kiem-ke-hang-hoa/{id}'
+  AND p.method = 'DELETE'
+  AND NOT EXISTS (
+      SELECT 1 FROM permission_role pr
+      WHERE pr.role_id = r.role_id AND pr.permission_id = p.id
+  );
+
+-- =========================================================
+-- 51. TRA_HANG VNPAY RETURN BỔ SUNG (CUỐI FILE)
+-- =========================================================
+
+INSERT INTO permissions (name, apiPath, method, module, createdAt)
+SELECT 'VNPay trả kết quả phiếu trả hàng', '/api/v1/tra-hang/vnpay/return', 'GET', 'TRA_HANG', NOW()
+WHERE NOT EXISTS (
+    SELECT 1 FROM permissions
+    WHERE apiPath = '/api/v1/tra-hang/vnpay/return' AND method = 'GET'
+);
+
+INSERT INTO permission_role (role_id, permission_id)
+SELECT roles.role_id, p.id
+FROM permissions p
+JOIN (
+    SELECT 1 AS role_id
+    UNION ALL SELECT 2 AS role_id
+    UNION ALL SELECT 3 AS role_id
+    UNION ALL SELECT 4 AS role_id
+) roles
+WHERE p.apiPath = '/api/v1/tra-hang/vnpay/return'
+  AND p.method = 'GET'
+  AND NOT EXISTS (
+      SELECT 1 FROM permission_role pr
+      WHERE pr.role_id = roles.role_id AND pr.permission_id = p.id
+  );

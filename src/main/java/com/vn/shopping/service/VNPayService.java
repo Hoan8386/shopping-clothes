@@ -54,6 +54,9 @@ public class VNPayService {
     private String vnpReturnUrl;
 
     @Value("${VNPAY_RETURN_URL_STAFF:http://localhost:3000/staff/orders}")
+    private String vnpStaffOrderReturnUrl;
+
+    @Value("${VNPAY_RETURN_URL_RETURN:http://localhost:3000/staff/returns}")
     private String vnpStaffReturnUrl;
 
     private final DonHangRepository donHangRepository;
@@ -105,7 +108,7 @@ public class VNPayService {
                 tongTien,
                 "Thanh toan gio hang tai quay #" + cartId,
                 ipAddr,
-                vnpStaffReturnUrl);
+                vnpStaffOrderReturnUrl);
     }
 
     public String createReturnPaymentUrl(Long traHangId, long tongTien, String ipAddr) throws IdInvalidException {
@@ -167,6 +170,10 @@ public class VNPayService {
         return txnRef != null && txnRef.startsWith(ONLINE_CART_TXN_PREFIX);
     }
 
+    public boolean isReturnTxnRef(String txnRef) {
+        return txnRef != null && txnRef.startsWith("TRH_");
+    }
+
     public Long extractStaffCartId(String txnRef) throws IdInvalidException {
         if (!isStaffCartTxnRef(txnRef)) {
             throw new IdInvalidException("Mã tham chiếu không phải của giỏ hàng nhân viên");
@@ -182,6 +189,24 @@ public class VNPayService {
             return Long.parseLong(parts[0]);
         } catch (NumberFormatException e) {
             throw new IdInvalidException("Không đọc được mã giỏ hàng từ tham chiếu VNPAY");
+        }
+    }
+
+    public Long extractReturnId(String txnRef) throws IdInvalidException {
+        if (!isReturnTxnRef(txnRef)) {
+            throw new IdInvalidException("Mã tham chiếu không phải của phiếu trả hàng");
+        }
+
+        String raw = txnRef.substring("TRH_".length());
+        String[] parts = raw.split("_");
+        if (parts.length < 1 || parts[0].isBlank()) {
+            throw new IdInvalidException("Mã tham chiếu phiếu trả hàng không hợp lệ");
+        }
+
+        try {
+            return Long.parseLong(parts[0]);
+        } catch (NumberFormatException e) {
+            throw new IdInvalidException("Không đọc được mã phiếu trả hàng từ tham chiếu VNPAY");
         }
     }
 

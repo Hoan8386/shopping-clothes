@@ -72,4 +72,11 @@ public class KiemKeHangHoaController {
         KiemKeHangHoa updated = kiemKeHangHoaService.duyet(id, req);
         return ResponseEntity.ok(kiemKeHangHoaService.convertToDTO(updated));
     }
+
+    @DeleteMapping("/{id}")
+    @ApiMessage("Xóa phiếu kiểm kê")
+    public ResponseEntity<Void> delete(@PathVariable("id") Long id) throws IdInvalidException {
+        kiemKeHangHoaService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }

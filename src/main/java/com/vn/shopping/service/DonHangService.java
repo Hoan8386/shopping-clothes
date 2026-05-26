@@ -518,8 +518,22 @@ public class DonHangService {
      */
     private void validateChuyenTrangThai(Integer trangThaiCu, Integer trangThaiMoi) throws IdInvalidException {
         boolean hopLe = false;
+        // Allow staff (or admin) to force-cancel or force-complete an order
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean isStaffOrAdmin = false;
+        if (auth != null && auth.isAuthenticated()) {
+            isStaffOrAdmin = auth.getAuthorities().stream()
+                    .anyMatch(a -> {
+                        String role = a.getAuthority() == null ? "" : a.getAuthority();
+                        return role.contains("NHAN_VIEN") || role.contains("NHAN_VIEN_QUAN_LY")
+                                || role.contains("ADMIN");
+                    });
+        }
 
-        if (trangThaiMoi == 4) {
+        if ((trangThaiMoi == 4 || trangThaiMoi == 5) && isStaffOrAdmin) {
+            // staff/admin may set cancel (4) or complete (5) to handle edge cases
+            hopLe = true;
+        } else if (trangThaiMoi == 4) {
             // Hủy đơn: chỉ cho phép khi chưa đóng gói (0 hoặc 1)
             hopLe = (trangThaiCu == 0 || trangThaiCu == 1);
         } else {
@@ -900,6 +914,23 @@ public class DonHangService {
             KhachHang kh = khOpt.get();
             if (donHang.getKhachHang() == null || !donHang.getKhachHang().getId().equals(kh.getId())) {
                 throw new IdInvalidException("Bạn không có quyền xem đơn hàng này");
+            }
+        } else {
+            // Là nhân viên/quản lý → chỉ xem được đơn thuộc đúng cửa hàng, trừ ADMIN
+            NhanVien nhanVien = nhanVienRepository.findByEmail(email).orElse(null);
+            if (nhanVien != null) {
+                String roleName = nhanVien.getRole() != null ? nhanVien.getRole().getName() : null;
+                boolean isAdmin = "ADMIN".equals(roleName);
+
+                if (!isAdmin) {
+                    if (nhanVien.getCuaHang() == null || nhanVien.getCuaHang().getId() == null) {
+                        throw new IdInvalidException("Nhân viên chưa được gán cửa hàng");
+                    }
+                    if (donHang.getCuaHang() == null || donHang.getCuaHang().getId() == null
+                            || !donHang.getCuaHang().getId().equals(nhanVien.getCuaHang().getId())) {
+                        throw new IdInvalidException("Bạn không có quyền xem đơn hàng của cửa hàng khác");
+                    }
+                }
             }
         }
 

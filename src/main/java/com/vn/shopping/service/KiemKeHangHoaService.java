@@ -169,6 +169,27 @@ public class KiemKeHangHoaService {
         return kiemKeHangHoaRepository.save(phieu);
     }
 
+    @Transactional
+    public void delete(Long id) throws IdInvalidException {
+        if (id == null) {
+            throw new IdInvalidException("Mã phiếu kiểm kê không được để trống");
+        }
+
+        KiemKeHangHoa existing = kiemKeHangHoaRepository.findById(id)
+                .orElseThrow(() -> new IdInvalidException("Không tìm thấy phiếu kiểm kê: " + id));
+
+        NhanVien currentNhanVien = getCurrentNhanVien();
+        validateCanEditPhieu(existing, currentNhanVien);
+
+        // Delete detail rows first
+        List<ChiTietKiemKe> chiTietKiemKes = chiTietKiemKeRepository.findByKiemKeHangHoaId(id);
+        if (!chiTietKiemKes.isEmpty()) {
+            chiTietKiemKeRepository.deleteAll(chiTietKiemKes);
+        }
+
+        kiemKeHangHoaRepository.delete(existing);
+    }
+
     public KiemKeHangHoa findById(Long id) {
         return kiemKeHangHoaRepository.findById(id).orElse(null);
     }
@@ -398,7 +419,7 @@ public class KiemKeHangHoaService {
         if (isAdmin(nhanVien) || isWarehouseStaff(nhanVien)) {
             return;
         }
-        throw new IdInvalidException("Chỉ nhân viên kho mới có quyền tạo phiếu kiểm kê");
+        throw new IdInvalidException("Chỉ nhân viên quản lý mới có quyền tạo phiếu kiểm kê");
     }
 
     private boolean isAdmin(NhanVien nhanVien) {
@@ -416,7 +437,7 @@ public class KiemKeHangHoaService {
         }
 
         String roleName = nhanVien.getRole().getName().trim().toUpperCase();
-        return roleName.equals("NHAN_VIEN_KHO") || roleName.contains("KHO");
+        return roleName.equals("NHAN_VIEN_QUAN_LY") || roleName.contains("KHO");
     }
 
     private void validateChiTietSanPhamTheoCuaHang(CuaHang cuaHang, ChiTietSanPham ctsp) throws IdInvalidException {

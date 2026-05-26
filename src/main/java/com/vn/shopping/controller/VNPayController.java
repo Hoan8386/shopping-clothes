@@ -2,9 +2,11 @@ package com.vn.shopping.controller;
 
 import com.vn.shopping.domain.request.ReqCreateVNPayPaymentDTO;
 import com.vn.shopping.domain.response.ResDonHangDTO;
+import com.vn.shopping.domain.response.ResTraHangDTO;
 import com.vn.shopping.service.DonHangService;
 import com.vn.shopping.service.GioHangNhanVienService;
 import com.vn.shopping.service.VNPayService;
+import com.vn.shopping.service.TraHangService;
 import com.vn.shopping.util.anotation.ApiMessage;
 import com.vn.shopping.util.error.IdInvalidException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,14 +28,17 @@ public class VNPayController {
     private final VNPayService vnpayService;
     private final GioHangNhanVienService gioHangNhanVienService;
     private final DonHangService donHangService;
+    private final TraHangService traHangService;
 
     public VNPayController(
             VNPayService vnpayService,
             GioHangNhanVienService gioHangNhanVienService,
-            DonHangService donHangService) {
+            DonHangService donHangService,
+            TraHangService traHangService) {
         this.vnpayService = vnpayService;
         this.gioHangNhanVienService = gioHangNhanVienService;
         this.donHangService = donHangService;
+        this.traHangService = traHangService;
     }
 
     @PostMapping("/create-payment-url")
@@ -80,6 +85,18 @@ public class VNPayController {
 
             data.put("donHangId", String.valueOf(donHang.getId()));
             data.put("paymentRef", donHang.getPaymentRef() != null ? donHang.getPaymentRef() : "");
+        }
+
+        if (success && vnpayService.isReturnTxnRef(txnRef)) {
+            Long traHangId = vnpayService.extractReturnId(txnRef);
+            com.vn.shopping.domain.TraHang traHang = traHangService.capNhatTrangThai(
+                    traHangId,
+                    1,
+                    data.getOrDefault("vnp_TransactionNo", ""));
+
+            ResTraHangDTO traHangDTO = traHangService.convertToDTO(traHang);
+            data.put("traHangId", String.valueOf(traHangDTO.getId()));
+            data.put("paymentRef", traHangDTO.getPaymentRef() != null ? traHangDTO.getPaymentRef() : "");
         }
 
         return ResponseEntity.ok(data);

@@ -55,7 +55,7 @@ Tai lieu nay tong hop cac API can cho mobile theo controller hien tai, trinh bay
       "active": true
     },
     "diemTichLuy": null,
-    "cuaHang": "Chi nhanh Q1"
+    "idCuaHang": 3
   }
 }
 ```
@@ -78,16 +78,18 @@ Tai lieu nay tong hop cac API can cho mobile theo controller hien tai, trinh bay
       "active": "Boolean"
     },
     "diemTichLuy": "Integer | null",
-    "cuaHang": "String | null"
+    "idCuaHang": "Long | null"
   }
 }
+```
 
 **Ghi chu:**
 
-- Nhan vien: `cuaHang` co gia tri, `diemTichLuy` = null.
-- Khach hang: `cuaHang` = null, `diemTichLuy` co gia tri (hoac null neu chua co).
+- Nhan vien: `idCuaHang` co gia tri, `diemTichLuy` = null.
+- Khach hang: `idCuaHang` = null, `diemTichLuy` co gia tri (hoac null neu chua co).
 - Response set cookie `refresh_token` (HttpOnly, Secure, Path=/).
-```
+
+````
 
 ---
 
@@ -115,10 +117,11 @@ Tai lieu nay tong hop cac API can cho mobile theo controller hien tai, trinh bay
       "description": "Khach hang",
       "active": true
     },
-    "diemTichLuy": 10
+    "diemTichLuy": 10,
+    "idCuaHang": null
   }
 }
-```
+````
 
 **Kieu du lieu:**
 
@@ -136,7 +139,8 @@ Tai lieu nay tong hop cac API can cho mobile theo controller hien tai, trinh bay
       "description": "String",
       "active": "Boolean"
     },
-    "diemTichLuy": "Integer"
+    "diemTichLuy": "Integer | null",
+    "idCuaHang": "Long | null"
   }
 }
 ```
@@ -169,7 +173,7 @@ Tai lieu nay tong hop cac API can cho mobile theo controller hien tai, trinh bay
       "active": true
     },
     "diemTichLuy": null,
-    "cuaHang": "Chi nhanh Q1"
+    "idCuaHang": 3
   }
 }
 ```
@@ -192,7 +196,7 @@ Tai lieu nay tong hop cac API can cho mobile theo controller hien tai, trinh bay
       "active": "Boolean"
     },
     "diemTichLuy": "Integer | null",
-    "cuaHang": "String | null"
+    "idCuaHang": "Long | null"
   }
 }
 ```
@@ -1128,6 +1132,74 @@ Can co `thongTinChuyenKhoan`.
 
 ---
 
+## 5. Tao URL thanh toan VNPAY cho phieu tra hang
+
+| Thuoc tinh   | Chi tiet                               |
+| ------------ | -------------------------------------- |
+| **URL**      | `POST /api/v1/tra-hang/{id}/vnpay-url` |
+| **Method**   | `POST`                                 |
+| **Xac thuc** | Bearer Token (JWT)                     |
+
+**Path Parameters:**
+
+| Tham so | Kieu | Mo ta             |
+| ------- | ---- | ----------------- |
+| `id`    | Long | Ma phieu tra hang |
+
+**Response:** `200 OK`
+
+```json
+{
+  "paymentUrl": "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html?..."
+}
+```
+
+**Kieu du lieu:**
+
+```json
+{
+  "paymentUrl": "String"
+}
+```
+
+---
+
+## 6. Xu ly return tu VNPAY cho phieu tra hang
+
+| Thuoc tinh   | Chi tiet                            |
+| ------------ | ----------------------------------- |
+| **URL**      | `GET /api/v1/tra-hang/vnpay/return` |
+| **Method**   | `GET`                               |
+| **Xac thuc** | Khong can (callback)                |
+
+**Query Parameters:** VNPay return params
+
+**Response:** `200 OK`
+
+```json
+{
+  "success": "true",
+  "vnp_TxnRef": "TRH_1001_1716510000000",
+  "vnp_TransactionNo": "12345678",
+  "traHangId": "1001",
+  "paymentRef": "VNPAY-20260301-001"
+}
+```
+
+**Kieu du lieu:**
+
+```json
+{
+  "success": "String",
+  "vnp_TxnRef": "String",
+  "vnp_TransactionNo": "String",
+  "traHangId": "String",
+  "paymentRef": "String"
+}
+```
+
+---
+
 # Khach Hang Lookup Controller
 
 > Base Path: `/api/v1/khach-hang`
@@ -1890,6 +1962,24 @@ Admin xac nhan, ton kho duoc cap nhat.
 #### Duyet
 
 1 -> 2 (YEU_CAU_KIEM_KE_LAI) hoac 1 -> 3 (XAC_NHAN)
+
+---
+
+## 7. Xoa phieu kiem ke
+
+| Thuoc tinh   | Chi tiet                               |
+| ------------ | -------------------------------------- |
+| **URL**      | `DELETE /api/v1/kiem-ke-hang-hoa/{id}` |
+| **Method**   | `DELETE`                               |
+| **Xac thuc** | Bearer Token (JWT)                     |
+
+**Path Parameters:**
+
+| Tham so | Kieu | Mo ta            |
+| ------- | ---- | ---------------- |
+| `id`    | Long | Ma phieu kiem ke |
+
+**Response:** `204 No Content`
 
 ---
 

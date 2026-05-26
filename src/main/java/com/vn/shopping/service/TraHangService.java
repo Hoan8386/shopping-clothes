@@ -202,6 +202,11 @@ public class TraHangService {
      */
     @Transactional
     public TraHang capNhatTrangThai(Long id, Integer trangThai) throws IdInvalidException {
+        return capNhatTrangThai(id, trangThai, null);
+    }
+
+    @Transactional
+    public TraHang capNhatTrangThai(Long id, Integer trangThai, String paymentRef) throws IdInvalidException {
         TraHang traHang = traHangRepository.findById(id)
                 .orElseThrow(() -> new IdInvalidException("Không tìm thấy phiếu trả hàng: " + id));
 
@@ -214,6 +219,9 @@ public class TraHangService {
         }
 
         traHang.setTrangThai(trangThai);
+        if (paymentRef != null && !paymentRef.isBlank()) {
+            traHang.setPaymentRef(paymentRef);
+        }
 
         // Cập nhật trạng thái chi tiết trả hàng
         if (traHang.getChiTietTraHangs() != null) {
