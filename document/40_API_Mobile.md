@@ -2011,3 +2011,52 @@ maVach = SP3HCTSGCH2
 - Lay `maVach` tu API chi tiet san pham (`ResChiTietSanPhamDTO.maVach`).
 - Hien thi ma bang barcode Code 128.
 - Khi quet anh, backend giai ma Code 128 de tim san pham.
+
+---
+
+# Data AI Controller
+
+> Base Path: `/api/v1/data-ai`
+> File: `DataAIController.java`
+
+---
+
+## 1. Lay danh sach san pham cho AI
+
+| Thuoc tinh   | Chi tiet                       |
+| ------------ | ------------------------------ |
+| **URL**      | `GET /api/v1/data-ai/san-pham` |
+| **Method**   | `GET`                          |
+| **Xac thuc** | Bearer Token (JWT)             |
+
+**Response:** `200 OK` - Tra ve `List<ResDataAIProductDTO>`
+
+```json
+[
+  {
+    "id": "SP1",
+    "name": "Sơ mi trắng nữ thanh lịch",
+    "product_type": "Sơ mi",
+    "color": "Trắng",
+    "price": 350000,
+    "gender": "không xác định",
+    "description": "Áo sơ mi công sở nữ tay dài, chất liệu lụa mềm mát."
+  }
+]
+```
+
+**Kieu du lieu:**
+
+```json
+[
+  {
+    "id": "String",
+    "name": "String",
+    "product_type": "String",
+    "color": "String | null",
+    "price": "Integer | null",
+    "gender": "String",
+    "description": "String | null"
+  }
+]
+```
