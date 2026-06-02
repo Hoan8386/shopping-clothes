@@ -13,6 +13,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -27,6 +28,7 @@ public class ThongKeService {
     private static final int TABLE_DATA_START_ROW = 10;
     private static final int TITLE_START_COLUMN = 2;
     private static final int TITLE_END_COLUMN = 10;
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     private final DonHangRepository donHangRepository;
     private final ChiTietDonHangRepository chiTietDonHangRepository;
@@ -34,7 +36,9 @@ public class ThongKeService {
     private final PhieuNhapRepository phieuNhapRepository;
     private final ChiTietPhieuNhapRepository chiTietPhieuNhapRepository;
     private final TraHangRepository traHangRepository;
+    private final ChiTietTraHangRepository chiTietTraHangRepository;
     private final DoiHangRepository doiHangRepository;
+    private final ChiTietDoiHangRepository chiTietDoiHangRepository;
     private final KhuyenMaiTheoHoaDonRepository khuyenMaiTheoHoaDonRepository;
     private final KhuyenMaiTheoDiemRepository khuyenMaiTheoDiemRepository;
     private final NhanVienRepository nhanVienRepository;
@@ -46,7 +50,9 @@ public class ThongKeService {
             PhieuNhapRepository phieuNhapRepository,
             ChiTietPhieuNhapRepository chiTietPhieuNhapRepository,
             TraHangRepository traHangRepository,
+            ChiTietTraHangRepository chiTietTraHangRepository,
             DoiHangRepository doiHangRepository,
+            ChiTietDoiHangRepository chiTietDoiHangRepository,
             KhuyenMaiTheoHoaDonRepository khuyenMaiTheoHoaDonRepository,
             KhuyenMaiTheoDiemRepository khuyenMaiTheoDiemRepository,
             NhanVienRepository nhanVienRepository,
@@ -57,11 +63,142 @@ public class ThongKeService {
         this.phieuNhapRepository = phieuNhapRepository;
         this.chiTietPhieuNhapRepository = chiTietPhieuNhapRepository;
         this.traHangRepository = traHangRepository;
+        this.chiTietTraHangRepository = chiTietTraHangRepository;
         this.doiHangRepository = doiHangRepository;
+        this.chiTietDoiHangRepository = chiTietDoiHangRepository;
         this.khuyenMaiTheoHoaDonRepository = khuyenMaiTheoHoaDonRepository;
         this.khuyenMaiTheoDiemRepository = khuyenMaiTheoDiemRepository;
         this.nhanVienRepository = nhanVienRepository;
         this.cuaHangRepository = cuaHangRepository;
+    }
+
+    private record OrderLineDetail(
+            LocalDateTime ngayTao,
+            Long donHangId,
+            Long cuaHangId,
+            String tenCuaHang,
+            Long khachHangId,
+            String tenKhachHang,
+            String sdtKhachHang,
+            Long nhanVienId,
+            String tenNhanVien,
+            Integer trangThai,
+            Integer trangThaiThanhToan,
+            Integer hinhThucDonHang,
+            Integer phuongThucThanhToan,
+            Long maKhuyenMaiHoaDon,
+            Long maKhuyenMaiDiem,
+            Integer tongTien,
+            Integer tienGiam,
+            Integer tongTienGiam,
+            Integer tongTienTra,
+            Long chiTietDonHangId,
+            Long chiTietSanPhamId,
+            Long sanPhamId,
+            String tenSanPham,
+            String thuongHieu,
+            String kieuSanPham,
+            String boSuuTap,
+            String mauSac,
+            String kichThuoc,
+            String maVach,
+            Integer soLuong,
+            Double giaSanPham,
+            Double giamGia,
+            Double giaGiam,
+            Double thanhTien,
+            String diaChi,
+            String tenNguoiMua) {
+    }
+
+    private record ReceiptLineDetail(
+            LocalDateTime ngayTao,
+            Long phieuNhapId,
+            String tenPhieuNhap,
+            Long cuaHangId,
+            String tenCuaHang,
+            Long nhaCungCapId,
+            String tenNhaCungCap,
+            Integer trangThaiPhieuNhap,
+            LocalDateTime ngayDatHang,
+            LocalDateTime ngayNhanHang,
+            Long chiTietPhieuNhapId,
+            Long chiTietSanPhamId,
+            Long sanPhamId,
+            String tenSanPham,
+            String mauSac,
+            String kichThuoc,
+            String maVach,
+            Integer soLuong,
+            Integer soLuongThieu,
+            Integer soLuongDaNhap,
+            String ghiTru,
+            String ghiTruKiemHang,
+            Integer trangThaiChiTiet,
+            Double giaVon,
+            Double giaTriDong) {
+    }
+
+    private record ReturnLineDetail(
+            LocalDateTime ngayTao,
+            Long traHangId,
+            Long donHangId,
+            Long cuaHangId,
+            String tenCuaHang,
+            Long khachHangId,
+            String tenKhachHang,
+            Long nhanVienId,
+            String tenNhanVien,
+            Integer trangThaiTraHang,
+            Double tongTienHoan,
+            String lyDoTraHang,
+            String paymentRef,
+            Long chiTietTraHangId,
+            Long chiTietDonHangId,
+            Long chiTietSanPhamId,
+            Long sanPhamId,
+            String tenSanPham,
+            String mauSac,
+            String kichThuoc,
+            String hinhAnhChinh,
+            Double giaSanPham,
+            Integer soLuongTra,
+            String ghiTru,
+            Integer trangThaiChiTiet,
+            Double thanhTien) {
+    }
+
+    private record ExchangeLineDetail(
+            LocalDateTime ngayTao,
+            Long doiHangId,
+            Long donHangId,
+            Long cuaHangId,
+            String tenCuaHang,
+            Long khachHangId,
+            String tenKhachHang,
+            Long nhanVienId,
+            String tenNhanVien,
+            Integer trangThaiDoiHang,
+            Double tongTien,
+            String ghiTruDoi,
+            Long chiTietDoiHangId,
+            Long chiTietDonHangIdTra,
+            Long chiTietSanPhamTraId,
+            Long sanPhamTraId,
+            String tenSanPhamTra,
+            String mauSacTra,
+            String kichThuocTra,
+            Double giaSanPhamTra,
+            Integer soLuongTra,
+            Long chiTietSanPhamDoiId,
+            Long sanPhamDoiId,
+            String tenSanPhamDoi,
+            String mauSacDoi,
+            String kichThuocDoi,
+            Double giaSanPhamDoi,
+            String ghiTruChiTiet,
+            Integer trangThaiChiTiet,
+            Double chenhLechGia) {
     }
 
     public ResThongKeDTO.RevenueReport getRevenueReport(LocalDate fromDate, LocalDate toDate, Long cuaHangId) {
@@ -412,8 +549,493 @@ public class ThongKeService {
                 items);
     }
 
+    private List<OrderLineDetail> collectOrderLineDetails(List<DonHang> orders) {
+        List<OrderLineDetail> details = new ArrayList<>();
+        for (DonHang order : orders) {
+            List<ChiTietDonHang> orderDetails = chiTietDonHangRepository.findByDonHang(order);
+            for (ChiTietDonHang detail : orderDetails) {
+                ChiTietSanPham variant = detail.getChiTietSanPham();
+                SanPham product = variant == null ? null : variant.getSanPham();
+                details.add(new OrderLineDetail(
+                        order.getNgayTao(),
+                        order.getId(),
+                        order.getCuaHang() == null ? null : order.getCuaHang().getId(),
+                        order.getCuaHang() == null ? "" : Objects.toString(order.getCuaHang().getTenCuaHang(), ""),
+                        order.getKhachHang() == null ? null : order.getKhachHang().getId(),
+                        order.getKhachHang() == null ? ""
+                                : Objects.toString(order.getKhachHang().getTenKhachHang(), ""),
+                        order.getKhachHang() == null ? "" : Objects.toString(order.getKhachHang().getSdt(), ""),
+                        order.getNhanVien() == null ? null : order.getNhanVien().getId(),
+                        order.getNhanVien() == null ? "" : Objects.toString(order.getNhanVien().getTenNhanVien(), ""),
+                        order.getTrangThai(),
+                        order.getTrangThaiThanhToan(),
+                        order.getHinhThucDonHang(),
+                        order.getPhuongThucThanhToan(),
+                        order.getMaKhuyenMaiHoaDon(),
+                        order.getMaKhuyenMaiDiem(),
+                        order.getTongTien(),
+                        order.getTienGiam(),
+                        order.getTongTienGiam(),
+                        order.getTongTienTra(),
+                        detail.getId(),
+                        variant == null ? null : variant.getId(),
+                        product == null ? null : product.getId(),
+                        product == null ? "" : Objects.toString(product.getTenSanPham(), ""),
+                        product == null ? ""
+                                : Objects.toString(product.getThuongHieu() == null ? null
+                                        : product.getThuongHieu().getTenThuongHieu(), ""),
+                        product == null ? ""
+                                : Objects.toString(product.getKieuSanPham() == null ? null
+                                        : product.getKieuSanPham().getTenKieuSanPham(), ""),
+                        product == null ? ""
+                                : Objects.toString(
+                                        product.getBoSuuTap() == null ? null : product.getBoSuuTap().getTenSuuTap(),
+                                        ""),
+                        variant == null ? ""
+                                : Objects.toString(
+                                        variant.getMauSac() == null ? null : variant.getMauSac().getTenMauSac(), ""),
+                        variant == null ? ""
+                                : Objects.toString(variant.getKichThuoc() == null ? null
+                                        : variant.getKichThuoc().getTenKichThuoc(), ""),
+                        variant == null ? "" : Objects.toString(variant.getMaVach(), ""),
+                        detail.getSoLuong(),
+                        detail.getGiaSanPham(),
+                        detail.getGiamGia(),
+                        detail.getGiaGiam(),
+                        detail.getThanhTien(),
+                        order.getDiaChi(),
+                        order.getTenNguoiMua()));
+            }
+        }
+        return details;
+    }
+
+    private List<ReceiptLineDetail> collectReceiptLineDetails(List<PhieuNhap> receipts) {
+        List<ReceiptLineDetail> details = new ArrayList<>();
+        for (PhieuNhap receipt : receipts) {
+            List<ChiTietPhieuNhap> receiptDetails = chiTietPhieuNhapRepository.findByPhieuNhapId(receipt.getId());
+            for (ChiTietPhieuNhap detail : receiptDetails) {
+                ChiTietSanPham variant = detail.getChiTietSanPham();
+                SanPham product = variant == null ? null : variant.getSanPham();
+                double giaVon = product == null ? 0 : safeDouble(product.getGiaVon());
+                details.add(new ReceiptLineDetail(
+                        receipt.getNgayTao(),
+                        receipt.getId(),
+                        receipt.getTenPhieuNhap(),
+                        receipt.getCuaHang() == null ? null : receipt.getCuaHang().getId(),
+                        receipt.getCuaHang() == null ? "" : Objects.toString(receipt.getCuaHang().getTenCuaHang(), ""),
+                        receipt.getNhaCungCap() == null ? null : receipt.getNhaCungCap().getId(),
+                        receipt.getNhaCungCap() == null ? ""
+                                : Objects.toString(receipt.getNhaCungCap().getTenNhaCungCap(), ""),
+                        receipt.getTrangThai(),
+                        receipt.getNgayDatHang(),
+                        receipt.getNgayNhanHang(),
+                        detail.getId(),
+                        variant == null ? null : variant.getId(),
+                        product == null ? null : product.getId(),
+                        product == null ? "" : Objects.toString(product.getTenSanPham(), ""),
+                        variant == null ? ""
+                                : Objects.toString(
+                                        variant.getMauSac() == null ? null : variant.getMauSac().getTenMauSac(), ""),
+                        variant == null ? ""
+                                : Objects.toString(variant.getKichThuoc() == null ? null
+                                        : variant.getKichThuoc().getTenKichThuoc(), ""),
+                        variant == null ? "" : Objects.toString(variant.getMaVach(), ""),
+                        detail.getSoLuong(),
+                        detail.getSoLuongThieu(),
+                        detail.getSoLuongDaNhap(),
+                        detail.getGhiTru(),
+                        detail.getGhiTruKiemHang(),
+                        detail.getTrangThai(),
+                        giaVon,
+                        safeInt(detail.getSoLuong()) * giaVon));
+            }
+        }
+        return details;
+    }
+
+    private List<ReturnLineDetail> collectReturnLineDetails(List<TraHang> returns) {
+        List<ReturnLineDetail> details = new ArrayList<>();
+        for (TraHang traHang : returns) {
+            List<ChiTietTraHang> returnDetails = chiTietTraHangRepository.findByTraHangId(traHang.getId());
+            for (ChiTietTraHang detail : returnDetails) {
+                ChiTietDonHang returnOrderDetail = detail.getSanPhamTra();
+                ChiTietSanPham variant = returnOrderDetail == null ? null : returnOrderDetail.getChiTietSanPham();
+                SanPham product = variant == null ? null : variant.getSanPham();
+                DonHang order = traHang.getDonHang();
+                details.add(new ReturnLineDetail(
+                        traHang.getNgayTao(),
+                        traHang.getId(),
+                        order == null ? null : order.getId(),
+                        order == null || order.getCuaHang() == null ? null : order.getCuaHang().getId(),
+                        order == null || order.getCuaHang() == null ? ""
+                                : Objects.toString(order.getCuaHang().getTenCuaHang(), ""),
+                        order == null || order.getKhachHang() == null ? null : order.getKhachHang().getId(),
+                        order == null || order.getKhachHang() == null ? ""
+                                : Objects.toString(order.getKhachHang().getTenKhachHang(), ""),
+                        order == null || order.getNhanVien() == null ? null : order.getNhanVien().getId(),
+                        order == null || order.getNhanVien() == null ? ""
+                                : Objects.toString(order.getNhanVien().getTenNhanVien(), ""),
+                        traHang.getTrangThai(),
+                        traHang.getTongTien(),
+                        traHang.getLyDoTraHang(),
+                        traHang.getPaymentRef(),
+                        detail.getId(),
+                        returnOrderDetail == null ? null : returnOrderDetail.getId(),
+                        variant == null ? null : variant.getId(),
+                        product == null ? null : product.getId(),
+                        product == null ? "" : Objects.toString(product.getTenSanPham(), ""),
+                        variant == null ? ""
+                                : Objects.toString(
+                                        variant.getMauSac() == null ? null : variant.getMauSac().getTenMauSac(), ""),
+                        variant == null ? ""
+                                : Objects.toString(variant.getKichThuoc() == null ? null
+                                        : variant.getKichThuoc().getTenKichThuoc(), ""),
+                        product == null ? "" : Objects.toString(product.getHinhAnhChinh(), ""),
+                        returnOrderDetail == null ? null : returnOrderDetail.getGiaSanPham(),
+                        detail.getSoLuongTra(),
+                        detail.getGhiTru(),
+                        detail.getTrangThai(),
+                        returnOrderDetail == null || returnOrderDetail.getThanhTien() == null ? 0
+                                : returnOrderDetail.getThanhTien()));
+            }
+        }
+        return details;
+    }
+
+    private List<ExchangeLineDetail> collectExchangeLineDetails(List<DoiHang> exchanges) {
+        List<ExchangeLineDetail> details = new ArrayList<>();
+        for (DoiHang doiHang : exchanges) {
+            List<ChiTietDoiHang> exchangeDetails = chiTietDoiHangRepository.findByDoiHangId(doiHang.getId());
+            for (ChiTietDoiHang detail : exchangeDetails) {
+                ChiTietDonHang returnOrderDetail = detail.getSanPhamTra();
+                ChiTietSanPham returnVariant = returnOrderDetail == null ? null : returnOrderDetail.getChiTietSanPham();
+                SanPham returnProduct = returnVariant == null ? null : returnVariant.getSanPham();
+                ChiTietSanPham exchangeVariant = detail.getSanPhamDoi();
+                SanPham exchangeProduct = exchangeVariant == null ? null : exchangeVariant.getSanPham();
+                DonHang order = doiHang.getDonHang();
+                details.add(new ExchangeLineDetail(
+                        doiHang.getNgayTao(),
+                        doiHang.getId(),
+                        order == null ? null : order.getId(),
+                        order == null || order.getCuaHang() == null ? null : order.getCuaHang().getId(),
+                        order == null || order.getCuaHang() == null ? ""
+                                : Objects.toString(order.getCuaHang().getTenCuaHang(), ""),
+                        order == null || order.getKhachHang() == null ? null : order.getKhachHang().getId(),
+                        order == null || order.getKhachHang() == null ? ""
+                                : Objects.toString(order.getKhachHang().getTenKhachHang(), ""),
+                        order == null || order.getNhanVien() == null ? null : order.getNhanVien().getId(),
+                        order == null || order.getNhanVien() == null ? ""
+                                : Objects.toString(order.getNhanVien().getTenNhanVien(), ""),
+                        doiHang.getTrangThai(),
+                        doiHang.getTongTien(),
+                        doiHang.getGhiTru(),
+                        detail.getId(),
+                        returnOrderDetail == null ? null : returnOrderDetail.getId(),
+                        returnVariant == null ? null : returnVariant.getId(),
+                        returnProduct == null ? null : returnProduct.getId(),
+                        returnProduct == null ? "" : Objects.toString(returnProduct.getTenSanPham(), ""),
+                        returnVariant == null ? ""
+                                : Objects.toString(returnVariant.getMauSac() == null ? null
+                                        : returnVariant.getMauSac().getTenMauSac(), ""),
+                        returnVariant == null ? ""
+                                : Objects.toString(returnVariant.getKichThuoc() == null ? null
+                                        : returnVariant.getKichThuoc().getTenKichThuoc(), ""),
+                        returnOrderDetail == null ? null : returnOrderDetail.getGiaSanPham(),
+                        returnOrderDetail == null ? null : returnOrderDetail.getSoLuong(),
+                        exchangeVariant == null ? null : exchangeVariant.getId(),
+                        exchangeProduct == null ? null : exchangeProduct.getId(),
+                        exchangeProduct == null ? "" : Objects.toString(exchangeProduct.getTenSanPham(), ""),
+                        exchangeVariant == null ? ""
+                                : Objects.toString(exchangeVariant.getMauSac() == null ? null
+                                        : exchangeVariant.getMauSac().getTenMauSac(), ""),
+                        exchangeVariant == null ? ""
+                                : Objects.toString(exchangeVariant.getKichThuoc() == null ? null
+                                        : exchangeVariant.getKichThuoc().getTenKichThuoc(), ""),
+                        exchangeProduct == null ? null : safeDouble(exchangeProduct.getGiaBan()),
+                        detail.getGhiTru(),
+                        detail.getTrangThai(),
+                        safeDouble(exchangeProduct == null ? null : exchangeProduct.getGiaBan())
+                                - safeDouble(returnOrderDetail == null ? null : returnOrderDetail.getGiaSanPham())));
+            }
+        }
+        return details;
+    }
+
+    private void writeValues(Row row, Workbook workbook, boolean alternateRow, Object... values) {
+        for (int i = 0; i < values.length; i++) {
+            Object value = values[i];
+            Cell cell = row.createCell(i);
+            if (value instanceof Number number) {
+                cell.setCellValue(number.doubleValue());
+                cell.setCellStyle(createDataCellStyle(workbook, alternateRow));
+            } else if (value instanceof LocalDateTime dateTime) {
+                cell.setCellValue(formatDateTime(dateTime));
+                cell.setCellStyle(createDataCellStyle(workbook, alternateRow, true));
+            } else if (value instanceof LocalDate date) {
+                cell.setCellValue(date.toString());
+                cell.setCellStyle(createDataCellStyle(workbook, alternateRow, true));
+            } else {
+                cell.setCellValue(Objects.toString(value, ""));
+                cell.setCellStyle(createDataCellStyle(workbook, alternateRow, true));
+            }
+        }
+    }
+
+    private void writeOrderDetailSheet(Sheet sheet, List<OrderLineDetail> lines, String reportTitle, String fromDate,
+            String toDate, Long cuaHangId) {
+        writeTableTitle(sheet, reportTitle, fromDate, toDate, cuaHangId);
+        writeHeader(sheet, "Ngày tạo", "Mã đơn", "Cửa hàng", "Khách hàng", "SĐT", "Nhân viên", "Trạng thái",
+                "Thanh toán", "Hình thức", "KM hóa đơn", "KM điểm", "Mã CTSP", "Sản phẩm", "Thương hiệu",
+                "Kiểu SP", "Bộ sưu tập", "Màu", "Size", "Mã vạch", "SL", "Giá SP", "Giảm giá",
+                "Giá sau giảm", "Thành tiền", "Tổng đơn", "Tiền giảm", "Tổng tiền trả", "PT thanh toán",
+                "Địa chỉ", "Người mua");
+
+        Workbook workbook = sheet.getWorkbook();
+        int rowNum = TABLE_DATA_START_ROW;
+        for (OrderLineDetail item : lines) {
+            Row row = sheet.createRow(rowNum++);
+            boolean altRow = rowNum % 2 == 0;
+            writeValues(row, workbook, altRow,
+                    item.ngayTao(),
+                    item.donHangId(),
+                    item.tenCuaHang(),
+                    item.tenKhachHang(),
+                    item.sdtKhachHang(),
+                    item.tenNhanVien(),
+                    Objects.toString(item.trangThai(), "") + " - " + orderStatusText(item.trangThai()),
+                    Objects.toString(item.trangThaiThanhToan(), "") + " - "
+                            + paymentStatusText(item.trangThaiThanhToan()),
+                    Objects.toString(item.hinhThucDonHang(), "") + " - " + orderTypeText(item.hinhThucDonHang()),
+                    item.maKhuyenMaiHoaDon(),
+                    item.maKhuyenMaiDiem(),
+                    item.chiTietSanPhamId(),
+                    item.tenSanPham(),
+                    item.thuongHieu(),
+                    item.kieuSanPham(),
+                    item.boSuuTap(),
+                    item.mauSac(),
+                    item.kichThuoc(),
+                    item.maVach(),
+                    item.soLuong(),
+                    item.giaSanPham(),
+                    item.giamGia(),
+                    item.giaGiam(),
+                    item.thanhTien(),
+                    item.tongTien(),
+                    item.tienGiam(),
+                    item.tongTienTra(),
+                    Objects.toString(item.phuongThucThanhToan(), "") + " - "
+                            + paymentMethodText(item.phuongThucThanhToan()),
+                    item.diaChi(),
+                    item.tenNguoiMua());
+        }
+
+        autosize(sheet, 30);
+    }
+
+    private void writeReceiptDetailSheet(Sheet sheet, List<ReceiptLineDetail> lines, String reportTitle,
+            String fromDate,
+            String toDate, Long cuaHangId) {
+        writeTableTitle(sheet, reportTitle, fromDate, toDate, cuaHangId);
+        writeHeader(sheet, "Ngày tạo", "Mã phiếu", "Tên phiếu", "Cửa hàng", "Nhà cung cấp", "Trạng thái phiếu",
+                "Ngày đặt", "Ngày nhận", "Mã CTPN", "Mã CTSP", "Sản phẩm", "Màu", "Size", "Mã vạch",
+                "SL đặt", "SL thiếu", "SL đã nhập", "Ghi chú", "Ghi chú kiểm", "Trạng thái CT", "Giá vốn",
+                "Giá trị dòng");
+
+        Workbook workbook = sheet.getWorkbook();
+        int rowNum = TABLE_DATA_START_ROW;
+        for (ReceiptLineDetail item : lines) {
+            Row row = sheet.createRow(rowNum++);
+            boolean altRow = rowNum % 2 == 0;
+            writeValues(row, workbook, altRow,
+                    item.ngayTao(),
+                    item.phieuNhapId(),
+                    item.tenPhieuNhap(),
+                    item.tenCuaHang(),
+                    item.tenNhaCungCap(),
+                    item.trangThaiPhieuNhap(),
+                    item.ngayDatHang(),
+                    item.ngayNhanHang(),
+                    item.chiTietPhieuNhapId(),
+                    item.chiTietSanPhamId(),
+                    item.tenSanPham(),
+                    item.mauSac(),
+                    item.kichThuoc(),
+                    item.maVach(),
+                    item.soLuong(),
+                    item.soLuongThieu(),
+                    item.soLuongDaNhap(),
+                    item.ghiTru(),
+                    item.ghiTruKiemHang(),
+                    item.trangThaiChiTiet(),
+                    item.giaVon(),
+                    item.giaTriDong());
+        }
+
+        autosize(sheet, 23);
+    }
+
+    private void writeReturnDetailSheet(Sheet sheet, List<ReturnLineDetail> lines, String reportTitle, String fromDate,
+            String toDate, Long cuaHangId) {
+        writeTableTitle(sheet, reportTitle, fromDate, toDate, cuaHangId);
+        writeHeader(sheet, "Ngày tạo", "Mã trả", "Mã đơn", "Cửa hàng", "Khách hàng", "Nhân viên", "Trạng thái",
+                "Tổng tiền hoàn", "Lý do", "Payment ref", "Mã CT trả", "Mã CTĐH", "Mã CTSP", "Sản phẩm",
+                "Màu", "Size", "Ảnh", "Giá SP", "SL trả", "Ghi chú", "Trạng thái CT", "Thành tiền");
+
+        Workbook workbook = sheet.getWorkbook();
+        int rowNum = TABLE_DATA_START_ROW;
+        for (ReturnLineDetail item : lines) {
+            Row row = sheet.createRow(rowNum++);
+            boolean altRow = rowNum % 2 == 0;
+            writeValues(row, workbook, altRow,
+                    item.ngayTao(),
+                    item.traHangId(),
+                    item.donHangId(),
+                    item.tenCuaHang(),
+                    item.tenKhachHang(),
+                    item.tenNhanVien(),
+                    Objects.toString(item.trangThaiTraHang(), "") + " - " + returnStatusText(item.trangThaiTraHang()),
+                    item.tongTienHoan(),
+                    item.lyDoTraHang(),
+                    item.paymentRef(),
+                    item.chiTietTraHangId(),
+                    item.chiTietDonHangId(),
+                    item.chiTietSanPhamId(),
+                    item.tenSanPham(),
+                    item.mauSac(),
+                    item.kichThuoc(),
+                    item.hinhAnhChinh(),
+                    item.giaSanPham(),
+                    item.soLuongTra(),
+                    item.ghiTru(),
+                    item.trangThaiChiTiet(),
+                    item.thanhTien());
+        }
+
+        autosize(sheet, 23);
+    }
+
+    private void writeExchangeDetailSheet(Sheet sheet, List<ExchangeLineDetail> lines, String reportTitle,
+            String fromDate, String toDate, Long cuaHangId) {
+        writeTableTitle(sheet, reportTitle, fromDate, toDate, cuaHangId);
+        writeHeader(sheet, "Ngày tạo", "Mã đổi", "Mã đơn", "Cửa hàng", "Khách hàng", "Nhân viên", "Trạng thái",
+                "Tổng tiền", "Ghi chú", "Mã CT đổi", "Mã CT trả", "Mã CTSP trả", "SP trả", "Màu trả",
+                "Size trả", "Giá trả", "SL trả", "Mã CTSP đổi", "SP đổi", "Màu đổi", "Size đổi",
+                "Giá đổi", "Ghi chú CT", "Trạng thái CT", "Chênh lệch");
+
+        Workbook workbook = sheet.getWorkbook();
+        int rowNum = TABLE_DATA_START_ROW;
+        for (ExchangeLineDetail item : lines) {
+            Row row = sheet.createRow(rowNum++);
+            boolean altRow = rowNum % 2 == 0;
+            writeValues(row, workbook, altRow,
+                    item.ngayTao(),
+                    item.doiHangId(),
+                    item.donHangId(),
+                    item.tenCuaHang(),
+                    item.tenKhachHang(),
+                    item.tenNhanVien(),
+                    Objects.toString(item.trangThaiDoiHang(), "") + " - " + exchangeStatusText(item.trangThaiDoiHang()),
+                    item.tongTien(),
+                    item.ghiTruDoi(),
+                    item.chiTietDoiHangId(),
+                    item.chiTietDonHangIdTra(),
+                    item.chiTietSanPhamTraId(),
+                    item.tenSanPhamTra(),
+                    item.mauSacTra(),
+                    item.kichThuocTra(),
+                    item.giaSanPhamTra(),
+                    item.soLuongTra(),
+                    item.chiTietSanPhamDoiId(),
+                    item.tenSanPhamDoi(),
+                    item.mauSacDoi(),
+                    item.kichThuocDoi(),
+                    item.giaSanPhamDoi(),
+                    item.ghiTruChiTiet(),
+                    item.trangThaiChiTiet(),
+                    item.chenhLechGia());
+        }
+
+        autosize(sheet, 26);
+    }
+
+    private String formatDateTime(LocalDateTime value) {
+        return value == null ? "" : value.format(DATE_TIME_FORMATTER);
+    }
+
+    private String orderStatusText(Integer status) {
+        if (status == null) {
+            return "";
+        }
+        return switch (status) {
+            case 0 -> "Chờ xác nhận";
+            case 1 -> "Đã xác nhận";
+            case 2 -> "Đang xử lý";
+            case 3 -> "Đang giao";
+            case 4 -> "Hủy";
+            case 5 -> "Hoàn thành";
+            default -> "Trạng thái " + status;
+        };
+    }
+
+    private String paymentStatusText(Integer status) {
+        if (status == null) {
+            return "";
+        }
+        return status == 1 ? "Đã thanh toán" : "Chưa thanh toán";
+    }
+
+    private String orderTypeText(Integer type) {
+        if (type == null) {
+            return "";
+        }
+        return type == 1 ? "Online" : "Tại quầy";
+    }
+
+    private String paymentMethodText(Integer method) {
+        if (method == null) {
+            return "";
+        }
+        return switch (method) {
+            case 0 -> "Tiền mặt";
+            case 1 -> "Chuyển khoản";
+            case 2 -> "VNPay";
+            default -> "Phương thức " + method;
+        };
+    }
+
+    private String returnStatusText(Integer status) {
+        if (status == null) {
+            return "";
+        }
+        return switch (status) {
+            case 0 -> "Chờ xử lý";
+            case 1 -> "Đã duyệt";
+            case 2 -> "Đã từ chối";
+            default -> "Trạng thái " + status;
+        };
+    }
+
+    private String exchangeStatusText(Integer status) {
+        if (status == null) {
+            return "";
+        }
+        return switch (status) {
+            case 0 -> "Chờ xử lý";
+            case 1 -> "Đã duyệt";
+            case 2 -> "Đã hoàn tất";
+            default -> "Trạng thái " + status;
+        };
+    }
+
     public byte[] exportRevenueReport(LocalDate fromDate, LocalDate toDate, Long cuaHangId) throws IOException {
         ResThongKeDTO.RevenueReport report = getRevenueReport(fromDate, toDate, cuaHangId);
+        LocalDate start = normalizeFromDate(fromDate);
+        LocalDate end = normalizeToDate(toDate);
+        List<DonHang> orders = filterByStoreAndDate(donHangRepository.findAll(), DonHang::getNgayTao, start, end,
+                cuaHangId, DonHang::getCuaHang);
+        List<OrderLineDetail> orderLines = collectOrderLineDetails(orders);
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             writeKeyValueSheet(
                     workbook.createSheet("TổngQuan"),
@@ -452,6 +1074,11 @@ public class ThongKeService {
             }
 
             autosize(detail, 3);
+
+            Sheet orderDetail = workbook.createSheet("ChiTietDonHang");
+            writeOrderDetailSheet(orderDetail, orderLines, "Chi tiết đơn hàng và sản phẩm", report.getFromDate(),
+                    report.getToDate(), cuaHangId);
+
             workbook.write(out);
             return out.toByteArray();
         }
@@ -460,6 +1087,11 @@ public class ThongKeService {
     public byte[] exportOrderPerformanceReport(LocalDate fromDate, LocalDate toDate, Long cuaHangId)
             throws IOException {
         ResThongKeDTO.OrderPerformanceReport report = getOrderPerformanceReport(fromDate, toDate, cuaHangId);
+        LocalDate start = normalizeFromDate(fromDate);
+        LocalDate end = normalizeToDate(toDate);
+        List<DonHang> orders = filterByStoreAndDate(donHangRepository.findAll(), DonHang::getNgayTao, start, end,
+                cuaHangId, DonHang::getCuaHang);
+        List<OrderLineDetail> orderLines = collectOrderLineDetails(orders);
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             writeKeyValueSheet(
                     workbook.createSheet("TổngQuan"),
@@ -495,6 +1127,11 @@ public class ThongKeService {
             }
 
             autosize(detail, 2);
+
+            Sheet orderDetail = workbook.createSheet("ChiTietDonHang");
+            writeOrderDetailSheet(orderDetail, orderLines, "Chi tiết đơn hàng theo hiệu suất", report.getFromDate(),
+                    report.getToDate(), cuaHangId);
+
             workbook.write(out);
             return out.toByteArray();
         }
@@ -502,6 +1139,9 @@ public class ThongKeService {
 
     public byte[] exportInventoryAlertReport(int lowStockThreshold, Long cuaHangId) throws IOException {
         ResThongKeDTO.InventoryAlertReport report = getInventoryAlertReport(lowStockThreshold, cuaHangId);
+        List<ChiTietSanPham> variants = chiTietSanPhamRepository.findAll().stream()
+                .filter(v -> cuaHangId == null || Objects.equals(v.getMaCuaHang(), cuaHangId))
+                .toList();
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             writeKeyValueSheet(
                     workbook.createSheet("TổngQuan"),
@@ -517,46 +1157,39 @@ public class ThongKeService {
 
             Sheet detail = workbook.createSheet("CảnhBáo");
             writeTableTitle(detail, "Danh sách cảnh báo tồn kho", null, null, cuaHangId);
-            writeHeader(detail, "Chi tiết SP", "Sản phẩm", "Tên SP", "Cửa hàng", "Màu", "Size", "Số lượng", "Cảnh báo");
+            writeHeader(detail, "Chi tiết SP", "Sản phẩm", "Tên SP", "Thương hiệu", "Kiểu SP", "Bộ sưu tập",
+                    "Cửa hàng", "Mã vạch", "Màu", "Size", "Giá bán", "Giá vốn", "Tồn kho", "Trạng thái",
+                    "Mô tả");
             int rowNum = TABLE_DATA_START_ROW;
-            for (ResThongKeDTO.InventoryAlertItem item : report.getAlerts()) {
+            for (ChiTietSanPham variant : variants) {
+                if (safeInt(variant.getSoLuong()) > Math.max(0, lowStockThreshold)) {
+                    continue;
+                }
+                SanPham product = variant.getSanPham();
                 Row row = detail.createRow(rowNum++);
                 boolean altRow = rowNum % 2 == 0;
 
-                Cell c0 = row.createCell(0);
-                c0.setCellValue(item.getChiTietSanPhamId() == null ? 0 : item.getChiTietSanPhamId());
-                c0.setCellStyle(createDataCellStyle(workbook, altRow));
-
-                Cell c1 = row.createCell(1);
-                c1.setCellValue(item.getSanPhamId() == null ? 0 : item.getSanPhamId());
-                c1.setCellStyle(createDataCellStyle(workbook, altRow));
-
-                Cell c2 = row.createCell(2);
-                c2.setCellValue(Objects.toString(item.getTenSanPham(), ""));
-                c2.setCellStyle(createDataCellStyle(workbook, altRow, true));
-
-                Cell c3 = row.createCell(3);
-                c3.setCellValue(item.getCuaHangId() == null ? 0 : item.getCuaHangId());
-                c3.setCellStyle(createDataCellStyle(workbook, altRow));
-
-                Cell c4 = row.createCell(4);
-                c4.setCellValue(Objects.toString(item.getMauSac(), ""));
-                c4.setCellStyle(createDataCellStyle(workbook, altRow, true));
-
-                Cell c5 = row.createCell(5);
-                c5.setCellValue(Objects.toString(item.getKichThuoc(), ""));
-                c5.setCellStyle(createDataCellStyle(workbook, altRow, true));
-
-                Cell c6 = row.createCell(6);
-                c6.setCellValue(item.getSoLuong() == null ? 0 : item.getSoLuong());
-                c6.setCellStyle(createDataCellStyle(workbook, altRow));
-
-                Cell c7 = row.createCell(7);
-                c7.setCellValue(item.getTrangThaiCanhBao() == null ? 0 : item.getTrangThaiCanhBao());
-                c7.setCellStyle(createDataCellStyle(workbook, altRow));
+                writeValues(row, workbook, altRow,
+                        variant.getId(),
+                        product == null ? null : product.getId(),
+                        product == null ? "" : product.getTenSanPham(),
+                        product == null || product.getThuongHieu() == null ? ""
+                                : product.getThuongHieu().getTenThuongHieu(),
+                        product == null || product.getKieuSanPham() == null ? ""
+                                : product.getKieuSanPham().getTenKieuSanPham(),
+                        product == null || product.getBoSuuTap() == null ? "" : product.getBoSuuTap().getTenSuuTap(),
+                        variant.getMaCuaHang(),
+                        variant.getMaVach(),
+                        variant.getMauSac() == null ? "" : variant.getMauSac().getTenMauSac(),
+                        variant.getKichThuoc() == null ? "" : variant.getKichThuoc().getTenKichThuoc(),
+                        product == null ? null : product.getGiaBan(),
+                        product == null ? null : product.getGiaVon(),
+                        variant.getSoLuong(),
+                        variant.getTrangThai(),
+                        product == null ? "" : product.getMoTa());
             }
 
-            autosize(detail, 8);
+            autosize(detail, 15);
             workbook.write(out);
             return out.toByteArray();
         }
@@ -565,6 +1198,17 @@ public class ThongKeService {
     public byte[] exportTopProductReport(LocalDate fromDate, LocalDate toDate, int limit, Long cuaHangId)
             throws IOException {
         ResThongKeDTO.TopProductReport report = getTopProductReport(fromDate, toDate, limit, cuaHangId);
+        LocalDate start = normalizeFromDate(fromDate);
+        LocalDate end = normalizeToDate(toDate);
+        List<DonHang> orders = filterByStoreAndDate(donHangRepository.findAll(), DonHang::getNgayTao, start, end,
+                cuaHangId, DonHang::getCuaHang);
+        Set<Long> topProductIds = report.getTopProducts().stream()
+                .map(ResThongKeDTO.TopProductItem::getSanPhamId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        List<OrderLineDetail> orderLines = collectOrderLineDetails(orders).stream()
+                .filter(line -> line.sanPhamId() != null && topProductIds.contains(line.sanPhamId()))
+                .toList();
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             writeKeyValueSheet(
                     workbook.createSheet("TổngQuan"),
@@ -606,6 +1250,11 @@ public class ThongKeService {
             }
 
             autosize(detail, 5);
+
+            Sheet orderDetail = workbook.createSheet("ChiTietBanHang");
+            writeOrderDetailSheet(orderDetail, orderLines, "Chi tiết bán hàng của top sản phẩm", report.getFromDate(),
+                    report.getToDate(), cuaHangId);
+
             workbook.write(out);
             return out.toByteArray();
         }
@@ -614,6 +1263,11 @@ public class ThongKeService {
     public byte[] exportImportSupplierReport(LocalDate fromDate, LocalDate toDate, Long cuaHangId)
             throws IOException {
         ResThongKeDTO.ImportSupplierReport report = getImportSupplierReport(fromDate, toDate, cuaHangId);
+        LocalDate start = normalizeFromDate(fromDate);
+        LocalDate end = normalizeToDate(toDate);
+        List<PhieuNhap> receipts = filterByStoreAndDate(phieuNhapRepository.findAll(), this::getReceiptDate, start, end,
+                cuaHangId, PhieuNhap::getCuaHang);
+        List<ReceiptLineDetail> receiptLines = collectReceiptLineDetails(receipts);
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             writeKeyValueSheet(
                     workbook.createSheet("TổngQuan"),
@@ -660,6 +1314,12 @@ public class ThongKeService {
             }
 
             autosize(detail, 6);
+
+            Sheet receiptDetail = workbook.createSheet("ChiTietPhieuNhap");
+            writeReceiptDetailSheet(receiptDetail, receiptLines, "Chi tiết phiếu nhập và sản phẩm",
+                    report.getFromDate(),
+                    report.getToDate(), cuaHangId);
+
             workbook.write(out);
             return out.toByteArray();
         }
@@ -668,6 +1328,14 @@ public class ThongKeService {
     public byte[] exportReturnExchangeReport(LocalDate fromDate, LocalDate toDate, Long cuaHangId)
             throws IOException {
         ResThongKeDTO.ReturnExchangeReport report = getReturnExchangeReport(fromDate, toDate, cuaHangId);
+        LocalDate start = normalizeFromDate(fromDate);
+        LocalDate end = normalizeToDate(toDate);
+        List<TraHang> returns = filterByStoreAndDate(traHangRepository.findAll(), TraHang::getNgayTao, start, end,
+                cuaHangId, tr -> tr.getDonHang() == null ? null : tr.getDonHang().getCuaHang());
+        List<DoiHang> exchanges = filterByStoreAndDate(doiHangRepository.findAll(), DoiHang::getNgayTao, start, end,
+                cuaHangId, dh -> dh.getDonHang() == null ? null : dh.getDonHang().getCuaHang());
+        List<ReturnLineDetail> returnLines = collectReturnLineDetails(returns);
+        List<ExchangeLineDetail> exchangeLines = collectExchangeLineDetails(exchanges);
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             writeKeyValueSheet(
                     workbook.createSheet("TổngQuan"),
@@ -684,6 +1352,15 @@ public class ThongKeService {
                     kv("Tỷ lệ trả", report.getReturnRate()),
                     kv("Tỷ lệ đổi", report.getExchangeRate()));
 
+            Sheet returnDetail = workbook.createSheet("ChiTietTraHang");
+            writeReturnDetailSheet(returnDetail, returnLines, "Chi tiết trả hàng", report.getFromDate(),
+                    report.getToDate(),
+                    cuaHangId);
+
+            Sheet exchangeDetail = workbook.createSheet("ChiTietDoiHang");
+            writeExchangeDetailSheet(exchangeDetail, exchangeLines, "Chi tiết đổi hàng", report.getFromDate(),
+                    report.getToDate(), cuaHangId);
+
             workbook.write(out);
             return out.toByteArray();
         }
@@ -691,6 +1368,13 @@ public class ThongKeService {
 
     public byte[] exportPromotionReport(LocalDate fromDate, LocalDate toDate, Long cuaHangId) throws IOException {
         ResThongKeDTO.PromotionReport report = getPromotionReport(fromDate, toDate, cuaHangId);
+        LocalDate start = normalizeFromDate(fromDate);
+        LocalDate end = normalizeToDate(toDate);
+        List<DonHang> orders = filterByStoreAndDate(donHangRepository.findAll(), DonHang::getNgayTao, start, end,
+                cuaHangId, DonHang::getCuaHang);
+        List<OrderLineDetail> promoLines = collectOrderLineDetails(orders).stream()
+                .filter(line -> line.maKhuyenMaiHoaDon() != null || line.maKhuyenMaiDiem() != null)
+                .toList();
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             writeKeyValueSheet(
                     workbook.createSheet("TổngQuan"),
@@ -706,6 +1390,10 @@ public class ThongKeService {
                     kv("Đơn dùng KM điểm", report.getUsedDiemPromotions()),
                     kv("Tổng tiền giảm", report.getTotalDiscountAmount()));
 
+            Sheet detail = workbook.createSheet("DonApDungKM");
+            writeOrderDetailSheet(detail, promoLines, "Chi tiết đơn hàng áp dụng khuyến mãi", report.getFromDate(),
+                    report.getToDate(), cuaHangId);
+
             workbook.write(out);
             return out.toByteArray();
         }
@@ -714,6 +1402,13 @@ public class ThongKeService {
     public byte[] exportStaffPerformanceReport(LocalDate fromDate, LocalDate toDate, Long cuaHangId)
             throws IOException {
         ResThongKeDTO.StaffPerformanceReport report = getStaffPerformanceReport(fromDate, toDate, cuaHangId);
+        LocalDate start = normalizeFromDate(fromDate);
+        LocalDate end = normalizeToDate(toDate);
+        List<DonHang> orders = filterByStoreAndDate(donHangRepository.findAll(), DonHang::getNgayTao, start, end,
+                cuaHangId, DonHang::getCuaHang).stream()
+                .filter(order -> order.getNhanVien() != null && order.getNhanVien().getId() != null)
+                .toList();
+        List<OrderLineDetail> staffLines = collectOrderLineDetails(orders);
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             writeKeyValueSheet(
                     workbook.createSheet("TổngQuan"),
@@ -764,6 +1459,11 @@ public class ThongKeService {
             }
 
             autosize(detail, 7);
+
+            Sheet orderDetail = workbook.createSheet("ChiTietDonHang");
+            writeOrderDetailSheet(orderDetail, staffLines, "Chi tiết đơn hàng theo nhân viên", report.getFromDate(),
+                    report.getToDate(), cuaHangId);
+
             workbook.write(out);
             return out.toByteArray();
         }
