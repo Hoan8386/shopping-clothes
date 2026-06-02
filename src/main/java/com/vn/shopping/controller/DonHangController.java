@@ -39,7 +39,7 @@ public class DonHangController {
             @RequestParam(required = false) Integer trangThai,
             @RequestParam(required = false) Integer trangThaiThanhToan,
             @RequestParam(required = false) Integer hinhThucDonHang,
-            Pageable pageable) {
+            Pageable pageable) throws IdInvalidException {
         Pageable effectivePageable = pageable;
         if (pageable == null || pageable.getSort().isUnsorted()) {
             int page = pageable != null ? pageable.getPageNumber() : 0;

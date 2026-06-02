@@ -24,6 +24,7 @@ import com.vn.shopping.repository.*;
 import com.vn.shopping.util.error.IdInvalidException;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.Predicate;
 
 @Service
 public class DonHangService {
@@ -454,8 +455,8 @@ public class DonHangService {
 
             existing.setTrangThai(trangThaiMoi);
 
-            // Khi khách xác nhận đã nhận hàng, đơn được xem là đã thanh toán
-            if (trangThaiMoi == 5) {
+            // Chỉ khi chuyển đúng luồng 3 -> 5 thì mới xem là đã thanh toán
+            if (trangThaiCu == STATUS_SHIPPING && trangThaiMoi == 5) {
                 existing.setTrangThaiThanhToan(1);
             }
 
@@ -484,6 +485,38 @@ public class DonHangService {
                         // Không phải admin và không phải chính người đang xử lý
                         if (!isAdmin && !emailNhanVienCu.equals(email)) {
 
+                            throw new IdInvalidException(
+                                    "Đơn hàng đã được nhân viên khác xử lý");
+                        }
+                    }
+
+                    // Gán nhân viên hiện tại vào đơn hàng
+                    NhanVien nhanVien = nhanVienRepository.findByEmail(email)
+                            .orElseThrow(() -> new IdInvalidException(
+                                    "Không tìm thấy nhân viên với email: " + email));
+
+                    existing.setNhanVien(nhanVien);
+                }
+            }
+            // Nếu nhân viên/admin trực tiếp đặt trạng thái thành 'Đã nhận hàng' (5),
+            // gán nhân viên hiện tại (với cùng kiểm tra) và đánh dấu trạng thái thanh toán
+            // = 1
+            if (trangThaiMoi == 5) {
+                Authentication authStaff = SecurityContextHolder.getContext().getAuthentication();
+                if (authStaff != null && authStaff.isAuthenticated()) {
+                    String email = authStaff.getName();
+
+                    boolean isAdmin = authStaff.getAuthorities().stream()
+                            .anyMatch(a -> "ADMIN".equals(a.getAuthority()));
+
+                    // Nếu đơn đã có nhân viên xử lý trước đó
+                    if (existing.getNhanVien() != null
+                            && existing.getNhanVien().getEmail() != null) {
+
+                        String emailNhanVienCu = existing.getNhanVien().getEmail();
+
+                        // Không phải admin và không phải chính người đang xử lý
+                        if (!isAdmin && !emailNhanVienCu.equals(email)) {
                             throw new IdInvalidException(
                                     "Đơn hàng đã được nhân viên khác xử lý");
                         }
@@ -852,6 +885,8 @@ public class DonHangService {
      * - Nếu user là KHACH_HANG → bắt buộc lọc theo khachHangId (chỉ xem đơn của
      * mình)
      * - Nếu user là NHAN_VIEN / ADMIN → xem tất cả, có thể lọc tùy ý
+     * 
+     * @throws IdInvalidException
      */
     @Transactional(readOnly = true)
     public ResultPaginationDTO findAllWithFilter(
@@ -860,22 +895,66 @@ public class DonHangService {
             Integer trangThai,
             Integer trangThaiThanhToan,
             Integer hinhThucDonHang,
-            Pageable pageable) {
+            Pageable pageable) throws IdInvalidException {
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         // Xác định user hiện tại là Khách hàng hay Nhân viên
         Long khachHangId = null;
+        Long nhanVienCuaHangId = null;
+        boolean isStaffView = false;
         Optional<KhachHang> khOpt = khachHangRepository.findByEmail(email);
         if (khOpt.isPresent()) {
             // Là khách hàng → chỉ xem đơn hàng của mình
             khachHangId = khOpt.get().getId();
+        } else {
+            // Là nhân viên/quản lý/admin
+            NhanVien nhanVien = nhanVienRepository.findByEmail(email).orElse(null);
+            if (nhanVien != null) {
+                String roleName = nhanVien.getRole() != null ? nhanVien.getRole().getName() : null;
+                boolean isAdmin = "ADMIN".equals(roleName);
+                if (!isAdmin) {
+                    if (nhanVien.getCuaHang() == null || nhanVien.getCuaHang().getId() == null) {
+                        throw new IdInvalidException("Nhân viên chưa được gán cửa hàng");
+                    }
+                    nhanVienCuaHangId = nhanVien.getCuaHang().getId();
+                    isStaffView = true;
+                }
+            }
         }
         // Nếu không phải khách hàng thì là nhân viên/admin → khachHangId = null → xem
         // tất cả
 
-        Specification<DonHang> spec = DonHangSpecification.filter(
-                khachHangId, cuaHangId, nhanVienId, trangThai, trangThaiThanhToan, hinhThucDonHang);
+        Specification<DonHang> spec;
+        if (isStaffView) {
+            Long storeId = nhanVienCuaHangId;
+            spec = (root, query, criteriaBuilder) -> {
+                List<Predicate> predicates = new ArrayList<>();
+                Predicate orCondition = storeId == null
+                        ? criteriaBuilder.equal(root.get("trangThai"), 0)
+                        : criteriaBuilder.or(
+                                criteriaBuilder.equal(root.get("trangThai"), 0),
+                                criteriaBuilder.equal(root.get("cuaHang").get("id"), storeId));
+                predicates.add(orCondition);
+
+                if (nhanVienId != null) {
+                    predicates.add(criteriaBuilder.equal(root.get("nhanVien").get("id"), nhanVienId));
+                }
+
+                if (trangThaiThanhToan != null) {
+                    predicates.add(criteriaBuilder.equal(root.get("trangThaiThanhToan"), trangThaiThanhToan));
+                }
+
+                if (hinhThucDonHang != null) {
+                    predicates.add(criteriaBuilder.equal(root.get("hinhThucDonHang"), hinhThucDonHang));
+                }
+
+                return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+            };
+        } else {
+            spec = DonHangSpecification.filter(
+                    khachHangId, cuaHangId, nhanVienId, trangThai, trangThaiThanhToan, hinhThucDonHang);
+        }
 
         Page<DonHang> page = donHangRepository.findAll(spec, pageable);
 
@@ -923,6 +1002,10 @@ public class DonHangService {
                 boolean isAdmin = "ADMIN".equals(roleName);
 
                 if (!isAdmin) {
+                    Integer trangThai = donHang.getTrangThai();
+                    if (trangThai != null && trangThai == 0) {
+                        return convertToDTO(donHang);
+                    }
                     if (nhanVien.getCuaHang() == null || nhanVien.getCuaHang().getId() == null) {
                         throw new IdInvalidException("Nhân viên chưa được gán cửa hàng");
                     }

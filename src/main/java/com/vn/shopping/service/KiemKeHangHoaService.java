@@ -52,6 +52,59 @@ public class KiemKeHangHoaService {
         NhanVien currentNhanVien = getCurrentNhanVien();
         validateCanCreatePhieu(currentNhanVien);
 
+        // Dùng API cũ: nếu ADMIN tạo phiếu thì tự động tạo và giao cho toàn bộ
+        // nhân viên quản lý của cửa hàng được chọn.
+        if (isAdmin(currentNhanVien)) {
+            List<CuaHang> cuaHangMucTieu;
+            if (dto.getCuaHangId() != null) {
+                cuaHangMucTieu = Collections.singletonList(resolveCuaHang(dto.getCuaHangId(), currentNhanVien));
+            } else {
+                cuaHangMucTieu = cuaHangRepository.findAll();
+            }
+
+            if (cuaHangMucTieu.isEmpty()) {
+                throw new IdInvalidException("Không có cửa hàng nào để tạo phiếu kiểm kê");
+            }
+
+            LoaiKiemKe loaiKiemKe = null;
+            if (dto.getLoaiKiemKeId() != null) {
+                loaiKiemKe = loaiKiemKeRepository.findById(dto.getLoaiKiemKeId())
+                        .orElseThrow(() -> new IdInvalidException(
+                                "Không tìm thấy loại kiểm kê: " + dto.getLoaiKiemKeId()));
+            }
+
+            KiemKeHangHoa firstCreated = null;
+            for (CuaHang cuaHang : cuaHangMucTieu) {
+                List<NhanVien> quanLyCuaHang = nhanVienRepository.findByCuaHang_Id(cuaHang.getId()).stream()
+                        .filter(this::isWarehouseStaff)
+                        .collect(Collectors.toList());
+
+                for (NhanVien quanLy : quanLyCuaHang) {
+                    KiemKeHangHoa phieu = new KiemKeHangHoa();
+                    phieu.setTenPhieuKiemKe(dto.getTenPhieuKiemKe());
+                    phieu.setGhiChu(dto.getGhiChu());
+                    phieu.setTrangThai(TRANG_THAI_NHAP);
+                    phieu.setNgayKiemKe(dto.getNgayKiemKe() != null ? dto.getNgayKiemKe() : LocalDateTime.now());
+                    phieu.setNhanVienTao(quanLy);
+                    phieu.setCuaHang(cuaHang);
+                    phieu.setLoaiKiemKe(loaiKiemKe);
+
+                    KiemKeHangHoa saved = kiemKeHangHoaRepository.save(phieu);
+                    upsertChiTiet(saved, dto.getChiTietKiemKes());
+
+                    if (firstCreated == null) {
+                        firstCreated = saved;
+                    }
+                }
+            }
+
+            if (firstCreated == null) {
+                throw new IdInvalidException("Không có nhân viên quản lý ở các cửa hàng để giao phiếu kiểm kê");
+            }
+
+            return firstCreated;
+        }
+
         KiemKeHangHoa phieu = new KiemKeHangHoa();
         phieu.setTenPhieuKiemKe(dto.getTenPhieuKiemKe());
         phieu.setGhiChu(dto.getGhiChu());
