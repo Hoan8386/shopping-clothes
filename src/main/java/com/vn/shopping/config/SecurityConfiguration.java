@@ -73,6 +73,7 @@ public class SecurityConfiguration {
                 "/api/v1/kich-thuoc/**",
                 "/api/v1/danh-gia-san-pham",
                 "/api/v1/danh-gia-san-pham/**",
+                "/notification/*"
         };
 
         http

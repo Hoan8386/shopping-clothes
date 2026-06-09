@@ -70,8 +70,15 @@ public class NhanVienService {
         nhanVien.setSoDienThoai(nhanVien.getSoDienThoai().trim());
         nhanVien.setMatKhau(passwordEncoder.encode(nhanVien.getMatKhau().trim()));
 
-        // Tự động gán role NHAN_VIEN (id=3) nếu chưa có role
-        if (nhanVien.getRole() == null) {
+        // Resolve role từ DB theo id client gửi, fallback về NHAN_VIEN (id=3) nếu không có
+        Long roleId = (nhanVien.getRole() != null && nhanVien.getRole().getId() != null)
+                ? nhanVien.getRole().getId()
+                : null;
+        if (roleId != null) {
+            Role role = roleRepository.findById(roleId)
+                    .orElseThrow(() -> new IdInvalidException("Không tìm thấy role với id: " + roleId));
+            nhanVien.setRole(role);
+        } else {
             nhanVien.setRole(getDefaultNhanVienRole());
         }
         return nhanVienRepository.save(nhanVien);
@@ -94,8 +101,10 @@ public class NhanVienService {
         existing.setTrangThai(nhanVien.getTrangThai());
         existing.setCuaHang(nhanVien.getCuaHang());
 
-        if (nhanVien.getRole() != null) {
-            existing.setRole(nhanVien.getRole());
+        if (nhanVien.getRole() != null && nhanVien.getRole().getId() != null) {
+            Role role = roleRepository.findById(nhanVien.getRole().getId())
+                    .orElseThrow(() -> new IdInvalidException("Không tìm thấy role với id: " + nhanVien.getRole().getId()));
+            existing.setRole(role);
         }
 
         return nhanVienRepository.save(existing);

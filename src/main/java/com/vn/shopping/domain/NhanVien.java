@@ -52,7 +52,6 @@ public class NhanVien {
     @Column(name = "Avatar", columnDefinition = "MEDIUMTEXT")
     private String avatar;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
     @JsonIgnoreProperties(value = { "permissions" })

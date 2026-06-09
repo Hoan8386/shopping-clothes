@@ -1,5 +1,6 @@
 package com.vn.shopping.service;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.vn.shopping.domain.*;
 import com.vn.shopping.domain.request.ReqChiTietKiemKeDTO;
 import com.vn.shopping.domain.request.ReqDuyetKiemKeDTO;
@@ -23,6 +24,9 @@ public class KiemKeHangHoaService {
     private static final int TRANG_THAI_YEU_CAU_KIEM_KE_LAI = 2;
     private static final int TRANG_THAI_DA_XAC_NHAN = 3;
 
+    // Token FCM thiết bị nhận thông báo
+    private static final String FCM_TOKEN = "eBChTVOXQAS1APd1n5a-h4:APA91bFsO_9zABc8HoD2YjBogD4eBPmyXeaxPBA2lTsBnDUwlxx3PNlPggkK5J7HHUnQYrZkuD1omnWahwteaUKX0aChGEaGQU277n-JtwLnwc9JykHvEow";
+
     private final KiemKeHangHoaRepository kiemKeHangHoaRepository;
     private final ChiTietKiemKeRepository chiTietKiemKeRepository;
     private final LoaiKiemKeRepository loaiKiemKeRepository;
@@ -30,6 +34,7 @@ public class KiemKeHangHoaService {
     private final NhanVienRepository nhanVienRepository;
     private final ChiTietSanPhamRepository chiTietSanPhamRepository;
     private final SanPhamRepository sanPhamRepository;
+    private final NotificationService notificationService;
 
     public KiemKeHangHoaService(KiemKeHangHoaRepository kiemKeHangHoaRepository,
             ChiTietKiemKeRepository chiTietKiemKeRepository,
@@ -37,7 +42,8 @@ public class KiemKeHangHoaService {
             CuaHangRepository cuaHangRepository,
             NhanVienRepository nhanVienRepository,
             ChiTietSanPhamRepository chiTietSanPhamRepository,
-            SanPhamRepository sanPhamRepository) {
+            SanPhamRepository sanPhamRepository,
+            NotificationService notificationService) {
         this.kiemKeHangHoaRepository = kiemKeHangHoaRepository;
         this.chiTietKiemKeRepository = chiTietKiemKeRepository;
         this.loaiKiemKeRepository = loaiKiemKeRepository;
@@ -45,6 +51,7 @@ public class KiemKeHangHoaService {
         this.nhanVienRepository = nhanVienRepository;
         this.chiTietSanPhamRepository = chiTietSanPhamRepository;
         this.sanPhamRepository = sanPhamRepository;
+        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -95,6 +102,9 @@ public class KiemKeHangHoaService {
                     if (firstCreated == null) {
                         firstCreated = saved;
                     }
+
+                    // Gửi push notification sau khi tạo phiếu kiểm kê thành công
+                    guiThongBaoKiemKe(saved, currentNhanVien);
                 }
             }
 
@@ -123,6 +133,10 @@ public class KiemKeHangHoaService {
 
         KiemKeHangHoa saved = kiemKeHangHoaRepository.save(phieu);
         upsertChiTiet(saved, dto.getChiTietKiemKes());
+
+        // Gửi push notification sau khi tạo phiếu kiểm kê thành công
+        guiThongBaoKiemKe(saved, currentNhanVien);
+
         return saved;
     }
 
@@ -336,6 +350,30 @@ public class KiemKeHangHoaService {
         }
 
         return dto;
+    }
+
+    /**
+     * Gửi push notification FCM thông báo tạo phiếu kiểm kê thành công.
+     * Nội dung hiển thị: tên phiếu, cửa hàng, người tạo.
+     */
+    private void guiThongBaoKiemKe(KiemKeHangHoa phieu, NhanVien nguoiTao) {
+        try {
+            String tenPhieu = phieu.getTenPhieuKiemKe() != null ? phieu.getTenPhieuKiemKe() : "(Chưa đặt tên)";
+            String tenCuaHang = (phieu.getCuaHang() != null && phieu.getCuaHang().getTenCuaHang() != null)
+                    ? phieu.getCuaHang().getTenCuaHang() : "N/A";
+            String tenNguoiTao = (nguoiTao != null && nguoiTao.getTenNhanVien() != null)
+                    ? nguoiTao.getTenNhanVien() : "Admin";
+
+            String title = "📋 Phiếu kiểm kê mới #" + phieu.getId();
+            String body = String.format(
+                    "Tên phiếu: %s%nCửa hàng: %s%nNgười tạo: %s",
+                    tenPhieu, tenCuaHang, tenNguoiTao);
+
+            notificationService.sendNotification(FCM_TOKEN, title, body);
+        } catch (FirebaseMessagingException e) {
+            // Không ném exception ra ngoài để không ảnh hưởng luồng tạo phiếu
+            System.err.println("[FCM] Gửi thông báo kiểm kê thất bại cho phiếu #" + phieu.getId() + ": " + e.getMessage());
+        }
     }
 
     private void upsertChiTiet(KiemKeHangHoa phieu, List<ReqChiTietKiemKeDTO> items) throws IdInvalidException {

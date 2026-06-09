@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.vn.shopping.domain.ChiTietDonLuanChuyen;
 import com.vn.shopping.domain.ChiTietSanPham;
 import com.vn.shopping.domain.CuaHang;
@@ -37,22 +38,28 @@ import com.vn.shopping.util.error.IdInvalidException;
 @Service
 public class DonLuanChuyenService {
 
+    // Token FCM thiết bị nhận thông báo
+    private static final String FCM_TOKEN = "eBChTVOXQAS1APd1n5a-h4:APA91bFsO_9zABc8HoD2YjBogD4eBPmyXeaxPBA2lTsBnDUwlxx3PNlPggkK5J7HHUnQYrZkuD1omnWahwteaUKX0aChGEaGQU277n-JtwLnwc9JykHvEow";
+
     private final DonLuanChuyenRepository donLuanChuyenRepository;
     private final CuaHangRepository cuaHangRepository;
     private final LoaiDonLuanChuyenRepository loaiDonLuanChuyenRepository;
     private final ChiTietSanPhamRepository chiTietSanPhamRepository;
     private final NhanVienRepository nhanVienRepository;
+    private final NotificationService notificationService;
 
     public DonLuanChuyenService(DonLuanChuyenRepository donLuanChuyenRepository,
             CuaHangRepository cuaHangRepository,
             LoaiDonLuanChuyenRepository loaiDonLuanChuyenRepository,
             ChiTietSanPhamRepository chiTietSanPhamRepository,
-            NhanVienRepository nhanVienRepository) {
+            NhanVienRepository nhanVienRepository,
+            NotificationService notificationService) {
         this.donLuanChuyenRepository = donLuanChuyenRepository;
         this.cuaHangRepository = cuaHangRepository;
         this.loaiDonLuanChuyenRepository = loaiDonLuanChuyenRepository;
         this.chiTietSanPhamRepository = chiTietSanPhamRepository;
         this.nhanVienRepository = nhanVienRepository;
+        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -144,7 +151,18 @@ public class DonLuanChuyenService {
         }
 
         donLuanChuyen.setChiTietDonLuanChuyens(chiTietList);
-        return donLuanChuyenRepository.save(donLuanChuyen);
+        DonLuanChuyen saved = donLuanChuyenRepository.save(donLuanChuyen);
+
+        // Gửi thông báo đến cửa hàng đặt (nhận hàng)
+        String tenCuaHangGui = cuaHangGui.getTenCuaHang() != null ? cuaHangGui.getTenCuaHang() : "N/A";
+        String tenCuaHangDat = cuaHangDat.getTenCuaHang() != null ? cuaHangDat.getTenCuaHang() : "N/A";
+        int soSanPham = chiTietList.size();
+        guiThongBaoLuanChuyen(
+                "📦 Đơn luân chuyển mới #" + saved.getId(),
+                String.format("Từ: %s → Đến: %s%nSản phẩm: %d | Trạng thái: Chờ xác nhận",
+                        tenCuaHangGui, tenCuaHangDat, soSanPham));
+
+        return saved;
     }
 
     @Transactional
@@ -202,11 +220,23 @@ public class DonLuanChuyenService {
 
         if (trangThai == 2) { // 2: Đang giao
             donLuanChuyen.setThoiGianGiao(LocalDateTime.now());
+            // Thông báo cửa hàng đặt sắp có hàng đến
+            String tenGui = donLuanChuyen.getCuaHangGui() != null ? donLuanChuyen.getCuaHangGui().getTenCuaHang() : "N/A";
+            String tenDat = donLuanChuyen.getCuaHangDat() != null ? donLuanChuyen.getCuaHangDat().getTenCuaHang() : "N/A";
+            guiThongBaoLuanChuyen(
+                    "🚚 Đơn luân chuyển #" + id + " đang được giao",
+                    String.format("Từ: %s → Đến: %s%nHàng đang trên đường, chuẩn bị nhận!", tenGui, tenDat));
         }
 
         if (trangThai == 4) { // 4: Đã nhận
             donLuanChuyen.setThoiGianNhan(LocalDateTime.now());
             applyInventoryTransfer(donLuanChuyen);
+            // Thông báo hoàn tất luân chuyển
+            String tenGui2 = donLuanChuyen.getCuaHangGui() != null ? donLuanChuyen.getCuaHangGui().getTenCuaHang() : "N/A";
+            String tenDat2 = donLuanChuyen.getCuaHangDat() != null ? donLuanChuyen.getCuaHangDat().getTenCuaHang() : "N/A";
+            guiThongBaoLuanChuyen(
+                    "✅ Đơn luân chuyển #" + id + " đã hoàn tất",
+                    String.format("Từ: %s → Đến: %s%nHàng đã được nhận và cập nhật tồn kho!", tenGui2, tenDat2));
         }
 
         if (donLuanChuyen.getChiTietDonLuanChuyens() != null) {
@@ -407,6 +437,17 @@ public class DonLuanChuyenService {
             return Optional.empty();
         }
         return nhanVienRepository.findByEmail(currentUserEmail.get());
+    }
+
+    /**
+     * Gửi push notification FCM cho các sự kiện luân chuyển hàng.
+     */
+    private void guiThongBaoLuanChuyen(String title, String body) {
+        try {
+            notificationService.sendNotification(FCM_TOKEN, title, body);
+        } catch (FirebaseMessagingException e) {
+            System.err.println("[FCM] Gửi thông báo luân chuyển thất bại: " + e.getMessage());
+        }
     }
 
     private boolean canAccessTransfer(DonLuanChuyen donLuanChuyen) {

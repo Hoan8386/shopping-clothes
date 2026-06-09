@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.vn.shopping.domain.*;
 import com.vn.shopping.domain.request.ReqApDungKhuyenMaiDTO;
 import com.vn.shopping.domain.request.ReqCapNhatDonHangDTO;
@@ -33,6 +34,9 @@ public class DonHangService {
     private static final int STATUS_PACKING = 2;
     private static final int STATUS_SHIPPING = 3;
 
+    // Token FCM thiết bị nhận thông báo
+    private static final String FCM_TOKEN = "eBChTVOXQAS1APd1n5a-h4:APA91bFsO_9zABc8HoD2YjBogD4eBPmyXeaxPBA2lTsBnDUwlxx3PNlPggkK5J7HHUnQYrZkuD1omnWahwteaUKX0aChGEaGQU277n-JtwLnwc9JykHvEow";
+
     private final DonHangRepository donHangRepository;
     private final EntityManager entityManager;
     private final KhachHangRepository khachHangRepository;
@@ -47,6 +51,7 @@ public class DonHangService {
     private final KhuyenMaiTheoHoaDonRepository khuyenMaiTheoHoaDonRepository;
     private final GioHangService gioHangService;
     private final VNPayService vnPayService;
+    private final NotificationService notificationService;
 
     public DonHangService(DonHangRepository donHangRepository, EntityManager entityManager,
             KhachHangRepository khachHangRepository, NhanVienRepository nhanVienRepository,
@@ -56,7 +61,8 @@ public class DonHangService {
             KhuyenMaiTheoDiemRepository khuyenMaiTheoDiemRepository,
             KhuyenMaiTheoHoaDonRepository khuyenMaiTheoHoaDonRepository,
             GioHangService gioHangService,
-            VNPayService vnPayService) {
+            VNPayService vnPayService,
+            NotificationService notificationService) {
         this.donHangRepository = donHangRepository;
         this.entityManager = entityManager;
         this.khachHangRepository = khachHangRepository;
@@ -71,6 +77,7 @@ public class DonHangService {
         this.khuyenMaiTheoHoaDonRepository = khuyenMaiTheoHoaDonRepository;
         this.gioHangService = gioHangService;
         this.vnPayService = vnPayService;
+        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -264,7 +271,39 @@ public class DonHangService {
 
         entityManager.flush();
         entityManager.clear();
-        return donHangRepository.findById(savedDonHang.getId()).orElse(savedDonHang);
+        DonHang ketQua = donHangRepository.findById(savedDonHang.getId()).orElse(savedDonHang);
+
+        // Gửi push notification đến thiết bị sau khi tạo đơn thành công
+        guiThongBaoDatHang(ketQua, chiTietDonHangs);
+
+        return ketQua;
+    }
+
+    /**
+     * Gửi push notification FCM thông báo đặt hàng thành công.
+     * Nội dung hiển thị: mã đơn, khách hàng, địa chỉ, tổng tiền, số sản phẩm.
+     */
+    private void guiThongBaoDatHang(DonHang donHang, List<ChiTietDonHang> chiTietDonHangs) {
+        try {
+            String tenKhachHang = (donHang.getKhachHang() != null && donHang.getKhachHang().getTenKhachHang() != null)
+                    ? donHang.getKhachHang().getTenKhachHang()
+                    : (donHang.getTenNguoiMua() != null ? donHang.getTenNguoiMua() : "Khách");
+
+            String diaChi = donHang.getDiaChi() != null ? donHang.getDiaChi() : "N/A";
+            String sdt = donHang.getSdt() != null ? donHang.getSdt() : "N/A";
+            int soSanPham = chiTietDonHangs != null ? chiTietDonHangs.size() : 0;
+            int tongTienTra = donHang.getTongTienTra() != null ? donHang.getTongTienTra() : 0;
+
+            String title = "🛒 Đơn hàng mới #" + donHang.getId();
+            String body = String.format(
+                    "Khách: %s | SĐT: %s%nĐịa chỉ: %s%nSản phẩm: %d | Tổng tiền: %,d đ",
+                    tenKhachHang, sdt, diaChi, soSanPham, tongTienTra);
+
+            notificationService.sendNotification(FCM_TOKEN, title, body);
+        } catch (FirebaseMessagingException e) {
+            // Không ném exception ra ngoài để không ảnh hưởng luồng tạo đơn
+            System.err.println("[FCM] Gửi thông báo thất bại cho đơn #" + donHang.getId() + ": " + e.getMessage());
+        }
     }
 
     /**
@@ -496,6 +535,11 @@ public class DonHangService {
                                     "Không tìm thấy nhân viên với email: " + email));
 
                     existing.setNhanVien(nhanVien);
+
+                    // Gán mã cửa hàng từ thông tin nhân viên vào đơn hàng
+                    if (nhanVien.getCuaHang() != null) {
+                        existing.setCuaHang(nhanVien.getCuaHang());
+                    }
                 }
             }
             // Nếu nhân viên/admin trực tiếp đặt trạng thái thành 'Đã nhận hàng' (5),
@@ -567,8 +611,10 @@ public class DonHangService {
             // staff/admin may set cancel (4) or complete (5) to handle edge cases
             hopLe = true;
         } else if (trangThaiMoi == 4) {
-            // Hủy đơn: chỉ cho phép khi chưa đóng gói (0 hoặc 1)
-            hopLe = (trangThaiCu == 0 || trangThaiCu == 1);
+            // Hủy đơn:
+            // - 0, 1: chưa đóng gói → cho phép mọi người
+            // - 3: đang giao mà người nhận từ chối → cho phép
+            hopLe = (trangThaiCu == 0 || trangThaiCu == 1 || trangThaiCu == 3);
         } else {
             // Luồng chính: 0→1, 1→2, 2→3, 3→5
             hopLe = (trangThaiCu == 0 && trangThaiMoi == 1)
@@ -930,12 +976,24 @@ public class DonHangService {
             Long storeId = nhanVienCuaHangId;
             spec = (root, query, criteriaBuilder) -> {
                 List<Predicate> predicates = new ArrayList<>();
-                Predicate orCondition = storeId == null
-                        ? criteriaBuilder.equal(root.get("trangThai"), 0)
-                        : criteriaBuilder.or(
-                                criteriaBuilder.equal(root.get("trangThai"), 0),
-                                criteriaBuilder.equal(root.get("cuaHang").get("id"), storeId));
-                predicates.add(orCondition);
+
+                if (trangThai != null) {
+                    // Client truyền trangThai cụ thể → lọc chính xác theo trạng thái đó
+                    predicates.add(criteriaBuilder.equal(root.get("trangThai"), trangThai));
+                    // Nếu trangThai != 0 thì chỉ lấy đơn thuộc cửa hàng nhân viên
+                    if (trangThai != 0 && storeId != null) {
+                        predicates.add(criteriaBuilder.equal(root.get("cuaHang").get("id"), storeId));
+                    }
+                } else {
+                    // Không truyền trangThai → áp dụng OR mặc định:
+                    // lấy đơn "Chờ xác nhận" (trangThai=0) HOẶC đơn thuộc cửa hàng nhân viên
+                    Predicate orCondition = storeId == null
+                            ? criteriaBuilder.equal(root.get("trangThai"), 0)
+                            : criteriaBuilder.or(
+                                    criteriaBuilder.equal(root.get("trangThai"), 0),
+                                    criteriaBuilder.equal(root.get("cuaHang").get("id"), storeId));
+                    predicates.add(orCondition);
+                }
 
                 if (nhanVienId != null) {
                     predicates.add(criteriaBuilder.equal(root.get("nhanVien").get("id"), nhanVienId));

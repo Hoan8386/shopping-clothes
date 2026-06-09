@@ -53,10 +53,10 @@ public class VNPayService {
     @Value("${VNPAY_RETURN_URL:}")
     private String vnpReturnUrl;
 
-    @Value("${VNPAY_RETURN_URL_STAFF:http://localhost:3000/staff/orders}")
+    @Value("${VNPAY_RETURN_URL_STAFF}")
     private String vnpStaffOrderReturnUrl;
 
-    @Value("${VNPAY_RETURN_URL_RETURN:http://localhost:3000/staff/returns}")
+    @Value("${VNPAY_RETURN_URL_RETURN}")
     private String vnpStaffReturnUrl;
 
     private final DonHangRepository donHangRepository;
